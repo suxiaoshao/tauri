@@ -1,0 +1,8 @@
+[workspace]
+
+
+members = [
+    "packages/http-client/src-tauri",
+]
+[profile.release]
+strip = "symbols"
