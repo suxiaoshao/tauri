@@ -2,7 +2,7 @@ use crate::parse::Movie;
 use crate::{parse_page, MovieResult};
 use reqwest::Client;
 
-static PATH: &str = "C:/Users/Administrator/Downloads";
+pub(crate) static PATH: &str = "C:/Users/Administrator/Downloads";
 
 async fn fetch_one(client: &Client, start: u32) -> MovieResult<Vec<Movie>> {
     let url = "https://movie.douban.com/top250?filter=";

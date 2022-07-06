@@ -3,7 +3,7 @@ use crate::MovieResult;
 use once_cell::sync::Lazy;
 use scraper::{ElementRef, Html, Selector};
 use serde::{Deserialize, Serialize};
-use std::fmt::Debug;
+use std::{collections::HashSet, fmt::Debug};
 
 static SELECTOR_ITEM: Lazy<Selector> =
     Lazy::new(|| Selector::parse("#content > div > div.article > ol > li > div").unwrap());
@@ -29,10 +29,10 @@ pub(crate) struct Movie {
     pub href: String,
     pub name: Vec<String>,
     pub year: u32,
-    pub area: Vec<String>,
-    pub tags: Vec<String>,
-    pub director: Vec<String>,
-    pub actor: Vec<String>,
+    pub area: HashSet<String>,
+    pub tags: HashSet<String>,
+    pub director: HashSet<String>,
+    pub actor: HashSet<String>,
 }
 
 fn parse_item(item: &ElementRef) -> MovieResult<Movie> {
@@ -81,7 +81,7 @@ fn parse_title(item: &ElementRef) -> MovieResult<Title> {
     let name = title
         .select(&SELECTOR_TITLE_NAME)
         .map(|x| to_string(x).replace(" / ", ""))
-        .collect::<Vec<_>>();
+        .collect();
     Ok(Title { href, name })
 }
 
@@ -95,13 +95,13 @@ fn to_string(text: ElementRef) -> String {
 #[derive(Debug)]
 struct Info {
     year: u32,
-    area: Vec<String>,
-    tags: Vec<String>,
+    area: HashSet<String>,
+    tags: HashSet<String>,
 }
 #[derive(Debug)]
 struct Staff {
-    director: Vec<String>,
-    actor: Vec<String>,
+    director: HashSet<String>,
+    actor: HashSet<String>,
 }
 
 fn parse_info(item: &ElementRef) -> MovieResult<(Info, Staff)> {
@@ -127,9 +127,9 @@ fn parse_staff(item: &str) -> MovieResult<Staff> {
     };
     Ok(Staff { director, actor })
 }
-fn parse_people(item: &str) -> MovieResult<Vec<String>> {
+fn parse_people(item: &str) -> MovieResult<HashSet<String>> {
     let item = item.rsplit(':').next().ok_or(MovieErrors::ParseError)?;
-    let result = item.split('/').map(|x| x.to_string()).collect::<Vec<_>>();
+    let result = item.split('/').map(|x| x.to_string()).collect();
     Ok(result)
 }
 fn parse_info_detail(item: &str) -> MovieResult<Info> {
@@ -139,13 +139,13 @@ fn parse_info_detail(item: &str) -> MovieResult<Info> {
         .ok_or(MovieErrors::ParseError)?
         .split(' ')
         .map(|x| x.to_string())
-        .collect::<Vec<_>>();
+        .collect();
     let area = item
         .next()
         .ok_or(MovieErrors::ParseError)?
         .split(' ')
         .map(|x| x.to_string())
-        .collect::<Vec<_>>();
+        .collect();
     let year = item
         .next()
         .ok_or(MovieErrors::ParseError)?
@@ -155,25 +155,4 @@ fn parse_info_detail(item: &str) -> MovieResult<Info> {
         .parse::<u32>()?;
 
     Ok(Info { year, area, tags })
-}
-
-#[cfg(test)]
-mod test {
-    #[test]
-    fn test_parse_info_detail() {
-        let item =
-            "1961(中国大陆) / 1964(中国大陆) / 1978(中国大陆) / 中国大陆 / 剧情 动画 奇幻 古装";
-        let info = super::parse_info_detail(item).unwrap();
-        assert_eq!(info.year, 1961);
-        assert_eq!(info.area, vec!["中国大陆".to_string()]);
-        assert_eq!(
-            info.tags,
-            vec![
-                "剧情".to_string(),
-                "动画".to_string(),
-                "奇幻".to_string(),
-                "古装".to_string()
-            ]
-        );
-    }
 }
