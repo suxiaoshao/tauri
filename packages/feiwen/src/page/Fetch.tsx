@@ -14,7 +14,7 @@ export default function Fetch() {
   const navigate = useNavigate();
   const { register, handleSubmit } = useForm<FetchInput>();
   const onSubmit: SubmitHandler<FetchInput> = async (formData) => {
-    invoke('fetch', formData).catch(console.error);
+    invoke('fetch', { ...formData }).catch(console.error);
     console.log(formData);
   };
   return (
