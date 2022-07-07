@@ -1,0 +1,12 @@
+[package]
+name = "remove"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+futures = "0.3.21"
+tokio = { version = "1.19.2", features = ["macros","fs", "rt-multi-thread"] }
+clap = { version = "3.2.8", features = ["derive"] }
+async-recursion = "1.0.0"

@@ -4,7 +4,8 @@
 members = [
     "packages/http-client/src-tauri",
     "packages/movie",
-    "packages/feiwen/src-tauri"
+    "packages/feiwen/src-tauri",
+    "packages/remove"
 ]
 [profile.release]
 strip = "symbols"
