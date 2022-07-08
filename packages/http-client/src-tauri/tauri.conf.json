@@ -1,5 +1,4 @@
 {
-  "$schema": "../node_modules/@tauri-apps/cli/schema.json",
   "build": {
     "beforeBuildCommand": "pnpm build",
     "beforeDevCommand": "pnpm dev",
@@ -13,6 +12,10 @@
   "tauri": {
     "allowlist": {
       "all": true
+    },
+    "systemTray": {
+      "iconPath": "icons/icon.png",
+      "iconAsTemplate": true
     },
     "bundle": {
       "active": true,
@@ -38,7 +41,10 @@
       "windows": {
         "certificateThumbprint": null,
         "digestAlgorithm": "sha256",
-        "timestampUrl": ""
+        "timestampUrl": "",
+        "wix": {
+          "language": ["zh-CN", "en-US"]
+        }
       }
     },
     "security": {
@@ -50,10 +56,16 @@
     "windows": [
       {
         "fullscreen": false,
-        "height": 600,
-        "resizable": true,
+        "resizable": false,
         "title": "http client",
-        "width": 800
+        "visible": false,
+        "decorations": false,
+        "width": 800,
+        "minHeight": 56,
+        "height": 56,
+        "maxHeight": 600,
+        "center": true,
+        "skipTaskbar": true
       }
     ]
   }
