@@ -16,7 +16,7 @@ tauri-build = { version = "1.0.3", features = [] }
 
 [dependencies]
 serde_json = "1.0.82"
-serde = { version = "1.0.138", features = ["derive"] }
+serde = { version = "1.0.139", features = ["derive"] }
 tauri = { version = "1.0.3", features = ["api-all", "system-tray"] }
 
 # 数据库
@@ -27,6 +27,10 @@ reqwest = "0.11.11"
 
 # 错误处理
 anyhow = "1.0.58"
+
+# 搜索应用
+lnk = "0.4.1"
+walkdir = "2.3.2"
 
 [features]
 # by default Tauri runs in production mode

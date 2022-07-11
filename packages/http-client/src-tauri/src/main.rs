@@ -3,6 +3,9 @@
     windows_subsystem = "windows"
 )]
 
+mod app_search;
+use app_search::AppPath;
+use std::{collections::HashMap, path::PathBuf};
 use tauri::{
     AppHandle, CustomMenuItem, GlobalShortcutManager, Manager, Menu, SystemTray, SystemTrayEvent,
     SystemTrayMenu,
@@ -11,6 +14,7 @@ use tauri::{
 fn main() -> anyhow::Result<()> {
     let context = tauri::generate_context!();
     tauri::Builder::default()
+        .invoke_handler(tauri::generate_handler![app_search])
         .menu(menu(&context.package_info().name))
         .system_tray(system_tray())
         .on_system_tray_event(on_system_tray_event)
@@ -76,4 +80,9 @@ fn on_system_tray_event(app: &AppHandle, event: SystemTrayEvent) {
         },
         _ => {}
     }
+}
+
+#[tauri::command]
+async fn app_search() -> Option<HashMap<PathBuf, AppPath>> {
+    app_search::app_search()
 }
