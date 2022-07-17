@@ -5,10 +5,9 @@
 
 mod app_search;
 use app_search::AppPath;
-use std::{collections::HashMap, path::PathBuf};
 use tauri::{
-    AppHandle, CustomMenuItem, GlobalShortcutManager, Manager, Menu, SystemTray, SystemTrayEvent,
-    SystemTrayMenu,
+    AppHandle, CustomMenuItem, GlobalShortcutManager, LogicalPosition, LogicalSize, Manager, Menu,
+    SystemTray, SystemTrayEvent, SystemTrayMenu,
 };
 
 fn main() -> anyhow::Result<()> {
@@ -35,22 +34,40 @@ fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
     let mut manager = app.global_shortcut_manager();
 
     let window = app.get_window("main").unwrap();
-    let w = app.get_window("main").unwrap();
 
+    // 修改窗口位置
+    let scale_factor = window.scale_factor().unwrap();
+    let monitor = window.current_monitor().unwrap().unwrap();
+    let size = monitor.size();
+    let LogicalSize { width, height } = size.to_logical::<f64>(scale_factor);
+    let size = window.outer_size().unwrap();
+    let LogicalSize { width: w_width, .. } = size.to_logical::<f64>(scale_factor);
+    window
+        .set_position(LogicalPosition {
+            y: height / 5.0,
+            x: width / 2.0 - w_width / 2.0,
+        })
+        .unwrap();
+
+    // 设置消失
+    let w = app.get_window("main").unwrap();
     window.on_window_event(move |event| {
         if let tauri::WindowEvent::Focused(false) = event {
             w.hide().unwrap();
         }
     });
 
+    // 全局快捷键
     manager.register("Alt+Space", move || {
         if window.is_visible().unwrap() {
             window.hide().unwrap();
         } else {
             window.show().unwrap();
             window.set_focus().unwrap();
+            app_search::app_data_init();
         }
     })?;
+
     Ok(())
 }
 
@@ -70,6 +87,7 @@ fn on_system_tray_event(app: &AppHandle, event: SystemTrayEvent) {
             } else {
                 window.show().unwrap();
                 window.set_focus().unwrap();
+                app_search::app_data_init();
             }
         }
 
@@ -83,6 +101,6 @@ fn on_system_tray_event(app: &AppHandle, event: SystemTrayEvent) {
 }
 
 #[tauri::command]
-async fn app_search() -> Option<HashMap<PathBuf, AppPath>> {
-    app_search::app_search()
+async fn app_search(path: String) -> Vec<AppPath> {
+    app_search::query_app_data(&path)
 }

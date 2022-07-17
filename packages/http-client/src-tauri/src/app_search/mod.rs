@@ -1,77 +1,44 @@
-use std::{
-    collections::HashMap,
-    path::{Path, PathBuf},
-};
-
-use lnk::ShellLink;
+mod get_app_data;
+use once_cell::sync::Lazy;
 use serde::Serialize;
-use tauri::api::path::data_dir;
-use walkdir::{DirEntry, WalkDir};
+use std::sync::Mutex;
+use std::{collections::HashMap, path::PathBuf};
 
-pub fn app_search() -> Option<HashMap<PathBuf, AppPath>> {
-    let path = data_dir()?;
-    let path = path.join("Microsoft/Windows/Start Menu/Programs");
-    let mut map = HashMap::new();
-    search_by_path(&path).into_iter().for_each(|app| {
-        map.insert(app.path.clone(), app);
-    });
-    let path = PathBuf::from("C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs");
-
-    search_by_path(&path).into_iter().for_each(|app| {
-        map.insert(app.path.clone(), app);
-    });
-    Some(map)
-}
-
-fn search_by_path(path: &PathBuf) -> Vec<AppPath> {
-    WalkDir::new(path)
-        .into_iter()
-        .filter_map(|e| e.ok())
-        .filter(filter_lnk)
-        .filter_map(map_lnk)
-        .collect()
-}
-
-fn filter_lnk(path: &DirEntry) -> bool {
-    path.file_type().is_file() && path.path().extension().and_then(|x| x.to_str()) == Some("lnk")
-}
-
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Clone)]
 pub struct AppPath {
-    name: Option<String>,
+    desc: Option<String>,
     icon: Option<PathBuf>,
     path: PathBuf,
+    name: String,
 }
-
-fn map_lnk(dir: DirEntry) -> Option<AppPath> {
-    let data = ShellLink::open(dir.path()).ok()?;
-    let name = data.name().clone();
-    let icon = data.icon_location().as_ref().map(PathBuf::from);
-    let path = data.relative_path().as_ref().map(PathBuf::from)?;
-    let path = push_path(dir.path(), &path);
-    Some(AppPath { name, icon, path })
-}
-
-fn push_path(origin_path: &Path, path: &Path) -> PathBuf {
-    let mut result = origin_path.join("");
-    result.pop();
-    for i in path.iter() {
-        match i.to_str() {
-            Some("..") => {
-                result.pop();
-            }
-            _ => result.push(i),
-        }
+impl PartialEq<&str> for &AppPath {
+    fn eq(&self, path: &&str) -> bool {
+        let name = self.name.to_ascii_lowercase();
+        let path = path.to_ascii_lowercase();
+        name.contains(&path) && !path.is_empty()
     }
-    result
 }
 
-#[cfg(test)]
-mod test {
-    use super::app_search;
+pub type AppDataType = HashMap<PathBuf, AppPath>;
 
-    #[test]
-    fn test_app_search() {
-        app_search();
-    }
+pub static APP_DATA: Lazy<Mutex<AppDataType>> = Lazy::new(|| {
+    let m = HashMap::new();
+    Mutex::new(m)
+});
+
+pub fn app_data_init() -> Option<()> {
+    let data = get_app_data::get_app_data()?;
+    *APP_DATA.lock().unwrap() = data;
+    Some(())
+}
+
+pub fn query_app_data(path: &str) -> Vec<AppPath> {
+    let data = APP_DATA
+        .lock()
+        .unwrap()
+        .values()
+        .cloned()
+        .filter(|x| x == path)
+        .collect::<Vec<_>>();
+    data
 }

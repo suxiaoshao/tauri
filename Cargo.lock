@@ -1299,6 +1299,7 @@ dependencies = [
  "anyhow",
  "diesel",
  "lnk",
+ "once_cell",
  "reqwest",
  "serde",
  "serde_json",

@@ -1,13 +1,13 @@
 import { CustomTheme } from 'theme';
 import { SnackbarProvider } from 'notify';
 import { BrowserRouter } from 'react-router-dom';
-import { TextField } from '@mui/material';
+import AppRouter from './components/AppRouter';
 function App() {
   return (
     <CustomTheme>
       <SnackbarProvider>
         <BrowserRouter>
-          <TextField placeholder="搜索" fullWidth />
+          <AppRouter />
         </BrowserRouter>
       </SnackbarProvider>
     </CustomTheme>
