@@ -38,12 +38,20 @@ fn filter_lnk(path: &DirEntry) -> bool {
 }
 
 fn map_lnk(dir: DirEntry) -> Option<AppPath> {
+    let name = dir
+        .path()
+        .iter()
+        .last()?
+        .to_str()?
+        .to_string()
+        .split('.')
+        .next()?
+        .to_string();
     let data = ShellLink::open(dir.path()).ok()?;
     let desc = data.name().clone();
     let icon = data.icon_location().as_ref().map(PathBuf::from);
     let path = data.relative_path().as_ref().map(PathBuf::from)?;
     let path = push_path(dir.path(), &path);
-    let name = path.iter().last()?.to_str()?.to_string();
     Some(AppPath {
         desc,
         icon,
