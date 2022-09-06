@@ -1,4 +1,8 @@
 mod get_app_data;
+#[cfg(target_os = "macos")]
+mod macos;
+#[cfg(target_os = "windows")]
+mod win;
 use once_cell::sync::Lazy;
 use pinyin::ToPinyin;
 use serde::Serialize;

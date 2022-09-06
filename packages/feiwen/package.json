@@ -9,6 +9,6 @@
     "tauri": "tauri"
   },
   "dependencies": {
-    "react-hook-form": "^7.33.1"
+    "react-hook-form": "^7.34.2"
   }
 }
