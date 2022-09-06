@@ -28,7 +28,7 @@ async fn fetch(url: String, start_page: u32, end_page: u32, cookies: String) -> 
 }
 #[tauri::command]
 fn tags() -> Result<Vec<String>, String> {
-    TagModel::all_tags()
+    TagModel::all_tags().map_err(|x| x.to_string())
 }
 #[tauri::command]
 async fn query(
@@ -44,4 +44,5 @@ async fn query(
         Some(tag) => NovelModel::query_with_tag(offset, limit, is_limit, tag),
         None => NovelModel::query(offset, limit, is_limit),
     }
+    .map_err(|x| x.to_string())
 }

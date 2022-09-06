@@ -1,6 +1,9 @@
 use crate::fetch::parse_novel::{parse_url::UrlWithName, Novel};
 use anyhow::Ok;
-use diesel::{Connection, QueryDsl, RunQueryDsl, SqliteConnection};
+use diesel::{
+    r2d2::{ConnectionManager, Pool},
+    QueryDsl, RunQueryDsl, SqliteConnection,
+};
 use std::path::PathBuf;
 
 use self::model::NovelTagModel;
@@ -14,16 +17,20 @@ pub fn get_data_path() -> anyhow::Result<PathBuf> {
     let path = path.join("feiwen/data.sqlite");
     Ok(path)
 }
+type SqlitePool = Pool<ConnectionManager<SqliteConnection>>;
 
-pub fn get_conn() -> anyhow::Result<SqliteConnection> {
+pub fn get_conn() -> anyhow::Result<SqlitePool> {
     let path = get_data_path()?;
     let path = path.to_str().ok_or_else(|| anyhow::anyhow!("路径错误"))?;
-    let conn = SqliteConnection::establish(path)?;
-    Ok(conn)
+    let manager = ConnectionManager::<SqliteConnection>::new(path);
+    // Refer to the `r2d2` documentation for more methods to use
+    // when building a connection pool
+    let pool = Pool::builder().test_on_check_out(true).build(manager)?;
+    Ok(pool)
 }
 
 pub struct StoreManager {
-    conn: SqliteConnection,
+    conn: SqlitePool,
 }
 
 impl StoreManager {
@@ -55,20 +62,22 @@ impl StoreManager {
             })
             .collect::<Vec<NovelTagModel>>();
         let data: model::NovelModel = data.into();
+        let conn = &mut self.conn.get()?;
         diesel::insert_or_ignore_into(novel::table)
             .values(&data)
-            .execute(&self.conn)?;
+            .execute(conn)?;
         diesel::insert_or_ignore_into(tag::table)
             .values(&tags)
-            .execute(&self.conn)?;
+            .execute(conn)?;
         diesel::insert_or_ignore_into(novel_tag::table)
             .values(&novel_tags)
-            .execute(&self.conn)?;
+            .execute(conn)?;
         Ok(())
     }
     pub fn len(&self) -> anyhow::Result<i64> {
         use schema::novel::dsl::*;
-        let data = novel.count().get_result(&self.conn)?;
+        let conn = &mut self.conn.get()?;
+        let data = novel.count().get_result(conn)?;
         Ok(data)
     }
 }
