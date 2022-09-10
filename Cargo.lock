@@ -1293,6 +1293,7 @@ dependencies = [
  "lnk",
  "once_cell",
  "pinyin",
+ "plist",
  "reqwest",
  "serde",
  "serde_json",

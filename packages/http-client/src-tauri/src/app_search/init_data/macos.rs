@@ -2,7 +2,9 @@ use std::{collections::HashMap, path::PathBuf};
 
 use walkdir::{DirEntry, WalkDir};
 
-use super::{AppDataType, AppPath};
+use crate::app_search::AppPath;
+
+use super::AppDataType;
 
 static PATH: &str = "/Applications";
 pub fn get_app_data() -> Option<AppDataType> {
@@ -60,6 +62,7 @@ mod test {
 
     #[test]
     fn test_app_search() {
-        get_app_data();
+        let data = get_app_data();
+        println!("{:#?}", data);
     }
 }
