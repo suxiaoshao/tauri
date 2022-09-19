@@ -7,7 +7,9 @@ use lnk::ShellLink;
 use tauri::api::path::data_dir;
 use walkdir::{DirEntry, WalkDir};
 
-use super::{AppDataType, AppPath};
+use crate::app_search::AppPath;
+
+use super::AppDataType;
 
 pub fn get_app_data() -> Option<AppDataType> {
     let path = data_dir()?;
