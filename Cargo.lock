@@ -1157,6 +1157,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "h-clipboard"
+version = "0.0.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "tauri",
+ "tauri-build",
+]
+
+[[package]]
 name = "h2"
 version = "0.3.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
