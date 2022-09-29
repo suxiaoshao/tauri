@@ -6,7 +6,7 @@ pub struct Clipboard<T: ClipboardManager> {
     clip: T,
 }
 
-impl<T: ClipboardManager + Send + Sync> Clipboard<T> {
+impl<T: ClipboardManager + Send + Sync + Sized> Clipboard<T> {
     fn update(&mut self) {
         if let Ok(Some(text)) = self.clip.read_text() {
             if self.old_data != text {

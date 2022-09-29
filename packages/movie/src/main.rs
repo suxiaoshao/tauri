@@ -6,7 +6,7 @@ mod query;
 use crate::errors::MovieResult;
 use crate::fetch::fetch_all;
 use crate::parse::parse_page;
-use clap::{clap_derive::ArgEnum, Args, Parser, Subcommand};
+use clap::{Args, Parser, Subcommand, ValueEnum};
 use parse::Movie;
 
 #[derive(Parser)]
@@ -33,14 +33,14 @@ pub(crate) struct Query {
     #[clap(short, long, default_value = "true")]
     all_tags: bool,
     /// 根据排序
-    #[clap(short, long, arg_enum, default_value = "year")]
+    #[clap(short, long, value_enum, default_value = "year")]
     order_by: OrderBy,
     /// 排序方式
     #[clap(short, long, default_value = "true")]
     desc: bool,
 }
 
-#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ArgEnum, Debug)]
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum, Debug)]
 enum OrderBy {
     Year,
 }
