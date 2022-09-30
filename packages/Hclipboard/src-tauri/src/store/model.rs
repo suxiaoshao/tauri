@@ -1,3 +1,5 @@
+use crate::error::ClipResult;
+
 use super::schema::history;
 use diesel::prelude::*;
 use time::{OffsetDateTime, PrimitiveDateTime};
@@ -17,7 +19,7 @@ pub struct NewHistory<'a> {
 }
 
 impl History {
-    pub fn insert(data: &str, conn: &mut SqliteConnection) -> QueryResult<()> {
+    pub fn insert(data: &str, conn: &mut SqliteConnection) -> ClipResult<()> {
         match history::table
             .filter(history::data.eq(data))
             .first::<History>(conn)
@@ -27,12 +29,12 @@ impl History {
                 Self::create(data, conn)?;
             }
             Err(e) => {
-                return Err(e);
+                return Err(e.into());
             }
         };
         Ok(())
     }
-    fn update_data(&self, data: &str, conn: &mut SqliteConnection) -> QueryResult<()> {
+    fn update_data(&self, data: &str, conn: &mut SqliteConnection) -> ClipResult<()> {
         let time = OffsetDateTime::now_utc();
         let time = PrimitiveDateTime::new(time.date(), time.time());
         diesel::update(history::table.find(self.id))
@@ -62,8 +64,9 @@ mod tests {
     fn insert() -> anyhow::Result<()> {
         let mut conn = establish_connection(
             "file:/Users/weijie.su/Library/Application Support/Hclipboard/clipboard.sqlite3",
-        );
-        History::insert("test", &mut conn)?;
+        )?;
+        let conn = &mut conn.get()?;
+        History::insert("test", conn)?;
         Ok(())
     }
 }
