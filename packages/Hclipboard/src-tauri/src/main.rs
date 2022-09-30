@@ -16,9 +16,17 @@ fn main() {
     use tauri::api::path::*;
     tauri::Builder::default()
         .setup(|x| {
+            //data path
+            let data_path = app_dir(&x.config())
+                .unwrap()
+                .join("clipboard.sqlite3")
+                .to_str()
+                .unwrap()
+                .to_string();
+            // clip
             let data = x.clipboard_manager();
             std::thread::spawn(|| {
-                clipboard::Clipboard::init(data);
+                clipboard::Clipboard::init(data, data_path);
             });
 
             dbg!(app_dir(&x.config()));

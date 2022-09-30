@@ -3,7 +3,7 @@ use diesel::prelude::*;
 use time::{OffsetDateTime, PrimitiveDateTime};
 
 #[derive(Queryable)]
-struct History {
+pub struct History {
     id: i32,
     data: String,
     update_time: PrimitiveDateTime,
@@ -11,15 +11,15 @@ struct History {
 
 #[derive(Insertable)]
 #[diesel(table_name = history)]
-pub struct NewHistory {
-    data: String,
+pub struct NewHistory<'a> {
+    data: &'a str,
     update_time: PrimitiveDateTime,
 }
 
 impl History {
-    pub fn insert(data: String, conn: &mut SqliteConnection) -> QueryResult<()> {
+    pub fn insert(data: &str, conn: &mut SqliteConnection) -> QueryResult<()> {
         match history::table
-            .filter(history::data.eq(&data))
+            .filter(history::data.eq(data))
             .first::<History>(conn)
         {
             Ok(old_history) => old_history.update_data(data, conn)?,
@@ -32,7 +32,7 @@ impl History {
         };
         Ok(())
     }
-    fn update_data(&self, data: String, conn: &mut SqliteConnection) -> QueryResult<()> {
+    fn update_data(&self, data: &str, conn: &mut SqliteConnection) -> QueryResult<()> {
         let time = OffsetDateTime::now_utc();
         let time = PrimitiveDateTime::new(time.date(), time.time());
         diesel::update(history::table.find(self.id))
@@ -40,7 +40,7 @@ impl History {
             .execute(conn)?;
         Ok(())
     }
-    fn create(data: String, conn: &mut SqliteConnection) -> QueryResult<()> {
+    fn create(data: &str, conn: &mut SqliteConnection) -> QueryResult<()> {
         let time = OffsetDateTime::now_utc();
         let time = PrimitiveDateTime::new(time.date(), time.time());
         diesel::insert_into(history::table)
@@ -61,10 +61,9 @@ mod tests {
     #[test]
     fn insert() -> anyhow::Result<()> {
         let mut conn = establish_connection(
-            "file:/Users/weijie.su/Library/Application Support/Hclipboard/clipboard.sqlite3"
-                .to_string(),
+            "file:/Users/weijie.su/Library/Application Support/Hclipboard/clipboard.sqlite3",
         );
-        History::insert("test".to_string(), &mut conn)?;
+        History::insert("test", &mut conn)?;
         Ok(())
     }
 }
