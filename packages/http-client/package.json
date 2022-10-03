@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "notify": "workspace:notify",
-    "react-use": "^17.4.0",
     "theme": "workspace:theme"
   }
 }

@@ -5,8 +5,17 @@ use tauri::{
 
 use crate::{
     error::{ClipError, ClipResult},
-    store::{self, DbConn},
+    store::{self, DbConn, History},
 };
+#[tauri::command(async)]
+fn query_history(
+    search_name: Option<String>,
+    state: tauri::State<'_, DbConn>,
+) -> ClipResult<Vec<History>> {
+    let mut conn = state.get()?;
+    let data = History::query(search_name.as_ref(), &mut conn)?;
+    Ok(data)
+}
 
 pub fn init<R: Runtime>() -> TauriPlugin<R> {
     Builder::new("clipboard")
@@ -14,11 +23,11 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
             setup(x)?;
             Ok(())
         })
+        .invoke_handler(tauri::generate_handler![query_history])
         .build()
 }
 
 fn setup<R: Runtime>(app: &AppHandle<R>) -> ClipResult<()> {
-    println!("clip setup");
     use tauri::api::path::*;
     //data path
     let data_path = app_dir(&app.config())

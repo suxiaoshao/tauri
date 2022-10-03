@@ -3,7 +3,7 @@ create table history
 (
     id          INTEGER primary key autoincrement not null,
     data        text                              not null,
-    update_time TIMESTAMP                         not null
+    update_time NUMERIC                           not null
 );
 
 CREATE UNIQUE INDEX history_data

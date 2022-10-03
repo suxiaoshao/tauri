@@ -4,6 +4,6 @@ diesel::table! {
     history (id) {
         id -> Integer,
         data -> Text,
-        update_time -> Timestamp,
+        update_time -> BigInt,
     }
 }

@@ -8,5 +8,9 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "tauri": "tauri"
+  },
+  "dependencies": {
+    "notify": "workspace:notify",
+    "theme": "workspace:theme"
   }
 }

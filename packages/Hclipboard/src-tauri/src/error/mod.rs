@@ -1,21 +1,45 @@
 use thiserror::Error;
 
-#[derive(Error, Debug)]
+#[derive(Error, Debug, serde::Serialize)]
 pub enum ClipError {
     #[error("获取不了剪切板数据库路径")]
     DbPath,
     #[error("初始化错误:{}",.0)]
-    Setup(#[source] tauri::Error),
+    Setup(
+        #[serde(skip_serializing)]
+        #[source]
+        tauri::Error,
+    ),
     #[error("tauri错误:{}",.0)]
-    Tauri(#[source] tauri::Error),
+    Tauri(
+        #[serde(skip_serializing)]
+        #[source]
+        tauri::Error,
+    ),
     #[error("数据库错误:{}",.0)]
-    Sqlite(#[source] diesel::result::Error),
+    Sqlite(
+        #[serde(skip_serializing)]
+        #[source]
+        diesel::result::Error,
+    ),
     #[error("数据库连接错误:{}",.0)]
-    Connection(#[source] diesel::ConnectionError),
+    Connection(
+        #[serde(skip_serializing)]
+        #[source]
+        diesel::ConnectionError,
+    ),
     #[error("数据库连接池错误:{}",.0)]
-    Pool(#[source] diesel::r2d2::PoolError),
+    Pool(
+        #[serde(skip_serializing)]
+        #[source]
+        diesel::r2d2::PoolError,
+    ),
     #[error("数据库连接池获取链接错误:{}",.0)]
-    GetConnection(#[from] diesel::r2d2::Error),
+    GetConnection(
+        #[serde(skip_serializing)]
+        #[from]
+        diesel::r2d2::Error,
+    ),
 }
 
 impl From<tauri::Error> for ClipError {

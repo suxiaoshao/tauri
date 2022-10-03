@@ -9,6 +9,7 @@
     "tauri": "tauri"
   },
   "dependencies": {
-    "react-hook-form": "^7.36.1"
+    "notify": "workspace:notify",
+    "theme": "workspace:theme"
   }
 }

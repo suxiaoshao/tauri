@@ -19,7 +19,7 @@ serde_json = "1.0.85"
 serde = { version = "1.0.145", features = ["derive"] }
 tauri = { version = "1.1.1", features = ["api-all"] }
 # database
-diesel = { version = "2.0.0", features = ["sqlite", "time", "r2d2"] }
+diesel = { version = "2.0.0", features = ["sqlite", "r2d2"] }
 time = "0.3.14"
 # 剪切板监听
 clipboard-master = "3.1.3"
