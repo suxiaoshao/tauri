@@ -8,6 +8,7 @@ export interface QueryHistoryRequest {
 export interface ClipHistory {
   data: string;
   updateTime: number;
+  id: number;
 }
 
 export type QueryHistoryResponse = ClipHistory[];

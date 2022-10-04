@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "notify": "workspace:notify",
-    "theme": "workspace:theme"
+    "theme": "workspace:theme",
+    "dayjs": "^1.11.5"
   }
 }

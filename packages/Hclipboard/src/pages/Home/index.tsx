@@ -1,7 +1,8 @@
-import { Box, Divider, List, ListItemButton, ListItemText, TextField } from '@mui/material';
+import { Box, List, TextField } from '@mui/material';
 import { useForm } from 'react-hook-form';
 import { useCallback, useEffect, useState } from 'react';
-import { ClipHistory, query } from '../../../http-client/src/rpc/query';
+import { ClipHistory, query } from '../../rpc/query';
+import HistoryItem from './components/HistoryItem';
 
 export default function Home() {
   // 表单
@@ -27,7 +28,9 @@ export default function Home() {
     }
   }, [data]);
   return (
-    <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+    <Box
+      sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 1 }}
+    >
       <TextField
         placeholder="搜索"
         sx={{ margin: 1 }}
@@ -35,14 +38,9 @@ export default function Home() {
         autoFocus
         inputProps={{ spellcheck: 'false' }}
       />
-      <List sx={{ flex: '1 1 0', margin: 1, overflowY: 'auto' }}>
-        {data.map(({ data, updateTime }, index) => (
-          <>
-            <ListItemButton key={data} selected={selectIndex === index}>
-              <ListItemText primary={data} secondary={updateTime} />
-            </ListItemButton>
-            {index !== data.length - 1 && <Divider />}
-          </>
+      <List sx={{ flex: '1 1 0', overflowY: 'auto', width: '100%' }}>
+        {data.map((item, index) => (
+          <HistoryItem key={item.id} item={item} selected={selectIndex === index} isLast={index === data.length - 1} />
         ))}
       </List>
     </Box>

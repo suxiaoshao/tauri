@@ -8,6 +8,7 @@ use time::OffsetDateTime;
 pub struct History {
     id: i32,
     data: String,
+    #[serde(rename = "updateTime")]
     update_time: i64,
 }
 
