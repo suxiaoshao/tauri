@@ -14,7 +14,7 @@ export default function HistoryItem({ item: { data, updateTime }, selected, isLa
       <ListItemButton key={data} selected={selected}>
         <ListItemText primaryTypographyProps={{}} primary={data} secondary={formatTime(updateTime)} />
       </ListItemButton>
-      {isLast && <Divider />}
+      {!isLast && <Divider />}
     </>
   );
 }

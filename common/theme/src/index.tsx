@@ -14,14 +14,13 @@ export function CustomTheme({ children }: CustomThemeProps): JSX.Element {
   const isDark = useMediaQuery('(prefers-color-scheme: dark)');
 
   const theme = React.useMemo(() => {
-    const newTheme = createTheme({
+    return createTheme({
       palette: isDark
         ? {
             mode: 'dark',
           }
         : undefined,
     });
-    return newTheme;
   }, [isDark]);
   return (
     <ThemeProvider theme={theme}>

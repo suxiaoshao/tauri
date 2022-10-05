@@ -54,9 +54,10 @@
         "title": "Hclipboard",
         "width": 800,
         "skipTaskbar": true,
-        "decorations": false,
-        "visible": false
+        "visible": false,
+        "transparent": true
       }
-    ]
+    ],
+    "macOSPrivateApi": true
   }
 }

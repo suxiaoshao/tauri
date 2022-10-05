@@ -1174,6 +1174,7 @@ version = "0.0.0"
 dependencies = [
  "anyhow",
  "clipboard-master",
+ "cocoa",
  "diesel",
  "serde",
  "serde_json",
@@ -1182,6 +1183,8 @@ dependencies = [
  "tauri-plugin-positioner",
  "thiserror",
  "time",
+ "window-shadows",
+ "window-vibrancy",
 ]
 
 [[package]]
@@ -3934,6 +3937,30 @@ name = "winapi-x86_64-pc-windows-gnu"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "712e227841d057c1ee1cd2fb22fa7e5a5461ae8e48fa2ca79ec42cfc1931183f"
+
+[[package]]
+name = "window-shadows"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6c69eb48aac2da0199ea148c6f2c2610db8a0572b32a3dc857dec40ca22f1cec"
+dependencies = [
+ "cocoa",
+ "objc",
+ "raw-window-handle",
+ "windows-sys",
+]
+
+[[package]]
+name = "window-vibrancy"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1cf5fadca1f5fbb2e715306643b254894eebf1918e683c07ee6251c93b15c3d0"
+dependencies = [
+ "cocoa",
+ "objc",
+ "raw-window-handle",
+ "windows-sys",
+]
 
 [[package]]
 name = "windows"
