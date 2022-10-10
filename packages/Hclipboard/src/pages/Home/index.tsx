@@ -40,7 +40,13 @@ export default function Home() {
       />
       <List sx={{ flex: '1 1 0', overflowY: 'auto', width: '100%' }}>
         {data.map((item, index) => (
-          <HistoryItem key={item.id} item={item} selected={selectIndex === index} isLast={index === data.length - 1} />
+          <HistoryItem
+            index={index}
+            key={item.id}
+            item={item}
+            selected={selectIndex === index}
+            isLast={index === data.length - 1}
+          />
         ))}
       </List>
     </Box>

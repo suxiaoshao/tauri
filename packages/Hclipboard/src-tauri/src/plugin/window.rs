@@ -1,5 +1,5 @@
-use cocoa::appkit::{NSWindow, NSWindowStyleMask, NSWindowTitleVisibility};
-use tauri::{GlobalShortcutManager, Manager, Runtime};
+use serde_json::Value;
+use tauri::{AppHandle, GlobalShortcutManager, Manager, Runtime};
 use tauri_plugin_positioner::{Position, WindowExt};
 use window_shadows::set_shadow;
 use window_vibrancy::{apply_vibrancy, NSVisualEffectMaterial};
@@ -9,6 +9,34 @@ pub struct WindowPlugin;
 impl<R: Runtime> tauri::plugin::Plugin<R> for WindowPlugin {
     fn name(&self) -> &'static str {
         "window"
+    }
+    fn initialize(&mut self, app: &AppHandle<R>, config: Value) -> tauri::plugin::Result<()> {
+        let mut manager = app.global_shortcut_manager();
+        let app = app.clone();
+        // 全局快捷键
+        manager
+            .register("Command+Y", move || {
+                println!("Command+Y");
+                match app.get_window("clip") {
+                    Some(window) => {
+                        println!("clip close");
+                        window.close().unwrap();
+                    }
+                    None => {
+                        println!("clip create");
+                        tauri::WindowBuilder::new(
+                            &app,
+                            "clip",
+                            tauri::WindowUrl::App("index.html".into()),
+                        )
+                        .build()
+                        .unwrap();
+                    }
+                }
+            })
+            .map_err(tauri::Error::Runtime)
+            .unwrap();
+        Ok(())
     }
     fn created(&mut self, window: tauri::Window<R>) {
         // 修改边框
@@ -22,49 +50,37 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for WindowPlugin {
             .expect("Unsupported platform! 'apply_blur' is only supported on Windows");
         // 设置快捷键
         let app = window.app_handle();
-        let mut manager = app.global_shortcut_manager();
-        if window.label() == "main" {
+        if window.label() == "clip" {
             // 设置消失
-            let w = app.get_window("main").unwrap();
+            let w = app.get_window("clip").unwrap();
             window.on_window_event(move |event| {
                 if let tauri::WindowEvent::Focused(false) = event {
-                    w.hide().unwrap();
+                    w.close().unwrap();
                 }
             });
-            // 全局快捷键
-            manager
-                .register("Command+Y", move || {
-                    println!("Command+Y");
-                    if window.is_visible().unwrap() {
-                        window.hide().unwrap();
-                    } else {
-                        window.show().unwrap();
-                        window.set_focus().unwrap();
-                        window.move_window(Position::TopRight).unwrap();
-                        if cfg!(debug_assertions) {
-                            window.open_devtools();
-                        }
-                    }
-                })
-                .map_err(tauri::Error::Runtime)
-                .unwrap();
-        }
-
-        // 标题栏
-        if cfg!(target_os = "macos") {
-            unsafe {
-                let id = app.get_window("main").unwrap().ns_window().unwrap() as cocoa::base::id;
-                NSWindow::setTitlebarAppearsTransparent_(id, cocoa::base::YES);
-                let mut style_mask = id.styleMask();
-                style_mask.set(NSWindowStyleMask::NSFullSizeContentViewWindowMask, true);
-                style_mask.remove(
-                    NSWindowStyleMask::NSClosableWindowMask
-                        | NSWindowStyleMask::NSMiniaturizableWindowMask
-                        | NSWindowStyleMask::NSResizableWindowMask,
-                );
-                id.setStyleMask_(style_mask);
-                id.setTitleVisibility_(NSWindowTitleVisibility::NSWindowTitleHidden);
-                id.setTitlebarAppearsTransparent_(cocoa::base::YES);
+            window.show().unwrap();
+            window.set_focus().unwrap();
+            window.move_window(Position::TopRight).unwrap();
+            // 标题栏
+            if cfg!(target_os = "macos") {
+                use cocoa::appkit::{NSWindow, NSWindowStyleMask, NSWindowTitleVisibility};
+                unsafe {
+                    let id = window.ns_window().unwrap() as cocoa::base::id;
+                    NSWindow::setTitlebarAppearsTransparent_(id, cocoa::base::YES);
+                    let mut style_mask = id.styleMask();
+                    style_mask.set(NSWindowStyleMask::NSFullSizeContentViewWindowMask, true);
+                    style_mask.remove(
+                        NSWindowStyleMask::NSClosableWindowMask
+                            | NSWindowStyleMask::NSMiniaturizableWindowMask
+                            | NSWindowStyleMask::NSResizableWindowMask,
+                    );
+                    id.setStyleMask_(style_mask);
+                    id.setTitleVisibility_(NSWindowTitleVisibility::NSWindowTitleHidden);
+                    id.setTitlebarAppearsTransparent_(cocoa::base::YES);
+                }
+            }
+            if cfg!(debug_assertions) {
+                window.open_devtools();
             }
         }
     }

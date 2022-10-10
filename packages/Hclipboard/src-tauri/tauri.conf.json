@@ -56,6 +56,15 @@
         "skipTaskbar": true,
         "visible": false,
         "transparent": true
+      },
+      {
+        "label": "clip",
+        "fullscreen": false,
+        "height": 600,
+        "resizable": true,
+        "width": 800,
+        "skipTaskbar": true,
+        "transparent": true
       }
     ],
     "macOSPrivateApi": true
