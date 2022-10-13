@@ -10,28 +10,21 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for WindowPlugin {
     fn name(&self) -> &'static str {
         "window"
     }
-    fn initialize(&mut self, app: &AppHandle<R>, config: Value) -> tauri::plugin::Result<()> {
+    fn initialize(&mut self, app: &AppHandle<R>, _: Value) -> tauri::plugin::Result<()> {
         let mut manager = app.global_shortcut_manager();
         let app = app.clone();
         // 全局快捷键
         manager
             .register("Command+Y", move || {
                 println!("Command+Y");
-                match app.get_window("clip") {
-                    Some(window) => {
-                        println!("clip close");
-                        window.close().unwrap();
-                    }
-                    None => {
-                        println!("clip create");
-                        tauri::WindowBuilder::new(
-                            &app,
-                            "clip",
-                            tauri::WindowUrl::App("index.html".into()),
-                        )
-                        .build()
-                        .unwrap();
-                    }
+                let window = app.get_window("main").unwrap();
+                if window.is_visible().unwrap() {
+                    window.hide().unwrap();
+                } else {
+                    // 设置位置
+                    window.show().unwrap();
+                    window.set_focus().unwrap();
+                    window.move_window(Position::TopRight).unwrap();
                 }
             })
             .map_err(tauri::Error::Runtime)
@@ -50,17 +43,14 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for WindowPlugin {
             .expect("Unsupported platform! 'apply_blur' is only supported on Windows");
         // 设置快捷键
         let app = window.app_handle();
-        if window.label() == "clip" {
+        if window.label() == "main" {
             // 设置消失
-            let w = app.get_window("clip").unwrap();
+            let w = app.get_window("main").unwrap();
             window.on_window_event(move |event| {
                 if let tauri::WindowEvent::Focused(false) = event {
-                    w.close().unwrap();
+                    w.hide().unwrap();
                 }
             });
-            window.show().unwrap();
-            window.set_focus().unwrap();
-            window.move_window(Position::TopRight).unwrap();
             // 标题栏
             if cfg!(target_os = "macos") {
                 use cocoa::appkit::{NSWindow, NSWindowStyleMask, NSWindowTitleVisibility};

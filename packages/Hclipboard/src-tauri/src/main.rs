@@ -17,16 +17,15 @@ fn main() -> ClipResult<()> {
         .plugin(plugin::window::WindowPlugin)
         .plugin(tauri_plugin_positioner::init())
         .build(tauri::generate_context!())?;
-    app.run(|app_handle, e| match e {
+    app.run(|_, e| match e {
         RunEvent::Exit => println!("Exiting..."),
-        RunEvent::ExitRequested { api, .. } => println!("Exit requested..."),
+        RunEvent::ExitRequested { .. } => println!("Exit requested..."),
         RunEvent::WindowEvent { label, event, .. } => {
             println!("Window event: {} - {:?}", label, event)
         }
         RunEvent::Ready => println!("Ready!"),
         RunEvent::Resumed => println!("Resumed!"),
-        RunEvent::MainEventsCleared => println!("Main events cleared!"),
-        _ => println!("Other event: {:?}", e),
+        _ => {}
     });
     Ok(())
 }

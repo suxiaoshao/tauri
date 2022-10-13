@@ -48,23 +48,14 @@
     },
     "windows": [
       {
-        "fullscreen": false,
-        "height": 600,
-        "resizable": true,
-        "title": "Hclipboard",
-        "width": 800,
-        "skipTaskbar": true,
-        "visible": false,
-        "transparent": true
-      },
-      {
-        "label": "clip",
+        "label": "main",
         "fullscreen": false,
         "height": 600,
         "resizable": true,
         "width": 800,
         "skipTaskbar": true,
-        "transparent": true
+        "transparent": true,
+        "alwaysOnTop": true
       }
     ],
     "macOSPrivateApi": true

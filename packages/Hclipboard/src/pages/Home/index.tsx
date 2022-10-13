@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { useCallback, useEffect, useState } from 'react';
 import { ClipHistory, query } from '../../rpc/query';
 import HistoryItem from './components/HistoryItem';
+import { appWindow } from '@tauri-apps/api/window';
 
 export default function Home() {
   // 表单
@@ -17,6 +18,15 @@ export default function Home() {
   }, [searchName]);
   useEffect(() => {
     fetchData();
+    // 重新获取焦点时刷新数据
+    const unlisten = appWindow.onFocusChanged((handle) => {
+      if (handle) {
+        fetchData();
+      }
+    });
+    return () => {
+      unlisten.then((e) => e());
+    };
   }, [fetchData]);
   // 被选择
   const [selectIndex, setSelectIndex] = useState<number | null>(null);
@@ -27,6 +37,11 @@ export default function Home() {
       setSelectIndex(null);
     }
   }, [data]);
+  appWindow.onFocusChanged((handle) => {
+    if (handle) {
+      fetchData();
+    }
+  });
   return (
     <Box
       sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 1 }}
