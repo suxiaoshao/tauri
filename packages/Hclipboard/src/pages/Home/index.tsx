@@ -1,47 +1,45 @@
 import { Box, List, TextField } from '@mui/material';
 import { useForm } from 'react-hook-form';
 import { useCallback, useEffect, useState } from 'react';
-import { ClipHistory, query } from '../../rpc/query';
 import HistoryItem from './components/HistoryItem';
+import useClipData from './hooks/useClipData';
+import { useKey } from 'react-use';
 import { appWindow } from '@tauri-apps/api/window';
+import { writeText } from '@tauri-apps/api/clipboard';
 
 export default function Home() {
   // 表单
   const { register, watch } = useForm<{ searchData?: string }>();
   const searchName = watch('searchData');
-  // 剪切板历史
-  const [data, setDate] = useState([] as ClipHistory[]);
-  // 查询剪切板历史
-  const fetchData = useCallback(async () => {
-    const newData = await query({ searchName: searchName || null });
-    setDate(newData);
-  }, [searchName]);
-  useEffect(() => {
-    fetchData();
-    // 重新获取焦点时刷新数据
-    const unlisten = appWindow.onFocusChanged((handle) => {
-      if (handle) {
-        fetchData();
-      }
-    });
-    return () => {
-      unlisten.then((e) => e());
-    };
-  }, [fetchData]);
+  // 历史记录
+  const data = useClipData(searchName);
   // 被选择
-  const [selectIndex, setSelectIndex] = useState<number | null>(null);
+  const [selectIndex, setSelectIndex] = useState<number>(0);
   useEffect(() => {
-    if (data.length > 0) {
-      setSelectIndex(0);
-    } else {
-      setSelectIndex(null);
-    }
+    setSelectIndex(0);
   }, [data]);
-  appWindow.onFocusChanged((handle) => {
-    if (handle) {
-      fetchData();
+  const add = useCallback(() => {
+    if (selectIndex < data.length - 1) {
+      setSelectIndex((value) => value + 1);
     }
-  });
+  }, [data.length, selectIndex]);
+  const sub = useCallback(() => {
+    if (selectIndex >= 1) {
+      setSelectIndex((value) => value - 1);
+    }
+  }, [selectIndex]);
+  useKey('ArrowUp', sub, undefined, [sub]);
+  useKey('ArrowDown', add, undefined, [add]);
+  useKey(
+    'Enter',
+    async () => {
+      const item = data[selectIndex];
+      await writeText(item.data);
+      await appWindow.hide();
+    },
+    undefined,
+    [data, selectIndex],
+  );
   return (
     <Box
       sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 1 }}

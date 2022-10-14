@@ -1,7 +1,7 @@
 import { Box, Divider, Drawer, Link, ListItemButton, Typography } from '@mui/material';
 import { ClipHistory } from '../../../rpc/query';
 import formatTime from '../../../utils/formatTime';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { encodeNonAsciiHTML } from 'entities';
 import useElementSize from '../hooks/useElementSize';
 
@@ -10,9 +10,15 @@ export interface HistoryItemProps {
   selected: boolean;
   isLast: boolean;
   index: number;
+  onClick?: () => void;
 }
 
-export default function HistoryItem({ item: { data, updateTime }, selected, isLast, index }: HistoryItemProps) {
+export default function HistoryItem({
+  item: { data, updateTime },
+  selected,
+  isLast,
+  index,
+}: HistoryItemProps) {
   // 设置空格
   const dataList = useMemo(
     () => data.split('\n').map((value) => encodeNonAsciiHTML(value).replace(/ /g, '&nbsp;')),
@@ -20,9 +26,14 @@ export default function HistoryItem({ item: { data, updateTime }, selected, isLa
   );
   const [{ height } = { height: 0 }, ref] = useElementSize();
   const [open, setOpen] = useState(false);
+  useEffect(() => {
+    if (selected && ref.current) {
+      ref.current?.scrollIntoView({ block: 'center', behavior: 'auto' });
+    }
+  }, [ref, selected]);
   return (
     <>
-      <ListItemButton sx={{ display: 'flex', overflowX: 'hidden' }} key={data} selected={selected}>
+      <ListItemButton sx={{ display: 'flex', overflowX: 'hidden' }} selected={selected}>
         <Box sx={{ flex: '0 0 80px' }}>
           <Typography color="text.secondary" variant={'body2'}>
             {formatTime(updateTime)}
