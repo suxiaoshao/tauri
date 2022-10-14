@@ -2,7 +2,8 @@ import { Box, Divider, Drawer, Link, ListItemButton, Typography } from '@mui/mat
 import { ClipHistory } from '../../../rpc/query';
 import formatTime from '../../../utils/formatTime';
 import { useMemo, useState } from 'react';
-import { useSize } from 'react-use';
+import { encodeNonAsciiHTML } from 'entities';
+import useElementSize from '../hooks/useElementSize';
 
 export interface HistoryItemProps {
   item: ClipHistory;
@@ -12,16 +13,12 @@ export interface HistoryItemProps {
 }
 
 export default function HistoryItem({ item: { data, updateTime }, selected, isLast, index }: HistoryItemProps) {
-  const dataList = useMemo(() => data.split('\n'), [data]);
-  const [sized, { height }] = useSize(() => (
-    <Box>
-      {dataList.map((value) => (
-        <Typography variant={'body1'} key={value}>
-          {value}
-        </Typography>
-      ))}
-    </Box>
-  ));
+  // 设置空格
+  const dataList = useMemo(
+    () => data.split('\n').map((value) => encodeNonAsciiHTML(value).replace(/ /g, '&nbsp;')),
+    [data],
+  );
+  const [{ height } = { height: 0 }, ref] = useElementSize();
   const [open, setOpen] = useState(false);
   return (
     <>
@@ -31,8 +28,19 @@ export default function HistoryItem({ item: { data, updateTime }, selected, isLa
             {formatTime(updateTime)}
           </Typography>
         </Box>
-        <Box sx={{ flex: '1 1 0' }}>
-          <Box sx={{ maxHeight: '120px', overflow: 'hidden' }}>{sized}</Box>{' '}
+        <Box sx={{ flex: '1 1 calc(100% - 110px)', maxWidth: 'calc(100% - 110px)' }}>
+          <Box sx={{ maxHeight: '120px', overflowY: 'hidden', width: '100%' }}>
+            <Box ref={ref} sx={{ width: '100%' }}>
+              {dataList.map((value) => (
+                <Typography
+                  sx={{ width: '100%', wordBreak: 'break-all' }}
+                  variant={'body1'}
+                  dangerouslySetInnerHTML={{ __html: value }}
+                  key={value}
+                ></Typography>
+              ))}
+            </Box>
+          </Box>
           {height > 120 && (
             <Link
               onClick={(event) => {
@@ -56,9 +64,12 @@ export default function HistoryItem({ item: { data, updateTime }, selected, isLa
         {
           <Box sx={{ padding: 1, width: '60vw' }}>
             {dataList.map((value) => (
-              <Typography variant={'body1'} key={value}>
-                {value}
-              </Typography>
+              <Typography
+                sx={{ width: '100%', wordBreak: 'break-all' }}
+                variant={'body1'}
+                dangerouslySetInnerHTML={{ __html: value }}
+                key={value}
+              ></Typography>
             ))}
           </Box>
         }

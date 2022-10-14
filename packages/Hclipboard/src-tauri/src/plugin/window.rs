@@ -16,7 +16,6 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for WindowPlugin {
         // 全局快捷键
         manager
             .register("Command+Y", move || {
-                println!("Command+Y");
                 let window = app.get_window("main").unwrap();
                 if window.is_visible().unwrap() {
                     window.hide().unwrap();
@@ -24,7 +23,7 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for WindowPlugin {
                     // 设置位置
                     window.show().unwrap();
                     window.set_focus().unwrap();
-                    window.move_window(Position::TopRight).unwrap();
+                    window.move_window(Position::Center).unwrap();
                 }
             })
             .map_err(tauri::Error::Runtime)
@@ -38,14 +37,10 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for WindowPlugin {
         #[cfg(target_os = "macos")]
         apply_vibrancy(&window, NSVisualEffectMaterial::HudWindow, None, None)
             .expect("Unsupported platform! 'apply_vibrancy' is only supported on macOS");
-        #[cfg(target_os = "windows")]
-        apply_blur(&window, Some((18, 18, 18, 125)))
-            .expect("Unsupported platform! 'apply_blur' is only supported on Windows");
-        // 设置快捷键
-        let app = window.app_handle();
+        // 消失时隐藏
         if window.label() == "main" {
             // 设置消失
-            let w = app.get_window("main").unwrap();
+            let w = window.clone();
             window.on_window_event(move |event| {
                 if let tauri::WindowEvent::Focused(false) = event {
                     w.hide().unwrap();
@@ -69,7 +64,8 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for WindowPlugin {
                     id.setTitlebarAppearsTransparent_(cocoa::base::YES);
                 }
             }
-            if cfg!(debug_assertions) {
+            #[cfg(debug_assertions)]
+            {
                 window.open_devtools();
             }
         }
