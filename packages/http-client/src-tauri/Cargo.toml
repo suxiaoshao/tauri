@@ -15,8 +15,8 @@ rust-version = "1.57"
 tauri-build = { version = "1.1.1", features = [] }
 
 [dependencies]
-serde_json = "1.0.86"
-serde = { version = "1.0.145", features = ["derive"] }
+serde_json = "1.0.87"
+serde = { version = "1.0.146", features = ["derive"] }
 tauri = { version = "1.1.1", features = ["api-all", "system-tray"] }
 
 # 数据库
@@ -26,7 +26,7 @@ diesel = { version = "2.0.2", features = ["sqlite"] }
 reqwest = "0.11.12"
 
 # 错误处理
-anyhow = "1.0.65"
+anyhow = "1.0.66"
 
 # 搜索应用
 lnk = "0.4.1"

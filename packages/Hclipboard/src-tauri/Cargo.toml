@@ -15,8 +15,8 @@ tauri-build = { version = "1.1.1", features = [] }
 
 [dependencies]
 # tauri
-serde_json = "1.0.86"
-serde = { version = "1.0.145", features = ["derive"] }
+serde_json = "1.0.87"
+serde = { version = "1.0.146", features = ["derive"] }
 tauri = { version = "1.1.1", features = ["api-all", "macos-private-api"] }
 # database
 diesel = { version = "2.0.2", features = ["sqlite", "r2d2"] }
@@ -34,7 +34,7 @@ window-vibrancy = "0.3.0"
 cocoa = "0.24.0"
 
 [dev-dependencies]
-anyhow = "1.0.65"
+anyhow = "1.0.66"
 
 [features]
 # by default Tauri runs in production mode

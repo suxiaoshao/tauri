@@ -40,6 +40,12 @@ pub enum ClipError {
         #[from]
         diesel::r2d2::Error,
     ),
+    #[error("文件系统错误:{}",.0)]
+    Fs(
+        #[serde(skip_serializing)]
+        #[from]
+        std::io::Error,
+    ),
 }
 
 impl From<tauri::Error> for ClipError {

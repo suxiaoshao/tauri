@@ -13,12 +13,7 @@ export interface HistoryItemProps {
   onClick?: () => void;
 }
 
-export default function HistoryItem({
-  item: { data, updateTime },
-  selected,
-  isLast,
-  index,
-}: HistoryItemProps) {
+export default function HistoryItem({ item: { data, updateTime }, selected, isLast, index }: HistoryItemProps) {
   // 设置空格
   const dataList = useMemo(
     () => data.split('\n').map((value) => encodeNonAsciiHTML(value).replace(/ /g, '&nbsp;')),
