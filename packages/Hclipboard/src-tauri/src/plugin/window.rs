@@ -3,7 +3,7 @@ use tauri::{AppHandle, GlobalShortcutManager, Manager, Runtime};
 use tauri_plugin_positioner::{Position, WindowExt};
 use window_shadows::set_shadow;
 #[cfg(target_os = "windows")]
-use window_vibrancy::apply_blur;
+use window_vibrancy::apply_mica;
 #[cfg(target_os = "macos")]
 use window_vibrancy::{apply_vibrancy, NSVisualEffectMaterial};
 
@@ -48,8 +48,11 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for WindowPlugin {
         apply_vibrancy(&window, NSVisualEffectMaterial::HudWindow, None, None)
             .expect("Unsupported platform! 'apply_vibrancy' is only supported on macOS");
         #[cfg(target_os = "windows")]
-        apply_blur(&window, Some((18, 18, 18, 125)))
-            .expect("Unsupported platform! 'apply_blur' is only supported on Windows");
+        {
+            window.set_decorations(false).unwrap();
+            apply_mica(&window)
+                .expect("Unsupported platform! 'apply_blur' is only supported on Windows");
+        }
         // 消失时隐藏
         if window.label() == "main" {
             // 设置消失
