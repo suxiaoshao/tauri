@@ -19,10 +19,7 @@ fn main() -> ClipResult<()> {
         .build(tauri::generate_context!())?;
     app.run(|_, e| match e {
         RunEvent::Exit => println!("Exiting..."),
-        RunEvent::ExitRequested { .. } => println!("Exit requested..."),
-        RunEvent::WindowEvent { label, event, .. } => {
-            println!("Window event: {} - {:?}", label, event)
-        }
+        RunEvent::ExitRequested { api, .. } => api.prevent_exit(),
         RunEvent::Ready => println!("Ready!"),
         RunEvent::Resumed => println!("Resumed!"),
         _ => {}

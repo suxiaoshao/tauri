@@ -2,6 +2,9 @@ use serde_json::Value;
 use tauri::{AppHandle, GlobalShortcutManager, Manager, Runtime};
 use tauri_plugin_positioner::{Position, WindowExt};
 use window_shadows::set_shadow;
+#[cfg(target_os = "windows")]
+use window_vibrancy::apply_blur;
+#[cfg(target_os = "macos")]
 use window_vibrancy::{apply_vibrancy, NSVisualEffectMaterial};
 
 pub struct WindowPlugin;
@@ -15,17 +18,24 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for WindowPlugin {
         let app = app.clone();
         // 全局快捷键
         manager
-            .register("Command+Y", move || {
-                let window = app.get_window("main").unwrap();
-                if window.is_visible().unwrap() {
-                    window.hide().unwrap();
+            .register(
+                if cfg!(target_os = "macos") {
+                    "Command+Y"
                 } else {
-                    // 设置位置
-                    window.show().unwrap();
-                    window.set_focus().unwrap();
-                    window.move_window(Position::Center).unwrap();
-                }
-            })
+                    "Ctrl+Y"
+                },
+                move || {
+                    let window = app.get_window("main").unwrap();
+                    if window.is_visible().unwrap() {
+                        window.hide().unwrap();
+                    } else {
+                        // 设置位置
+                        window.show().unwrap();
+                        window.set_focus().unwrap();
+                        window.move_window(Position::Center).unwrap();
+                    }
+                },
+            )
             .map_err(tauri::Error::Runtime)
             .unwrap();
         Ok(())
@@ -37,6 +47,9 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for WindowPlugin {
         #[cfg(target_os = "macos")]
         apply_vibrancy(&window, NSVisualEffectMaterial::HudWindow, None, None)
             .expect("Unsupported platform! 'apply_vibrancy' is only supported on macOS");
+        #[cfg(target_os = "windows")]
+        apply_blur(&window, Some((18, 18, 18, 125)))
+            .expect("Unsupported platform! 'apply_blur' is only supported on Windows");
         // 消失时隐藏
         if window.label() == "main" {
             // 设置消失
@@ -47,7 +60,8 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for WindowPlugin {
                 }
             });
             // 标题栏
-            if cfg!(target_os = "macos") {
+            #[cfg(target_os = "macos")]
+            {
                 use cocoa::appkit::{NSWindow, NSWindowStyleMask, NSWindowTitleVisibility};
                 unsafe {
                     let id = window.ns_window().unwrap() as cocoa::base::id;
