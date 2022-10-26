@@ -23,7 +23,7 @@ fn check_data_file(url: &str) -> ClipResult<bool> {
     use std::{fs::File, path::Path};
     let path = Path::new(url);
     if !path.exists() {
-        std::fs::create_dir_all(path.parent().unwrap())?;
+        std::fs::create_dir_all(path.parent().ok_or(ClipError::Path)?)?;
         File::create(path)?;
         return Ok(true);
     }
@@ -39,4 +39,4 @@ fn create_tables(conn: &DbConn) -> ClipResult<()> {
 
 pub use model::History;
 
-use crate::error::ClipResult;
+use crate::error::{ClipError, ClipResult};
