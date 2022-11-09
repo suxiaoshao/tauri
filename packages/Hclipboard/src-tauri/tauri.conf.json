@@ -55,7 +55,8 @@
         "width": 800,
         "skipTaskbar": true,
         "transparent": true,
-        "alwaysOnTop": true
+        "alwaysOnTop": true,
+        "visible": false
       }
     ],
     "macOSPrivateApi": true

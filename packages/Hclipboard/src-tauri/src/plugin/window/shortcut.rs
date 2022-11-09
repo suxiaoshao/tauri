@@ -1,5 +1,4 @@
 use tauri::{AppHandle, GlobalShortcutManager, Manager, Runtime};
-use tauri_plugin_positioner::{Position, WindowExt};
 
 use crate::error::ClipResult;
 
@@ -23,17 +22,17 @@ pub fn manager_global_shortcut<R: Runtime>(app: &AppHandle<R>) -> tauri::plugin:
 }
 
 fn on_short<R: Runtime>(app: &AppHandle<R>) -> ClipResult<()> {
-    if let Some(window) = app.get_window("main") {
-        if window.is_visible()? {
-            window.hide()?;
-        } else {
-            // 设置位置
-            window.show()?;
-            window.set_focus()?;
-            window.move_window(Position::Center)?;
-        }
+    if let Some(window) = app.get_window("clip") {
+        window.close()?;
     } else {
-        todo!()
+        let window =
+            tauri::WindowBuilder::new(app, "clip", tauri::WindowUrl::App("index.html".into()))
+                .center()
+                .inner_size(800f64, 600f64)
+                .skip_taskbar(true)
+                .transparent(true)
+                .always_on_top(true)
+                .build()?;
     };
     Ok(())
 }
