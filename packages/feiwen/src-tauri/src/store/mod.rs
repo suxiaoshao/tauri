@@ -57,7 +57,7 @@ impl StoreManager {
             .tags
             .iter()
             .map(|UrlWithName { name, .. }| NovelTagModel {
-                novel_id: data.title.id as i32,
+                novel_id: data.title.id,
                 tag_id: name.clone(),
             })
             .collect::<Vec<NovelTagModel>>();

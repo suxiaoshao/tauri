@@ -10,7 +10,7 @@
     "tauri": "tauri"
   },
   "dependencies": {
-    "dayjs": "^1.11.6",
+    "dayjs": "^1.11.7",
     "entities": "^4.4.0",
     "notify": "workspace:notify",
     "theme": "workspace:theme"

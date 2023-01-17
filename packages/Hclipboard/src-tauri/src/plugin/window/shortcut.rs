@@ -25,7 +25,7 @@ fn on_short<R: Runtime>(app: &AppHandle<R>) -> ClipResult<()> {
     if let Some(window) = app.get_window("clip") {
         window.close()?;
     } else {
-        let window =
+        let windows =
             tauri::WindowBuilder::new(app, "clip", tauri::WindowUrl::App("index.html".into()))
                 .center()
                 .inner_size(800f64, 600f64)
@@ -33,6 +33,7 @@ fn on_short<R: Runtime>(app: &AppHandle<R>) -> ClipResult<()> {
                 .transparent(true)
                 .always_on_top(true)
                 .build()?;
+        windows.set_focus()?;
     };
     Ok(())
 }

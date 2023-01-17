@@ -30,7 +30,7 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
 fn setup<R: Runtime>(app: &AppHandle<R>) -> ClipResult<()> {
     use tauri::api::path::*;
     //data path
-    let data_path = app_dir(&app.config())
+    let data_path = app_config_dir(&app.config())
         .ok_or(ClipError::DbPath)?
         .join("clipboard.sqlite3")
         .to_str()

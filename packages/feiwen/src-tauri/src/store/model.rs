@@ -119,7 +119,7 @@ impl From<crate::fetch::parse_novel::Novel> for NovelModel {
     fn from(value: crate::fetch::parse_novel::Novel) -> Self {
         let (author_id, author_name) = match value.author {
             crate::fetch::parse_novel::Author::Anonymous(name) => (None, name),
-            crate::fetch::parse_novel::Author::Known(Title { name, id }) => (Some(id as i32), name),
+            crate::fetch::parse_novel::Author::Known(Title { name, id }) => (Some(id), name),
         };
         Self {
             id: value.title.id,

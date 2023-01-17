@@ -11,13 +11,13 @@ rust-version = "1.57"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [build-dependencies]
-tauri-build = { version = "1.2.0", features = [] }
+tauri-build = { version = "1.2.1", features = [] }
 
 [dependencies]
 # tauri
-serde_json = "1.0.87"
-serde = { version = "1.0.147", features = ["derive"] }
-tauri = { version = "1.2.0", features = ["api-all", "macos-private-api"] }
+serde_json = "1.0.91"
+serde = { version = "1.0.152", features = ["derive"] }
+tauri = { version = "1.2.3", features = ["api-all", "macos-private-api"] }
 # database
 diesel = { version = "2.0.2", features = ["sqlite", "r2d2"] }
 libsqlite3-sys = { version = "0.25.2", features = ["bundled-windows"] }
@@ -25,17 +25,17 @@ time = "0.3.17"
 # 剪切板监听
 clipboard-master = "3.1.3"
 # 错误处理
-thiserror = "1.0.37"
+thiserror = "1.0.38"
 # 窗口管理
 tauri-plugin-positioner = "1.0.4"
-window-shadows = "0.2.0"
-window-vibrancy = "0.3.1"
+window-shadows = "0.2.1"
+window-vibrancy = "0.3.2"
 
 [target.'cfg(target_os="macos")'.dependencies]
 cocoa = "0.24.1"
 
 [dev-dependencies]
-anyhow = "1.0.66"
+anyhow = "1.0.68"
 
 [features]
 # by default Tauri runs in production mode
