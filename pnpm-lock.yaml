@@ -23,6 +23,7 @@ importers:
       eslint-plugin-prettier: ^4.2.1
       eslint-plugin-react: ^7.32.0
       eslint-plugin-react-hooks: ^4.6.0
+      git-cz: ^4.9.0
       prettier: ^2.8.3
       react: ^18.2.0
       react-dom: ^18.2.0
@@ -39,6 +40,7 @@ importers:
       '@mui/lab': 5.0.0-alpha.115_hjvzipabzikmspdw5vrjiezodi
       '@mui/material': 5.11.4_lskpmcsdi7ipu6qpuapyu56ihm
       '@tauri-apps/api': 1.2.0
+      git-cz: 4.9.0
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
       react-hook-form: 7.42.1_react@18.2.0
@@ -2140,6 +2142,11 @@ packages:
       call-bind: 1.0.2
       get-intrinsic: 1.1.3
     dev: true
+
+  /git-cz/4.9.0:
+    resolution: {integrity: sha512-cSRL8IIOXU7UFLdbziCYqg8f8InwLwqHezkiRHNSph7oZqGv0togId1kMTfKil6gzK0VaSXeVBb4oDl0fQCHiw==}
+    hasBin: true
+    dev: false
 
   /glob-parent/5.1.2:
     resolution: {integrity: sha512-AOIgSQCepiJYwP3ARnGx+5VnTu2HBYdzbGP45eLw1vr3zB3vZLeyed1sC9hnbcOc9/SrMyM5RPQrkGz4aS9Zow==}
