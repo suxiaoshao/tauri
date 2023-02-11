@@ -5,8 +5,8 @@ on:
       - main
 
 jobs:
-  web:
-    runs-on: ubuntu-latest
+  test:
+    runs-on: ${{ matrix.platform }}
     steps:
       - name: git clone
         uses: actions/checkout@v3
@@ -20,18 +20,20 @@ jobs:
         with:
           version: latest
           run_install: true
-      - name: Lint
+      - name: web Lint
         run: pnpm lint
-  tauri:
-    runs-on: ubuntu-latest
-    steps:
-      - name: git clone
-        uses: actions/checkout@v3
+      - name: web build
+        run: pnpm run build:web
       - name: Install Rust
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
           override: true
+      - name: install dependencies (ubuntu only)
+        if: matrix.platform == 'ubuntu-20.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
       - name: rust Lint
         run: cargo clippy --all
       - name: rust test

@@ -8,7 +8,8 @@
     "format": "prettier --config ./.prettierrc.js --write .",
     "eslint": "eslint --config ./.eslintrc.js --ext .jsx --ext .js --ext .ts --ext .tsx .",
     "tslint": "tsc --build tsconfig.json",
-    "build": "pnpm --filter './packages/*' run tauri build",
+    "build:tauri": "pnpm --filter './packages/*' run tauri build",
+    "build:web": "pnpm --filter './packages/*' run build",
     "commit": "git-cz",
     "prepare": "husky install"
   },
