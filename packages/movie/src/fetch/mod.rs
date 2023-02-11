@@ -21,11 +21,11 @@ pub(crate) async fn fetch_all() -> MovieResult<()> {
     let client = Client::new();
     let mut movies = Vec::new();
     for i in 0..10 {
-        print!("fetching page {}", i);
+        print!("fetching page {i}");
         let movie = fetch_one(&client, i * 25).await?;
         movies.extend(movie);
         let data = serde_json::to_string(&movies)?;
-        tokio::fs::write(format!("{}/data.json", PATH), data).await?;
+        tokio::fs::write(format!("{PATH}/data.json"), data).await?;
     }
     Ok(())
 }

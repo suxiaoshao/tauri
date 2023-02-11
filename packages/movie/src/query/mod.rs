@@ -36,7 +36,7 @@ pub(crate) async fn query(
 }
 
 async fn get_data() -> MovieResult<Vec<Movie>> {
-    let data = tokio::fs::read_to_string(format!("{}/data.json", PATH)).await?;
+    let data = tokio::fs::read_to_string(format!("{PATH}/data.json")).await?;
     let movies = serde_json::from_str(&data)?;
     Ok(movies)
 }
