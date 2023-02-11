@@ -1,0 +1,38 @@
+name: ci
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - name: git clone
+        uses: actions/checkout@v3
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: lts/*
+      - uses: pnpm/action-setup@v2
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          version: latest
+          run_install: true
+      - name: Lint
+        run: pnpm lint
+  tauri:
+    runs-on: ubuntu-latest
+    steps:
+      - name: git clone
+        uses: actions/checkout@v3
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+      - name: rust Lint
+        run: cargo clippy --all
+      - name: rust test
+        run: cargo test --all
