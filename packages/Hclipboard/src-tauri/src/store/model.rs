@@ -56,7 +56,10 @@ impl History {
         Ok(())
     }
     /// 根据数据获取历史记录
-    pub fn query(search_name: Option<&String>, conn: &mut SqliteConnection) -> ClipResult<Vec<History>> {
+    pub fn query(
+        search_name: Option<&String>,
+        conn: &mut SqliteConnection,
+    ) -> ClipResult<Vec<History>> {
         match search_name {
             None => Self::query_all(conn),
             Some(search_name) => Self::query_by_search(search_name, conn),
@@ -87,7 +90,7 @@ mod tests {
     #[test]
     fn insert() -> anyhow::Result<()> {
         let conn = establish_connection(
-            "file:/Users/weijie.su/Library/Application Support/Hclipboard/clipboard.sqlite3",
+            "/Users/weijie.su/Library/Application Support/Hclipboard/clipboard.sqlite3",
         )?;
         let conn = &mut conn.get()?;
         History::insert("test", conn)?;

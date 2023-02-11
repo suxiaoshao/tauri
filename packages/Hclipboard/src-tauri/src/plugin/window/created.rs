@@ -42,9 +42,5 @@ fn window_beatify<R: Runtime>(window: &tauri::Window<R>) -> ClipResult<()> {
             id.setTitlebarAppearsTransparent_(cocoa::base::YES);
         }
     }
-    #[cfg(debug_assertions)]
-    {
-        window.open_devtools();
-    }
     Ok(())
 }

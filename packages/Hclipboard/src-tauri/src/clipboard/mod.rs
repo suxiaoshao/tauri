@@ -19,6 +19,7 @@ impl<T: ClipboardManager + Send + Sync + Sized> Clipboard<T> {
     fn update(&mut self) -> ClipResult<()> {
         if let Ok(Some(text)) = self.clip.read_text() {
             if self.old_data != text {
+                #[cfg(debug_assertions)]
                 println!("clipboard: {}", text);
                 History::insert(&text, &mut self.conn)?;
                 self.old_data = text;
