@@ -1,3 +1,4 @@
+use log::warn;
 use serde_json::Value;
 use tauri::{AppHandle, Manager, RunEvent, Runtime};
 
@@ -17,7 +18,9 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for WindowPlugin {
         Ok(())
     }
     fn created(&mut self, window: tauri::Window<R>) {
-        on_created(window);
+        if let Err(err) = on_created(window) {
+            warn!("window created error:{}", err)
+        };
     }
     fn on_event(&mut self, app: &AppHandle<R>, event: &tauri::RunEvent) {
         match event {
@@ -25,9 +28,16 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for WindowPlugin {
                 label,
                 event: tauri::WindowEvent::Focused(false),
                 ..
-            } if label == "clip" => {
-                app.get_window("clip").unwrap().close().unwrap();
-            }
+            } if label == "main" => match app.get_window("main") {
+                Some(window) => {
+                    if let Err(err) = window.hide() {
+                        warn!("main window hide error:{}", err)
+                    };
+                }
+                None => {
+                    warn!("main window not found");
+                }
+            },
             _ => {}
         }
     }

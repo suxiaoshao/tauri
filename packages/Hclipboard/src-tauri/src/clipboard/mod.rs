@@ -3,6 +3,7 @@ use diesel::{
     r2d2::{ConnectionManager, PooledConnection},
     SqliteConnection,
 };
+use log::warn;
 use tauri::ClipboardManager;
 
 use crate::{error::ClipResult, store::History};
@@ -42,7 +43,9 @@ impl<T: ClipboardManager + Send + Sync + Sized> Clipboard<T> {
 
 impl<T: ClipboardManager> clipboard_master::ClipboardHandler for Clipboard<T> {
     fn on_clipboard_change(&mut self) -> CallbackResult {
-        self.update();
+        if let Err(err) = self.update() {
+            warn!("update clipboard error:{}", err)
+        }
         CallbackResult::Next
     }
 }
