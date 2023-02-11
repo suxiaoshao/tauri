@@ -1,7 +1,7 @@
 name: Tech Request
 description: File a tech request
-title: "[Tech]: "
-labels: ["tech"]
+title: '[Tech]: '
+labels: ['tech']
 assignees:
   - suxiaoshao
 body:
