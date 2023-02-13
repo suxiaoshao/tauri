@@ -2,34 +2,32 @@
     all(not(debug_assertions), target_os = "windows"),
     windows_subsystem = "windows"
 )]
-
 use error::ClipResult;
-use tauri::{Manager, RunEvent};
-
+use log::LevelFilter;
+use tauri_plugin_log::LogTarget;
 mod clipboard;
 mod error;
 mod plugin;
 mod store;
 
 fn main() -> ClipResult<()> {
-    let app = tauri::Builder::default()
-        .plugin(plugin::clipboard::init())
+    tauri::Builder::default()
+        .setup(|app| {
+            #[cfg(target_os = "macos")]
+            app.set_activation_policy(tauri::ActivationPolicy::Accessory);
+            Ok(())
+        })
+        .plugin(plugin::clipboard::ClipboardPlugin)
         .plugin(plugin::window::WindowPlugin)
         .plugin(tauri_plugin_positioner::init())
-        .build(tauri::generate_context!())?;
-    app.run(|app, e| match e {
-        RunEvent::Exit => println!("Exiting..."),
-        RunEvent::ExitRequested { api, .. } => api.prevent_exit(),
-        RunEvent::Ready => println!("Ready!"),
-        RunEvent::Resumed => println!("Resumed!"),
-        RunEvent::WindowEvent {
-            label,
-            event: tauri::WindowEvent::Focused(false),
-            ..
-        } if label == "clip" => {
-            app.get_window("clip").unwrap().close().unwrap();
-        }
-        _ => {}
-    });
+        .plugin(plugin::tracing::TracingPlugin)
+        .plugin(
+            tauri_plugin_log::Builder::default()
+                .level(LevelFilter::Info)
+                .targets([LogTarget::LogDir, LogTarget::Stdout, LogTarget::Webview])
+                .build(),
+        )
+        .run(tauri::generate_context!())?;
+
     Ok(())
 }

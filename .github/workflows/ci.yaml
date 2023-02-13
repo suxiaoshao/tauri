@@ -6,6 +6,10 @@ on:
 
 jobs:
   test:
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [macos-latest]
     runs-on: ${{ matrix.platform }}
     steps:
       - name: git clone

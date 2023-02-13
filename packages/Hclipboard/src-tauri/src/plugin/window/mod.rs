@@ -1,5 +1,6 @@
+use log::warn;
 use serde_json::Value;
-use tauri::{AppHandle, Runtime};
+use tauri::{AppHandle, Manager, RunEvent, Runtime};
 
 use self::{created::on_created, shortcut::manager_global_shortcut};
 
@@ -17,6 +18,27 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for WindowPlugin {
         Ok(())
     }
     fn created(&mut self, window: tauri::Window<R>) {
-        on_created(window);
+        if let Err(err) = on_created(window) {
+            warn!("window created error:{}", err)
+        };
+    }
+    fn on_event(&mut self, app: &AppHandle<R>, event: &tauri::RunEvent) {
+        match event {
+            RunEvent::WindowEvent {
+                label,
+                event: tauri::WindowEvent::Focused(false),
+                ..
+            } if label == "main" => match app.get_window("main") {
+                Some(window) => {
+                    if let Err(err) = window.hide() {
+                        warn!("main window hide error:{}", err)
+                    };
+                }
+                None => {
+                    warn!("main window not found");
+                }
+            },
+            _ => {}
+        }
     }
 }

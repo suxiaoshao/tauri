@@ -1,3 +1,4 @@
+use log::warn;
 use tauri::{AppHandle, GlobalShortcutManager, Manager, Runtime};
 
 use crate::error::ClipResult;
@@ -14,7 +15,9 @@ pub fn manager_global_shortcut<R: Runtime>(app: &AppHandle<R>) -> tauri::plugin:
                 "Ctrl+Y"
             },
             move || {
-                on_short(&app);
+                if let Err(err) = on_short(&app) {
+                    warn!("global shortcut error:{}", err)
+                };
             },
         )
         .map_err(tauri::Error::Runtime)?;
@@ -22,18 +25,13 @@ pub fn manager_global_shortcut<R: Runtime>(app: &AppHandle<R>) -> tauri::plugin:
 }
 
 fn on_short<R: Runtime>(app: &AppHandle<R>) -> ClipResult<()> {
-    if let Some(window) = app.get_window("clip") {
-        window.close()?;
-    } else {
-        let windows =
-            tauri::WindowBuilder::new(app, "clip", tauri::WindowUrl::App("index.html".into()))
-                .center()
-                .inner_size(800f64, 600f64)
-                .skip_taskbar(true)
-                .transparent(true)
-                .always_on_top(true)
-                .build()?;
-        windows.set_focus()?;
-    };
+    if let Some(window) = app.get_window("main") {
+        if window.is_visible()? {
+            window.hide()?;
+        } else {
+            window.show()?;
+            window.set_focus()?;
+        }
+    }
     Ok(())
 }

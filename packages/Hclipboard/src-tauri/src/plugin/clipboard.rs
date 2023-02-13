@@ -1,12 +1,9 @@
-use tauri::{
-    plugin::{Builder, TauriPlugin},
-    AppHandle, Manager, Runtime,
-};
-
 use crate::{
     error::{ClipError, ClipResult},
     store::{self, DbConn, History},
 };
+use serde_json::Value;
+use tauri::{AppHandle, Invoke, Manager, Runtime};
 #[tauri::command(async)]
 fn query_history(
     search_name: Option<String>,
@@ -17,14 +14,21 @@ fn query_history(
     Ok(data)
 }
 
-pub fn init<R: Runtime>() -> TauriPlugin<R> {
-    Builder::new("clipboard")
-        .setup(|x| {
-            setup(x)?;
-            Ok(())
-        })
-        .invoke_handler(tauri::generate_handler![query_history])
-        .build()
+pub struct ClipboardPlugin;
+
+impl<R: Runtime> tauri::plugin::Plugin<R> for ClipboardPlugin {
+    fn name(&self) -> &'static str {
+        "clipboard"
+    }
+    fn initialize(&mut self, app: &AppHandle<R>, _: Value) -> tauri::plugin::Result<()> {
+        setup(app)?;
+        Ok(())
+    }
+    fn extend_api(&mut self, invoke: Invoke<R>) {
+        let handle: Box<dyn Fn(Invoke<R>) + Send + Sync> =
+            Box::new(tauri::generate_handler![query_history]);
+        (handle)(invoke);
+    }
 }
 
 fn setup<R: Runtime>(app: &AppHandle<R>) -> ClipResult<()> {

@@ -34,6 +34,7 @@ fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
     let mut manager = app.global_shortcut_manager();
 
     let window = app.get_window("main").unwrap();
+    #[cfg(debug_assertions)]
     window.open_devtools();
 
     // 修改窗口位置
