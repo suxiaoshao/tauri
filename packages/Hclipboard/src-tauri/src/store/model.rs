@@ -89,11 +89,11 @@ mod tests {
 
     #[test]
     fn insert() -> anyhow::Result<()> {
-        let conn = establish_connection(
-            "/Users/weijie.su/Library/Application Support/Hclipboard/clipboard.sqlite3",
-        )?;
+        let path = "./clipboard.sqlite3";
+        let conn = establish_connection("./clipboard.sqlite3")?;
         let conn = &mut conn.get()?;
         History::insert("test", conn)?;
+        std::fs::remove_file(path)?;
         Ok(())
     }
 }

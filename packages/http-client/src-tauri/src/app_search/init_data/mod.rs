@@ -13,3 +13,8 @@ pub fn get_app_data() -> Option<AppDataType> {
 pub fn get_app_data() -> Option<AppDataType> {
     win::get_app_data()
 }
+
+#[cfg(target_os = "linux")]
+pub fn get_app_data() -> Option<AppDataType> {
+    None
+}
