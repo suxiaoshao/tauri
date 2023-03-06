@@ -9,7 +9,7 @@
     "tauri": "tauri"
   },
   "dependencies": {
-    "notify": "workspace:notify",
-    "theme": "workspace:theme"
+    "notify": "workspace:^1.0.0",
+    "theme": "workspace:^1.0.0"
   }
 }

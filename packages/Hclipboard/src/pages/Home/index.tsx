@@ -9,7 +9,7 @@ import { writeText } from '@tauri-apps/api/clipboard';
 
 export default function Home() {
   // 表单
-  const { register, watch } = useForm<{ searchData?: string }>();
+  const { register, watch, setValue } = useForm<{ searchData?: string }>();
   const searchName = watch('searchData');
   // 历史记录
   const data = useClipData(searchName);
@@ -40,6 +40,14 @@ export default function Home() {
     undefined,
     [data, selectIndex],
   );
+  useEffect(() => {
+    const fn = appWindow.onFocusChanged(() => {
+      setValue('searchData', '');
+    });
+    return () => {
+      fn.then((fn) => fn());
+    };
+  }, [setValue]);
   return (
     <Box
       sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 1 }}
