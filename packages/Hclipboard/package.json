@@ -12,7 +12,7 @@
   "dependencies": {
     "dayjs": "^1.11.7",
     "entities": "^4.4.0",
-    "notify": "workspace:notify",
-    "theme": "workspace:theme"
+    "notify": "workspace:^1.0.0",
+    "theme": "workspace:^1.0.0"
   }
 }
