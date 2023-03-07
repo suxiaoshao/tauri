@@ -7,6 +7,7 @@ members = [
     "packages/feiwen/src-tauri",
     "packages/remove",
     "packages/Hclipboard/src-tauri",
+    "packages/ChatGPT/src-tauri",
 ]
 [profile.release]
 strip = "symbols"
