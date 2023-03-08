@@ -1,15 +1,25 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-// Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-#[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
-}
+use errors::ChatGPTResult;
+use log::LevelFilter;
+use plugins::LogPlugin;
+use tauri_plugin_log::LogTarget;
 
-fn main() {
+mod errors;
+mod plugins;
+
+fn main() -> ChatGPTResult<()> {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![greet])
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+        .plugin(
+            tauri_plugin_log::Builder::default()
+                .level(LevelFilter::Info)
+                .targets([LogTarget::LogDir, LogTarget::Stdout, LogTarget::Webview])
+                .build(),
+        )
+        .plugin(LogPlugin)
+        .plugin(plugins::WindowPlugin)
+        .plugin(tauri_plugin_window_state::Builder::default().build())
+        .run(tauri::generate_context!())?;
+    Ok(())
 }
