@@ -7,6 +7,7 @@ use plugins::LogPlugin;
 use tauri_plugin_log::LogTarget;
 
 mod errors;
+mod fetch;
 mod plugins;
 
 fn main() -> ChatGPTResult<()> {

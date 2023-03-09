@@ -75,10 +75,10 @@ importers:
 
   common/notify:
     specifiers:
-      notistack: ^3.0.0
+      notistack: ^3.0.1
       rxjs: ^7.8.0
     dependencies:
-      notistack: 3.0.0_owo25xnefcwdq3zjgtohz6dbju
+      notistack: 3.0.1_owo25xnefcwdq3zjgtohz6dbju
       rxjs: 7.8.0
 
   common/theme:
@@ -2485,8 +2485,8 @@ packages:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
     dev: true
 
-  /notistack/3.0.0_owo25xnefcwdq3zjgtohz6dbju:
-    resolution: {integrity: sha512-W2efiijfkND3K0pmxMsL9h9RA7ycbAeWlkpb6vuGhJnXr4ff50qfUSeqnbGXHdJQUvfbRT9BWM4doFZggeQgSw==}
+  /notistack/3.0.1_owo25xnefcwdq3zjgtohz6dbju:
+    resolution: {integrity: sha512-ntVZXXgSQH5WYfyU+3HfcXuKaapzAJ8fBLQ/G618rn3yvSzEbnOB8ZSOwhX+dAORy/lw+GC2N061JA0+gYWTVA==}
     engines: {node: '>=12.0.0', npm: '>=6.0.0'}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0

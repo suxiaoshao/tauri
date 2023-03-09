@@ -52,6 +52,18 @@ pub enum ChatGPTError {
     Shadow,
     #[error("页面透明效果错误")]
     Vibrancy,
+    #[error("请求头构造错误:{}",.0)]
+    HeaderParse(
+        #[serde(skip_serializing)]
+        #[from]
+        reqwest::header::InvalidHeaderValue,
+    ),
+    #[error("请求错误:{}",.0)]
+    Request(
+        #[serde(skip_serializing)]
+        #[from]
+        reqwest::Error,
+    ),
 }
 
 impl From<tauri::Error> for ChatGPTError {

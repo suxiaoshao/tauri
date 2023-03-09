@@ -20,7 +20,6 @@ fn window_beatify<R: Runtime>(window: &tauri::Window<R>) -> ChatGPTResult<()> {
     apply_vibrancy(window, NSVisualEffectMaterial::HudWindow, None, None)?;
     #[cfg(target_os = "windows")]
     {
-        window.set_decorations(false)?;
         apply_mica(&window)?;
     }
     // // 标题栏
