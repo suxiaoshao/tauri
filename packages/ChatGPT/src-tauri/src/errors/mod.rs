@@ -2,8 +2,8 @@ use thiserror::Error;
 
 #[derive(Error, Debug, serde::Serialize)]
 pub enum ChatGPTError {
-    #[error("获取不了剪切板数据库路径")]
-    DbPath,
+    #[error("获取不了配置路径")]
+    ConfigPath,
     #[error("初始化错误:{}",.0)]
     Setup(
         #[serde(skip_serializing)]
@@ -46,8 +46,6 @@ pub enum ChatGPTError {
         #[from]
         std::io::Error,
     ),
-    #[error("无父文件夹")]
-    Path,
     #[error("页面shadow错误")]
     Shadow,
     #[error("页面透明效果错误")]
@@ -63,6 +61,18 @@ pub enum ChatGPTError {
         #[serde(skip_serializing)]
         #[from]
         reqwest::Error,
+    ),
+    #[error("toml解析错误:{}",.0)]
+    TomlParse(
+        #[serde(skip_serializing)]
+        #[from]
+        toml::de::Error,
+    ),
+    #[error("toml序列化错误:{}",.0)]
+    TomlSerialize(
+        #[serde(skip_serializing)]
+        #[from]
+        toml::ser::Error,
     ),
 }
 
