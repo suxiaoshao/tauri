@@ -1,9 +1,11 @@
 import { AnyAction, configureStore, ThunkAction } from '@reduxjs/toolkit';
 import { themeReducer } from 'theme';
+import configReducer from '../features/Setting/configSlice';
 
 const store = configureStore({
   reducer: {
     theme: themeReducer,
+    config: configReducer,
   },
 });
 export default store;

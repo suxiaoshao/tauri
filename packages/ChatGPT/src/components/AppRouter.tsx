@@ -1,6 +1,6 @@
 import { Routes, Route } from 'react-router-dom';
-import Home from '../pages/Home';
-import Setting from '../pages/Setting';
+import Home from '../features/Home';
+import Setting from '../features/Setting';
 
 export default function AppRouter() {
   return (

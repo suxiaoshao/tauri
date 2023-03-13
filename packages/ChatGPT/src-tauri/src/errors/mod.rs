@@ -74,6 +74,12 @@ pub enum ChatGPTError {
         #[from]
         toml::ser::Error,
     ),
+    #[error("notify watcher错误:{}",.0)]
+    Notify(
+        #[serde(skip_serializing)]
+        #[from]
+        notify::Error,
+    ),
 }
 
 impl From<tauri::Error> for ChatGPTError {
