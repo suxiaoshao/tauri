@@ -1,6 +1,8 @@
 import { AnyAction, configureStore, ThunkAction } from '@reduxjs/toolkit';
+import { invoke } from '@tauri-apps/api';
+import { listen } from '@tauri-apps/api/event';
 import { themeReducer } from 'theme';
-import configReducer from '../features/Setting/configSlice';
+import configReducer, { ConfigSliceType, setConfig } from '../features/Setting/configSlice';
 
 const store = configureStore({
   reducer: {
@@ -16,3 +18,14 @@ export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
 
 export type AppThunkAction<ReturnType = void> = ThunkAction<ReturnType, RootState, unknown, AnyAction>;
+
+listen<ConfigSliceType>('config', (event) => {
+  store.dispatch(setConfig(event.payload));
+});
+
+async function setInitDate(): Promise<void> {
+  const config = await invoke<ConfigSliceType>('plugin:config|get_config');
+  store.dispatch(setConfig(config));
+}
+
+setInitDate();

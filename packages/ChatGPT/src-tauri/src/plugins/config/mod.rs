@@ -58,7 +58,7 @@ fn set_config<R: Runtime>(
     data: ChatGPTConfig,
 ) -> ChatGPTResult<()> {
     data.save(&app_handle)?;
-    app_handle.emit_to("main", "config", data)?;
+    app_handle.emit_to("main", "config", &data)?;
     Ok(())
 }
 

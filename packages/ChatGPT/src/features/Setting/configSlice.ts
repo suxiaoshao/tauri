@@ -1,7 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { invoke } from '@tauri-apps/api';
-import { appWindow } from '@tauri-apps/api/window';
-import store, { RootState } from '../../app/store';
+import { type RootState } from '../../app/store';
 
 export type ConfigSliceType = {
   api_key?: string | null;
@@ -21,14 +19,3 @@ export const { setConfig } = themeSlice.actions;
 export const selectApiKey = (state: RootState) => state.config.api_key;
 
 export default themeSlice.reducer;
-
-appWindow.listen<ConfigSliceType>('config', (event) => {
-  store.dispatch(setConfig(event.payload));
-});
-
-async function setInitDate(): Promise<void> {
-  const config = await invoke<ConfigSliceType>('plugin:config|get_config');
-  store.dispatch(setConfig(config));
-}
-
-setInitDate();
