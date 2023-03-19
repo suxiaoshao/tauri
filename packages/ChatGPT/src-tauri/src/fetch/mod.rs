@@ -49,25 +49,3 @@ pub async fn fetch(api_key: &str, body: &ChatRequest) -> ChatGPTResult<()> {
     }
     Ok(())
 }
-
-#[cfg(test)]
-mod test {
-    use crate::errors::ChatGPTResult;
-
-    use super::types::{ChatRequest, Message};
-
-    #[tokio::test]
-    async fn test_fetch() -> ChatGPTResult<()> {
-        let api_key = std::env::var("OPENAI_API_KEY").unwrap();
-        let request = ChatRequest::new(
-            Default::default(),
-            vec![Message::new(
-                super::types::Role::User,
-                "请你帮我把中文翻译成英文，并且使用github issues 的风格".to_string(),
-            )],
-        );
-        let response = super::fetch(&api_key, &request).await?;
-        println!("{:#?}", response);
-        Ok(())
-    }
-}
