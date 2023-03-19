@@ -21,7 +21,7 @@ fn window_beatify<R: Runtime>(window: &tauri::Window<R>) -> ClipResult<()> {
     #[cfg(target_os = "windows")]
     {
         window.set_decorations(false)?;
-        apply_mica(&window)?;
+        apply_mica(window)?;
     }
     // 标题栏
     #[cfg(target_os = "macos")]

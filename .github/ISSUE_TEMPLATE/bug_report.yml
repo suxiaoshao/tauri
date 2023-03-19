@@ -15,7 +15,8 @@ body:
         - Hclipboard
         - http-client
         - movie
-        - others
+        - remove
+        - ChatGPT
         - others
         - all
     validations:

@@ -6,5 +6,9 @@
   "types": "src/index.tsx",
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "@material/material-color-utilities": "0.2.4",
+    "@mui/system": "^5.11.13"
+  }
 }
