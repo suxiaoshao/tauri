@@ -80,6 +80,18 @@ pub enum ChatGPTError {
         #[from]
         notify::Error,
     ),
+    #[error("eventsource错误:{}",.0)]
+    EventSource(
+        #[serde(skip_serializing)]
+        #[from]
+        reqwest_eventsource::CannotCloneRequestError,
+    ),
+    #[error("serde_json错误:{}",.0)]
+    SerdeJson(
+        #[serde(skip_serializing)]
+        #[from]
+        serde_json::Error,
+    ),
 }
 
 impl From<tauri::Error> for ChatGPTError {

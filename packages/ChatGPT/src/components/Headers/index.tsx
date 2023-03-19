@@ -45,14 +45,14 @@ export default function Headers() {
   return (
     <Box sx={{ width: '100%', height: '100%' }}>
       <AppBar data-tauri-drag-region position="static">
-        <Toolbar data-tauri-drag-region variant="dense" sx={{ marginLeft: '46px' }}>
-          <IconButton size="large" edge="start" color="inherit" aria-label="menu" sx={{ mr: 2 }}>
+        <Toolbar data-tauri-drag-region variant="dense" sx={{ marginLeft: '50px', height: '40px', minHeight: '28px' }}>
+          <IconButton size="small" edge="start" color="inherit" aria-label="menu" sx={{ mr: 2 }}>
             <Menu />
           </IconButton>
-          <Typography data-tauri-drag-region variant="h6" component="div" sx={{ flexGrow: 1 }}>
+          <Typography data-tauri-drag-region variant="body1" component="div" sx={{ flexGrow: 1 }}>
             ChatGPT
           </Typography>
-          <IconButton size="large" edge="start" color="inherit" onClick={handleClick}>
+          <IconButton size="small" edge="start" color="inherit" onClick={handleClick}>
             <Settings />
           </IconButton>
         </Toolbar>

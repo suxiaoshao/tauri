@@ -16,7 +16,7 @@ tauri-build = { version = "1.2.1", features = [] }
 
 [dependencies]
 serde_json = "1.0.94"
-serde = { version = "1.0.154", features = ["derive"] }
+serde = { version = "1.0.156", features = ["derive"] }
 tauri = { version = "1.2.4", features = ["api-all", "system-tray"] }
 
 # 数据库
@@ -30,7 +30,7 @@ anyhow = "1.0.69"
 
 # 搜索应用
 lnk = "0.5.1"
-walkdir = "2.3.2"
+walkdir = "2.3.3"
 pinyin = "0.9.0"
 
 # 数据

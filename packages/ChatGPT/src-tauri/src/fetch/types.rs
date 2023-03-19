@@ -6,6 +6,12 @@ pub struct Message {
     pub content: String,
 }
 
+#[derive(Debug, Deserialize, Serialize)]
+pub struct Delta {
+    pub role: Option<Role>,
+    pub content: Option<String>,
+}
+
 impl Message {
     pub fn new(role: Role, content: String) -> Self {
         Self { role, content }
@@ -25,11 +31,16 @@ pub enum Role {
 pub struct ChatRequest {
     pub model: Modal,
     pub messages: Vec<Message>,
+    pub stream: bool,
 }
 
 impl ChatRequest {
     pub fn new(model: Modal, messages: Vec<Message>) -> Self {
-        Self { model, messages }
+        Self {
+            model,
+            messages,
+            stream: true,
+        }
     }
 }
 
@@ -54,10 +65,7 @@ pub struct ChatResponse {
     created: i64,
 
     #[serde(rename = "choices")]
-    choices: Vec<Choice>,
-
-    #[serde(rename = "usage")]
-    usage: Usage,
+    pub choices: Vec<Choice>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -65,11 +73,11 @@ pub struct Choice {
     #[serde(rename = "index")]
     index: i64,
 
-    #[serde(rename = "message")]
-    message: Message,
+    #[serde(rename = "delta")]
+    pub delta: Delta,
 
     #[serde(rename = "finish_reason")]
-    finish_reason: String,
+    finish_reason: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
