@@ -108,6 +108,7 @@ impl<R: Runtime> WindowExt for Window<R> {
     }
 }
 
+#[allow(dead_code)]
 pub enum ToolbarThickness {
     Thick,
     Medium,

@@ -29,13 +29,13 @@ pub enum Role {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ChatRequest {
-    pub model: Modal,
+    pub model: Model,
     pub messages: Vec<Message>,
     pub stream: bool,
 }
 
 impl ChatRequest {
-    pub fn new(model: Modal, messages: Vec<Message>) -> Self {
+    pub fn new(model: Model, messages: Vec<Message>) -> Self {
         Self {
             model,
             messages,
@@ -45,7 +45,7 @@ impl ChatRequest {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
-pub enum Modal {
+pub enum Model {
     #[serde(rename = "text-davinci-003")]
     TextDavinci,
     #[default]

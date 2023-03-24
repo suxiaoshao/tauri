@@ -3,10 +3,13 @@ use reqwest_eventsource::{Event, RequestBuilderExt};
 
 use crate::errors::ChatGPTResult;
 
-use self::types::{ChatRequest, ChatResponse};
+pub use self::types::{ChatRequest, ChatResponse, Message, Model, Role};
 
 mod types;
-pub async fn fetch(api_key: &str, body: &ChatRequest) -> ChatGPTResult<()> {
+pub async fn fetch<F>(api_key: &str, body: &ChatRequest, func: F) -> ChatGPTResult<()>
+where
+    F: Fn(ChatResponse),
+{
     let mut headers = reqwest::header::HeaderMap::new();
     headers.append("Authorization", format!("Bearer {api_key}").parse()?);
     let client = reqwest::ClientBuilder::new()
@@ -22,23 +25,10 @@ pub async fn fetch(api_key: &str, body: &ChatRequest) -> ChatGPTResult<()> {
             Ok(Event::Message(message)) => {
                 let message = message.data;
                 if message == "[DONE]" {
+                    log::info!("Connection Closed!");
                     es.close();
                 } else {
-                    match serde_json::from_str::<ChatResponse>(&message) {
-                        Ok(data) => {
-                            let data =
-                                data.choices.into_iter().fold(String::new(), |mut s, data| {
-                                    if let Some(data) = data.delta.content {
-                                        s.push_str(&data);
-                                    }
-                                    s
-                                });
-                            print!("{}", data)
-                        }
-                        Err(err) => {
-                            println!("Error: {},{message}", err);
-                        }
-                    };
+                    func(serde_json::from_str::<ChatResponse>(&message)?);
                 }
             }
             Err(err) => {
@@ -48,4 +38,36 @@ pub async fn fetch(api_key: &str, body: &ChatRequest) -> ChatGPTResult<()> {
         }
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod test {
+    use crate::errors::ChatGPTResult;
+
+    #[tokio::test]
+    async fn test() -> ChatGPTResult<()> {
+        use super::*;
+        let body = ChatRequest::new(
+            Model::Gpt35,
+            vec![Message::new(Role::User, "Hello".to_string())],
+        );
+        let api_key = dotenv::var("OPENAI_API_KEY").unwrap();
+        fetch(&api_key, &body, |message| {
+            print!(
+                "{}",
+                message
+                    .choices
+                    .into_iter()
+                    .fold(String::new(), |mut acc, choice| {
+                        if let Some(content) = choice.delta.content {
+                            acc.push_str(&content);
+                        }
+                        acc
+                    })
+            );
+        })
+        .await?;
+        println!();
+        Ok(())
+    }
 }

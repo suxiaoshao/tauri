@@ -15,7 +15,7 @@ tauri-build = { version = "1.2.1", features = [] }
 [dependencies]
 # tauri
 tauri = { version = "1.2.4", features = ["macos-private-api", "shell-open", "window-close", "window-create", "window-set-focus", "window-show", "window-start-dragging"] }
-serde = { version = "1.0.156", features = ["derive"] }
+serde = { version = "1.0.157", features = ["derive"] }
 serde_json = "1.0.94"
 
 # database
@@ -24,7 +24,7 @@ libsqlite3-sys = { version = "0.25.2", features = ["bundled-windows"] }
 time = "0.3.20"
 
 # 错误处理
-thiserror = "1.0.39"
+thiserror = "1.0.40"
 
 # log
 tauri-plugin-log = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "dev" }
@@ -52,3 +52,6 @@ cocoa = "0.24.1"
 # this feature is used for production builds or when `devPath` points to the filesystem
 # DO NOT REMOVE!!
 custom-protocol = ["tauri/custom-protocol"]
+
+[dev-dependencies]
+dotenv = "0.15.0"

@@ -57,7 +57,9 @@ export default function Headers() {
           </IconButton>
         </Toolbar>
       </AppBar>
-      <Outlet />
+      <Box sx={{ width: '100%', height: 'calc(100% - 40px)' }}>
+        <Outlet />
+      </Box>
     </Box>
   );
 }

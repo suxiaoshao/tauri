@@ -92,6 +92,8 @@ pub enum ChatGPTError {
         #[from]
         serde_json::Error,
     ),
+    #[error("api key未设置")]
+    ApiKeyNotSet,
 }
 
 impl From<tauri::Error> for ChatGPTError {
