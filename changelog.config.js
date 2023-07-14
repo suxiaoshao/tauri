@@ -5,7 +5,7 @@ module.exports = {
   maxMessageLength: 64,
   minMessageLength: 3,
   questions: ['type', 'scope', 'subject', 'body', 'breaking', 'issues', 'lerna'],
-  scopes: ['feiwen', 'Hclipboard', 'http-client', 'movie', 'remove', 'ChatGPT', 'others', 'all'],
+  scopes: ['feiwen', 'Hclipboard', 'http-client', 'movie', 'remove', 'ChatGPT', 'others', 'common', 'all'],
   types: {
     chore: {
       description: 'Build process or auxiliary tool changes',

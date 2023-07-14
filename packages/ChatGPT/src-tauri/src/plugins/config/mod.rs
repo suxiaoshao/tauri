@@ -1,4 +1,4 @@
-use tauri::{Invoke, Manager, Runtime};
+use tauri::{Invoke, Manager, Runtime, WindowBuilder};
 
 use crate::errors::ChatGPTResult;
 mod config_data;
@@ -18,8 +18,11 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for ConfigPlugin {
         Ok(())
     }
     fn extend_api(&mut self, invoke: tauri::Invoke<R>) {
-        let handle: Box<dyn Fn(Invoke<R>) + Send + Sync> =
-            Box::new(tauri::generate_handler![set_config, get_config]);
+        let handle: Box<dyn Fn(Invoke<R>) + Send + Sync> = Box::new(tauri::generate_handler![
+            set_config,
+            get_config,
+            create_setting_window
+        ]);
         (handle)(invoke);
     }
 }
@@ -66,6 +69,26 @@ fn set_config<R: Runtime>(
 fn get_config<R: Runtime>(app_handle: tauri::AppHandle<R>) -> ChatGPTResult<ChatGPTConfig> {
     let state = ChatGPTConfig::get(&app_handle)?;
     Ok(state)
+}
+
+#[tauri::command]
+async fn create_setting_window<R: Runtime>(
+    app: tauri::AppHandle<R>,
+    window: tauri::Window<R>,
+) -> ChatGPTResult<()> {
+    match app.get_window("setting") {
+        Some(window) => {
+            window.show()?;
+            window.set_focus()?;
+        }
+        None => {
+            WindowBuilder::new(&app, "setting", tauri::WindowUrl::App("/setting".into()))
+                .transparent(true)
+                .parent_window(window.ns_window()?)
+                .build()?;
+        }
+    };
+    Ok(())
 }
 
 pub use config_data::ChatGPTConfig;

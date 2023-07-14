@@ -12,12 +12,6 @@ pub struct Delta {
     pub content: Option<String>,
 }
 
-impl Message {
-    pub fn new(role: Role, content: String) -> Self {
-        Self { role, content }
-    }
-}
-
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
 #[serde(rename_all = "lowercase")]
 pub enum Role {
@@ -32,16 +26,6 @@ pub struct ChatRequest {
     pub model: Model,
     pub messages: Vec<Message>,
     pub stream: bool,
-}
-
-impl ChatRequest {
-    pub fn new(model: Model, messages: Vec<Message>) -> Self {
-        Self {
-            model,
-            messages,
-            stream: true,
-        }
-    }
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]

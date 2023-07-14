@@ -39,35 +39,3 @@ where
     }
     Ok(())
 }
-
-#[cfg(test)]
-mod test {
-    use crate::errors::ChatGPTResult;
-
-    #[tokio::test]
-    async fn test() -> ChatGPTResult<()> {
-        use super::*;
-        let body = ChatRequest::new(
-            Model::Gpt35,
-            vec![Message::new(Role::User, "Hello".to_string())],
-        );
-        let api_key = dotenv::var("OPENAI_API_KEY").unwrap();
-        fetch(&api_key, &body, |message| {
-            print!(
-                "{}",
-                message
-                    .choices
-                    .into_iter()
-                    .fold(String::new(), |mut acc, choice| {
-                        if let Some(content) = choice.delta.content {
-                            acc.push_str(&content);
-                        }
-                        acc
-                    })
-            );
-        })
-        .await?;
-        println!();
-        Ok(())
-    }
-}
