@@ -22,6 +22,7 @@ fn main() -> ChatGPTResult<()> {
         .plugin(plugins::WindowPlugin)
         .plugin(tauri_plugin_window_state::Builder::default().build())
         .plugin(plugins::ConfigPlugin)
+        .plugin(plugins::ChatPlugin)
         .run(tauri::generate_context!())?;
     Ok(())
 }

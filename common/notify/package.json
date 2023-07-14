@@ -9,6 +9,6 @@
   "license": "ISC",
   "dependencies": {
     "notistack": "^3.0.1",
-    "rxjs": "^7.8.0"
+    "rxjs": "^7.8.1"
   }
 }

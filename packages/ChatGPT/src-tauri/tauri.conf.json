@@ -46,7 +46,8 @@
         "height": 600,
         "transparent": true,
         "titleBarStyle": "Overlay",
-        "hiddenTitle": true
+        "hiddenTitle": true,
+        "label": "main"
       }
     ],
     "macOSPrivateApi": true

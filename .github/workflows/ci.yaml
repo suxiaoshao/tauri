@@ -23,7 +23,8 @@ jobs:
         id: pnpm-install
         with:
           version: latest
-          run_install: true
+          run_install: |
+            - recursive: true
       - name: web Lint
         run: pnpm lint
       - name: web build

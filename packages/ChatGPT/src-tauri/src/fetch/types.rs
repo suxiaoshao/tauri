@@ -12,12 +12,6 @@ pub struct Delta {
     pub content: Option<String>,
 }
 
-impl Message {
-    pub fn new(role: Role, content: String) -> Self {
-        Self { role, content }
-    }
-}
-
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
 #[serde(rename_all = "lowercase")]
 pub enum Role {
@@ -29,23 +23,13 @@ pub enum Role {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ChatRequest {
-    pub model: Modal,
+    pub model: Model,
     pub messages: Vec<Message>,
     pub stream: bool,
 }
 
-impl ChatRequest {
-    pub fn new(model: Modal, messages: Vec<Message>) -> Self {
-        Self {
-            model,
-            messages,
-            stream: true,
-        }
-    }
-}
-
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
-pub enum Modal {
+pub enum Model {
     #[serde(rename = "text-davinci-003")]
     TextDavinci,
     #[default]

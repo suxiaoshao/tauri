@@ -41,4 +41,7 @@ impl ChatGPTConfig {
         };
         Ok(config)
     }
+    pub fn get_api_key(&self) -> ChatGPTResult<&str> {
+        self.api_key.as_deref().ok_or(ChatGPTError::ApiKeyNotSet)
+    }
 }
