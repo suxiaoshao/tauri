@@ -37,7 +37,7 @@ window-vibrancy = "0.4.0"
 
 # http request
 reqwest = { version = "0.11.18", features = ["json"] }
-tokio= { version = "1.29.1", features = ["rt","rt-multi-thread","sync","fs","io-util","macros"] }
+tokio= { version = "1.29.1", features = ["rt", "rt-multi-thread", "sync", "fs", "io-util", "macros"] }
 reqwest-eventsource = "0.4.0"
 futures = "0.3.28"
 
