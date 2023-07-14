@@ -5,6 +5,7 @@
 
 use fetch::parse_novel::Novel;
 use store::model::{NovelModel, TagModel};
+use tauri::Manager;
 
 #[macro_use]
 extern crate diesel;
@@ -14,6 +15,14 @@ mod store;
 
 fn main() -> anyhow::Result<()> {
     tauri::Builder::default()
+        .setup(|app| {
+            #[cfg(debug_assertions)]
+            {
+                let win = app.get_window("main").unwrap();
+                win.open_devtools();
+            }
+            Ok(())
+        })
         .invoke_handler(tauri::generate_handler![fetch, tags, query])
         .run(tauri::generate_context!())?;
     Ok(())
