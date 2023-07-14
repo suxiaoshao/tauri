@@ -77,7 +77,7 @@ export default function ThemeDrawerItem() {
                     aria-labelledby="color-setting"
                     {...field}
                     onChange={(event, newValue) => {
-                      field.onChange(newValue);
+                      field.onChange(newValue as 'dark' | 'light' | 'system');
                     }}
                   >
                     <FormControlLabel value="light" control={<Radio />} label="亮色" />

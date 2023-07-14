@@ -4,7 +4,7 @@ import { useState, MouseEvent, ReactNode, Key, FocusEventHandler, FocusEvent, Fo
 
 export interface CustomSelectorProps<T> {
   children?: { value: T; label: ReactNode; key: Key }[];
-  onChange: (event: { target: { value: T } }, newValue: T) => void;
+  onChange: (newValue: T) => void;
   onBlur?: FocusEventHandler<HTMLInputElement>;
   value: T;
   render?: (onClick: (event: MouseEvent<HTMLButtonElement>) => void) => ReactNode;
@@ -31,7 +31,7 @@ function CustomSelector<T>(
         {children?.map(({ value: itemValue, label, key }) => (
           <MenuItem
             onClick={() => {
-              onChange({ target: { value: itemValue } }, itemValue);
+              onChange(itemValue);
               handleClose();
             }}
             selected={itemValue === value}
