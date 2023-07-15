@@ -26,7 +26,14 @@ fn window_beatify<R: Runtime>(window: &tauri::Window<R>) -> ChatGPTResult<()> {
     apply_vibrancy(window, NSVisualEffectMaterial::HudWindow, None, None)?;
     #[cfg(target_os = "windows")]
     {
-        apply_mica(window)?;
+        apply_mica(
+            window,
+            window.theme().ok().map(|x| match x {
+                tauri::Theme::Light => false,
+                tauri::Theme::Dark => true,
+                _ => false,
+            }),
+        )?;
     }
     // 标题栏
     #[cfg(target_os = "macos")]
