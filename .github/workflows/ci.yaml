@@ -27,6 +27,8 @@ jobs:
             - recursive: true
       - name: web Lint
         run: pnpm lint
+      - name: web test
+        run: pnpm test
       - name: web build
         run: pnpm run build:web
       - name: Install Rust

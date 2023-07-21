@@ -82,10 +82,16 @@ async fn create_setting_window<R: Runtime>(
             window.set_focus()?;
         }
         None => {
-            WindowBuilder::new(&app, "setting", tauri::WindowUrl::App("/setting".into()))
-                .transparent(true)
-                .parent_window(window.ns_window()?)
-                .build()?;
+            let child =
+                WindowBuilder::new(&app, "setting", tauri::WindowUrl::App("/setting".into()))
+                    .transparent(true);
+
+            #[cfg(target_os = "macos")]
+            let child = child.parent_window(window.ns_window().unwrap());
+            #[cfg(windows)]
+            let child = child.owner_window(window.hwnd().unwrap());
+            let child = child.build()?;
+            println!("create setting window:{:?}", child);
         }
     };
     Ok(())
