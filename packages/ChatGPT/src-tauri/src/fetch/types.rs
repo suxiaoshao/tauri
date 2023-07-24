@@ -33,7 +33,7 @@ pub enum Model {
     #[serde(rename = "text-davinci-003")]
     TextDavinci,
     #[default]
-    #[serde(rename = "gpt-3.5-turbo")]
+    #[serde(rename = "gpt-3.5-turbo-0613")]
     Gpt35,
 }
 

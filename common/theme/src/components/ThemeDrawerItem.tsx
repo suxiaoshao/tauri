@@ -19,7 +19,7 @@ import {
 } from '@mui/material';
 import { useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { ThemeSliceType, updateColor, useAppDispatch, useAppSelector } from './themeSlice';
+import { ThemeSliceType, updateColor, useAppDispatch, useAppSelector } from '../themeSlice';
 import { string, object } from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 

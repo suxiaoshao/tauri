@@ -1,7 +1,7 @@
 import { AnyAction, createSlice, EnhancedStore, PayloadAction, ThunkAction } from '@reduxjs/toolkit';
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 import { argbFromHex, themeFromSourceColor } from '@material/material-color-utilities';
-import { youThemeToMuiTheme } from './youTheme';
+import { youThemeToMuiTheme } from './utils/youTheme';
 
 export type ThemeSliceType = {
   color: string;

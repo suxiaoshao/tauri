@@ -7,12 +7,14 @@ import CustomSelector from '../../../components/CustomSelector';
 import { Role, ChatRequest, Model, ChatResponse, Message } from '../types';
 import { Dispatch } from 'react';
 import { FetchingMessageAction, FetchingMessageActionTag } from '..';
+import { FetchingMessageType, FetchingMessageTypeTag } from './FetchingMessage';
 
 export interface ChatFormProps {
   fetchingMessageDispatch: Dispatch<FetchingMessageAction>;
+  fetchingMessage: FetchingMessageType;
 }
 
-export default function ChatForm({ fetchingMessageDispatch }: ChatFormProps) {
+export default function ChatForm({ fetchingMessageDispatch, fetchingMessage }: ChatFormProps) {
   const { register, handleSubmit, control, setValue } = useForm<Message>({ defaultValues: { role: Role.user } });
   const onSubmit = handleSubmit(async (data) => {
     const chatRequest: ChatRequest = {
@@ -32,6 +34,7 @@ export default function ChatForm({ fetchingMessageDispatch }: ChatFormProps) {
     fetchingMessageDispatch({ tag: FetchingMessageActionTag.complete });
     unListen();
   });
+  const isLoading = [FetchingMessageTypeTag.loading, FetchingMessageActionTag.start].includes(fetchingMessage.tag);
   return (
     <Paper
       onSubmit={onSubmit}
@@ -69,7 +72,7 @@ export default function ChatForm({ fetchingMessageDispatch }: ChatFormProps) {
         )}
       />
 
-      <IconButton type="submit" color="primary" sx={{ p: '10px' }}>
+      <IconButton type="submit" color="primary" sx={{ p: '10px' }} disabled={isLoading}>
         <Send />
       </IconButton>
     </Paper>

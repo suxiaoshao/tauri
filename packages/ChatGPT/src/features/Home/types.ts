@@ -1,6 +1,6 @@
 export enum Model {
   TextDavinci = 'text-davinci-003',
-  Gpt35 = 'gpt-3.5-turbo',
+  Gpt35 = 'gpt-3.5-turbo-0613',
 }
 
 export interface ChatRequest {

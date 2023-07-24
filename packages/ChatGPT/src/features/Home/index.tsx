@@ -67,7 +67,7 @@ export default function Home() {
       <Box sx={{ flex: '1 1 0', overflowY: 'auto' }}>
         <FetchingMessage fetchingMessage={fetchingMessage} />
       </Box>
-      <ChatForm fetchingMessageDispatch={fetchingMessageDispatch} />
+      <ChatForm fetchingMessageDispatch={fetchingMessageDispatch} fetchingMessage={fetchingMessage} />
     </Box>
   );
 }
