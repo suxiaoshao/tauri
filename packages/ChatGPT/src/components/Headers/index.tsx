@@ -5,6 +5,7 @@ import { useCallback, useEffect } from 'react';
 import { useAppSelector } from '../../app/hooks';
 import { selectApiKey } from '../../features/Setting/configSlice';
 import { invoke } from '@tauri-apps/api';
+import useSettingKey from '../../hooks/useSettingKey';
 
 export default function Headers() {
   const apiKey = useAppSelector(selectApiKey);
@@ -32,6 +33,7 @@ export default function Headers() {
   const handleClick = useCallback(() => {
     invoke('plugin:config|create_setting_window');
   }, []);
+  useSettingKey();
   return (
     <Box sx={{ width: '100%', height: '100%' }}>
       <AppBar data-tauri-drag-region position="static">

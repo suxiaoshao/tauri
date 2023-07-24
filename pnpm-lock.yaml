@@ -145,14 +145,32 @@ importers:
         specifier: ^1.11.9
         version: 1.11.9
 
+  common/types: {}
+
   packages/ChatGPT:
     dependencies:
+      markdown-to-jsx:
+        specifier: ^7.2.1
+        version: 7.2.1(react@18.2.0)
       notify:
         specifier: workspace:^1.0.0
         version: link:../../common/notify
+      prism-themes:
+        specifier: ^1.9.0
+        version: 1.9.0
+      prismjs:
+        specifier: ^1.29.0
+        version: 1.29.0
       theme:
         specifier: workspace:^1.0.0
         version: link:../../common/theme
+      types:
+        specifier: workspace:^1.0.0
+        version: link:../../common/types
+    devDependencies:
+      '@types/prismjs':
+        specifier: ^1.26.0
+        version: 1.26.0
 
   packages/Hclipboard:
     dependencies:
@@ -186,6 +204,9 @@ importers:
       theme:
         specifier: workspace:^1.0.0
         version: link:../../common/theme
+      types:
+        specifier: workspace:^1.0.0
+        version: link:../../common/types
 
 packages:
 
@@ -1615,6 +1636,10 @@ packages:
   /@types/parse-json@4.0.0:
     resolution: {integrity: sha512-//oorEZjL6sbPcKUaCdIGlIUeH26mgzimjBB77G6XRgnDl/L5wOnpyBGRe/Mmf5CVW3PwEBE1NjiMZ/ssFh4wA==}
     dev: false
+
+  /@types/prismjs@1.26.0:
+    resolution: {integrity: sha512-ZTaqn/qSqUuAq1YwvOFQfVW1AR/oQJlLSZVustdjwI+GZ8kr0MSHBj0tsXPW1EqHubx50gtBEjbPGsdZwQwCjQ==}
+    dev: true
 
   /@types/prop-types@15.7.5:
     resolution: {integrity: sha512-JCB8C6SnDoQf0cNycqd/35A7MjcnK+ZTqE7judS6o7utxUCg6imJg3QK2qzHKszlTjcj2cn+NwMB2i96ubpj7w==}
@@ -4481,6 +4506,15 @@ packages:
       semver: 6.3.1
     dev: true
 
+  /markdown-to-jsx@7.2.1(react@18.2.0):
+    resolution: {integrity: sha512-9HrdzBAo0+sFz9ZYAGT5fB8ilzTW+q6lPocRxrIesMO+aB40V9MgFfbfMXxlGjf22OpRy+IXlvVaQenicdpgbg==}
+    engines: {node: '>= 10'}
+    peerDependencies:
+      react: '>= 0.14.0'
+    dependencies:
+      react: 18.2.0
+    dev: false
+
   /mdn-data@2.0.14:
     resolution: {integrity: sha512-dn6wd0uw5GsdswPFfsgMp5NSB0/aDe6fK94YJV/AJDYXL6HVLWBsxeq7js7Ad+mU2K9LAlwpk6kN2D5mwCPVow==}
     dev: false
@@ -4981,6 +5015,15 @@ packages:
       ansi-styles: 5.2.0
       react-is: 18.2.0
     dev: true
+
+  /prism-themes@1.9.0:
+    resolution: {integrity: sha512-tX2AYsehKDw1EORwBps+WhBFKc2kxfoFpQAjxBndbZKr4fRmMkv47XN0BghC/K1qwodB1otbe4oF23vUTFDokw==}
+    dev: false
+
+  /prismjs@1.29.0:
+    resolution: {integrity: sha512-Kx/1w86q/epKcmte75LNrEoT+lX8pBpavuAbvJWRXar7Hz8jrtF+e3vY751p0R8H9HdArwaCTNDDzHg/ScJK1Q==}
+    engines: {node: '>=6'}
+    dev: false
 
   /process-nextick-args@2.0.1:
     resolution: {integrity: sha512-3ouUOpQhtgrbOa17J7+uxOTpITYWaGP7/AhoR3+A+/1e9skrzelGi/dXzEYyvbxubEF6Wn2ypscTKiKJFFn1ag==}

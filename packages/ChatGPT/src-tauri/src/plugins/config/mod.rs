@@ -84,14 +84,14 @@ async fn create_setting_window<R: Runtime>(
         None => {
             let child =
                 WindowBuilder::new(&app, "setting", tauri::WindowUrl::App("/setting".into()))
+                    .title("setting")
                     .transparent(true);
 
             #[cfg(target_os = "macos")]
             let child = child.parent_window(window.ns_window().unwrap());
             #[cfg(windows)]
             let child = child.owner_window(window.hwnd().unwrap());
-            let child = child.build()?;
-            println!("create setting window:{:?}", child);
+            child.build()?;
         }
     };
     Ok(())

@@ -23,6 +23,9 @@
         "setFocus": true,
         "show": true,
         "startDragging": true
+      },
+      "os": {
+        "all": true
       }
     },
     "bundle": {

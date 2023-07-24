@@ -52,7 +52,7 @@ const config = defineConfig({
   devtool: isProduction ? false : undefined,
   resolve: {
     alias: {
-      '@http': resolve(process.cwd(), './src'),
+      '@chatgpt': resolve(process.cwd(), './src'),
     },
   },
 });
