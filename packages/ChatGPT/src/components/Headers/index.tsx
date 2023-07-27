@@ -6,6 +6,7 @@ import { useAppSelector } from '../../app/hooks';
 import { selectApiKey } from '../../features/Setting/configSlice';
 import { invoke } from '@tauri-apps/api';
 import useSettingKey from '../../hooks/useSettingKey';
+import { platform } from '@chatgpt/const/platform';
 
 export default function Headers() {
   const apiKey = useAppSelector(selectApiKey);
@@ -37,7 +38,15 @@ export default function Headers() {
   return (
     <Box sx={{ width: '100%', height: '100%' }}>
       <AppBar data-tauri-drag-region position="static">
-        <Toolbar data-tauri-drag-region variant="dense" sx={{ marginLeft: '50px', height: '40px', minHeight: '28px' }}>
+        <Toolbar
+          data-tauri-drag-region
+          variant="dense"
+          sx={{
+            ...(platform === 'Darwin' ? { marginLeft: '50px' } : {}),
+            height: '40px',
+            minHeight: '28px',
+          }}
+        >
           <IconButton size="small" edge="start" color="inherit" aria-label="menu" sx={{ mr: 2 }}>
             <Menu />
           </IconButton>
