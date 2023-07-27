@@ -1,9 +1,8 @@
-use tauri::{Invoke, Manager, Runtime};
+use serde_json::Value;
+use tauri::{AppHandle, Invoke, Manager, Runtime};
 
-use crate::{
-    errors::ChatGPTResult,
-    fetch::{fetch as http_fetch, ChatRequest},
-};
+use crate::{errors::ChatGPTResult, fetch::{fetch as http_fetch, ChatRequest}, store};
+use crate::errors::ChatGPTError;
 
 use super::config::ChatGPTConfig;
 
@@ -12,6 +11,10 @@ pub struct ChatPlugin;
 impl<R: Runtime> tauri::plugin::Plugin<R> for ChatPlugin {
     fn name(&self) -> &'static str {
         "chat"
+    }
+    fn initialize(&mut self, app: &AppHandle<R>, _: Value) -> tauri::plugin::Result<()> {
+        setup(app)?;
+        Ok(())
     }
     fn extend_api(&mut self, invoke: Invoke<R>) {
         let handle: Box<dyn Fn(Invoke<R>) + Send + Sync> =
@@ -31,5 +34,20 @@ async fn fetch<R: Runtime>(
         app_handle.emit_to("main", "fetch", &x).unwrap();
     })
     .await?;
+    Ok(())
+}
+
+fn setup<R: Runtime>(app: &AppHandle<R>) -> ChatGPTResult<()> {
+    use tauri::api::path::*;
+    //data path
+    let data_path = app_config_dir(&app.config())
+        .ok_or(ChatGPTError::DbPath)?
+        .join("history.sqlite3")
+        .to_str()
+        .ok_or(ChatGPTError::DbPath)?
+        .to_string();
+    // database connection
+    let conn = store::establish_connection(&data_path)?;
+    app.manage(conn);
     Ok(())
 }

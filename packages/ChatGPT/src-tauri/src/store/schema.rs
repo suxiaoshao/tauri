@@ -5,8 +5,8 @@ diesel::table! {
         id -> Integer,
         title -> Text,
         mode -> Text,
-        created_time -> Double,
-        updated_time -> Double,
+        created_time -> BigInt,
+        updated_time -> BigInt,
         info -> Nullable<Text>,
         prompt -> Nullable<Text>,
     }
@@ -19,10 +19,10 @@ diesel::table! {
         role -> Text,
         content -> Text,
         status -> Text,
-        created_time -> Double,
-        updated_time -> Double,
-        start_time -> Double,
-        end_time -> Double,
+        created_time -> BigInt,
+        updated_time -> BigInt,
+        start_time -> BigInt,
+        end_time -> BigInt,
     }
 }
 

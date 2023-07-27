@@ -94,6 +94,10 @@ pub enum ChatGPTError {
     ),
     #[error("api key未设置")]
     ApiKeyNotSet,
+    #[error("无父文件夹")]
+    Path,
+    #[error("获取不了历史记录数据库路径")]
+    DbPath,
 }
 
 impl From<tauri::Error> for ChatGPTError {
