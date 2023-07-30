@@ -49,7 +49,7 @@ impl Conversation {
         Ok(())
     }
     /// 获取所有对话
-    fn query_all(conn: &mut SqliteConnection) -> ChatGPTResult<Vec<Conversation>> {
+    pub fn query_all(conn: &mut SqliteConnection) -> ChatGPTResult<Vec<Conversation>> {
         let data = conversations::table
             .order(conversations::updated_time.desc())
             .load::<Conversation>(conn)?;

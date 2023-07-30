@@ -8,6 +8,8 @@ use diesel::{
     SqliteConnection,
 };
 
+pub use model::{conversations::Conversation};
+
 pub type DbConn = Pool<ConnectionManager<SqliteConnection>>;
 
 pub fn establish_connection(url: &str) -> ChatGPTResult<DbConn> {

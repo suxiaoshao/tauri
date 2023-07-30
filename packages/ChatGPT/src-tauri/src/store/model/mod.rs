@@ -1,2 +1,2 @@
-mod conversations;
-mod messages;
+pub mod conversations;
+pub mod messages;

@@ -3,11 +3,13 @@ import { invoke } from '@tauri-apps/api';
 import { listen } from '@tauri-apps/api/event';
 import { themeReducer } from 'theme';
 import configReducer, { ConfigSliceType, setConfig } from '../features/Setting/configSlice';
+import { conversationReducer } from '@chatgpt/features/Conversations/conversationSlice';
 
 const store = configureStore({
   reducer: {
     theme: themeReducer,
     config: configReducer,
+    conversation: conversationReducer,
   },
 });
 export default store;
