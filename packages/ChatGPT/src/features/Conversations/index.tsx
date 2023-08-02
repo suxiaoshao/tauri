@@ -32,6 +32,7 @@ export default function AppDrawer({ open, drawerWidth }: DrawerProps) {
           key={conversation.id}
           onClick={() => handleSelect(conversation)}
           selected={conversation.id === selectedConversation?.id}
+          dense
         >
           <ListItemIcon>{conversation.mode === 'prompt' ? <Inbox /> : <Mail />}</ListItemIcon>
           <ListItemText primary={conversation.title} secondary={conversation.info} />
