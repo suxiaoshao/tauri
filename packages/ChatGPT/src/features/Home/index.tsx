@@ -1,8 +1,11 @@
 import { Box, Paper } from '@mui/material';
 import ChatForm from './components/ChatForm';
 import FetchingMessage, { FetchingMessageType, FetchingMessageTypeTag } from './components/FetchingMessage';
-import { Reducer, useReducer } from 'react';
+import { Reducer, useMemo, useReducer } from 'react';
 import { Enum } from 'types';
+import { useAppSelector } from '@chatgpt/app/hooks';
+import { selectSelectedConversation } from '@chatgpt/features/Conversations/conversationSlice';
+import AddConversation from '@chatgpt/features/Home/components/AddConversation';
 
 export enum FetchingMessageActionTag {
   add = 'add',
@@ -58,16 +61,23 @@ export default function Home() {
   const [fetchingMessage, fetchingMessageDispatch] = useReducer<FetchingMessageReducer>(reducer, {
     tag: FetchingMessageTypeTag.init,
   });
-  return (
-    <Box
-      component={Paper}
-      sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', p: 2 }}
-      square
-    >
-      <Box sx={{ flex: '1 1 0', overflowY: 'auto' }}>
-        <FetchingMessage fetchingMessage={fetchingMessage} />
-      </Box>
-      <ChatForm fetchingMessageDispatch={fetchingMessageDispatch} fetchingMessage={fetchingMessage} />
-    </Box>
-  );
+  const selectedConversation = useAppSelector(selectSelectedConversation);
+  return useMemo(() => {
+    if (selectedConversation) {
+      return (
+        <Box
+          component={Paper}
+          sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', p: 2 }}
+          square
+        >
+          <Box sx={{ flex: '1 1 0', overflowY: 'auto' }}>
+            <FetchingMessage fetchingMessage={fetchingMessage} />
+          </Box>
+          <ChatForm fetchingMessageDispatch={fetchingMessageDispatch} fetchingMessage={fetchingMessage} />
+        </Box>
+      );
+    } else {
+      return <AddConversation />;
+    }
+  }, [fetchingMessage, selectedConversation]);
 }

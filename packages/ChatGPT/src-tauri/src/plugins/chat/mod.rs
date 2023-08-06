@@ -1,8 +1,8 @@
 use serde_json::Value;
 use tauri::{AppHandle, Invoke, Manager, Runtime};
 
-use crate::errors::ChatGPTError;
 use crate::store::{Conversation, DbConn};
+use crate::{errors::ChatGPTError, store::NewConversation};
 use crate::{
     errors::ChatGPTResult,
     fetch::{fetch as http_fetch, ChatRequest},
@@ -22,17 +22,17 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for ChatPlugin {
         Ok(())
     }
     fn extend_api(&mut self, invoke: Invoke<R>) {
-        let handle: Box<dyn Fn(Invoke<R>) + Send + Sync> =
-            Box::new(tauri::generate_handler![fetch, get_conversations]);
+        let handle: Box<dyn Fn(Invoke<R>) + Send + Sync> = Box::new(tauri::generate_handler![
+            fetch,
+            get_conversations,
+            save_conversation
+        ]);
         (handle)(invoke);
     }
 }
 // remember to call `.manage(MyState::default())`
 #[tauri::command(async)]
-async fn fetch<R: Runtime>(
-    app_handle: AppHandle<R>,
-    body: ChatRequest,
-) -> ChatGPTResult<()> {
+async fn fetch<R: Runtime>(app_handle: AppHandle<R>, body: ChatRequest) -> ChatGPTResult<()> {
     let config = ChatGPTConfig::get(&app_handle)?;
     let api_key = config.get_api_key()?;
     http_fetch(api_key, &body, |x| {
@@ -46,6 +46,17 @@ async fn get_conversations(state: tauri::State<'_, DbConn>) -> ChatGPTResult<Vec
     let mut conn = state.get()?;
     let data = Conversation::query_all(&mut conn)?;
     Ok(data)
+}
+
+#[tauri::command]
+async fn save_conversation(
+    state: tauri::State<'_, DbConn>,
+    data: NewConversation,
+) -> ChatGPTResult<()> {
+    let mut conn = state.get()?;
+    dbg!(&data);
+    Conversation::insert(data, &mut conn)?;
+    Ok(())
 }
 
 fn setup<R: Runtime>(app: &AppHandle<R>) -> ChatGPTResult<()> {

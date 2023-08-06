@@ -98,6 +98,8 @@ pub enum ChatGPTError {
     Path,
     #[error("获取不了历史记录数据库路径")]
     DbPath,
+    #[error("无效的模式:{}",.0)]
+    InvalidMode(String),
 }
 
 impl From<tauri::Error> for ChatGPTError {

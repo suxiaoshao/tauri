@@ -1,11 +1,12 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AppThunkAction, RootState } from '../../app/store';
 import { invoke } from '@tauri-apps/api';
+import { Mode } from '../Home/components/AddConversation';
 
 export interface Conversation {
   id: number;
   title: string;
-  mode: string;
+  mode: Mode;
   createdTime: number;
   updatedTime: number;
   info?: string | null;

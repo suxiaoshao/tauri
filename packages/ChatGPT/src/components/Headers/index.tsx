@@ -16,7 +16,7 @@ export default function Headers() {
   const handleClick = useCallback(async () => {
     await invoke('plugin:config|create_setting_window');
   }, []);
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   const handleDrawerChange = () => {
     setOpen((value) => !value);
   };
