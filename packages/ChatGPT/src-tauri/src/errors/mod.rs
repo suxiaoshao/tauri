@@ -100,6 +100,10 @@ pub enum ChatGPTError {
     DbPath,
     #[error("无效的模式:{}",.0)]
     InvalidMode(String),
+    #[error("无效的角色:{}",.0)]
+    InvalidRole(String),
+    #[error("无效的消息状态:{}",.0)]
+    InvalidMessageStatus(String),
 }
 
 impl From<tauri::Error> for ChatGPTError {

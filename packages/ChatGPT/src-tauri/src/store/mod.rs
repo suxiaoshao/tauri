@@ -9,6 +9,7 @@ use diesel::{
 };
 
 pub use model::conversations::*;
+pub use model::messages::*;
 
 pub type DbConn = Pool<ConnectionManager<SqliteConnection>>;
 

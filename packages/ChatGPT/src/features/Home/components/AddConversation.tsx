@@ -2,6 +2,8 @@ import { Box, Select, TextField, FormControl, InputLabel, MenuItem, Button, Typo
 import { useForm } from 'react-hook-form';
 import { Paper } from '@mui/material';
 import { invoke } from '@tauri-apps/api';
+import { useAppDispatch } from '@chatgpt/app/hooks';
+import { fetchConversations } from '@chatgpt/features/Conversations/conversationSlice';
 
 export enum Mode {
   Contextual = 'contextual',
@@ -16,10 +18,12 @@ export interface NewConversation {
 
 export default function AddConversation() {
   const { register, handleSubmit } = useForm<NewConversation>();
-  const onSubmit = handleSubmit(({ mode, title, info, prompt }) => {
-    invoke('plugin:chat|save_conversation', {
+  const dispatch = useAppDispatch();
+  const onSubmit = handleSubmit(async ({ mode, title, info, prompt }) => {
+    await invoke('plugin:chat|save_conversation', {
       data: { mode, title, info: info?.trim() || null, prompt: prompt?.trim() || null },
     });
+    dispatch(fetchConversations());
   });
   return (
     <Box

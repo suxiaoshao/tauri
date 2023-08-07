@@ -25,7 +25,8 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for ChatPlugin {
         let handle: Box<dyn Fn(Invoke<R>) + Send + Sync> = Box::new(tauri::generate_handler![
             fetch,
             get_conversations,
-            save_conversation
+            save_conversation,
+            add_message,
         ]);
         (handle)(invoke);
     }
@@ -54,8 +55,17 @@ async fn save_conversation(
     data: NewConversation,
 ) -> ChatGPTResult<()> {
     let mut conn = state.get()?;
-    dbg!(&data);
     Conversation::insert(data, &mut conn)?;
+    Ok(())
+}
+
+#[tauri::command]
+async fn add_message(
+    state: tauri::State<'_, DbConn>,
+    data: store::NewMessage,
+) -> ChatGPTResult<()> {
+    let mut conn = state.get()?;
+    store::Message::insert(data, &mut conn)?;
     Ok(())
 }
 

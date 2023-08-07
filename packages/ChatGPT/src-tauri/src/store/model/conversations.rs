@@ -1,5 +1,5 @@
 use super::{super::schema::conversations, types::Mode};
-use crate::errors::{ChatGPTError, ChatGPTResult};
+use crate::{errors::ChatGPTResult, store::Message};
 use diesel::prelude::*;
 use time::OffsetDateTime;
 
@@ -14,6 +14,7 @@ pub struct Conversation {
     updated_time: i64,
     info: Option<String>,
     prompt: Option<String>,
+    messages: Vec<Message>,
 }
 
 #[derive(serde::Deserialize, Debug)]
@@ -46,22 +47,6 @@ struct SqlConversation {
     prompt: Option<String>,
 }
 
-impl TryFrom<SqlConversation> for Conversation {
-    type Error = ChatGPTError;
-
-    fn try_from(value: SqlConversation) -> Result<Self, Self::Error> {
-        Ok(Conversation {
-            id: value.id,
-            title: value.title,
-            mode: value.mode.parse()?,
-            created_time: value.created_time,
-            updated_time: value.updated_time,
-            info: value.info,
-            prompt: value.prompt,
-        })
-    }
-}
-
 impl Conversation {
     pub fn insert(
         NewConversation {
@@ -92,7 +77,31 @@ impl Conversation {
             .order(conversations::updated_time.desc())
             .load::<SqlConversation>(conn)?;
         data.into_iter()
-            .map(TryFrom::try_from)
+            .map(|sql_conversation| Self::from_sql_conversation(sql_conversation, conn))
             .collect::<ChatGPTResult<_>>()
+    }
+    fn from_sql_conversation(
+        SqlConversation {
+            id,
+            title,
+            mode,
+            created_time,
+            updated_time,
+            info,
+            prompt,
+        }: SqlConversation,
+        conn: &mut SqliteConnection,
+    ) -> ChatGPTResult<Conversation> {
+        let messages = Message::messages_by_conversation_id(id, conn)?;
+        Ok(Conversation {
+            id,
+            title,
+            mode: mode.parse()?,
+            created_time,
+            updated_time,
+            info,
+            prompt,
+            messages,
+        })
     }
 }
