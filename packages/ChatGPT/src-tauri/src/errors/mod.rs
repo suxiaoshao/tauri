@@ -104,6 +104,14 @@ pub enum ChatGPTError {
     InvalidRole(String),
     #[error("无效的消息状态:{}",.0)]
     InvalidMessageStatus(String),
+    #[error("无效的时间格式:{}",.0)]
+    InvalidTimeFormat(
+        #[serde(skip_serializing)]
+        #[from]
+        time::error::IndeterminateOffset,
+    ),
+    #[error("无效的 model:{}",.0)]
+    InvalidModel(String),
 }
 
 impl From<tauri::Error> for ChatGPTError {

@@ -1,14 +1,16 @@
 use diesel::prelude::*;
+use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
 
 use crate::{
     errors::{ChatGPTError, ChatGPTResult},
-    store::schema::messages,
+    store::{
+        schema::messages,
+        types::{Role, Status},
+    },
 };
 
-use super::types::{Role, Status};
-
-#[derive(Debug, Queryable, serde::Serialize)]
+#[derive(Debug, Queryable, Serialize)]
 pub struct Message {
     pub id: i32,
     pub conversation_id: i32,
@@ -16,19 +18,29 @@ pub struct Message {
     pub content: String,
     pub status: Status,
     #[serde(rename = "createdTime")]
-    pub created_time: i64,
+    pub created_time: OffsetDateTime,
     #[serde(rename = "updatedTime")]
-    pub updated_time: i64,
+    pub updated_time: OffsetDateTime,
     #[serde(rename = "startTime")]
-    pub start_time: i64,
+    pub start_time: OffsetDateTime,
     #[serde(rename = "endTime")]
-    pub end_time: i64,
+    pub end_time: OffsetDateTime,
 }
-#[derive(serde::Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 pub struct NewMessage {
     pub role: Role,
     pub content: String,
     pub status: Status,
+}
+
+impl NewMessage {
+    pub fn new(role: Role, content: String, status: Status) -> Self {
+        Self {
+            role,
+            content,
+            status,
+        }
+    }
 }
 
 #[derive(Insertable)]
@@ -37,10 +49,10 @@ struct SqlNewMessage {
     role: String,
     content: String,
     status: String,
-    created_time: i64,
-    updated_time: i64,
-    start_time: i64,
-    end_time: i64,
+    created_time: OffsetDateTime,
+    updated_time: OffsetDateTime,
+    start_time: OffsetDateTime,
+    end_time: OffsetDateTime,
 }
 
 #[derive(Debug, Queryable)]
@@ -50,10 +62,10 @@ pub struct SqlMessage {
     pub role: String,
     pub content: String,
     pub status: String,
-    pub created_time: i64,
-    pub updated_time: i64,
-    pub start_time: i64,
-    pub end_time: i64,
+    pub created_time: OffsetDateTime,
+    pub updated_time: OffsetDateTime,
+    pub start_time: OffsetDateTime,
+    pub end_time: OffsetDateTime,
 }
 
 impl TryFrom<SqlMessage> for Message {
@@ -82,8 +94,8 @@ impl Message {
             status,
         }: NewMessage,
         conn: &mut SqliteConnection,
-    ) -> ChatGPTResult<()> {
-        let time = (OffsetDateTime::now_utc().unix_timestamp_nanos() / 1000) as i64;
+    ) -> ChatGPTResult<Message> {
+        let time = OffsetDateTime::now_local()?;
 
         let new_message = SqlNewMessage {
             role: role.to_string(),
@@ -97,7 +109,8 @@ impl Message {
         diesel::insert_into(messages::table)
             .values(&new_message)
             .execute(conn)?;
-        Ok(())
+        let message: SqlMessage = messages::table.order(messages::id.desc()).first(conn)?;
+        Message::try_from(message)
     }
     pub fn messages_by_conversation_id(
         conversation_id: i32,

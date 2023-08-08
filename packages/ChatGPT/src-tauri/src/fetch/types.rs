@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
 
+use crate::store::{Model, Role};
+
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Message {
     pub role: Role,
@@ -12,29 +14,11 @@ pub struct Delta {
     pub content: Option<String>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, Default)]
-#[serde(rename_all = "lowercase")]
-pub enum Role {
-    System,
-    #[default]
-    User,
-    Assistant,
-}
-
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ChatRequest {
     pub model: Model,
     pub messages: Vec<Message>,
     pub stream: bool,
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone, Default)]
-pub enum Model {
-    #[serde(rename = "text-davinci-003")]
-    TextDavinci,
-    #[default]
-    #[serde(rename = "gpt-3.5-turbo-0613")]
-    Gpt35,
 }
 
 #[derive(Serialize, Deserialize, Debug)]

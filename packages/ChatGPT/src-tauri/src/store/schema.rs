@@ -5,8 +5,15 @@ diesel::table! {
         id -> Integer,
         title -> Text,
         mode -> Text,
-        created_time -> BigInt,
-        updated_time -> BigInt,
+        model -> Text,
+        temperature -> Double,
+        top_p -> Double,
+        n -> BigInt,
+        max_tokens -> Nullable<BigInt>,
+        presence_penalty -> Double,
+        frequency_penalty -> Double,
+        created_time -> TimestamptzSqlite,
+        updated_time -> TimestamptzSqlite,
         info -> Nullable<Text>,
         prompt -> Nullable<Text>,
     }
@@ -19,16 +26,13 @@ diesel::table! {
         role -> Text,
         content -> Text,
         status -> Text,
-        created_time -> BigInt,
-        updated_time -> BigInt,
-        start_time -> BigInt,
-        end_time -> BigInt,
+        created_time -> TimestamptzSqlite,
+        updated_time -> TimestamptzSqlite,
+        start_time -> TimestamptzSqlite,
+        end_time -> TimestamptzSqlite,
     }
 }
 
 diesel::joinable!(messages -> conversations (conversation_id));
 
-diesel::allow_tables_to_appear_in_same_query!(
-    conversations,
-    messages,
-);
+diesel::allow_tables_to_appear_in_same_query!(conversations, messages,);

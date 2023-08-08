@@ -3,7 +3,7 @@ use reqwest_eventsource::{Event, RequestBuilderExt};
 
 use crate::errors::ChatGPTResult;
 
-pub use self::types::{ChatRequest, ChatResponse, Message, Model, Role};
+pub use self::types::{ChatRequest, ChatResponse, Message};
 
 mod types;
 pub async fn fetch<F>(api_key: &str, body: &ChatRequest, func: F) -> ChatGPTResult<()>

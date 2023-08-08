@@ -18,8 +18,8 @@ once_cell = "1.18.0"
 tokio = { version = "1.29.1", features = ["rt", "rt-multi-thread", "macros", "fs"] }
 
 # 存储
-serde = { version = "1.0.182", features = ["derive"] }
+serde = { version = "1.0.183", features = ["derive"] }
 serde_json = "1.0.104"
 
 # 参数
-clap = { version = "4.3.19", features = ["derive"] }
+clap = { version = "4.3.21", features = ["derive"] }

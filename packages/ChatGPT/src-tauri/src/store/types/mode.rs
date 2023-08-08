@@ -8,6 +8,8 @@ pub enum Mode {
     Contextual,
     #[serde(rename = "single")]
     Single,
+    #[serde(rename = "assistant-only")]
+    AssistantOnly,
 }
 
 impl FromStr for Mode {
@@ -17,6 +19,7 @@ impl FromStr for Mode {
         match s {
             "contextual" => Ok(Mode::Contextual),
             "single" => Ok(Mode::Single),
+            "assistant-only" => Ok(Mode::AssistantOnly),
             _ => Err(ChatGPTError::InvalidMode(s.to_owned())),
         }
     }
@@ -27,6 +30,7 @@ impl ToString for Mode {
         match self {
             Mode::Contextual => "contextual".to_owned(),
             Mode::Single => "single".to_owned(),
+            Mode::AssistantOnly => "assistant-only".to_owned(),
         }
     }
 }
@@ -38,6 +42,10 @@ mod test {
         use super::Mode;
         assert_eq!("contextual".parse::<Mode>().unwrap(), Mode::Contextual);
         assert_eq!("single".parse::<Mode>().unwrap(), Mode::Single);
+        assert_eq!(
+            "assistant-only".parse::<Mode>().unwrap(),
+            Mode::AssistantOnly
+        );
         assert!("invalid".parse::<Mode>().is_err());
     }
 }

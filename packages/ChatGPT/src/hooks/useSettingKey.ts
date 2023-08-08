@@ -7,7 +7,7 @@ export default function useSettingKey() {
     const handleShortcut = async (event: KeyboardEvent) => {
       const isMacos = platform === 'Darwin';
       if (((event.metaKey && isMacos) || (event.ctrlKey && !isMacos)) && event.key === ',') {
-        invoke('plugin:config|create_setting_window');
+        await invoke('plugin:config|create_setting_window');
       }
     };
     document.addEventListener('keydown', handleShortcut);

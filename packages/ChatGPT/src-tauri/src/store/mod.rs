@@ -1,5 +1,6 @@
 mod model;
 mod schema;
+mod types;
 
 use crate::errors::{ChatGPTError, ChatGPTResult};
 use diesel::{
@@ -10,6 +11,7 @@ use diesel::{
 
 pub use model::conversations::*;
 pub use model::messages::*;
+pub use types::*;
 
 pub type DbConn = Pool<ConnectionManager<SqliteConnection>>;
 

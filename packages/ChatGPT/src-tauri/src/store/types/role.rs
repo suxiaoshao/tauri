@@ -2,11 +2,12 @@ use std::str::FromStr;
 
 use crate::errors::ChatGPTError;
 
-#[derive(serde::Serialize, serde::Deserialize, PartialEq, Eq, Debug)]
+#[derive(serde::Serialize, serde::Deserialize, PartialEq, Eq, Debug, Default)]
 pub enum Role {
     #[serde(rename = "system")]
     System,
     #[serde(rename = "user")]
+    #[default]
     User,
     #[serde(rename = "assistant")]
     Assistant,
