@@ -2,7 +2,6 @@ import { Box, List, ListItemButton, ListItemIcon, ListItemText, Toolbar, Drawer,
 import { Add, Inbox, Mail } from '@mui/icons-material';
 import { headersHeight } from '@chatgpt/components/Headers';
 import {
-  Conversation,
   selectConversations,
   selectSelectedConversation,
   setSelected,
@@ -10,6 +9,7 @@ import {
 import { useAppDispatch, useAppSelector } from '@chatgpt/app/hooks';
 import { useCallback, useMemo } from 'react';
 import { Mode } from '../Home/components/AddConversation';
+import { Conversation } from '@chatgpt/types/conversation';
 
 export interface DrawerProps {
   open: boolean;

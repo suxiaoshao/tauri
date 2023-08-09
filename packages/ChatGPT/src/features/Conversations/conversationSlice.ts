@@ -1,41 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AppThunkAction, RootState } from '../../app/store';
 import { invoke } from '@tauri-apps/api';
-import { Mode } from '../Home/components/AddConversation';
-
-export enum Role {
-  System = 'system',
-  User = 'user',
-  Assistant = 'assistant',
-}
-
-export enum Status {
-  Normal = 'normal',
-  Hidden = 'hidden',
-}
-
-export interface Message {
-  id: number;
-  conversation_id: number;
-  role: Role;
-  content: string;
-  status: Status;
-  createdTime: number;
-  updatedTime: number;
-  startTime: number;
-  endTime: number;
-}
-
-export interface Conversation {
-  id: number;
-  title: string;
-  mode: Mode;
-  createdTime: number;
-  updatedTime: number;
-  info?: string | null;
-  prompt?: string | null;
-  messages?: Message[];
-}
+import { Conversation } from '@chatgpt/types/conversation';
 
 export interface ConversationSliceType {
   value: Conversation[];

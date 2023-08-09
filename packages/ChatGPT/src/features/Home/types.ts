@@ -1,22 +1,8 @@
-export enum Model {
-  TextDavinci = 'text-davinci-003',
-  Gpt35 = 'gpt-3.5-turbo-0613',
-}
-
-export interface ChatRequest {
-  model: Model;
-  stream: boolean;
-  messages: Message[];
-}
+import { Role } from '@chatgpt/types/common';
 
 export interface Message {
   role: Role;
   content: string;
-}
-export enum Role {
-  system = 'system',
-  user = 'user',
-  assistant = 'assistant',
 }
 
 export interface ChatResponse {

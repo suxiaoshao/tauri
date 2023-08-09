@@ -8,6 +8,8 @@ pub enum Status {
     Normal,
     #[serde(rename = "hidden")]
     Hidden,
+    #[serde(rename = "loading")]
+    Loading,
 }
 
 impl FromStr for Status {
@@ -17,6 +19,7 @@ impl FromStr for Status {
         match s {
             "normal" => Ok(Status::Normal),
             "hidden" => Ok(Status::Hidden),
+            "loading" => Ok(Status::Loading),
             _ => Err(ChatGPTError::InvalidMessageStatus(s.to_owned())),
         }
     }
@@ -27,6 +30,7 @@ impl ToString for Status {
         match self {
             Status::Normal => "normal".to_owned(),
             Status::Hidden => "hidden".to_owned(),
+            Status::Loading => "loading".to_owned(),
         }
     }
 }
@@ -38,6 +42,7 @@ mod test {
         use super::Status;
         assert_eq!("normal".parse::<Status>().unwrap(), Status::Normal);
         assert_eq!("hidden".parse::<Status>().unwrap(), Status::Hidden);
+        assert_eq!("loading".parse::<Status>().unwrap(), Status::Loading);
         assert!("invalid".parse::<Status>().is_err());
     }
 }

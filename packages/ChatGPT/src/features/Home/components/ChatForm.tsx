@@ -4,12 +4,13 @@ import { invoke } from '@tauri-apps/api';
 import { listen } from '@tauri-apps/api/event';
 import { Controller, useForm } from 'react-hook-form';
 import CustomSelector from '../../../components/CustomSelector';
-import { Role, ChatResponse, Message } from '../types';
+import { ChatResponse, Message } from '../types';
 import { Dispatch } from 'react';
 import { FetchingMessageAction, FetchingMessageActionTag } from '..';
 import { FetchingMessageType, FetchingMessageTypeTag } from './FetchingMessage';
 import { useAppSelector } from '@chatgpt/app/hooks';
 import { selectSelectedConversation } from '@chatgpt/features/Conversations/conversationSlice';
+import { Role } from '@chatgpt/types/common';
 
 export interface ChatFormProps {
   fetchingMessageDispatch: Dispatch<FetchingMessageAction>;

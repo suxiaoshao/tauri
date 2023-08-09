@@ -23,6 +23,7 @@ impl Message {
             Mode::Contextual => match status {
                 crate::store::Status::Normal => Some(Self { role, content }),
                 crate::store::Status::Hidden => None,
+                Status::Loading => None,
             },
             Mode::Single => None,
             Mode::AssistantOnly => match (role, status) {
