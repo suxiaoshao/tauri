@@ -1,16 +1,16 @@
 import { Send } from '@mui/icons-material';
-import { Paper, InputBase, Divider, Button, IconButton } from '@mui/material';
+import { Paper, InputBase, IconButton } from '@mui/material';
 import { invoke } from '@tauri-apps/api';
 import { listen } from '@tauri-apps/api/event';
-import { Controller, useForm } from 'react-hook-form';
-import CustomSelector from '../../../components/CustomSelector';
-import { ChatResponse, Message } from '../types';
+import { useForm } from 'react-hook-form';
 import { Dispatch } from 'react';
 import { FetchingMessageAction, FetchingMessageActionTag } from '..';
 import { FetchingMessageType, FetchingMessageTypeTag } from './FetchingMessage';
 import { useAppSelector } from '@chatgpt/app/hooks';
 import { selectSelectedConversation } from '@chatgpt/features/Conversations/conversationSlice';
 import { Role } from '@chatgpt/types/common';
+import { Message } from '@chatgpt/types/message';
+import { ChatResponse } from '../types';
 
 export interface ChatFormProps {
   fetchingMessageDispatch: Dispatch<FetchingMessageAction>;
@@ -18,7 +18,7 @@ export interface ChatFormProps {
 }
 
 export default function ChatForm({ fetchingMessageDispatch, fetchingMessage }: ChatFormProps) {
-  const { register, handleSubmit, control, setValue } = useForm<Message>({ defaultValues: { role: Role.user } });
+  const { register, handleSubmit, setValue } = useForm<Message>({ defaultValues: { role: Role.user } });
   const id = useAppSelector(selectSelectedConversation)?.id;
   const onSubmit = handleSubmit(async (data) => {
     fetchingMessageDispatch({ tag: FetchingMessageActionTag.start });
@@ -42,7 +42,15 @@ export default function ChatForm({ fetchingMessageDispatch, fetchingMessage }: C
     <Paper
       onSubmit={onSubmit}
       component="form"
-      sx={{ p: '2px 4px', display: 'flex', alignItems: 'flex-end', width: '100%', flex: '0 0 auto', borderRadius: 2 }}
+      sx={{
+        p: '2px 4px',
+        display: 'flex',
+        alignItems: 'flex-end',
+        width: (theme) => `calc(100% - ${theme.spacing(4)})`,
+        flex: '0 0 auto',
+        borderRadius: 2,
+        m: 2,
+      }}
       elevation={3}
     >
       <InputBase
@@ -51,28 +59,6 @@ export default function ChatForm({ fetchingMessageDispatch, fetchingMessage }: C
         multiline
         maxRows={4}
         {...register('content')}
-      />
-      <Divider sx={{ height: (theme) => `calc(100% - ${theme.spacing(1)})`, m: 0.5 }} orientation="vertical" />
-      <Controller
-        control={control}
-        rules={{ required: true }}
-        name="role"
-        render={({ field }) => (
-          <CustomSelector<Role>
-            {...field}
-            render={(onClick) => (
-              <Button sx={{ marginBottom: '4px' }} onClick={onClick}>
-                {field.value}
-              </Button>
-            )}
-          >
-            {[
-              { value: Role.user, label: 'user', key: 'user' },
-              { value: Role.assistant, label: 'assistant', key: 'assistant' },
-              { value: Role.system, label: 'system', key: 'system' },
-            ]}
-          </CustomSelector>
-        )}
       />
 
       <IconButton type="submit" color="primary" sx={{ p: '10px' }} disabled={isLoading}>

@@ -17,7 +17,8 @@
     "jsx": "react-jsx",
     "paths": {
       "@chatgpt/*": ["./packages/ChatGPT/src/*"]
-    }
+    },
+    "types": ["./config/types/types.d.ts"]
   },
   "include": ["packages/*/src", "packages/*/rspack.config.js", "common/*/src"],
   "exclude": ["./**/node_modules", "node_modules"]

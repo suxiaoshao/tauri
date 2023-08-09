@@ -1,6 +1,6 @@
 import { Box, Paper } from '@mui/material';
 import ChatForm from './components/ChatForm';
-import FetchingMessage, { FetchingMessageType, FetchingMessageTypeTag } from './components/FetchingMessage';
+import { FetchingMessageType, FetchingMessageTypeTag } from './components/FetchingMessage';
 import { Reducer, useMemo, useReducer } from 'react';
 import { Enum } from 'types';
 import { useAppSelector } from '@chatgpt/app/hooks';
@@ -66,14 +66,9 @@ export default function Home() {
   return useMemo(() => {
     if (selectedConversation) {
       return (
-        <Box
-          component={Paper}
-          sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', p: 2 }}
-          square
-        >
+        <Box component={Paper} sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }} square>
           <Box sx={{ flex: '1 1 0', overflowY: 'auto' }}>
-            <MessageHistory />
-            <FetchingMessage fetchingMessage={fetchingMessage} />
+            <MessageHistory messages={selectedConversation.messages} />
           </Box>
           <ChatForm fetchingMessageDispatch={fetchingMessageDispatch} fetchingMessage={fetchingMessage} />
         </Box>

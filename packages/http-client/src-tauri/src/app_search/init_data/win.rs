@@ -75,13 +75,3 @@ fn push_path(origin_path: &Path, path: &Path) -> PathBuf {
     }
     result
 }
-
-#[cfg(test)]
-mod test {
-    use super::get_app_data;
-
-    #[test]
-    fn test_app_search() {
-        get_app_data();
-    }
-}

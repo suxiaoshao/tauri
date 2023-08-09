@@ -1,5 +1,17 @@
+import { Message } from '@chatgpt/types/message';
 import { Box } from '@mui/material';
+import MessageItem from './MessageItem';
 
-export default function MessageHistory() {
-  return <Box></Box>;
+export interface MessageHistoryProps {
+  messages: Message[];
+}
+
+export default function MessageHistory({ messages }: MessageHistoryProps) {
+  return (
+    <Box>
+      {messages.map((message) => (
+        <MessageItem message={message} key={message.id} />
+      ))}
+    </Box>
+  );
 }
