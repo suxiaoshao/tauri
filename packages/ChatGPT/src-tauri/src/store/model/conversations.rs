@@ -1,33 +1,33 @@
 use super::super::schema::conversations;
 use crate::{
     errors::ChatGPTResult,
-    store::{types::Mode, Message},
+    store::{types::Mode, Message, Model},
 };
 use diesel::prelude::*;
 use time::OffsetDateTime;
 
 #[derive(serde::Serialize)]
 pub struct Conversation {
-    id: i32,
-    title: String,
-    mode: Mode,
-    model: String,
+    pub id: i32,
+    pub title: String,
+    pub mode: Mode,
+    pub model: Model,
     #[serde(rename = "createdTime")]
-    created_time: OffsetDateTime,
+    pub created_time: OffsetDateTime,
     #[serde(rename = "updatedTime")]
-    updated_time: OffsetDateTime,
-    temperature: f64,
-    top_p: f64,
-    n: i64,
+    pub updated_time: OffsetDateTime,
+    pub temperature: f64,
+    pub top_p: f64,
+    pub n: i64,
     #[serde(rename = "maxTokens")]
-    max_tokens: Option<i64>,
+    pub max_tokens: Option<i64>,
     #[serde(rename = "presencePenalty")]
-    presence_penalty: f64,
+    pub presence_penalty: f64,
     #[serde(rename = "frequencyPenalty")]
-    frequency_penalty: f64,
-    info: Option<String>,
-    prompt: Option<String>,
-    messages: Vec<Message>,
+    pub frequency_penalty: f64,
+    pub info: Option<String>,
+    pub prompt: Option<String>,
+    pub messages: Vec<Message>,
 }
 
 #[derive(serde::Deserialize, Debug)]
@@ -158,7 +158,7 @@ impl Conversation {
             id,
             title,
             mode: mode.parse()?,
-            model,
+            model: model.parse()?,
             temperature,
             top_p,
             n,

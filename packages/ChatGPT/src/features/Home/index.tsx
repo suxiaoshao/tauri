@@ -6,6 +6,7 @@ import { Enum } from 'types';
 import { useAppSelector } from '@chatgpt/app/hooks';
 import { selectSelectedConversation } from '@chatgpt/features/Conversations/conversationSlice';
 import AddConversation from '@chatgpt/features/Home/components/AddConversation';
+import MessageHistory from './components/MessageHiyory.tsx';
 
 export enum FetchingMessageActionTag {
   add = 'add',
@@ -71,6 +72,7 @@ export default function Home() {
           square
         >
           <Box sx={{ flex: '1 1 0', overflowY: 'auto' }}>
+            <MessageHistory />
             <FetchingMessage fetchingMessage={fetchingMessage} />
           </Box>
           <ChatForm fetchingMessageDispatch={fetchingMessageDispatch} fetchingMessage={fetchingMessage} />

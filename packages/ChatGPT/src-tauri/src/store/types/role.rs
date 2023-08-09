@@ -2,7 +2,7 @@ use std::str::FromStr;
 
 use crate::errors::ChatGPTError;
 
-#[derive(serde::Serialize, serde::Deserialize, PartialEq, Eq, Debug, Default)]
+#[derive(serde::Serialize, serde::Deserialize, PartialEq, Eq, Debug, Default, Clone, Copy)]
 pub enum Role {
     #[serde(rename = "system")]
     System,

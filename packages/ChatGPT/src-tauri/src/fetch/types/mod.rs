@@ -1,24 +1,16 @@
 use serde::{Deserialize, Serialize};
 
-use crate::store::{Model, Role};
+use crate::store::Role;
 
-#[derive(Debug, Deserialize, Serialize)]
-pub struct Message {
-    pub role: Role,
-    pub content: String,
-}
+mod chat_request;
+mod message;
+
+pub use chat_request::ChatRequest;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Delta {
     pub role: Option<Role>,
     pub content: Option<String>,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct ChatRequest {
-    pub model: Model,
-    pub messages: Vec<Message>,
-    pub stream: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug)]

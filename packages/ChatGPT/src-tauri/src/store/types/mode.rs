@@ -2,7 +2,7 @@ use std::str::FromStr;
 
 use crate::errors::ChatGPTError;
 
-#[derive(serde::Serialize, serde::Deserialize, PartialEq, Eq, Debug)]
+#[derive(serde::Serialize, serde::Deserialize, PartialEq, Eq, Debug, Clone, Copy)]
 pub enum Mode {
     #[serde(rename = "contextual")]
     Contextual,

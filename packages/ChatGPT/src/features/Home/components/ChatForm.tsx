@@ -4,10 +4,12 @@ import { invoke } from '@tauri-apps/api';
 import { listen } from '@tauri-apps/api/event';
 import { Controller, useForm } from 'react-hook-form';
 import CustomSelector from '../../../components/CustomSelector';
-import { Role, ChatRequest, Model, ChatResponse, Message } from '../types';
+import { Role, ChatResponse, Message } from '../types';
 import { Dispatch } from 'react';
 import { FetchingMessageAction, FetchingMessageActionTag } from '..';
 import { FetchingMessageType, FetchingMessageTypeTag } from './FetchingMessage';
+import { useAppSelector } from '@chatgpt/app/hooks';
+import { selectSelectedConversation } from '@chatgpt/features/Conversations/conversationSlice';
 
 export interface ChatFormProps {
   fetchingMessageDispatch: Dispatch<FetchingMessageAction>;
@@ -16,12 +18,8 @@ export interface ChatFormProps {
 
 export default function ChatForm({ fetchingMessageDispatch, fetchingMessage }: ChatFormProps) {
   const { register, handleSubmit, control, setValue } = useForm<Message>({ defaultValues: { role: Role.user } });
+  const id = useAppSelector(selectSelectedConversation)?.id;
   const onSubmit = handleSubmit(async (data) => {
-    const chatRequest: ChatRequest = {
-      model: Model.Gpt35,
-      stream: true,
-      messages: [data],
-    };
     fetchingMessageDispatch({ tag: FetchingMessageActionTag.start });
     setValue('content', '');
     const unListen = await listen<ChatResponse>('fetch', (response) => {
@@ -30,7 +28,11 @@ export default function ChatForm({ fetchingMessageDispatch, fetchingMessage }: C
       });
     });
 
-    await invoke('plugin:chat|fetch', { body: chatRequest });
+    const result = await invoke('plugin:chat|fetch', {
+      content: data.content,
+      id: id,
+    });
+    console.log(result);
     fetchingMessageDispatch({ tag: FetchingMessageActionTag.complete });
     unListen();
   });

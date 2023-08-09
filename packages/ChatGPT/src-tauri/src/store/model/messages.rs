@@ -9,6 +9,7 @@ use crate::{
         types::{Role, Status},
     },
 };
+use diesel::expression_methods::TextExpressionMethods;
 
 #[derive(Debug, Queryable, Serialize)]
 pub struct Message {
@@ -28,14 +29,16 @@ pub struct Message {
 }
 #[derive(Deserialize, Debug)]
 pub struct NewMessage {
+    pub conversation_id: i32,
     pub role: Role,
     pub content: String,
     pub status: Status,
 }
 
 impl NewMessage {
-    pub fn new(role: Role, content: String, status: Status) -> Self {
+    pub fn new(conversation_id: i32, role: Role, content: String, status: Status) -> Self {
         Self {
+            conversation_id,
             role,
             content,
             status,
@@ -46,6 +49,7 @@ impl NewMessage {
 #[derive(Insertable)]
 #[diesel(table_name = messages)]
 struct SqlNewMessage {
+    conversation_id: i32,
     role: String,
     content: String,
     status: String,
@@ -89,6 +93,7 @@ impl TryFrom<SqlMessage> for Message {
 impl Message {
     pub fn insert(
         NewMessage {
+            conversation_id,
             role,
             content,
             status,
@@ -98,6 +103,7 @@ impl Message {
         let time = OffsetDateTime::now_local()?;
 
         let new_message = SqlNewMessage {
+            conversation_id,
             role: role.to_string(),
             content,
             status: status.to_string(),
@@ -123,5 +129,16 @@ impl Message {
             .into_iter()
             .map(TryFrom::try_from)
             .collect::<ChatGPTResult<_>>()
+    }
+    pub fn add_content(id: i32, content: String, conn: &mut SqliteConnection) -> ChatGPTResult<()> {
+        let time = OffsetDateTime::now_local()?;
+        diesel::update(messages::table.filter(messages::id.eq(id)))
+            .set((
+                messages::content.eq(messages::content.concat(content)),
+                messages::updated_time.eq(time),
+                messages::end_time.eq(time),
+            ))
+            .execute(conn)?;
+        Ok(())
     }
 }
