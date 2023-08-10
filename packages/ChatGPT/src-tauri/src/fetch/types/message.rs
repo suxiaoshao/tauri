@@ -24,6 +24,7 @@ impl Message {
                 crate::store::Status::Normal => Some(Self { role, content }),
                 crate::store::Status::Hidden => None,
                 Status::Loading => None,
+                Status::Error => None,
             },
             Mode::Single => None,
             Mode::AssistantOnly => match (role, status) {

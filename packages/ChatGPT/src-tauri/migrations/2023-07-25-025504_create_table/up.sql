@@ -31,7 +31,7 @@ create table messages
     conversation_id INTEGER                           not null,
     role            TEXT                              not null check ( role in ('system', 'user', 'assistant') ),
     content         TEXT                              not null,
-    status          TEXT                              not null check ( status in ('normal', 'hidden','loading') ),
+    status          TEXT                              not null check ( status in ('normal', 'hidden','loading','error') ),
     created_time    DateTime                          not null,
     updated_time    DateTime                          not null,
     start_time      DateTime                          not null,

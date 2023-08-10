@@ -11,9 +11,10 @@ use crate::{
 };
 use diesel::expression_methods::TextExpressionMethods;
 
-#[derive(Debug, Queryable, Serialize)]
+#[derive(Debug, Queryable, Serialize, Clone, Deserialize, PartialEq, Eq)]
 pub struct Message {
     pub id: i32,
+    #[serde(rename = "conversationId")]
     pub conversation_id: i32,
     pub role: Role,
     pub content: String,
@@ -140,5 +141,24 @@ impl Message {
             ))
             .execute(conn)?;
         Ok(())
+    }
+    pub fn update_status(
+        id: i32,
+        status: Status,
+        conn: &mut SqliteConnection,
+    ) -> ChatGPTResult<()> {
+        let time = OffsetDateTime::now_local()?;
+        diesel::update(messages::table.filter(messages::id.eq(id)))
+            .set((
+                messages::status.eq(status.to_string()),
+                messages::updated_time.eq(time),
+                messages::end_time.eq(time),
+            ))
+            .execute(conn)?;
+        Ok(())
+    }
+    pub fn find(id: i32, conn: &mut SqliteConnection) -> ChatGPTResult<Message> {
+        let message: SqlMessage = messages::table.filter(messages::id.eq(id)).first(conn)?;
+        Message::try_from(message)
     }
 }

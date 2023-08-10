@@ -1,7 +1,6 @@
 import { Send } from '@mui/icons-material';
 import { Paper, InputBase, IconButton } from '@mui/material';
 import { invoke } from '@tauri-apps/api';
-import { listen } from '@tauri-apps/api/event';
 import { useForm } from 'react-hook-form';
 import { Dispatch } from 'react';
 import { FetchingMessageAction, FetchingMessageActionTag } from '..';
@@ -10,7 +9,6 @@ import { useAppSelector } from '@chatgpt/app/hooks';
 import { selectSelectedConversation } from '@chatgpt/features/Conversations/conversationSlice';
 import { Role } from '@chatgpt/types/common';
 import { Message } from '@chatgpt/types/message';
-import { ChatResponse } from '../types';
 
 export interface ChatFormProps {
   fetchingMessageDispatch: Dispatch<FetchingMessageAction>;
@@ -23,19 +21,12 @@ export default function ChatForm({ fetchingMessageDispatch, fetchingMessage }: C
   const onSubmit = handleSubmit(async (data) => {
     fetchingMessageDispatch({ tag: FetchingMessageActionTag.start });
     setValue('content', '');
-    const unListen = await listen<ChatResponse>('fetch', (response) => {
-      response.payload.choices.forEach((choice) => {
-        fetchingMessageDispatch({ tag: FetchingMessageActionTag.add, value: choice.delta.content ?? '' });
-      });
-    });
 
-    const result = await invoke('plugin:chat|fetch', {
+    await invoke<Message>('plugin:chat|fetch', {
       content: data.content,
       id: id,
     });
-    console.log(result);
     fetchingMessageDispatch({ tag: FetchingMessageActionTag.complete });
-    unListen();
   });
   const isLoading = [FetchingMessageTypeTag.loading, FetchingMessageActionTag.start].includes(fetchingMessage.tag);
   return (

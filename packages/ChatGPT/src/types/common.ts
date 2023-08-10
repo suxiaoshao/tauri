@@ -2,6 +2,7 @@ export enum Status {
   Normal = 'normal',
   Hidden = 'hidden',
   Loading = 'loading',
+  Error = 'error',
 }
 
 export enum Role {

@@ -112,6 +112,8 @@ pub enum ChatGPTError {
     ),
     #[error("无效的 model:{}",.0)]
     InvalidModel(String),
+    #[error("窗口不存在")]
+    WindowNotFound,
 }
 
 impl From<tauri::Error> for ChatGPTError {
