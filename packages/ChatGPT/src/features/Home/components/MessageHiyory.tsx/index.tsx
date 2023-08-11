@@ -8,7 +8,7 @@ export interface MessageHistoryProps {
 
 export default function MessageHistory({ messages }: MessageHistoryProps) {
   return (
-    <Box>
+    <Box sx={{ mb: 4 }}>
       {messages.map((message) => (
         <MessageItem message={message} key={message.id} />
       ))}

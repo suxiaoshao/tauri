@@ -1,8 +1,20 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { type RootState } from '../../app/store';
 
+export enum Theme {
+  Dark = 'Dark',
+  Light = 'Light',
+  System = 'System',
+}
+
+interface ThemeOption {
+  theme: Theme;
+  color: string;
+}
+
 export type ConfigSliceType = {
-  api_key?: string | null;
+  apiKey?: string;
+  theme: ThemeOption;
 };
 
 export const themeSlice = createSlice({
@@ -10,12 +22,13 @@ export const themeSlice = createSlice({
   initialState: {} as ConfigSliceType,
   reducers: {
     setConfig: (state, action: PayloadAction<ConfigSliceType>) => {
-      state.api_key = action.payload.api_key;
+      state.apiKey = action.payload.apiKey;
+      state.theme = action.payload.theme;
     },
   },
 });
 export const { setConfig } = themeSlice.actions;
 
-export const selectApiKey = (state: RootState) => state.config.api_key;
+export const selectApiKey = (state: RootState) => state.config.apiKey;
 
 export default themeSlice.reducer;

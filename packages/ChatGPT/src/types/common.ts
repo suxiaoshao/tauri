@@ -5,6 +5,12 @@ export enum Status {
   Error = 'error',
 }
 
+export enum Mode {
+  Contextual = 'contextual',
+  Single = 'single',
+  AssistantOnly = 'assistant-only',
+}
+
 export enum Role {
   system = 'system',
   user = 'user',

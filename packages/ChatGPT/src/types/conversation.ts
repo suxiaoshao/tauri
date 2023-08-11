@@ -1,6 +1,5 @@
-import { Mode } from '@chatgpt/features/Home/components/AddConversation';
 import { Message } from '@chatgpt/types/message';
-import { Model } from '@chatgpt/types/common';
+import { Mode, Model } from '@chatgpt/types/common';
 
 export interface Conversation {
   id: number;
@@ -18,4 +17,18 @@ export interface Conversation {
   info?: string | null;
   prompt?: string | null;
   messages: Message[];
+}
+
+export interface NewConversation {
+  title: string;
+  mode: Mode;
+  model: Model;
+  temperature: number;
+  topP: number;
+  n: number;
+  maxTokens: number | null | undefined;
+  presencePenalty: number;
+  frequencyPenalty: number;
+  info: string | null | undefined;
+  prompt: string | null | undefined;
 }

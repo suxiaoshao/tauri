@@ -3,7 +3,7 @@ import { useNavigate, useLocation, createSearchParams, useSearchParams } from 'r
 import { useAppSelector } from '../app/hooks';
 
 export default function useConfig() {
-  const apiKey = useAppSelector((state) => state.config.api_key);
+  const apiKey = useAppSelector((state) => state.config.apiKey);
   const navigate = useNavigate();
   const { pathname, search, hash } = useLocation();
   const [urlSearch] = useSearchParams();

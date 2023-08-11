@@ -8,8 +8,8 @@ import {
 } from '@chatgpt/features/Conversations/conversationSlice';
 import { useAppDispatch, useAppSelector } from '@chatgpt/app/hooks';
 import { useCallback, useMemo } from 'react';
-import { Mode } from '../Home/components/AddConversation';
 import { Conversation } from '@chatgpt/types/conversation';
+import { Mode } from '@chatgpt/types/common';
 
 export interface DrawerProps {
   open: boolean;
@@ -22,7 +22,7 @@ export default function AppDrawer({ open, drawerWidth }: DrawerProps) {
   const dispatch = useAppDispatch();
   const handleSelect = useCallback(
     (conversation?: Conversation) => {
-      dispatch(setSelected(conversation));
+      dispatch(setSelected(conversation?.id ?? null));
     },
     [dispatch],
   );

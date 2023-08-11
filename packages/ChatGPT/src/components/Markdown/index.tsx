@@ -186,7 +186,7 @@ const option: MarkdownToJSX.Options = {
         variant: 'body1',
         sx: {
           lineHeight: '1.5em',
-          fontSize: 17,
+          fontSize: 16,
         } as SxProps<Theme>,
       },
     },

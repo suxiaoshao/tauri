@@ -34,12 +34,16 @@ pub struct Conversation {
 pub struct NewConversation {
     title: String,
     mode: Mode,
-    model: String,
+    model: Model,
     temperature: f64,
+    #[serde(rename = "topP")]
     top_p: f64,
     n: i64,
+    #[serde(rename = "maxTokens")]
     max_tokens: Option<i64>,
+    #[serde(rename = "presencePenalty")]
     presence_penalty: f64,
+    #[serde(rename = "frequencyPenalty")]
     frequency_penalty: f64,
     info: Option<String>,
     prompt: Option<String>,
@@ -110,7 +114,7 @@ impl Conversation {
             .values(SqlNewConversation {
                 title,
                 mode: mode.to_string(),
-                model,
+                model: model.to_string(),
                 temperature,
                 top_p,
                 n,

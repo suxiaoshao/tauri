@@ -1,5 +1,5 @@
 use log::warn;
-use tauri::Runtime;
+use tauri::{RunEvent, Runtime};
 
 use self::created::on_created;
 
@@ -15,5 +15,17 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for WindowPlugin {
         if let Err(err) = on_created(window) {
             warn!("window created error:{}", err)
         };
+    }
+    fn on_event(&mut self, app: &tauri::AppHandle<R>, event: &tauri::RunEvent) {
+        if let RunEvent::WindowEvent {
+            label,
+            event: tauri::WindowEvent::CloseRequested { .. },
+            ..
+        } = event
+        {
+            if label == "main" {
+                app.exit(0);
+            }
+        }
     }
 }

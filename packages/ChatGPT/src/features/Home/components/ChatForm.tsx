@@ -41,6 +41,7 @@ export default function ChatForm({ fetchingMessageDispatch, fetchingMessage }: C
         flex: '0 0 auto',
         borderRadius: 2,
         m: 2,
+        mt: 0,
       }}
       elevation={3}
     >
