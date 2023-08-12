@@ -1,6 +1,5 @@
 import { Box, List, ListItemButton, ListItemIcon, ListItemText, Toolbar, Drawer, Divider } from '@mui/material';
-import { Add, Inbox, Mail } from '@mui/icons-material';
-import { headersHeight } from '@chatgpt/components/Headers';
+import { Add, Inbox, Mail, Settings } from '@mui/icons-material';
 import {
   selectConversations,
   selectSelectedConversation,
@@ -10,6 +9,9 @@ import { useAppDispatch, useAppSelector } from '@chatgpt/app/hooks';
 import { useCallback, useMemo } from 'react';
 import { Conversation } from '@chatgpt/types/conversation';
 import { Mode } from '@chatgpt/types/common';
+import { invoke } from '@tauri-apps/api';
+
+const headersHeight = 28;
 
 export interface DrawerProps {
   open: boolean;
@@ -41,21 +43,31 @@ export default function AppDrawer({ open, drawerWidth }: DrawerProps) {
       );
     });
   }, [conversations, handleSelect, selectedConversation?.id]);
+  const handleSetting = useCallback(async () => {
+    await invoke('plugin:config|create_setting_window');
+  }, []);
   return (
     <Drawer
       variant="persistent"
+      data-tauri-drag-region
       sx={{
         width: drawerWidth,
         flexShrink: 0,
-        [`& .MuiDrawer-paper`]: { width: drawerWidth, boxSizing: 'border-box' },
+        [`& .MuiDrawer-paper`]: {
+          width: drawerWidth,
+          boxSizing: 'border-box',
+          backgroundColor: 'transparent',
+        },
         '& .MuiToolbar-root': {
           height: `${headersHeight}px`,
           minHeight: `${headersHeight}px`,
+          backgroundColor: 'transparent',
         },
+        backgroundColor: 'transparent',
       }}
       open={open}
     >
-      <Toolbar />
+      <Toolbar data-tauri-drag-region />
       <Box sx={{ overflow: 'auto' }}>
         <List>{content}</List>
         <Divider />
@@ -65,6 +77,12 @@ export default function AppDrawer({ open, drawerWidth }: DrawerProps) {
               <Add />
             </ListItemIcon>
             <ListItemText primary="Add" />
+          </ListItemButton>
+          <ListItemButton selected={selectedConversation === undefined} onClick={handleSetting}>
+            <ListItemIcon>
+              <Settings />
+            </ListItemIcon>
+            <ListItemText primary="Setting" />
           </ListItemButton>
         </List>
       </Box>

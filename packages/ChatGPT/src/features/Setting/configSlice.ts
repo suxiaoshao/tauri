@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { type RootState } from '../../app/store';
+import { AppThunkAction, type RootState } from '../../app/store';
+import { invoke } from '@tauri-apps/api';
 
 export enum Theme {
   Dark = 'Dark',
@@ -32,3 +33,8 @@ export const { setConfig } = themeSlice.actions;
 export const selectApiKey = (state: RootState) => state.config.apiKey;
 
 export default themeSlice.reducer;
+
+export const fetchConfig = (): AppThunkAction => async (dispatch) => {
+  const data = await invoke<ConfigSliceType>('plugin:config|get_config');
+  dispatch(setConfig(data));
+};

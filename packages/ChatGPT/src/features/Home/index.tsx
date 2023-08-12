@@ -1,4 +1,4 @@
-import { Box, Paper } from '@mui/material';
+import { Box } from '@mui/material';
 import ChatForm from './components/ChatForm';
 import { FetchingMessageType, FetchingMessageTypeTag } from './components/FetchingMessage';
 import { Reducer, useMemo, useReducer } from 'react';
@@ -66,7 +66,15 @@ export default function Home() {
   return useMemo(() => {
     if (selectedConversation) {
       return (
-        <Box component={Paper} sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }} square>
+        <Box
+          sx={{
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            backgroundColor: (theme) => theme.palette.background.paper + '70',
+          }}
+        >
           <Box sx={{ flex: '1 1 0', overflowY: 'auto' }}>
             <MessageHistory messages={selectedConversation.messages} />
           </Box>

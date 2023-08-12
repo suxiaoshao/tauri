@@ -42,6 +42,7 @@ export default function ChatForm({ fetchingMessageDispatch, fetchingMessage }: C
         borderRadius: 2,
         m: 2,
         mt: 0,
+        backgroundColor: (theme) => theme.palette.background.paper + '70',
       }}
       elevation={3}
     >

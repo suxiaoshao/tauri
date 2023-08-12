@@ -22,20 +22,9 @@ export default function MessageItem({ message }: MessageItemProps) {
   }, [message.role]);
   const loading = useMemo(() => {
     if (message.status === Status.Loading) {
-      return (
-        <CircularProgress
-          size={20}
-          sx={{ position: 'absolute', right: (theme) => theme.spacing(1), top: (theme) => theme.spacing(1) }}
-          color="inherit"
-        />
-      );
+      return <CircularProgress size={20} sx={{ mr: 2, mt: 1 }} color="inherit" />;
     }
-    return (
-      <CheckCircleOutlineOutlined
-        fontSize={'small'}
-        sx={{ position: 'absolute', right: (theme) => theme.spacing(1), top: (theme) => theme.spacing(1) }}
-      />
-    );
+    return <CheckCircleOutlineOutlined fontSize={'small'} sx={{ mr: 2, mt: 1 }} />;
   }, [message.status]);
   return (
     <>
@@ -48,14 +37,8 @@ export default function MessageItem({ message }: MessageItemProps) {
           minHeight: '56px',
         }}
       >
-        <Avatar
-          sx={{ position: 'absolute', left: (theme) => theme.spacing(1), top: (theme) => theme.spacing(1) }}
-          src={logo}
-        />
-        <CustomMarkdown
-          sx={{ p: 1, pt: 2.5, pl: 7, pr: 4.5, flex: '1 1 0', maxHeight: '300px', overflowY: 'auto' }}
-          value={message.content}
-        />
+        <Avatar sx={{ ml: 1, mt: 1 }} src={logo} />
+        <CustomMarkdown sx={{ m: 1, mt: 2.5, flex: '1 1 0' }} value={message.content} />
         {loading}
       </Box>
       <Divider />
