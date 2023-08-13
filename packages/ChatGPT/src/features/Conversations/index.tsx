@@ -1,5 +1,16 @@
-import { Box, List, ListItemButton, ListItemIcon, ListItemText, Toolbar, Drawer, Divider } from '@mui/material';
-import { Add, Inbox, Mail, Settings } from '@mui/icons-material';
+import {
+  Box,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Toolbar,
+  Drawer,
+  Divider,
+  ListItemAvatar,
+  Avatar,
+} from '@mui/material';
+import { Add, Settings } from '@mui/icons-material';
 import {
   selectConversations,
   selectSelectedConversation,
@@ -8,7 +19,6 @@ import {
 import { useAppDispatch, useAppSelector } from '@chatgpt/app/hooks';
 import { useCallback, useMemo } from 'react';
 import { Conversation } from '@chatgpt/types/conversation';
-import { Mode } from '@chatgpt/types/common';
 import { invoke } from '@tauri-apps/api';
 
 const headersHeight = 28;
@@ -37,8 +47,14 @@ export default function AppDrawer({ open, drawerWidth }: DrawerProps) {
           selected={conversation.id === selectedConversation?.id}
           dense
         >
-          <ListItemIcon>{conversation.mode === Mode.Single ? <Inbox /> : <Mail />}</ListItemIcon>
-          <ListItemText primary={conversation.title} secondary={conversation.info} />
+          <ListItemAvatar>
+            <Avatar sx={{ backgroundColor: 'transparent' }}>{conversation.icon}</Avatar>
+          </ListItemAvatar>
+          <ListItemText
+            primary={conversation.title}
+            secondary={conversation.info}
+            secondaryTypographyProps={{ noWrap: true }}
+          />
         </ListItemButton>
       );
     });
@@ -78,7 +94,7 @@ export default function AppDrawer({ open, drawerWidth }: DrawerProps) {
             </ListItemIcon>
             <ListItemText primary="Add" />
           </ListItemButton>
-          <ListItemButton selected={selectedConversation === undefined} onClick={handleSetting}>
+          <ListItemButton onClick={handleSetting}>
             <ListItemIcon>
               <Settings />
             </ListItemIcon>

@@ -3,6 +3,7 @@ create table conversations
 (
     id                INTEGER primary key autoincrement not null,
     title             TEXT                              not null,
+    icon              TEXT                              not null,
     mode              TEXT                              not null check ( mode in ('contextual', 'single', 'assistant-only') )     default 'contextual',
     model             TEXT                              not null,
     temperature       DOUBLE                            not null check ( temperature >= 0.0 and temperature <= 1.0 )              default 1.0,
@@ -20,8 +21,8 @@ create table conversations
 
 
 insert
-into conversations (title, mode, model, created_time, updated_time, info, prompt)
-values ('默认', 'contextual', 'gpt-3.5-turbo-0613', (SELECT datetime('now')),
+into conversations (title,icon, mode, model, created_time, updated_time, info, prompt)
+values ('默认','🤖', 'contextual', 'gpt-3.5-turbo-0613', (SELECT datetime('now')),
         (SELECT datetime('now')),
         '默认', null);
 
@@ -31,7 +32,7 @@ create table messages
     conversation_id INTEGER                           not null,
     role            TEXT                              not null check ( role in ('system', 'user', 'assistant') ),
     content         TEXT                              not null,
-    status          TEXT                              not null check ( status in ('normal', 'hidden','loading','error') ),
+    status          TEXT                              not null check ( status in ('normal', 'hidden', 'loading', 'error') ),
     created_time    DateTime                          not null,
     updated_time    DateTime                          not null,
     start_time      DateTime                          not null,

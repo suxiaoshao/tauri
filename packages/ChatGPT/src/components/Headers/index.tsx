@@ -11,7 +11,7 @@ export default function Headers() {
   useSettingKey();
 
   return (
-    <Box sx={{ width: '100%', height: '100%', backgroundColor: (theme) => theme.palette.background.paper + '70' }}>
+    <Box sx={{ width: '100%', height: '100%', backgroundColor: 'transparent' }}>
       <AppDrawer open={true} drawerWidth={drawerWidth} />
       <Box
         sx={{

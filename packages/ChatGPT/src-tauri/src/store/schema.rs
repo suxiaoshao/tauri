@@ -4,6 +4,7 @@ diesel::table! {
     conversations (id) {
         id -> Integer,
         title -> Text,
+        icon -> Text,
         mode -> Text,
         model -> Text,
         temperature -> Double,

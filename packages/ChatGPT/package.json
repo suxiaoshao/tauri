@@ -9,6 +9,7 @@
     "tauri": "tauri"
   },
   "dependencies": {
+    "emoji-regex": "^10.2.1",
     "markdown-to-jsx": "^7.3.2",
     "notify": "workspace:^1.0.0",
     "prism-themes": "^1.9.0",

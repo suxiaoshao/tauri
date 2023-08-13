@@ -23,6 +23,7 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for ChatPlugin {
             get_conversations,
             save_conversation,
             add_message,
+            update_conversation
         ]);
         (handle)(invoke);
     }
@@ -43,6 +44,17 @@ async fn save_conversation(
 ) -> ChatGPTResult<()> {
     let mut conn = state.get()?;
     Conversation::insert(data, &mut conn)?;
+    Ok(())
+}
+
+#[tauri::command]
+async fn update_conversation(
+    state: tauri::State<'_, DbConn>,
+    id: i32,
+    data: NewConversation,
+) -> ChatGPTResult<()> {
+    let conn = &mut state.get()?;
+    Conversation::update(id, data, conn)?;
     Ok(())
 }
 

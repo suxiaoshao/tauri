@@ -4,6 +4,7 @@ import { Mode, Model } from '@chatgpt/types/common';
 export interface Conversation {
   id: number;
   title: string;
+  icon: string;
   mode: Mode;
   model: Model;
   createdTime: string;
@@ -21,14 +22,15 @@ export interface Conversation {
 
 export interface NewConversation {
   title: string;
+  icon: string;
   mode: Mode;
   model: Model;
   temperature: number;
   topP: number;
   n: number;
-  maxTokens: number | null | undefined;
+  maxTokens?: number | null | undefined;
   presencePenalty: number;
   frequencyPenalty: number;
-  info: string | null | undefined;
-  prompt: string | null | undefined;
+  info?: string | null | undefined;
+  prompt?: string | null | undefined;
 }

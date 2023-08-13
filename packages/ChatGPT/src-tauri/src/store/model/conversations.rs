@@ -10,6 +10,7 @@ use time::OffsetDateTime;
 pub struct Conversation {
     pub id: i32,
     pub title: String,
+    pub icon: String,
     pub mode: Mode,
     pub model: Model,
     #[serde(rename = "createdTime")]
@@ -17,6 +18,7 @@ pub struct Conversation {
     #[serde(rename = "updatedTime")]
     pub updated_time: OffsetDateTime,
     pub temperature: f64,
+    #[serde(rename = "topP")]
     pub top_p: f64,
     pub n: i64,
     #[serde(rename = "maxTokens")]
@@ -33,6 +35,7 @@ pub struct Conversation {
 #[derive(serde::Deserialize, Debug)]
 pub struct NewConversation {
     title: String,
+    icon: String,
     mode: Mode,
     model: Model,
     temperature: f64,
@@ -53,6 +56,7 @@ pub struct NewConversation {
 #[diesel(table_name = conversations)]
 struct SqlNewConversation {
     title: String,
+    icon: String,
     mode: String,
     model: String,
     temperature: f64,
@@ -67,10 +71,12 @@ struct SqlNewConversation {
     prompt: Option<String>,
 }
 
-#[derive(Queryable)]
+#[derive(Queryable, AsChangeset)]
+#[diesel(table_name = conversations)]
 struct SqlConversation {
     id: i32,
     title: String,
+    icon: String,
     mode: String,
     model: String,
     temperature: f64,
@@ -95,6 +101,7 @@ impl Conversation {
     pub fn insert(
         NewConversation {
             title,
+            icon,
             mode,
             model,
             temperature,
@@ -113,6 +120,7 @@ impl Conversation {
         diesel::insert_into(conversations::table)
             .values(SqlNewConversation {
                 title,
+                icon,
                 mode: mode.to_string(),
                 model: model.to_string(),
                 temperature,
@@ -142,6 +150,7 @@ impl Conversation {
         SqlConversation {
             id,
             title,
+            icon,
             mode,
             model,
             temperature,
@@ -161,6 +170,7 @@ impl Conversation {
         Ok(Conversation {
             id,
             title,
+            icon,
             mode: mode.parse()?,
             model: model.parse()?,
             temperature,
@@ -175,5 +185,44 @@ impl Conversation {
             prompt,
             messages,
         })
+    }
+    pub fn update(
+        id: i32,
+        NewConversation {
+            title,
+            icon,
+            mode,
+            model,
+            temperature,
+            top_p,
+            n,
+            max_tokens,
+            presence_penalty,
+            frequency_penalty,
+            info,
+            prompt,
+        }: NewConversation,
+        conn: &mut SqliteConnection,
+    ) -> ChatGPTResult<()> {
+        let time = OffsetDateTime::now_local()?;
+        diesel::update(conversations::table)
+            .filter(conversations::id.eq(id))
+            .set((
+                conversations::title.eq(title),
+                conversations::icon.eq(icon),
+                conversations::mode.eq(mode.to_string()),
+                conversations::model.eq(model.to_string()),
+                conversations::temperature.eq(temperature),
+                conversations::top_p.eq(top_p),
+                conversations::n.eq(n),
+                conversations::max_tokens.eq(max_tokens),
+                conversations::presence_penalty.eq(presence_penalty),
+                conversations::frequency_penalty.eq(frequency_penalty),
+                conversations::updated_time.eq(time),
+                conversations::info.eq(info),
+                conversations::prompt.eq(prompt),
+            ))
+            .execute(conn)?;
+        Ok(())
     }
 }

@@ -3,12 +3,11 @@ import { Paper, InputBase, IconButton } from '@mui/material';
 import { invoke } from '@tauri-apps/api';
 import { useForm } from 'react-hook-form';
 import { Dispatch } from 'react';
-import { FetchingMessageAction, FetchingMessageActionTag } from '..';
-import { FetchingMessageType, FetchingMessageTypeTag } from './FetchingMessage';
 import { useAppSelector } from '@chatgpt/app/hooks';
 import { selectSelectedConversation } from '@chatgpt/features/Conversations/conversationSlice';
 import { Role } from '@chatgpt/types/common';
 import { Message } from '@chatgpt/types/message';
+import { FetchingMessageAction, FetchingMessageType } from '..';
 
 export interface ChatFormProps {
   fetchingMessageDispatch: Dispatch<FetchingMessageAction>;
@@ -19,16 +18,16 @@ export default function ChatForm({ fetchingMessageDispatch, fetchingMessage }: C
   const { register, handleSubmit, setValue } = useForm<Message>({ defaultValues: { role: Role.user } });
   const id = useAppSelector(selectSelectedConversation)?.id;
   const onSubmit = handleSubmit(async (data) => {
-    fetchingMessageDispatch({ tag: FetchingMessageActionTag.start });
+    fetchingMessageDispatch(FetchingMessageAction.start);
     setValue('content', '');
 
     await invoke<Message>('plugin:chat|fetch', {
       content: data.content,
       id: id,
     });
-    fetchingMessageDispatch({ tag: FetchingMessageActionTag.complete });
+    fetchingMessageDispatch(FetchingMessageAction.complete);
   });
-  const isLoading = [FetchingMessageTypeTag.loading, FetchingMessageActionTag.start].includes(fetchingMessage.tag);
+  const isLoading = [FetchingMessageType.loading].includes(fetchingMessage);
   return (
     <Paper
       onSubmit={onSubmit}
@@ -42,7 +41,7 @@ export default function ChatForm({ fetchingMessageDispatch, fetchingMessage }: C
         borderRadius: 2,
         m: 2,
         mt: 0,
-        backgroundColor: (theme) => theme.palette.background.paper + '70',
+        backgroundColor: 'transparent',
       }}
       elevation={3}
     >

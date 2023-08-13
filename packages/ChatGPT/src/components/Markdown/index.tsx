@@ -91,11 +91,13 @@ function MyCode(props: { children: string; className?: string }) {
   }
 }
 
-function MyPre(props: { children: string }) {
+function CustomPre(props: { children: string }) {
   return (
-    <div>
-      <pre className="line-numbers">{props.children}</pre>
-    </div>
+    <Box sx={{ width: '100%' }}>
+      <Box component="pre" className="line-numbers" sx={{ width: '100%' }}>
+        {props.children}
+      </Box>
+    </Box>
   );
 }
 
@@ -193,7 +195,7 @@ const option: MarkdownToJSX.Options = {
     img: CustomImage,
     a: CustomLink,
     code: MyCode,
-    pre: MyPre,
+    pre: CustomPre,
     li: MyListItem,
     table: MyTable,
     thead: TableHead,

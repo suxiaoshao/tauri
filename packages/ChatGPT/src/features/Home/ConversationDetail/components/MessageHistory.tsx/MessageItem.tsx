@@ -38,7 +38,10 @@ export default function MessageItem({ message }: MessageItemProps) {
         }}
       >
         <Avatar sx={{ ml: 1, mt: 1 }} src={logo} />
-        <CustomMarkdown sx={{ m: 1, mt: 2.5, flex: '1 1 0' }} value={message.content} />
+        <CustomMarkdown
+          sx={{ m: 1, mt: 2.5, flex: '1 1 0', width: (theme) => `calc(100% - ${theme.spacing(11.5)})` }}
+          value={message.content}
+        />
         {loading}
       </Box>
       <Divider />
