@@ -20,8 +20,9 @@ import { useAppDispatch, useAppSelector } from '@chatgpt/app/hooks';
 import { useCallback, useMemo } from 'react';
 import { Conversation } from '@chatgpt/types/conversation';
 import { invoke } from '@tauri-apps/api';
+import { platform } from '@chatgpt/const/platform';
 
-const headersHeight = 28;
+const headersHeight = platform === 'Darwin' ? 28 : 0;
 
 export interface DrawerProps {
   open: boolean;

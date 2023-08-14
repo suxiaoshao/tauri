@@ -2,6 +2,7 @@ use tauri::Runtime;
 use window_shadows::set_shadow;
 #[cfg(target_os = "windows")]
 use window_vibrancy::apply_mica;
+#[cfg(target_os = "macos")]
 use window_vibrancy::NSVisualEffectState;
 #[cfg(target_os = "macos")]
 use window_vibrancy::{apply_vibrancy, NSVisualEffectMaterial};
@@ -12,14 +13,13 @@ pub fn on_created<R: Runtime>(window: tauri::Window<R>) -> ChatGPTResult<()> {
     window_beatify(&window)?;
     #[cfg(debug_assertions)]
     {
-        if window.label() == "main" {
-            window.open_devtools()
-        }
+        window.open_devtools()
     }
     Ok(())
 }
 
 fn window_beatify<R: Runtime>(window: &tauri::Window<R>) -> ChatGPTResult<()> {
+    window.set_decorations(true)?;
     // 修改边框
     set_shadow(window, true)?;
     // 修改背景
@@ -32,14 +32,7 @@ fn window_beatify<R: Runtime>(window: &tauri::Window<R>) -> ChatGPTResult<()> {
     )?;
     #[cfg(target_os = "windows")]
     {
-        apply_mica(
-            window,
-            window.theme().ok().map(|x| match x {
-                tauri::Theme::Light => false,
-                tauri::Theme::Dark => true,
-                _ => false,
-            }),
-        )?;
+        apply_mica(window, None)?;
     }
     Ok(())
 }

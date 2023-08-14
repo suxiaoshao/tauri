@@ -1,4 +1,4 @@
-import { Box, Button, InputLabel, MenuItem, Paper, TextField } from '@mui/material';
+import { Box, Button, InputLabel, MenuItem, TextField } from '@mui/material';
 import { useForm } from 'react-hook-form';
 import { invoke } from '@tauri-apps/api/tauri';
 import { appWindow } from '@tauri-apps/api/window';
@@ -14,7 +14,7 @@ export default function Setting() {
     await appWindow.close();
   });
   return (
-    <Box sx={{ width: '100%', height: '100%' }} component={Paper} square>
+    <Box sx={{ width: '100%', height: '100%', backgroundColor: 'transparent' }}>
       <Box
         component="form"
         onSubmit={onSubmit}

@@ -48,7 +48,8 @@
         "transparent": true,
         "titleBarStyle": "Overlay",
         "hiddenTitle": true,
-        "label": "main"
+        "label": "main",
+        "decorations": false
       }
     ],
     "macOSPrivateApi": true

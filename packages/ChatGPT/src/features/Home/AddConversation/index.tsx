@@ -1,5 +1,4 @@
 import { Box, Typography, Toolbar, IconButton } from '@mui/material';
-import { Paper } from '@mui/material';
 import PublishIcon from '@mui/icons-material/Publish';
 import ConversationEdit from '../components/ConversationEdit';
 import { useAppDispatch } from '@chatgpt/app/hooks';
@@ -21,7 +20,6 @@ export default function AddConversation() {
   );
   return (
     <Box
-      component={Paper}
       sx={{
         width: '100%',
         height: '100%',
@@ -30,7 +28,6 @@ export default function AddConversation() {
         overflowY: 'auto',
         backgroundColor: 'transparent',
       }}
-      square
     >
       <Box
         data-tauri-drag-region
