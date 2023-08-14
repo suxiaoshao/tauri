@@ -8,7 +8,9 @@ const config = defineConfig({
   entry: {
     main: './src/main.tsx',
   },
-  output: {},
+  output: {
+    clean: isProduction ? true : false,
+  },
   builtins: {
     html: [
       {

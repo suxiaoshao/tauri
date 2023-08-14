@@ -76,7 +76,7 @@ export default function ConversationHeader({ conversation }: ConversationHeaderP
         sx={{
           height: '500px',
           '& .MuiDialog-paper': {
-            backgroundColor: (theme) => theme.palette.background.paper + '10',
+            backgroundColor: (theme) => theme.palette.background.paper + 'a0',
             backdropFilter: 'blur(20px)',
           },
         }}
