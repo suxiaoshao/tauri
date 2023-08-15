@@ -12,3 +12,14 @@ body,
 #root > * {
   overflow: hidden;
 }
+
+@media (prefers-color-scheme: dark) {
+  html,
+  body,
+  #root {
+    color-scheme: dark;
+  }
+  #root * {
+    color-scheme: dark;
+  }
+}

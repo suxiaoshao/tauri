@@ -33,7 +33,7 @@ libsqlite3-sys = { version = "0.26.0", features = ["bundled-windows"] }
 time = { version = "0.3.25", features = ["serde"] }
 
 # 错误处理
-thiserror = "1.0.44"
+thiserror = "1.0.46"
 
 # log
 tauri-plugin-log = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "dev" }

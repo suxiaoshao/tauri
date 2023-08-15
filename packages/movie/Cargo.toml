@@ -7,7 +7,7 @@ edition = "2021"
 
 [dependencies]
 # 错误处理
-thiserror = "1.0.44"
+thiserror = "1.0.46"
 
 # 网络请求
 reqwest = "0.11.18"
