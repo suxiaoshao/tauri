@@ -4,16 +4,11 @@ import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
-import './index.css';
-import setYouThemeToCssVars from './utils/cssVar';
-import {
-  colorSchemaMatch,
-  selectActiveYouTheme,
-  selectMuiTheme,
-  setSystemColorScheme,
-  useAppDispatch,
-  useAppSelector,
-} from './themeSlice';
+import 'theme/src/index.css';
+import { colorSchemaMatch, selectActiveYouTheme, selectMuiTheme, setSystemColorScheme } from './themeSlice';
+import { setYouThemeToCssVars } from 'theme';
+import { useAppDispatch, useAppSelector } from '@chatgpt/app/hooks';
+import { Theme } from '../Setting/configSlice';
 
 export interface CustomThemeProps {
   children?: React.ReactNode;
@@ -29,7 +24,7 @@ export function CustomTheme({ children }: CustomThemeProps): JSX.Element {
   }, [youTheme]);
   useEffect(() => {
     colorSchemaMatch.addEventListener('change', (e) => {
-      const colorScheme = e.matches ? 'dark' : 'light';
+      const colorScheme = e.matches ? Theme.Dark : Theme.Light;
       dispatch(setSystemColorScheme(colorScheme));
     });
   }, [dispatch]);
@@ -40,13 +35,3 @@ export function CustomTheme({ children }: CustomThemeProps): JSX.Element {
     </ThemeProvider>
   );
 }
-
-export { hexFromArgb, argbFromHex, themeFromSourceColor } from '@material/material-color-utilities';
-
-export { default as themeReducer, selectActiveYouTheme } from './themeSlice';
-
-export { default as ThemeDrawerItem } from './components/ThemeDrawerItem';
-
-export { youThemeToMuiTheme } from './utils/youTheme';
-
-export { default as setYouThemeToCssVars } from './utils/cssVar';

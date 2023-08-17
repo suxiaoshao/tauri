@@ -3,9 +3,9 @@ import { AppThunkAction, type RootState } from '../../app/store';
 import { invoke } from '@tauri-apps/api';
 
 export enum Theme {
-  Dark = 'Dark',
-  Light = 'Light',
-  System = 'System',
+  Dark = 'dark',
+  Light = 'light',
+  System = 'system',
 }
 
 interface ThemeOption {

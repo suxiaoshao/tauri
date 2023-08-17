@@ -6,10 +6,12 @@ use tauri::{api::path::app_config_dir, Runtime};
 use crate::errors::{ChatGPTError, ChatGPTResult};
 
 #[derive(Debug, Clone, Copy, Default, Deserialize, Serialize)]
+#[serde(rename_all = "lowercase")]
 enum Theme {
     Dark,
     Light,
     #[default]
+    #[serde(other)]
     System,
 }
 

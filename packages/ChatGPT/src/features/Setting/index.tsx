@@ -1,5 +1,5 @@
 import { Box, Button, InputLabel, MenuItem, TextField } from '@mui/material';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { invoke } from '@tauri-apps/api/tauri';
 import { appWindow } from '@tauri-apps/api/window';
 import { useAppSelector } from '../../app/hooks';
@@ -7,7 +7,7 @@ import { ConfigSliceType, Theme } from './configSlice';
 
 export default function Setting() {
   const initData = useAppSelector((state) => state.config);
-  const { register, handleSubmit } = useForm<ConfigSliceType>({ defaultValues: initData });
+  const { register, handleSubmit, control } = useForm<ConfigSliceType>({ defaultValues: initData });
 
   const onSubmit = handleSubmit(async (data) => {
     await invoke('plugin:config|set_config', { data });
@@ -27,18 +27,19 @@ export default function Setting() {
         }}
       >
         <TextField required {...register('apiKey', { required: true })} label="openai api key" fullWidth />
-        <TextField
-          required
-          {...register('theme.theme', { required: true })}
-          label="Theme"
-          select
-          fullWidth
-          sx={{ mt: 2 }}
-        >
-          <MenuItem value={Theme.Dark}>{Theme.Dark}</MenuItem>
-          <MenuItem value={Theme.Light}>{Theme.Light}</MenuItem>
-          <MenuItem value={Theme.System}>{Theme.System}</MenuItem>
-        </TextField>
+        <Controller
+          control={control}
+          name="theme.theme"
+          rules={{ required: true }}
+          render={({ field }) => (
+            <TextField required {...field} label="Theme" select fullWidth sx={{ mt: 2 }}>
+              <MenuItem value={Theme.Dark}>{Theme.Dark}</MenuItem>
+              <MenuItem value={Theme.Light}>{Theme.Light}</MenuItem>
+              <MenuItem value={Theme.System}>{Theme.System}</MenuItem>
+            </TextField>
+          )}
+        />
+
         <InputLabel htmlFor="color-input" sx={{ mt: 2 }} required>
           Color
         </InputLabel>

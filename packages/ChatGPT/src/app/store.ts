@@ -1,5 +1,5 @@
 import { AnyAction, configureStore, ThunkAction } from '@reduxjs/toolkit';
-import { themeReducer } from 'theme';
+import themeReducer from '@chatgpt/features/Theme/themeSlice';
 import configReducer from '../features/Setting/configSlice';
 import { conversationReducer } from '@chatgpt/features/Conversations/conversationSlice';
 
