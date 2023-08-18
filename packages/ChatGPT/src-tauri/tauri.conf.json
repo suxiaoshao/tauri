@@ -40,18 +40,7 @@
     "updater": {
       "active": false
     },
-    "windows": [
-      {
-        "fullscreen": false,
-        "resizable": true,
-        "title": "ChatGPT",
-        "transparent": true,
-        "titleBarStyle": "Overlay",
-        "hiddenTitle": true,
-        "label": "main",
-        "decorations": false
-      }
-    ],
+    "windows": [],
     "macOSPrivateApi": true
   }
 }
