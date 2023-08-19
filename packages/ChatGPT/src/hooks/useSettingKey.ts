@@ -1,8 +1,9 @@
-import { platform } from '@chatgpt/const/platform';
 import { invoke } from '@tauri-apps/api';
 import { useEffect } from 'react';
+import usePlatform from './usePlatform';
 
 export default function useSettingKey() {
+  const platform = usePlatform();
   useEffect(() => {
     const handleShortcut = async (event: KeyboardEvent) => {
       const isMacos = platform === 'Darwin';
@@ -14,5 +15,5 @@ export default function useSettingKey() {
     return () => {
       document.removeEventListener('keydown', handleShortcut);
     };
-  }, []);
+  }, [platform]);
 }

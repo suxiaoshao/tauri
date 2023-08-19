@@ -20,9 +20,7 @@ import { useAppDispatch, useAppSelector } from '@chatgpt/app/hooks';
 import { useCallback, useMemo } from 'react';
 import { Conversation } from '@chatgpt/types/conversation';
 import { invoke } from '@tauri-apps/api';
-import { platform } from '@chatgpt/const/platform';
-
-const headersHeight = platform === 'Darwin' ? 28 : 0;
+import usePlatform from '@chatgpt/hooks/usePlatform';
 
 export interface DrawerProps {
   open: boolean;
@@ -30,6 +28,8 @@ export interface DrawerProps {
 }
 
 export default function AppDrawer({ open, drawerWidth }: DrawerProps) {
+  const platform = usePlatform();
+  const headersHeight = useMemo(() => (platform === 'Darwin' ? 28 : 0), [platform]);
   const conversations = useAppSelector(selectConversations);
   const selectedConversation = useAppSelector(selectSelectedConversation);
   const dispatch = useAppDispatch();
