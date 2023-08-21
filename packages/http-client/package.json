@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "notify": "workspace:^1.0.0",
-    "theme": "workspace:^1.0.0"
+    "theme": "workspace:^1.0.0",
+    "types": "workspace:^1.0.0"
   }
 }

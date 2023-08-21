@@ -6,8 +6,20 @@ body,
   max-width: 100%;
   max-height: 100%;
   background-color: transparent !important;
+  overscroll-behavior: none;
 }
 
 #root > * {
   overflow: hidden;
+}
+
+@media (prefers-color-scheme: dark) {
+  html,
+  body,
+  #root {
+    color-scheme: dark;
+  }
+  #root * {
+    color-scheme: dark;
+  }
 }

@@ -5,7 +5,7 @@ import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import './index.css';
-import setYouThemeToCssVars from './cssVar';
+import setYouThemeToCssVars from './utils/cssVar';
 import {
   colorSchemaMatch,
   selectActiveYouTheme,
@@ -41,8 +41,12 @@ export function CustomTheme({ children }: CustomThemeProps): JSX.Element {
   );
 }
 
-export { hexFromArgb } from '@material/material-color-utilities';
+export { hexFromArgb, argbFromHex, themeFromSourceColor } from '@material/material-color-utilities';
 
 export { default as themeReducer, selectActiveYouTheme } from './themeSlice';
 
-export { default as ThemeDrawerItem } from './ThemeDrawerItem';
+export { default as ThemeDrawerItem } from './components/ThemeDrawerItem';
+
+export { youThemeToMuiTheme } from './utils/youTheme';
+
+export { default as setYouThemeToCssVars } from './utils/cssVar';

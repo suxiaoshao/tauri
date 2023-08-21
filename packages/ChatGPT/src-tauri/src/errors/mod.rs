@@ -94,6 +94,26 @@ pub enum ChatGPTError {
     ),
     #[error("api key未设置")]
     ApiKeyNotSet,
+    #[error("无父文件夹")]
+    Path,
+    #[error("获取不了历史记录数据库路径")]
+    DbPath,
+    #[error("无效的模式:{}",.0)]
+    InvalidMode(String),
+    #[error("无效的角色:{}",.0)]
+    InvalidRole(String),
+    #[error("无效的消息状态:{}",.0)]
+    InvalidMessageStatus(String),
+    #[error("无效的时间格式:{}",.0)]
+    InvalidTimeFormat(
+        #[serde(skip_serializing)]
+        #[from]
+        time::error::IndeterminateOffset,
+    ),
+    #[error("无效的 model:{}",.0)]
+    InvalidModel(String),
+    #[error("窗口不存在")]
+    WindowNotFound,
 }
 
 impl From<tauri::Error> for ChatGPTError {

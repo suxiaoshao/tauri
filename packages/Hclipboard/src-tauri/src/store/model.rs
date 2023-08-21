@@ -84,16 +84,34 @@ impl History {
 
 #[cfg(test)]
 mod tests {
+    use diesel::{
+        connection::SimpleConnection,
+        r2d2::{ConnectionManager, Pool},
+    };
+
+    use crate::store::DbConn;
+
     use super::*;
-    use crate::store::establish_connection;
 
     #[test]
     fn insert() -> anyhow::Result<()> {
-        let path = "./clipboard.sqlite3";
-        let conn = establish_connection("./clipboard.sqlite3")?;
+        let conn = establish_connection()?;
         let conn = &mut conn.get()?;
         History::insert("test", conn)?;
-        std::fs::remove_file(path)?;
         Ok(())
+    }
+    pub fn establish_connection() -> ClipResult<DbConn> {
+        let manager = ConnectionManager::<SqliteConnection>::new("file::memory:");
+        let pool = Pool::builder().test_on_check_out(true).build(manager)?;
+        create_tables(&pool)?;
+        Ok(pool)
+    }
+
+    fn create_tables(conn: &DbConn) -> ClipResult<()> {
+        conn.get()?
+            .batch_execute(include_str!(
+                "../../migrations/2022-09-27-115421_table/up.sql"
+            ))
+            .map_err(|e| e.into())
     }
 }

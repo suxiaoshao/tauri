@@ -1,15 +1,16 @@
-import { Box, Paper } from '@mui/material';
-import ChatForm from './components/ChatForm';
+import { useAppSelector } from '@chatgpt/app/hooks';
+import { selectSelectedConversation } from '@chatgpt/features/Conversations/conversationSlice';
+import AddConversation from '@chatgpt/features/Home/AddConversation';
+import ConversationDetail from './ConversationDetail';
+import { useMemo } from 'react';
 
 export default function Home() {
-  return (
-    <Box
-      component={Paper}
-      sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', p: 2 }}
-      square
-    >
-      <Box sx={{ flex: '1 1 0' }} />
-      <ChatForm />
-    </Box>
-  );
+  const selectedConversation = useAppSelector(selectSelectedConversation);
+  return useMemo(() => {
+    if (selectedConversation) {
+      return <ConversationDetail conversation={selectedConversation} />;
+    } else {
+      return <AddConversation />;
+    }
+  }, [selectedConversation]);
 }

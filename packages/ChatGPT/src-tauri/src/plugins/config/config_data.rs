@@ -5,9 +5,37 @@ use tauri::{api::path::app_config_dir, Runtime};
 
 use crate::errors::{ChatGPTError, ChatGPTResult};
 
+#[derive(Debug, Clone, Copy, Default, Deserialize, Serialize)]
+#[serde(rename_all = "lowercase")]
+enum Theme {
+    Dark,
+    Light,
+    #[default]
+    #[serde(other)]
+    System,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+struct ThemeOption {
+    theme: Theme,
+    color: String,
+}
+
+impl Default for ThemeOption {
+    fn default() -> Self {
+        Self {
+            theme: Default::default(),
+            color: "#3271ae".to_string(),
+        }
+    }
+}
+
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 pub struct ChatGPTConfig {
+    #[serde(rename = "apiKey")]
     api_key: Option<String>,
+    #[serde(default = "Default::default")]
+    theme: ThemeOption,
 }
 
 impl ChatGPTConfig {

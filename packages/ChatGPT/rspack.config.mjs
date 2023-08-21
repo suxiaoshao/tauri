@@ -8,7 +8,9 @@ const config = defineConfig({
   entry: {
     main: './src/main.tsx',
   },
-  output: {},
+  output: {
+    clean: isProduction ? true : false,
+  },
   builtins: {
     html: [
       {
@@ -52,7 +54,7 @@ const config = defineConfig({
   devtool: isProduction ? false : undefined,
   resolve: {
     alias: {
-      '@http': resolve(process.cwd(), './src'),
+      '@chatgpt': resolve(process.cwd(), './src'),
     },
   },
 });
