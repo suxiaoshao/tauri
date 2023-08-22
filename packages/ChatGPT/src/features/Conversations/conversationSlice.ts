@@ -23,7 +23,7 @@ export const conversationSlice = createSlice({
       state.selectedId = action.payload;
     },
     updateMessage: (state, { payload }: PayloadAction<Message>) => {
-      const conversation = state.value.find((c) => (c.id = payload.conversationId));
+      const conversation = state.value.find((c) => c.id === payload.conversationId);
       if (conversation) {
         const message = conversation.messages.findIndex((m) => m.id === payload.id);
         if (message >= 0) {
