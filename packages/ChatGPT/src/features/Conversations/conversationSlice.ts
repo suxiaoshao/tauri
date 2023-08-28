@@ -3,8 +3,10 @@ import { AppThunkAction, RootState } from '../../app/store';
 import { invoke } from '@tauri-apps/api';
 import { Message } from '@chatgpt/types/message';
 import { ChatData } from '@chatgpt/types/chatData';
-import { findConversation, firstConversation, getNodeId } from '@chatgpt/utils/chatData';
+import { findConversation, findFolder, getFirstConversation, getNodeId } from '@chatgpt/utils/chatData';
 import { Enum } from 'types';
+import { Conversation } from '@chatgpt/types/conversation';
+import { Folder } from '@chatgpt/types/folder';
 
 export enum SelectedType {
   Conversation = 'Conversation',
@@ -51,24 +53,71 @@ export const conversationSlice = createSlice({
 export const { setChatData, setSelected, updateMessage } = conversationSlice.actions;
 
 export const selectConversations = (state: RootState) => state.conversation.value;
-export const selectSelectedConversation = (state: RootState) => {
+export const selectSelected = (
+  state: RootState,
+): Enum<SelectedType.Conversation, Conversation> | Enum<SelectedType.Folder, Folder> | Enum<SelectedType.None> => {
   switch (state.conversation.selected.tag) {
+    case SelectedType.Folder:
+      const folder = findFolder(state.conversation.value, state.conversation.selected.value);
+      if (folder) {
+        return {
+          tag: SelectedType.Folder,
+          value: folder,
+        };
+      }
+
     case SelectedType.Conversation:
-      return findConversation(state.conversation.value, state.conversation.selected.value);
+      const conversation = findConversation(state.conversation.value, state.conversation.selected.value);
+      if (conversation) {
+        return {
+          value: conversation,
+          tag: SelectedType.Conversation,
+        };
+      }
+
+    default:
+      return {
+        tag: SelectedType.None,
+      };
+  }
+};
+export const selectSelectedNodeId = (state: RootState) => getNodeId(state.conversation.selected);
+export const selectSelectedFolderId = (state: RootState) => {
+  switch (state.conversation.selected.tag) {
+    case SelectedType.Folder:
+      return state.conversation.selected.value;
+    case SelectedType.Conversation:
+      return findConversation(state.conversation.value, state.conversation.selected.value)?.folderId ?? null;
     default:
       return null;
   }
 };
 
-export const selectSelectedNodeId = (state: RootState) => getNodeId(state.conversation.selected);
-
 export const conversationReducer = conversationSlice.reducer;
 
-export const fetchConversations = (): AppThunkAction => async (dispatch) => {
+export const fetchConversations = (): AppThunkAction => async (dispatch, getState) => {
   const data = await invoke<ChatData>('plugin:chat|get_chat_data');
   dispatch(setChatData(data));
-  const conversation = firstConversation(data);
-  if (conversation) {
-    dispatch(setSelected({ value: conversation.id, tag: SelectedType.Conversation }));
+  const oldState = getState().conversation.selected;
+  let noneSelected: Selected = { tag: SelectedType.None };
+  const firstConversation = getFirstConversation(data);
+  if (firstConversation) {
+    noneSelected = { value: firstConversation.id, tag: SelectedType.Conversation };
+  }
+  switch (oldState.tag) {
+    case SelectedType.Folder:
+      const folder = findFolder(data, oldState.value);
+      if (!folder) {
+        dispatch(setSelected(noneSelected));
+      }
+      break;
+    case SelectedType.Conversation:
+      const conversation = findConversation(data, oldState.value);
+      if (!conversation) {
+        dispatch(setSelected(noneSelected));
+      }
+      break;
+    case SelectedType.None:
+      dispatch(setSelected(noneSelected));
   }
 };

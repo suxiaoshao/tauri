@@ -49,7 +49,11 @@ export default function ConversationDetail({ conversation }: ConversationDetailP
       <Box sx={{ flex: '1 1 0', overflowY: 'auto' }}>
         <MessageHistory messages={conversation.messages} />
       </Box>
-      <ChatForm fetchingMessageDispatch={fetchingMessageDispatch} fetchingMessage={fetchingMessage} />
+      <ChatForm
+        conversationId={conversation.id}
+        fetchingMessageDispatch={fetchingMessageDispatch}
+        fetchingMessage={fetchingMessage}
+      />
     </Box>
   );
 }

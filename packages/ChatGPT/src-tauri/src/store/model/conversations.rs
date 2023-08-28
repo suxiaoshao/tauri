@@ -37,6 +37,8 @@ pub struct Conversation {
 #[derive(serde::Deserialize, Debug)]
 pub struct NewConversation {
     title: String,
+    #[serde(rename = "folderId")]
+    folder_id: Option<i32>,
     icon: String,
     mode: Mode,
     model: Model,
@@ -58,6 +60,7 @@ pub struct NewConversation {
 #[diesel(table_name = conversations)]
 struct SqlNewConversation {
     title: String,
+    folder_id: Option<i32>,
     icon: String,
     mode: String,
     model: String,
@@ -104,6 +107,7 @@ impl Conversation {
     pub fn insert(
         NewConversation {
             title,
+            folder_id,
             icon,
             mode,
             model,
@@ -118,11 +122,12 @@ impl Conversation {
         }: NewConversation,
         conn: &mut SqliteConnection,
     ) -> ChatGPTResult<()> {
-        let time = OffsetDateTime::now_local()?;
+        let time = OffsetDateTime::now_utc();
 
         diesel::insert_into(conversations::table)
             .values(SqlNewConversation {
                 title,
+                folder_id,
                 icon,
                 mode: mode.to_string(),
                 model: model.to_string(),
@@ -196,6 +201,7 @@ impl Conversation {
         id: i32,
         NewConversation {
             title,
+            folder_id,
             icon,
             mode,
             model,
@@ -210,11 +216,12 @@ impl Conversation {
         }: NewConversation,
         conn: &mut SqliteConnection,
     ) -> ChatGPTResult<()> {
-        let time = OffsetDateTime::now_local()?;
+        let time = OffsetDateTime::now_utc();
         diesel::update(conversations::table)
             .filter(conversations::id.eq(id))
             .set((
                 conversations::title.eq(title),
+                conversations::folder_id.eq(folder_id),
                 conversations::icon.eq(icon),
                 conversations::mode.eq(mode.to_string()),
                 conversations::model.eq(model.to_string()),

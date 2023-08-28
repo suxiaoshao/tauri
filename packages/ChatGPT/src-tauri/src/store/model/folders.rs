@@ -31,6 +31,7 @@ struct SqlFolder {
 #[derive(Deserialize)]
 pub struct NewFolder {
     name: String,
+    #[serde(rename = "parentId")]
     parent_id: Option<i32>,
 }
 
@@ -48,7 +49,7 @@ impl Folder {
         NewFolder { name, parent_id }: NewFolder,
         conn: &mut SqliteConnection,
     ) -> ChatGPTResult<()> {
-        let now = OffsetDateTime::now_local()?;
+        let now = OffsetDateTime::now_utc();
         let new_folder = SqlNewFolder {
             name,
             parent_id,
@@ -57,6 +58,21 @@ impl Folder {
         };
         diesel::insert_into(folders::table)
             .values(new_folder)
+            .execute(conn)?;
+        Ok(())
+    }
+    pub fn update(
+        id: i32,
+        NewFolder { name, parent_id }: NewFolder,
+        conn: &mut SqliteConnection,
+    ) -> ChatGPTResult<()> {
+        let now = OffsetDateTime::now_utc();
+        diesel::update(folders::table.filter(folders::id.eq(id)))
+            .set((
+                folders::name.eq(name),
+                folders::parent_id.eq(parent_id),
+                folders::updated_time.eq(now),
+            ))
             .execute(conn)?;
         Ok(())
     }
