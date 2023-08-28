@@ -1,7 +1,19 @@
 -- Your SQL goes here
+create table folders
+(
+    id           INTEGER primary key autoincrement not null,
+    name         TEXT                              not null,
+    parent_id    INTEGER,
+    created_time DateTime                          not null,
+    updated_time DateTime                          not null,
+    unique (name, parent_id),
+    foreign key (parent_id) references folder (id)
+);
+
 create table conversations
 (
     id                INTEGER primary key autoincrement not null,
+    folder_id         INTEGER,
     title             TEXT                              not null,
     icon              TEXT                              not null,
     mode              TEXT                              not null check ( mode in ('contextual', 'single', 'assistant-only') )     default 'contextual',
@@ -15,14 +27,15 @@ create table conversations
     created_time      DateTime                          not null,
     updated_time      DateTime                          not null,
     info              TEXT,
-    prompt            TEXT
+    prompt            TEXT,
+    foreign key (folder_id) references folder (id)
 );
 
 
 
 insert
-into conversations (title,icon, mode, model, created_time, updated_time, info, prompt)
-values ('默认','🤖', 'contextual', 'gpt-3.5-turbo-0613', (SELECT datetime('now')),
+into conversations (title, icon, mode, model, created_time, updated_time, info, prompt)
+values ('默认', '🤖', 'contextual', 'gpt-3.5-turbo-0613', (SELECT datetime('now')),
         (SELECT datetime('now')),
         '默认', null);
 

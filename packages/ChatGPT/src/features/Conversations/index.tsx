@@ -1,26 +1,19 @@
-import {
-  Box,
-  List,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Toolbar,
-  Drawer,
-  Divider,
-  ListItemAvatar,
-  Avatar,
-} from '@mui/material';
-import { Add, Settings } from '@mui/icons-material';
+import { Box, List, ListItemButton, ListItemIcon, ListItemText, Toolbar, Drawer, Divider } from '@mui/material';
+import { Add, ChevronRight, ExpandMore, Settings } from '@mui/icons-material';
 import {
   selectConversations,
-  selectSelectedConversation,
+  selectSelectedNodeId,
   setSelected,
 } from '@chatgpt/features/Conversations/conversationSlice';
 import { useAppDispatch, useAppSelector } from '@chatgpt/app/hooks';
 import { useCallback, useMemo } from 'react';
-import { Conversation } from '@chatgpt/types/conversation';
 import { invoke } from '@tauri-apps/api';
 import usePlatform from '@chatgpt/hooks/usePlatform';
+import { TreeView } from '@mui/lab';
+import FolderItem from './components/FolderItem';
+import ConversationItem from './components/ConversationItem';
+import { getSelectedFromNodeId } from '@chatgpt/utils/chatData';
+import { useNavigate, useMatch } from 'react-router-dom';
 
 export interface DrawerProps {
   open: boolean;
@@ -30,39 +23,39 @@ export interface DrawerProps {
 export default function AppDrawer({ open, drawerWidth }: DrawerProps) {
   const platform = usePlatform();
   const headersHeight = useMemo(() => (platform === 'Darwin' ? 28 : 0), [platform]);
-  const conversations = useAppSelector(selectConversations);
-  const selectedConversation = useAppSelector(selectSelectedConversation);
+  const { conversations, folders } = useAppSelector(selectConversations);
+  const selectedNodeId = useAppSelector(selectSelectedNodeId);
   const dispatch = useAppDispatch();
   const handleSelect = useCallback(
-    (conversation?: Conversation) => {
-      dispatch(setSelected(conversation?.id ?? null));
+    (event: React.SyntheticEvent, nodeIds: string) => {
+      dispatch(setSelected(getSelectedFromNodeId(nodeIds)));
     },
     [dispatch],
   );
   const content = useMemo(() => {
-    return conversations.map((conversation) => {
-      return (
-        <ListItemButton
-          key={conversation.id}
-          onClick={() => handleSelect(conversation)}
-          selected={conversation.id === selectedConversation?.id}
-          dense
-        >
-          <ListItemAvatar>
-            <Avatar sx={{ backgroundColor: 'transparent' }}>{conversation.icon}</Avatar>
-          </ListItemAvatar>
-          <ListItemText
-            primary={conversation.title}
-            secondary={conversation.info}
-            secondaryTypographyProps={{ noWrap: true }}
-          />
-        </ListItemButton>
-      );
-    });
-  }, [conversations, handleSelect, selectedConversation?.id]);
+    return (
+      <TreeView
+        aria-label="file system navigator"
+        defaultCollapseIcon={<ExpandMore />}
+        defaultExpandIcon={<ChevronRight />}
+        sx={{ flexGrow: 1, width: '100%', overflowY: 'auto' }}
+        selected={selectedNodeId}
+        onNodeSelect={handleSelect}
+      >
+        {folders.map((f) => (
+          <FolderItem key={f.id} folder={f} />
+        ))}
+        {conversations.map((c) => (
+          <ConversationItem key={c.id} conversation={c} />
+        ))}
+      </TreeView>
+    );
+  }, [conversations, folders, handleSelect, selectedNodeId]);
   const handleSetting = useCallback(async () => {
     await invoke('plugin:config|create_setting_window');
   }, []);
+  const navigate = useNavigate();
+  const matchAdd = useMatch('/add');
   return (
     <Drawer
       variant="persistent"
@@ -86,10 +79,19 @@ export default function AppDrawer({ open, drawerWidth }: DrawerProps) {
     >
       <Toolbar data-tauri-drag-region />
       <Box sx={{ overflow: 'auto' }}>
-        <List>{content}</List>
+        {content}
         <Divider />
         <List>
-          <ListItemButton selected={selectedConversation === undefined} onClick={() => handleSelect()}>
+          <ListItemButton
+            onClick={() => {
+              if (matchAdd) {
+                navigate('/');
+              } else {
+                navigate('/add');
+              }
+            }}
+            selected={matchAdd !== null}
+          >
             <ListItemIcon>
               <Add />
             </ListItemIcon>

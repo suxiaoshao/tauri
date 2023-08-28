@@ -29,6 +29,7 @@ import 'prismjs/components/prism-json.min';
 import 'prismjs/components/prism-nasm.min';
 import 'prismjs/components/prism-sql.min';
 import 'prismjs/components/prism-rust.min';
+import 'prismjs/components/prism-toml.min';
 
 /* style */
 import 'prism-themes/themes/prism-dracula.css';

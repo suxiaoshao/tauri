@@ -8,6 +8,7 @@ use crate::{errors::ChatGPTError, store::NewConversation};
 use crate::{errors::ChatGPTResult, store};
 
 pub struct ChatPlugin;
+mod chat_data;
 
 impl<R: Runtime> tauri::plugin::Plugin<R> for ChatPlugin {
     fn name(&self) -> &'static str {
@@ -20,21 +21,13 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for ChatPlugin {
     fn extend_api(&mut self, invoke: Invoke<R>) {
         let handle: Box<dyn Fn(Invoke<R>) + Send + Sync> = Box::new(tauri::generate_handler![
             fetch::fetch,
-            get_conversations,
             save_conversation,
             add_message,
-            update_conversation
+            update_conversation,
+            chat_data::get_chat_data
         ]);
         (handle)(invoke);
     }
-}
-// remember to call `.manage(MyState::default())`
-
-#[tauri::command]
-async fn get_conversations(state: tauri::State<'_, DbConn>) -> ChatGPTResult<Vec<Conversation>> {
-    let mut conn = state.get()?;
-    let data = Conversation::query_all(&mut conn)?;
-    Ok(data)
 }
 
 #[tauri::command]

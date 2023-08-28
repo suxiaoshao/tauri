@@ -1,13 +1,13 @@
 import { Box, Typography, Toolbar, IconButton } from '@mui/material';
 import PublishIcon from '@mui/icons-material/Publish';
-import ConversationEdit from '../components/ConversationEdit';
+import ConversationEdit from '../Home/components/ConversationEdit';
 import { useAppDispatch } from '@chatgpt/app/hooks';
 import { fetchConversations } from '@chatgpt/features/Conversations/conversationSlice';
 import { invoke } from '@tauri-apps/api';
 import { NewConversation } from '@chatgpt/types/conversation';
 import { useCallback } from 'react';
 
-export default function AddConversation() {
+export default function Adds() {
   const dispatch = useAppDispatch();
   const handleSubmit = useCallback(
     async ({ info, prompt, ...data }: NewConversation) => {

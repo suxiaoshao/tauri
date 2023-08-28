@@ -1,6 +1,6 @@
 import { useAppSelector } from '@chatgpt/app/hooks';
 import { selectSelectedConversation } from '@chatgpt/features/Conversations/conversationSlice';
-import AddConversation from '@chatgpt/features/Home/AddConversation';
+import Adds from '@chatgpt/features/Adds';
 import ConversationDetail from './ConversationDetail';
 import { useMemo } from 'react';
 
@@ -10,7 +10,7 @@ export default function Home() {
     if (selectedConversation) {
       return <ConversationDetail conversation={selectedConversation} />;
     } else {
-      return <AddConversation />;
+      return <Adds />;
     }
   }, [selectedConversation]);
 }

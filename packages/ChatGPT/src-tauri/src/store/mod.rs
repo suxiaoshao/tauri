@@ -10,6 +10,7 @@ use diesel::{
 };
 
 pub use model::conversations::*;
+pub use model::folders::*;
 pub use model::messages::*;
 pub use types::*;
 
