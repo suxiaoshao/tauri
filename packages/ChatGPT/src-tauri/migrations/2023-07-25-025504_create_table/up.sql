@@ -7,7 +7,7 @@ create table folders
     created_time DateTime                          not null,
     updated_time DateTime                          not null,
     unique (name, parent_id),
-    foreign key (parent_id) references folder (id)
+    foreign key (parent_id) references folders (id)
 );
 
 create table conversations
@@ -28,7 +28,7 @@ create table conversations
     updated_time      DateTime                          not null,
     info              TEXT,
     prompt            TEXT,
-    foreign key (folder_id) references folder (id)
+    foreign key (folder_id) references folders (id)
 );
 
 
