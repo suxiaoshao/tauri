@@ -3,11 +3,12 @@ mod fetch;
 use serde_json::Value;
 use tauri::{AppHandle, Invoke, Manager, Runtime};
 
-use crate::store::{Conversation, DbConn};
+use crate::store::{Conversation, DbConn, Folder, NewFolder};
 use crate::{errors::ChatGPTError, store::NewConversation};
 use crate::{errors::ChatGPTResult, store};
 
 pub struct ChatPlugin;
+mod chat_data;
 
 impl<R: Runtime> tauri::plugin::Plugin<R> for ChatPlugin {
     fn name(&self) -> &'static str {
@@ -20,25 +21,18 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for ChatPlugin {
     fn extend_api(&mut self, invoke: Invoke<R>) {
         let handle: Box<dyn Fn(Invoke<R>) + Send + Sync> = Box::new(tauri::generate_handler![
             fetch::fetch,
-            get_conversations,
-            save_conversation,
-            add_message,
-            update_conversation
+            add_conversation,
+            update_conversation,
+            chat_data::get_chat_data,
+            add_folder,
+            update_folder
         ]);
         (handle)(invoke);
     }
 }
-// remember to call `.manage(MyState::default())`
 
 #[tauri::command]
-async fn get_conversations(state: tauri::State<'_, DbConn>) -> ChatGPTResult<Vec<Conversation>> {
-    let mut conn = state.get()?;
-    let data = Conversation::query_all(&mut conn)?;
-    Ok(data)
-}
-
-#[tauri::command]
-async fn save_conversation(
+async fn add_conversation(
     state: tauri::State<'_, DbConn>,
     data: NewConversation,
 ) -> ChatGPTResult<()> {
@@ -59,12 +53,20 @@ async fn update_conversation(
 }
 
 #[tauri::command]
-async fn add_message(
+async fn add_folder(state: tauri::State<'_, DbConn>, folder: NewFolder) -> ChatGPTResult<()> {
+    let conn = &mut state.get()?;
+    Folder::insert(folder, conn)?;
+    Ok(())
+}
+
+#[tauri::command]
+async fn update_folder(
     state: tauri::State<'_, DbConn>,
-    data: store::NewMessage,
+    id: i32,
+    folder: NewFolder,
 ) -> ChatGPTResult<()> {
-    let mut conn = state.get()?;
-    store::Message::insert(data, &mut conn)?;
+    let conn = &mut state.get()?;
+    Folder::update(id, folder, conn)?;
     Ok(())
 }
 

@@ -3,8 +3,6 @@ import { Paper, InputBase, IconButton } from '@mui/material';
 import { invoke } from '@tauri-apps/api';
 import { useForm } from 'react-hook-form';
 import { Dispatch } from 'react';
-import { useAppSelector } from '@chatgpt/app/hooks';
-import { selectSelectedConversation } from '@chatgpt/features/Conversations/conversationSlice';
 import { Role } from '@chatgpt/types/common';
 import { Message } from '@chatgpt/types/message';
 import { FetchingMessageAction, FetchingMessageType } from '..';
@@ -12,18 +10,18 @@ import { FetchingMessageAction, FetchingMessageType } from '..';
 export interface ChatFormProps {
   fetchingMessageDispatch: Dispatch<FetchingMessageAction>;
   fetchingMessage: FetchingMessageType;
+  conversationId: number;
 }
 
-export default function ChatForm({ fetchingMessageDispatch, fetchingMessage }: ChatFormProps) {
+export default function ChatForm({ fetchingMessageDispatch, fetchingMessage, conversationId }: ChatFormProps) {
   const { register, handleSubmit, setValue } = useForm<Message>({ defaultValues: { role: Role.user } });
-  const id = useAppSelector(selectSelectedConversation)?.id;
   const onSubmit = handleSubmit(async (data) => {
     fetchingMessageDispatch(FetchingMessageAction.start);
     setValue('content', '');
 
     await invoke<Message>('plugin:chat|fetch', {
       content: data.content,
-      id: id,
+      id: conversationId,
     });
     fetchingMessageDispatch(FetchingMessageAction.complete);
   });

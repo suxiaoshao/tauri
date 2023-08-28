@@ -1,16 +1,20 @@
 import { useAppSelector } from '@chatgpt/app/hooks';
-import { selectSelectedConversation } from '@chatgpt/features/Conversations/conversationSlice';
-import AddConversation from '@chatgpt/features/Home/AddConversation';
+import { SelectedType, selectSelected } from '@chatgpt/features/Conversations/conversationSlice';
 import ConversationDetail from './ConversationDetail';
 import { useMemo } from 'react';
+import AddConversation from '../Adds/AddConversation';
+import FolderDetail from './FolderDetail';
 
 export default function Home() {
-  const selectedConversation = useAppSelector(selectSelectedConversation);
+  const selected = useAppSelector(selectSelected);
   return useMemo(() => {
-    if (selectedConversation) {
-      return <ConversationDetail conversation={selectedConversation} />;
-    } else {
-      return <AddConversation />;
+    switch (selected?.tag) {
+      case SelectedType.Conversation:
+        return <ConversationDetail conversation={selected.value} />;
+      case SelectedType.Folder:
+        return <FolderDetail folder={selected.value} />;
+      case SelectedType.None:
+        return <AddConversation />;
     }
-  }, [selectedConversation]);
+  }, [selected]);
 }

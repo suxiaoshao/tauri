@@ -4,14 +4,14 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { Box, TextField, MenuItem, FormControlLabel, Checkbox, BoxProps } from '@mui/material';
 import emojiRegex from 'emoji-regex';
 import { useState } from 'react';
-import { useForm, Resolver, Controller } from 'react-hook-form';
-import { object, string, number } from 'yup';
+import { useForm, Controller, Resolver } from 'react-hook-form';
+import { object, string, number, InferType } from 'yup';
 
 const conversationSchema = object<NewConversation>().shape({
   title: string().required(),
-  icon: string().matches(emojiRegex(), 'Icon should is emoji').nullable(),
+  icon: string().matches(emojiRegex(), 'Icon should is emoji').required(),
   mode: string().oneOf([Mode.AssistantOnly, Mode.Contextual, Mode.Single]).required(),
-  model: string().required(),
+  model: string().required().oneOf(Object.values(Model)),
   temperature: number().min(0).max(1).required(),
   topP: number().min(0).max(1).required(),
   n: number().min(1).integer().required(),
@@ -21,6 +21,8 @@ const conversationSchema = object<NewConversation>().shape({
   info: string().nullable(),
   prompt: string().nullable(),
 });
+
+export type ConversationForm = InferType<typeof conversationSchema>;
 
 const DefaultValues: Partial<NewConversation> = {
   mode: Mode.Contextual,
@@ -35,7 +37,7 @@ const DefaultValues: Partial<NewConversation> = {
 export interface ConversationEditProps extends Omit<BoxProps, 'component' | 'id' | 'onSubmit'> {
   initialValues?: NewConversation;
   id: string;
-  onSubmit: (newConversation: NewConversation) => Promise<void>;
+  onSubmit: (newConversation: ConversationForm) => Promise<void>;
 }
 export default function ConversationEdit({ initialValues, id, sx, onSubmit: submit, ...props }: ConversationEditProps) {
   const {
@@ -43,8 +45,8 @@ export default function ConversationEdit({ initialValues, id, sx, onSubmit: subm
     handleSubmit,
     formState: { errors },
     control,
-  } = useForm<NewConversation>({
-    resolver: yupResolver(conversationSchema) as Resolver<NewConversation, unknown>,
+  } = useForm<ConversationForm>({
+    resolver: yupResolver(conversationSchema) as Resolver<ConversationForm, unknown>,
     defaultValues: initialValues ?? DefaultValues,
   });
   const onSubmit = handleSubmit(submit);

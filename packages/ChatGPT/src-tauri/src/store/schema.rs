@@ -3,6 +3,7 @@
 diesel::table! {
     conversations (id) {
         id -> Integer,
+        folder_id -> Nullable<Integer>,
         title -> Text,
         icon -> Text,
         mode -> Text,
@@ -17,6 +18,16 @@ diesel::table! {
         updated_time -> TimestamptzSqlite,
         info -> Nullable<Text>,
         prompt -> Nullable<Text>,
+    }
+}
+
+diesel::table! {
+    folders (id) {
+        id -> Integer,
+        name -> Text,
+        parent_id -> Nullable<Integer>,
+        created_time -> TimestamptzSqlite,
+        updated_time -> TimestamptzSqlite,
     }
 }
 
@@ -38,5 +49,6 @@ diesel::joinable!(messages -> conversations (conversation_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
     conversations,
+    folders,
     messages,
 );

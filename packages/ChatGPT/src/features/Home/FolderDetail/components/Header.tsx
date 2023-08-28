@@ -1,45 +1,30 @@
-import { Conversation, NewConversation } from '@chatgpt/types/conversation';
-import {
-  Avatar,
-  Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  IconButton,
-  Typography,
-} from '@mui/material';
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import { useCallback, useState } from 'react';
-import ConversationEdit, { ConversationForm } from '../../../../components/ConversationEdit';
 import { invoke } from '@tauri-apps/api';
 import { useAppDispatch } from '@chatgpt/app/hooks';
 import { fetchConversations } from '@chatgpt/features/Conversations/conversationSlice';
-export interface ConversationHeaderProps {
-  conversation: Conversation;
+import { Folder, NewFolder } from '@chatgpt/types/folder';
+import FolderEdit, { FolderForm } from '@chatgpt/components/FolderEdit';
+export interface FolderHeaderProps {
+  folder: Folder;
 }
 
-export default function ConversationHeader({ conversation }: ConversationHeaderProps) {
+export default function FolderHeader({ folder }: FolderHeaderProps) {
   const dispatch = useAppDispatch();
   const [open, setOpen] = useState(false);
   const handleOpen = useCallback(() => setOpen(true), []);
   const handleClose = useCallback(() => setOpen(false), []);
   const handleSubmit = useCallback(
-    async ({ info, prompt, ...data }: ConversationForm) => {
-      await invoke('plugin:chat|update_conversation', {
-        data: {
-          info: info?.trim() || null,
-          prompt: prompt?.trim() || null,
-          folderId: conversation.folderId,
-          ...data,
-        } satisfies NewConversation,
-        id: conversation.id,
+    async ({ name }: FolderForm) => {
+      await invoke('plugin:chat|update_folder', {
+        folder: { name: name.trim(), parentId: folder.parentId } satisfies NewFolder,
+        id: folder.id,
       });
       dispatch(fetchConversations());
       handleClose();
     },
-    [conversation.folderId, conversation.id, dispatch, handleClose],
+    [folder.parentId, folder.id, dispatch, handleClose],
   );
 
   return (
@@ -53,22 +38,9 @@ export default function ConversationHeader({ conversation }: ConversationHeaderP
         boxShadow: (theme) => theme.shadows[3].split(',0px')[0],
       }}
     >
-      <Avatar data-tauri-drag-region sx={{ backgroundColor: 'transparent' }}>
-        {conversation.icon}
-      </Avatar>
       <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', ml: 1 }} data-tauri-drag-region>
         <Typography data-tauri-drag-region variant="h6" component="span" paragraph={false}>
-          {conversation.title}
-        </Typography>
-        <Typography
-          sx={{ ml: 1 }}
-          data-tauri-drag-region
-          variant="body2"
-          color="inherit"
-          component="span"
-          paragraph={false}
-        >
-          {conversation.info}
+          {folder.name}
         </Typography>
       </Box>
       <IconButton onClick={handleOpen}>
@@ -86,11 +58,11 @@ export default function ConversationHeader({ conversation }: ConversationHeaderP
           },
         }}
       >
-        <DialogTitle>Update Conversation</DialogTitle>
+        <DialogTitle>Update Folder</DialogTitle>
         <DialogContent dividers>
-          <ConversationEdit
-            initialValues={conversation}
-            id="conversation-form"
+          <FolderEdit
+            initialValues={folder}
+            id="folder-form"
             sx={{
               p: 0,
               overflowY: 'unset',
@@ -100,7 +72,7 @@ export default function ConversationHeader({ conversation }: ConversationHeaderP
           />
         </DialogContent>
         <DialogActions>
-          <Button variant="text" type="submit" form="conversation-form">
+          <Button variant="text" type="submit" form="folder-form">
             Save changes
           </Button>
         </DialogActions>

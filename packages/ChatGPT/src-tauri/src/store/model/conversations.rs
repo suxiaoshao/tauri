@@ -9,6 +9,8 @@ use time::OffsetDateTime;
 #[derive(serde::Serialize)]
 pub struct Conversation {
     pub id: i32,
+    #[serde(rename = "folderId")]
+    pub folder_id: Option<i32>,
     pub title: String,
     pub icon: String,
     pub mode: Mode,
@@ -35,6 +37,8 @@ pub struct Conversation {
 #[derive(serde::Deserialize, Debug)]
 pub struct NewConversation {
     title: String,
+    #[serde(rename = "folderId")]
+    folder_id: Option<i32>,
     icon: String,
     mode: Mode,
     model: Model,
@@ -56,6 +60,7 @@ pub struct NewConversation {
 #[diesel(table_name = conversations)]
 struct SqlNewConversation {
     title: String,
+    folder_id: Option<i32>,
     icon: String,
     mode: String,
     model: String,
@@ -75,6 +80,7 @@ struct SqlNewConversation {
 #[diesel(table_name = conversations)]
 struct SqlConversation {
     id: i32,
+    folder_id: Option<i32>,
     title: String,
     icon: String,
     mode: String,
@@ -101,6 +107,7 @@ impl Conversation {
     pub fn insert(
         NewConversation {
             title,
+            folder_id,
             icon,
             mode,
             model,
@@ -115,11 +122,12 @@ impl Conversation {
         }: NewConversation,
         conn: &mut SqliteConnection,
     ) -> ChatGPTResult<()> {
-        let time = OffsetDateTime::now_local()?;
+        let time = OffsetDateTime::now_utc();
 
         diesel::insert_into(conversations::table)
             .values(SqlNewConversation {
                 title,
+                folder_id,
                 icon,
                 mode: mode.to_string(),
                 model: model.to_string(),
@@ -137,9 +145,10 @@ impl Conversation {
             .execute(conn)?;
         Ok(())
     }
-    /// 获取所有对话
-    pub fn query_all(conn: &mut SqliteConnection) -> ChatGPTResult<Vec<Conversation>> {
+    /// 获取没有文件夹的会话
+    pub fn query(conn: &mut SqliteConnection) -> ChatGPTResult<Vec<Conversation>> {
         let data = conversations::table
+            .filter(conversations::folder_id.is_null())
             .order(conversations::updated_time.desc())
             .load::<SqlConversation>(conn)?;
         data.into_iter()
@@ -149,6 +158,7 @@ impl Conversation {
     fn from_sql_conversation(
         SqlConversation {
             id,
+            folder_id,
             title,
             icon,
             mode,
@@ -169,6 +179,7 @@ impl Conversation {
         let messages = Message::messages_by_conversation_id(id, conn)?;
         Ok(Conversation {
             id,
+            folder_id,
             title,
             icon,
             mode: mode.parse()?,
@@ -190,6 +201,7 @@ impl Conversation {
         id: i32,
         NewConversation {
             title,
+            folder_id,
             icon,
             mode,
             model,
@@ -204,11 +216,12 @@ impl Conversation {
         }: NewConversation,
         conn: &mut SqliteConnection,
     ) -> ChatGPTResult<()> {
-        let time = OffsetDateTime::now_local()?;
+        let time = OffsetDateTime::now_utc();
         diesel::update(conversations::table)
             .filter(conversations::id.eq(id))
             .set((
                 conversations::title.eq(title),
+                conversations::folder_id.eq(folder_id),
                 conversations::icon.eq(icon),
                 conversations::mode.eq(mode.to_string()),
                 conversations::model.eq(model.to_string()),
@@ -224,5 +237,17 @@ impl Conversation {
             ))
             .execute(conn)?;
         Ok(())
+    }
+    pub fn find_by_folder_id(
+        folder_id: i32,
+        conn: &mut SqliteConnection,
+    ) -> ChatGPTResult<Vec<Conversation>> {
+        let data = conversations::table
+            .filter(conversations::folder_id.eq(folder_id))
+            .order(conversations::updated_time.desc())
+            .load::<SqlConversation>(conn)?;
+        data.into_iter()
+            .map(|sql_conversation| Self::from_sql_conversation(sql_conversation, conn))
+            .collect::<ChatGPTResult<_>>()
     }
 }

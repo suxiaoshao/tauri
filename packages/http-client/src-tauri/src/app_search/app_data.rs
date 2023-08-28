@@ -19,8 +19,8 @@ impl PartialEq<&str> for &AppPath {
             .name
             .chars()
             .map(|x| x.to_pinyin().map(|x| x.plain()))
-            .fold(Some("".to_string()), |acc, x| match (acc, x) {
-                (Some(a), Some(b)) => Some(a + b),
+            .try_fold("".to_string(), |acc, x| match (acc, x) {
+                (a, Some(b)) => Some(a + b),
                 _ => None,
             })
             .unwrap_or_default();
