@@ -27,7 +27,7 @@ const createColorSchema = object({
   color: string()
     .required('主题色不能为空')
     .matches(/^#[0-9a-fA-F]{6}$/, '主题色格式不正确'),
-  colorSetting: string().required('主题模式不能为空').equals(['light', 'dark', 'system']),
+  colorSetting: string().oneOf(['light', 'dark', 'system']).required('主题模式不能为空'),
 });
 
 export default function ThemeDrawerItem() {

@@ -44,8 +44,11 @@ pub struct SqlMessage {
 }
 
 impl SqlMessage {
-    pub fn first(conn: &mut SqliteConnection) -> ChatGPTResult<Self> {
-        messages::table.first(conn).map_err(|e| e.into())
+    pub fn last(conn: &mut SqliteConnection) -> ChatGPTResult<Self> {
+        messages::table
+            .order(messages::id.desc())
+            .first(conn)
+            .map_err(|e| e.into())
     }
     pub fn query_by_conversation_id(
         conversation_id: i32,

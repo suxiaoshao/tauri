@@ -81,23 +81,25 @@ impl Message {
         }: NewMessage,
         conn: &mut SqliteConnection,
     ) -> ChatGPTResult<Message> {
-        let time = OffsetDateTime::now_utc();
-        let SqlConversation { path, .. } = SqlConversation::find(conversation_id, conn)?;
+        conn.immediate_transaction(|conn| {
+            let time = OffsetDateTime::now_utc();
+            let SqlConversation { path, .. } = SqlConversation::find(conversation_id, conn)?;
 
-        let new_message = SqlNewMessage {
-            conversation_id,
-            conversation_path: path,
-            role: role.to_string(),
-            content,
-            status: status.to_string(),
-            created_time: time,
-            updated_time: time,
-            start_time: time,
-            end_time: time,
-        };
-        new_message.insert(conn)?;
-        let message = SqlMessage::first(conn)?;
-        Message::try_from(message)
+            let new_message = SqlNewMessage {
+                conversation_id,
+                conversation_path: path,
+                role: role.to_string(),
+                content,
+                status: status.to_string(),
+                created_time: time,
+                updated_time: time,
+                start_time: time,
+                end_time: time,
+            };
+            new_message.insert(conn)?;
+            let message = SqlMessage::last(conn)?;
+            Message::try_from(message)
+        })
     }
     pub fn messages_by_conversation_id(
         conversation_id: i32,
