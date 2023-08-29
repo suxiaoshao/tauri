@@ -6,6 +6,7 @@ import { useAppDispatch } from '@chatgpt/app/hooks';
 import { fetchConversations } from '@chatgpt/features/Conversations/conversationSlice';
 import { Folder, NewFolder } from '@chatgpt/types/folder';
 import FolderEdit, { FolderForm } from '@chatgpt/components/FolderEdit';
+import { Delete } from '@mui/icons-material';
 export interface FolderHeaderProps {
   folder: Folder;
 }
@@ -26,6 +27,10 @@ export default function FolderHeader({ folder }: FolderHeaderProps) {
     },
     [folder.parentId, folder.id, dispatch, handleClose],
   );
+  const handleDelete = useCallback(async () => {
+    await invoke('plugin:chat|delete_folder', { id: folder.id });
+    dispatch(fetchConversations());
+  }, [dispatch, folder.id]);
 
   return (
     <Box
@@ -45,6 +50,9 @@ export default function FolderHeader({ folder }: FolderHeaderProps) {
       </Box>
       <IconButton onClick={handleOpen}>
         <EditIcon />
+      </IconButton>
+      <IconButton onClick={handleDelete}>
+        <Delete />
       </IconButton>
       <Dialog
         open={open}

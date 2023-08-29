@@ -16,6 +16,7 @@ import ConversationEdit, { ConversationForm } from '../../../../components/Conve
 import { invoke } from '@tauri-apps/api';
 import { useAppDispatch } from '@chatgpt/app/hooks';
 import { fetchConversations } from '@chatgpt/features/Conversations/conversationSlice';
+import { Delete } from '@mui/icons-material';
 export interface ConversationHeaderProps {
   conversation: Conversation;
 }
@@ -41,6 +42,10 @@ export default function ConversationHeader({ conversation }: ConversationHeaderP
     },
     [conversation.folderId, conversation.id, dispatch, handleClose],
   );
+  const handleDelete = useCallback(async () => {
+    await invoke('plugin:chat|delete_conversation', { id: conversation.id });
+    dispatch(fetchConversations());
+  }, [conversation.id, dispatch]);
 
   return (
     <Box
@@ -73,6 +78,9 @@ export default function ConversationHeader({ conversation }: ConversationHeaderP
       </Box>
       <IconButton onClick={handleOpen}>
         <EditIcon />
+      </IconButton>
+      <IconButton onClick={handleDelete}>
+        <Delete />
       </IconButton>
       <Dialog
         open={open}

@@ -23,9 +23,11 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for ChatPlugin {
             fetch::fetch,
             add_conversation,
             update_conversation,
+            delete_conversation,
             chat_data::get_chat_data,
             add_folder,
-            update_folder
+            update_folder,
+            delete_folder
         ]);
         (handle)(invoke);
     }
@@ -67,6 +69,19 @@ async fn update_folder(
 ) -> ChatGPTResult<()> {
     let conn = &mut state.get()?;
     Folder::update(id, folder, conn)?;
+    Ok(())
+}
+#[tauri::command]
+async fn delete_conversation(state: tauri::State<'_, DbConn>, id: i32) -> ChatGPTResult<()> {
+    let conn = &mut state.get()?;
+    Conversation::delete_by_id(id, conn)?;
+    Ok(())
+}
+
+#[tauri::command]
+async fn delete_folder(state: tauri::State<'_, DbConn>, id: i32) -> ChatGPTResult<()> {
+    let conn = &mut state.get()?;
+    Folder::delete_by_id(id, conn)?;
     Ok(())
 }
 

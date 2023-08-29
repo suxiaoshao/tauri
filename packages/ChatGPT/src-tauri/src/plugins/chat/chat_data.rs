@@ -12,7 +12,7 @@ pub struct ChatData {
 #[tauri::command]
 pub async fn get_chat_data(state: tauri::State<'_, DbConn>) -> ChatGPTResult<ChatData> {
     let conn = &mut state.get()?;
-    let conversations = Conversation::query(conn)?;
+    let conversations = Conversation::query_without_folder(conn)?;
     let folders = Folder::query(conn)?;
     Ok(ChatData {
         conversations,
