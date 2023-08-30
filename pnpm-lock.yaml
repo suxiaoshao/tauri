@@ -164,6 +164,9 @@ importers:
       prismjs:
         specifier: ^1.29.0
         version: 1.29.0
+      react-resizable:
+        specifier: ^3.0.5
+        version: 3.0.5(react-dom@18.2.0)(react@18.2.0)
       theme:
         specifier: workspace:^1.0.0
         version: link:../../common/theme
@@ -174,6 +177,9 @@ importers:
       '@types/prismjs':
         specifier: ^1.26.0
         version: 1.26.0
+      '@types/react-resizable':
+        specifier: ^3.0.4
+        version: 3.0.4
 
   packages/Hclipboard:
     dependencies:
@@ -1127,6 +1133,7 @@ packages:
     resolution: {integrity: sha512-JIq1ehp2oDOURoSiad+EyHWUD+CPReWxnvTgAUUHjNAH6mnGmJCMl3031/2lq1c9ZsH0yve36MzfTZa42K8gKw==}
     cpu: [arm64]
     os: [linux]
+    libc: [glibc]
     requiresBuild: true
     dev: true
     optional: true
@@ -1135,6 +1142,7 @@ packages:
     resolution: {integrity: sha512-GhyAj3laN69Kxu6qoane7nteCemVvqn6oKAB7edqfav4/Xq0DGRtlumAFR2ooShw4KpRI9I0keAZ5LDefAFc2Q==}
     cpu: [arm64]
     os: [linux]
+    libc: [musl]
     requiresBuild: true
     dev: true
     optional: true
@@ -1143,6 +1151,7 @@ packages:
     resolution: {integrity: sha512-tQdVXLnulhnhFYtN+r5ZZTNQyS8ErbEvC1efN7P7DSNOU3XRcL5WFzvlcY2KVtZyjmg3Z0xSoDbpYwQ7GAMHKQ==}
     cpu: [x64]
     os: [linux]
+    libc: [glibc]
     requiresBuild: true
     dev: true
     optional: true
@@ -1151,6 +1160,7 @@ packages:
     resolution: {integrity: sha512-/XvTDvslEjPoCb8BICbKjXKAKO/dNOlIdTzZL7cXYfOrJSxIFpsWen4txNxnky9ArVTw9TuDBQNfFAwi3Sq0kQ==}
     cpu: [x64]
     os: [linux]
+    libc: [musl]
     requiresBuild: true
     dev: true
     optional: true
@@ -1377,6 +1387,7 @@ packages:
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
+    libc: [glibc]
     requiresBuild: true
     dev: true
     optional: true
@@ -1386,6 +1397,7 @@ packages:
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
+    libc: [musl]
     requiresBuild: true
     dev: true
     optional: true
@@ -1395,6 +1407,7 @@ packages:
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
+    libc: [glibc]
     requiresBuild: true
     dev: true
     optional: true
@@ -1404,6 +1417,7 @@ packages:
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
+    libc: [musl]
     requiresBuild: true
     dev: true
     optional: true
@@ -1668,6 +1682,12 @@ packages:
     dependencies:
       '@types/react': 18.2.21
     dev: false
+
+  /@types/react-resizable@3.0.4:
+    resolution: {integrity: sha512-+QguN9CDfC1lthq+4noG1fkxh8cqkV2Fv/Mu3mdknCCBiwwNLecnBdk1MmNNN7uJpT23Nx/aVkYsbt5NuWouFw==}
+    dependencies:
+      '@types/react': 18.2.21
+    dev: true
 
   /@types/react-router-dom@5.3.3:
     resolution: {integrity: sha512-kpqnYK4wcdm5UaWI3fLcELopqLrHgLqNsdpHauzlQktfkHL3npOSwtj1Uz9oKBAzs7lFtVkV8j83voAz2D8fhw==}
@@ -5078,6 +5098,18 @@ packages:
       react: 18.2.0
       scheduler: 0.23.0
 
+  /react-draggable@4.4.5(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-OMHzJdyJbYTZo4uQE393fHcqqPYsEtkjfMgvCHr6rejT+Ezn4OZbNyGH50vv+SunC1RMvwOTSWkEODQLzw1M9g==}
+    peerDependencies:
+      react: '>= 16.3.0'
+      react-dom: '>= 16.3.0'
+    dependencies:
+      clsx: 1.2.1
+      prop-types: 15.8.1
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+    dev: false
+
   /react-hook-form@7.45.4(react@18.2.0):
     resolution: {integrity: sha512-HGDV1JOOBPZj10LB3+OZgfDBTn+IeEsNOKiq/cxbQAIbKaiJUe/KV8DBUzsx0Gx/7IG/orWqRRm736JwOfUSWQ==}
     engines: {node: '>=12.22.0'}
@@ -5135,6 +5167,18 @@ packages:
     resolution: {integrity: sha512-wViHqhAd8OHeLS/IRMJjTSDHF3U9eWi62F/MledQGPdJGDhodXJ9PBLNGr6WWL7qlH12Mt3TyTpbS+hGXMjCzQ==}
     engines: {node: '>=0.10.0'}
     dev: true
+
+  /react-resizable@3.0.5(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-vKpeHhI5OZvYn82kXOs1bC8aOXktGU5AmKAgaZS4F5JPburCtbmDPqE7Pzp+1kN4+Wb81LlF33VpGwWwtXem+w==}
+    peerDependencies:
+      react: '>= 16.3'
+    dependencies:
+      prop-types: 15.8.1
+      react: 18.2.0
+      react-draggable: 4.4.5(react-dom@18.2.0)(react@18.2.0)
+    transitivePeerDependencies:
+      - react-dom
+    dev: false
 
   /react-router-dom@6.15.0(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-aR42t0fs7brintwBGAv2+mGlCtgtFQeOzK0BM1/OiqEzRejOZtpMZepvgkscpMUnKb8YO84G7s3LsHnnDNonbQ==}

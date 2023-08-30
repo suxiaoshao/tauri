@@ -14,10 +14,12 @@
     "notify": "workspace:^1.0.0",
     "prism-themes": "^1.9.0",
     "prismjs": "^1.29.0",
+    "react-resizable": "^3.0.5",
     "theme": "workspace:^1.0.0",
     "types": "workspace:^1.0.0"
   },
   "devDependencies": {
-    "@types/prismjs": "^1.26.0"
+    "@types/prismjs": "^1.26.0",
+    "@types/react-resizable": "^3.0.4"
   }
 }
