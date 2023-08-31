@@ -3,11 +3,12 @@ import PublishIcon from '@mui/icons-material/Publish';
 import ConversationEdit, { ConversationForm } from '../../components/ConversationEdit';
 import { useAppDispatch, useAppSelector } from '@chatgpt/app/hooks';
 import { fetchConversations, selectSelectedFolderId } from '@chatgpt/features/Conversations/conversationSlice';
-import { invoke } from '@tauri-apps/api';
 import { useCallback } from 'react';
-import { useMatch, useNavigate } from 'react-router-dom';
+import { useMatch, useNavigate, useLocation } from 'react-router-dom';
 import { Add } from '@mui/icons-material';
 import { NewConversation } from '@chatgpt/types/conversation';
+import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
+import { addConversation } from '@chatgpt/service/chat';
 
 function AddConversation() {
   const dispatch = useAppDispatch();
@@ -15,12 +16,12 @@ function AddConversation() {
   const navigate = useNavigate();
   const handleSubmit = useCallback(
     async ({ info, prompt, ...data }: ConversationForm) => {
-      await invoke('plugin:chat|add_conversation', {
+      await addConversation({
         data: {
+          ...data,
           info: info?.trim() || null,
           prompt: prompt?.trim() || null,
           folderId,
-          ...data,
         } satisfies NewConversation,
       });
       dispatch(fetchConversations());
@@ -28,6 +29,7 @@ function AddConversation() {
     },
     [dispatch, folderId, navigate],
   );
+  const { state } = useLocation();
   return (
     <Box
       sx={{
@@ -43,8 +45,11 @@ function AddConversation() {
         data-tauri-drag-region
         sx={{ backgroundColor: 'transparent', boxShadow: (theme) => theme.shadows[3].split(',0px')[0] }}
       >
-        <Toolbar data-tauri-drag-region variant="dense">
-          <Typography data-tauri-drag-region variant="h6">
+        <Toolbar data-tauri-drag-region variant="dense" sx={{ pl: '0!important' }}>
+          <IconButton onClick={() => navigate(-1)}>
+            <KeyboardArrowLeftIcon />
+          </IconButton>
+          <Typography data-tauri-drag-region variant="h6" sx={{ ml: 1 }}>
             Add Conversation
           </Typography>
           <Box sx={{ flexGrow: 1 }} />
@@ -53,7 +58,7 @@ function AddConversation() {
           </IconButton>
         </Toolbar>
       </Box>
-      <ConversationEdit id="conversation-form" onSubmit={handleSubmit} />
+      <ConversationEdit initialValues={state} id="conversation-form" onSubmit={handleSubmit} />
     </Box>
   );
 }

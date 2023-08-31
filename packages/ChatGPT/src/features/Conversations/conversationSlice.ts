@@ -1,12 +1,12 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AppThunkAction, RootState } from '../../app/store';
-import { invoke } from '@tauri-apps/api';
 import { Message } from '@chatgpt/types/message';
 import { ChatData } from '@chatgpt/types/chatData';
 import { findConversation, findFolder, getFirstConversation, getNodeId } from '@chatgpt/utils/chatData';
 import { Enum } from 'types';
 import { Conversation } from '@chatgpt/types/conversation';
 import { Folder } from '@chatgpt/types/folder';
+import { getChatData } from '@chatgpt/service/chat';
 
 export enum SelectedType {
   Conversation = 'Conversation',
@@ -96,7 +96,7 @@ export const selectSelectedFolderId = (state: RootState) => {
 export const conversationReducer = conversationSlice.reducer;
 
 export const fetchConversations = (): AppThunkAction => async (dispatch, getState) => {
-  const data = await invoke<ChatData>('plugin:chat|get_chat_data');
+  const data = await getChatData();
   dispatch(setChatData(data));
   const oldState = getState().conversation.selected;
   let noneSelected: Selected = { tag: SelectedType.None };

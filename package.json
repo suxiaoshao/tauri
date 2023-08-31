@@ -23,9 +23,9 @@
     "@emotion/styled": "^11.11.0",
     "@fontsource/roboto": "^5.0.8",
     "@hookform/resolvers": "^3.3.1",
-    "@mui/icons-material": "^5.14.6",
-    "@mui/lab": "5.0.0-alpha.141",
-    "@mui/material": "^5.14.6",
+    "@mui/icons-material": "^5.14.7",
+    "@mui/lab": "5.0.0-alpha.142",
+    "@mui/material": "^5.14.7",
     "@reduxjs/toolkit": "^1.9.5",
     "@tauri-apps/api": "^1.4.0",
     "react": "^18.2.0",
@@ -37,7 +37,7 @@
     "yup": "^1.2.0"
   },
   "devDependencies": {
-    "@rspack/cli": "0.3.0",
+    "@rspack/cli": "0.3.1",
     "@tauri-apps/cli": "^1.4.0",
     "@testing-library/jest-dom": "^6.1.2",
     "@testing-library/react": "^14.0.0",
@@ -55,7 +55,7 @@
     "git-cz": "^4.9.0",
     "husky": "^8.0.3",
     "jsdom": "^22.1.0",
-    "prettier": "^3.0.2",
+    "prettier": "^3.0.3",
     "typescript": "^5.2.2",
     "vitest": "^0.34.3"
   }

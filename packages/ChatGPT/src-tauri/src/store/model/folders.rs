@@ -4,7 +4,7 @@ use super::super::schema::folders;
 use diesel::prelude::*;
 use time::OffsetDateTime;
 
-#[derive(Queryable)]
+#[derive(Queryable, Debug)]
 pub struct SqlFolder {
     pub(in super::super) id: i32,
     pub(in super::super) name: String,
@@ -85,7 +85,10 @@ pub struct SqlUpdateFolder {
 
 impl SqlUpdateFolder {
     pub fn update(&self, conn: &mut SqliteConnection) -> ChatGPTResult<()> {
-        diesel::update(folders::table).set(self).execute(conn)?;
+        diesel::update(folders::table)
+            .filter(folders::id.eq(self.id))
+            .set(self)
+            .execute(conn)?;
         Ok(())
     }
 }

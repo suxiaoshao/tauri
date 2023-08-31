@@ -33,7 +33,7 @@ impl SqlNewConversation {
     }
 }
 
-#[derive(Queryable, AsChangeset)]
+#[derive(Queryable, AsChangeset, Debug)]
 #[diesel(table_name = conversations)]
 pub struct SqlConversation {
     pub(in super::super) id: i32,
@@ -96,7 +96,7 @@ impl SqlConversation {
     }
 }
 
-#[derive(AsChangeset, Identifiable)]
+#[derive(AsChangeset, Identifiable, Debug)]
 #[diesel(table_name = conversations)]
 pub struct UpdateConversation {
     pub(in super::super) id: i32,
@@ -120,6 +120,7 @@ pub struct UpdateConversation {
 impl UpdateConversation {
     pub fn update(self, conn: &mut SqliteConnection) -> ChatGPTResult<()> {
         diesel::update(conversations::table)
+            .filter(conversations::id.eq(self.id))
             .set(self)
             .execute(conn)?;
         Ok(())

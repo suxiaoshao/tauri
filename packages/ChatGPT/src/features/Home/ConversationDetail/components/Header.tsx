@@ -8,15 +8,17 @@ import {
   DialogContent,
   DialogTitle,
   IconButton,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import { useCallback, useState } from 'react';
 import ConversationEdit, { ConversationForm } from '../../../../components/ConversationEdit';
-import { invoke } from '@tauri-apps/api';
 import { useAppDispatch } from '@chatgpt/app/hooks';
 import { fetchConversations } from '@chatgpt/features/Conversations/conversationSlice';
-import { Delete } from '@mui/icons-material';
+import { CopyAll, Delete } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
+import { deleteConversation, updateConversation } from '@chatgpt/service/chat';
 export interface ConversationHeaderProps {
   conversation: Conversation;
 }
@@ -28,12 +30,12 @@ export default function ConversationHeader({ conversation }: ConversationHeaderP
   const handleClose = useCallback(() => setOpen(false), []);
   const handleSubmit = useCallback(
     async ({ info, prompt, ...data }: ConversationForm) => {
-      await invoke('plugin:chat|update_conversation', {
+      await updateConversation({
         data: {
+          ...data,
           info: info?.trim() || null,
           prompt: prompt?.trim() || null,
           folderId: conversation.folderId,
-          ...data,
         } satisfies NewConversation,
         id: conversation.id,
       });
@@ -43,9 +45,13 @@ export default function ConversationHeader({ conversation }: ConversationHeaderP
     [conversation.folderId, conversation.id, dispatch, handleClose],
   );
   const handleDelete = useCallback(async () => {
-    await invoke('plugin:chat|delete_conversation', { id: conversation.id });
+    await deleteConversation({ id: conversation.id });
     dispatch(fetchConversations());
   }, [conversation.id, dispatch]);
+  const navigate = useNavigate();
+  const handleCopy = useCallback(async () => {
+    navigate('/add/conversation', { state: { ...conversation, id: undefined } });
+  }, [conversation, navigate]);
 
   return (
     <Box
@@ -76,12 +82,21 @@ export default function ConversationHeader({ conversation }: ConversationHeaderP
           {conversation.info}
         </Typography>
       </Box>
-      <IconButton onClick={handleOpen}>
-        <EditIcon />
-      </IconButton>
-      <IconButton onClick={handleDelete}>
-        <Delete />
-      </IconButton>
+      <Tooltip title="modify">
+        <IconButton onClick={handleOpen}>
+          <EditIcon />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="delete">
+        <IconButton onClick={handleDelete}>
+          <Delete />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="copy to new conversation">
+        <IconButton onClick={handleCopy}>
+          <CopyAll />
+        </IconButton>
+      </Tooltip>
       <Dialog
         open={open}
         onClose={handleClose}

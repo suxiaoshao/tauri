@@ -9,7 +9,6 @@ import {
   TextField,
 } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
-import { invoke } from '@tauri-apps/api/tauri';
 import { appWindow } from '@tauri-apps/api/window';
 import { useAppSelector } from '../../app/hooks';
 import { ConfigSliceType, Theme } from './configSlice';
@@ -17,13 +16,14 @@ import { Settings } from '@mui/icons-material';
 import { useCallback } from 'react';
 import useConfig from '@chatgpt/hooks/useConfig';
 import useSettingKey from '@chatgpt/hooks/useSettingKey';
+import { createSettingWindow, setConfigSevice } from '@chatgpt/service/config';
 
 function Setting() {
   const initData = useAppSelector((state) => state.config);
   const { register, handleSubmit, control } = useForm<ConfigSliceType>({ defaultValues: initData });
 
   const onSubmit = handleSubmit(async (data) => {
-    await invoke('plugin:config|set_config', { data });
+    await setConfigSevice({ data });
     await appWindow.close();
   });
   return (
@@ -72,7 +72,7 @@ function SettingItem() {
   useConfig();
   useSettingKey();
   const handleSetting = useCallback(async () => {
-    await invoke('plugin:config|create_setting_window');
+    await createSettingWindow();
   }, []);
   return (
     <ListItemButton onClick={handleSetting}>

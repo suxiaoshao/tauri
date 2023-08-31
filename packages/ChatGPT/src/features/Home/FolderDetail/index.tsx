@@ -1,6 +1,8 @@
 import { Folder } from '@chatgpt/types/folder';
-import { Box } from '@mui/material';
+import { List, Box } from '@mui/material';
 import FolderHeader from './components/Header';
+import ContentList from './components/ContentList';
+import ContentEmpty from './components/ContentEmpty';
 
 export interface FolderDetailProps {
   folder: Folder;
@@ -18,6 +20,13 @@ export default function FolderDetail({ folder }: FolderDetailProps) {
       }}
     >
       <FolderHeader folder={folder} />
+      <List>
+        {folder.conversations.length + folder.folders.length > 0 ? (
+          <ContentList folders={folder.folders} conversations={folder.conversations} />
+        ) : (
+          <ContentEmpty />
+        )}
+      </List>
     </Box>
   );
 }

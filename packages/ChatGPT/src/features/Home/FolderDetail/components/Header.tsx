@@ -1,12 +1,12 @@
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import { useCallback, useState } from 'react';
-import { invoke } from '@tauri-apps/api';
 import { useAppDispatch } from '@chatgpt/app/hooks';
 import { fetchConversations } from '@chatgpt/features/Conversations/conversationSlice';
 import { Folder, NewFolder } from '@chatgpt/types/folder';
 import FolderEdit, { FolderForm } from '@chatgpt/components/FolderEdit';
 import { Delete } from '@mui/icons-material';
+import { deleteFolder, updateFolder } from '@chatgpt/service/chat';
 export interface FolderHeaderProps {
   folder: Folder;
 }
@@ -18,7 +18,7 @@ export default function FolderHeader({ folder }: FolderHeaderProps) {
   const handleClose = useCallback(() => setOpen(false), []);
   const handleSubmit = useCallback(
     async ({ name }: FolderForm) => {
-      await invoke('plugin:chat|update_folder', {
+      await updateFolder({
         folder: { name: name.trim(), parentId: folder.parentId } satisfies NewFolder,
         id: folder.id,
       });
@@ -28,7 +28,7 @@ export default function FolderHeader({ folder }: FolderHeaderProps) {
     [folder.parentId, folder.id, dispatch, handleClose],
   );
   const handleDelete = useCallback(async () => {
-    await invoke('plugin:chat|delete_folder', { id: folder.id });
+    await deleteFolder({ id: folder.id });
     dispatch(fetchConversations());
   }, [dispatch, folder.id]);
 
@@ -46,6 +46,16 @@ export default function FolderHeader({ folder }: FolderHeaderProps) {
       <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', ml: 1 }} data-tauri-drag-region>
         <Typography data-tauri-drag-region variant="h6" component="span" paragraph={false}>
           {folder.name}
+        </Typography>
+        <Typography
+          sx={{ ml: 1 }}
+          data-tauri-drag-region
+          variant="body2"
+          color="inherit"
+          component="span"
+          paragraph={false}
+        >
+          {folder.path}
         </Typography>
       </Box>
       <IconButton onClick={handleOpen}>

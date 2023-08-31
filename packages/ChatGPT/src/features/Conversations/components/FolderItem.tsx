@@ -4,12 +4,14 @@ import ConversationItem from './ConversationItem';
 import { getNodeIdByFolder } from '@chatgpt/utils/chatData';
 import { Box, Typography } from '@mui/material';
 import { Folder as FolderIcon } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 
 export interface FolderItemProps {
   folder: Folder;
 }
 
 export default function FolderItem({ folder }: FolderItemProps) {
+  const navigate = useNavigate();
   return (
     <TreeItem
       nodeId={getNodeIdByFolder(folder)}
@@ -22,7 +24,7 @@ export default function FolderItem({ folder }: FolderItemProps) {
             pr: 0,
           }}
         >
-          <FolderIcon color="inherit" sx={{ mr: 1 }} />
+          <FolderIcon color="info" sx={{ mr: 1 }} />
           <Typography variant="body2" sx={{ fontWeight: 'inherit', flexGrow: 1 }}>
             {folder.name}
           </Typography>
@@ -31,6 +33,11 @@ export default function FolderItem({ folder }: FolderItemProps) {
           </Typography>
         </Box>
       }
+      onDoubleClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        navigate('/');
+      }}
     >
       {folder.folders.map((f) => (
         <FolderItem key={f.id} folder={f} />

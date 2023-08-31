@@ -6,8 +6,8 @@ import FolderEdit, { FolderForm } from '@chatgpt/components/FolderEdit';
 import { useAppDispatch, useAppSelector } from '@chatgpt/app/hooks';
 import { fetchConversations, selectSelectedFolderId } from '../Conversations/conversationSlice';
 import { useCallback } from 'react';
-import { invoke } from '@tauri-apps/api';
 import { NewFolder } from '@chatgpt/types/folder';
+import { addFolder } from '@chatgpt/service/chat';
 
 function AddFolder() {
   const dispatch = useAppDispatch();
@@ -15,7 +15,7 @@ function AddFolder() {
   const navigate = useNavigate();
   const handleSubmit = useCallback(
     async ({ name }: FolderForm) => {
-      await invoke('plugin:chat|add_folder', {
+      await addFolder({
         folder: {
           name: name.trim(),
           parentId: folderId,

@@ -1,6 +1,6 @@
-import { invoke } from '@tauri-apps/api';
 import { useEffect } from 'react';
 import usePlatform from './usePlatform';
+import { createSettingWindow } from '@chatgpt/service/config';
 
 export default function useSettingKey() {
   const platform = usePlatform();
@@ -8,7 +8,7 @@ export default function useSettingKey() {
     const handleShortcut = async (event: KeyboardEvent) => {
       const isMacos = platform === 'Darwin';
       if (((event.metaKey && isMacos) || (event.ctrlKey && !isMacos)) && event.key === ',') {
-        await invoke('plugin:config|create_setting_window');
+        await createSettingWindow();
       }
     };
     document.addEventListener('keydown', handleShortcut);

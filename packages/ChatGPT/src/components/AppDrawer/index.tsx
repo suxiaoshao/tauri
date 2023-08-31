@@ -9,7 +9,7 @@ import ConversationTree from '@chatgpt/features/Conversations';
 import Setting from '@chatgpt/features/Setting';
 import 'react-resizable/css/styles.css';
 export default function AppDrawer() {
-  const [drawerWidth, setDrawerWidth] = useState(200);
+  const [drawerWidth, setDrawerWidth] = useState(250);
   const platform = usePlatform();
   const headersHeight = useMemo(() => (platform === 'Darwin' ? 28 : 0), [platform]);
   return (

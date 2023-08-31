@@ -67,11 +67,12 @@ impl Folder {
         let parent_folder = parent_id
             .map(|folder_id| SqlFolder::find(folder_id, conn))
             .transpose()?;
+        let old_folder = SqlFolder::find(id, conn)?;
         let path = match parent_folder {
             Some(parent_folder) => format!("{}/{}", parent_folder.path, name),
             None => format!("/{}", name),
         };
-        if SqlFolder::path_exists(&path, conn)? {
+        if old_folder.path != path && SqlFolder::path_exists(&path, conn)? {
             return Err(ChatGPTError::FolderPathExists(path));
         }
         if SqlConversation::path_exists(&path, conn)? {

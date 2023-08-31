@@ -1,11 +1,11 @@
 import { Send } from '@mui/icons-material';
 import { Paper, InputBase, IconButton } from '@mui/material';
-import { invoke } from '@tauri-apps/api';
 import { useForm } from 'react-hook-form';
 import { Dispatch } from 'react';
 import { Role } from '@chatgpt/types/common';
 import { Message } from '@chatgpt/types/message';
 import { FetchingMessageAction, FetchingMessageType } from '..';
+import { fetchMessage } from '@chatgpt/service/chat';
 
 export interface ChatFormProps {
   fetchingMessageDispatch: Dispatch<FetchingMessageAction>;
@@ -19,7 +19,7 @@ export default function ChatForm({ fetchingMessageDispatch, fetchingMessage, con
     fetchingMessageDispatch(FetchingMessageAction.start);
     setValue('content', '');
 
-    await invoke<Message>('plugin:chat|fetch', {
+    await fetchMessage({
       content: data.content,
       id: conversationId,
     });

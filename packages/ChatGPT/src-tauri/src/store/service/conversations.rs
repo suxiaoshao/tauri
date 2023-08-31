@@ -196,6 +196,7 @@ impl Conversation {
         let folder = folder_id
             .map(|folder_id| SqlFolder::find(folder_id, conn))
             .transpose()?;
+        let old_conversation = SqlConversation::find(id, conn)?;
         let path = match folder {
             Some(folder) => format!("{}/{}", folder.path, title),
             None => format!("/{}", title),
@@ -203,7 +204,7 @@ impl Conversation {
         if SqlFolder::path_exists(&path, conn)? {
             return Err(ChatGPTError::FolderPathExists(path));
         }
-        if SqlConversation::path_exists(&path, conn)? {
+        if old_conversation.path != path && SqlConversation::path_exists(&path, conn)? {
             return Err(ChatGPTError::ConversationPathExists(path));
         }
         let update = UpdateConversation {
@@ -224,7 +225,10 @@ impl Conversation {
             info,
             prompt,
         };
-        update.update(conn)?;
+        conn.immediate_transaction(|conn| {
+            update.update(conn)?;
+            Ok::<(), ChatGPTError>(())
+        })?;
         Ok(())
     }
     pub fn find_by_folder_id(

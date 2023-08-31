@@ -2,12 +2,14 @@ import { Conversation } from '@chatgpt/types/conversation';
 import { getNodeIdByConversation } from '@chatgpt/utils/chatData';
 import { TreeItem } from '@mui/lab';
 import { Avatar, Box, Typography } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 export interface ConversationItemProps {
   conversation: Conversation;
 }
 
 export default function ConversationItem({ conversation }: ConversationItemProps) {
+  const navigate = useNavigate();
   return (
     <TreeItem
       nodeId={getNodeIdByConversation(conversation)}
@@ -29,6 +31,10 @@ export default function ConversationItem({ conversation }: ConversationItemProps
           </Typography>
         </Box>
       }
+      onDoubleClick={(e) => {
+        e.preventDefault();
+        navigate('/');
+      }}
     />
   );
 }
