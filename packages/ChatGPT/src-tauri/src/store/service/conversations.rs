@@ -248,4 +248,20 @@ impl Conversation {
         })?;
         Ok(())
     }
+    pub fn update_path(
+        old_path_pre: &str,
+        new_path_pre: &str,
+        conn: &mut SqliteConnection,
+    ) -> ChatGPTResult<()> {
+        let update_list = SqlConversation::find_by_path_pre(old_path_pre, conn)?;
+        let time = OffsetDateTime::now_utc();
+        update_list
+            .into_iter()
+            .map(|old| UpdateConversation::from_new_path(old, old_path_pre, new_path_pre, time))
+            .try_for_each(|update| {
+                update.update(conn)?;
+                Ok::<(), ChatGPTError>(())
+            })?;
+        Ok(())
+    }
 }

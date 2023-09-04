@@ -52,6 +52,13 @@ impl SqlFolder {
         diesel::delete(folders::table.filter(folders::path.like(path))).execute(conn)?;
         Ok(())
     }
+    pub fn find_by_path_pre(path: &str, conn: &mut SqliteConnection) -> ChatGPTResult<Vec<Self>> {
+        let path = format!("{}/%", path);
+        folders::table
+            .filter(folders::path.like(path))
+            .load::<Self>(conn)
+            .map_err(|e| e.into())
+    }
 }
 
 #[derive(Insertable)]
@@ -90,5 +97,26 @@ impl SqlUpdateFolder {
             .set(self)
             .execute(conn)?;
         Ok(())
+    }
+    pub fn from_new_path(
+        SqlFolder {
+            id,
+            name,
+            mut path,
+            parent_id,
+            ..
+        }: SqlFolder,
+        old_path_pre: &str,
+        new_path_pre: &str,
+        time: OffsetDateTime,
+    ) -> Self {
+        path.replace_range(0..old_path_pre.len(), new_path_pre);
+        Self {
+            id,
+            name,
+            path,
+            parent_id,
+            updated_time: time,
+        }
     }
 }

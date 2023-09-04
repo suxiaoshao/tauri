@@ -94,6 +94,13 @@ impl SqlConversation {
             .execute(conn)?;
         Ok(())
     }
+    pub fn find_by_path_pre(path: &str, conn: &mut SqliteConnection) -> ChatGPTResult<Vec<Self>> {
+        let path = format!("{}/%", path);
+        conversations::table
+            .filter(conversations::path.like(path))
+            .load::<Self>(conn)
+            .map_err(|e| e.into())
+    }
 }
 
 #[derive(AsChangeset, Identifiable, Debug)]
@@ -124,5 +131,48 @@ impl UpdateConversation {
             .set(self)
             .execute(conn)?;
         Ok(())
+    }
+    pub fn from_new_path(
+        SqlConversation {
+            id,
+            folder_id,
+            title,
+            icon,
+            mode,
+            model,
+            temperature,
+            top_p,
+            n,
+            max_tokens,
+            presence_penalty,
+            frequency_penalty,
+            info,
+            prompt,
+            mut path,
+            ..
+        }: SqlConversation,
+        old_path_pre: &str,
+        new_path_pre: &str,
+        time: OffsetDateTime,
+    ) -> Self {
+        path.replace_range(0..old_path_pre.len(), new_path_pre);
+        Self {
+            id,
+            folder_id,
+            path,
+            title,
+            icon,
+            mode,
+            model,
+            temperature,
+            top_p,
+            n,
+            max_tokens,
+            presence_penalty,
+            frequency_penalty,
+            updated_time: time,
+            info,
+            prompt,
+        }
     }
 }

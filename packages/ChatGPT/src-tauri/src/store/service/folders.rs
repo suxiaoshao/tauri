@@ -10,7 +10,7 @@ use crate::{
             folders::{SqlFolder, SqlNewFolder, SqlUpdateFolder},
             messages::SqlMessage,
         },
-        Conversation,
+        Conversation, Message,
     },
 };
 
@@ -72,7 +72,9 @@ impl Folder {
             Some(parent_folder) => format!("{}/{}", parent_folder.path, name),
             None => format!("/{}", name),
         };
-        if old_folder.path != path && SqlFolder::path_exists(&path, conn)? {
+
+        let path_updated = old_folder.path != path;
+        if path_updated && SqlFolder::path_exists(&path, conn)? {
             return Err(ChatGPTError::FolderPathExists(path));
         }
         if SqlConversation::path_exists(&path, conn)? {
@@ -80,12 +82,21 @@ impl Folder {
         }
         let update_folder = SqlUpdateFolder {
             id,
-            path,
+            path: path.clone(),
             name,
             parent_id,
             updated_time: now,
         };
-        update_folder.update(conn)?;
+        conn.immediate_transaction::<_, ChatGPTError, _>(move |conn| {
+            update_folder.update(conn)?;
+            if path_updated {
+                Self::update_path(&old_folder.path, &path, conn)?;
+                Conversation::update_path(&old_folder.path, &path, conn)?;
+                Message::update_path(&old_folder.path, &path, conn)?;
+            }
+            Ok(())
+        })?;
+
         Ok(())
     }
     pub fn query(conn: &mut SqliteConnection) -> ChatGPTResult<Vec<Self>> {
@@ -135,6 +146,22 @@ impl Folder {
             SqlFolder::delete_by_id(id, conn)?;
             Ok(())
         })?;
+        Ok(())
+    }
+    pub fn update_path(
+        old_path_pre: &str,
+        new_path_pre: &str,
+        conn: &mut SqliteConnection,
+    ) -> ChatGPTResult<()> {
+        let update_list = SqlFolder::find_by_path_pre(old_path_pre, conn)?;
+        let time = OffsetDateTime::now_utc();
+        update_list
+            .into_iter()
+            .map(|old| SqlUpdateFolder::from_new_path(old, old_path_pre, new_path_pre, time))
+            .try_for_each(|update| {
+                update.update(conn)?;
+                Ok::<(), ChatGPTError>(())
+            })?;
         Ok(())
     }
 }

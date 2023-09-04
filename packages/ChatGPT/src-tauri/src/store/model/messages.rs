@@ -109,4 +109,28 @@ impl SqlMessage {
             .execute(conn)?;
         Ok(())
     }
+    pub fn find_by_path_pre(path: &str, conn: &mut SqliteConnection) -> ChatGPTResult<Vec<Self>> {
+        let path = format!("{}/%", path);
+        messages::table
+            .filter(messages::conversation_path.like(path))
+            .load::<Self>(conn)
+            .map_err(|e| e.into())
+    }
+    pub fn update_path(
+        id: i32,
+        mut path: String,
+        old_path_pre: &str,
+        new_path_pre: &str,
+        time: OffsetDateTime,
+        conn: &mut SqliteConnection,
+    ) -> ChatGPTResult<()> {
+        path.replace_range(0..old_path_pre.len(), new_path_pre);
+        diesel::update(messages::table.filter(messages::id.eq(id)))
+            .set((
+                messages::conversation_path.eq(path),
+                messages::updated_time.eq(time),
+            ))
+            .execute(conn)?;
+        Ok(())
+    }
 }

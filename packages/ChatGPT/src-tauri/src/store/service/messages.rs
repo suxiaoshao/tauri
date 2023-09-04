@@ -7,6 +7,7 @@ use crate::{
     store::{
         model::{
             conversations::SqlConversation,
+            folders::SqlFolder,
             messages::{SqlMessage, SqlNewMessage},
         },
         Role, Status,
@@ -128,5 +129,31 @@ impl Message {
     pub fn find(id: i32, conn: &mut SqliteConnection) -> ChatGPTResult<Message> {
         let message = SqlMessage::find(id, conn)?;
         Message::try_from(message)
+    }
+    pub fn update_path(
+        old_path_pre: &str,
+        new_path_pre: &str,
+        conn: &mut SqliteConnection,
+    ) -> ChatGPTResult<()> {
+        let update_list = SqlMessage::find_by_path_pre(old_path_pre, conn)?;
+        let time = OffsetDateTime::now_utc();
+        update_list.into_iter().try_for_each(
+            |SqlMessage {
+                 id,
+                 conversation_path,
+                 ..
+             }| {
+                SqlMessage::update_path(
+                    id,
+                    conversation_path,
+                    old_path_pre,
+                    new_path_pre,
+                    time,
+                    conn,
+                )?;
+                Ok::<(), ChatGPTError>(())
+            },
+        )?;
+        Ok(())
     }
 }
