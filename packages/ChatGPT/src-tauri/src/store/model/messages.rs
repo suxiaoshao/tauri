@@ -133,4 +133,19 @@ impl SqlMessage {
             .execute(conn)?;
         Ok(())
     }
+    pub fn move_folder(
+        conversation_id: i32,
+        path: &str,
+        time: OffsetDateTime,
+        conn: &mut SqliteConnection,
+    ) -> ChatGPTResult<()> {
+        diesel::update(messages::table)
+            .filter(messages::conversation_id.eq(conversation_id))
+            .set((
+                messages::conversation_path.eq(path),
+                messages::updated_time.eq(time),
+            ))
+            .execute(conn)?;
+        Ok(())
+    }
 }

@@ -7,7 +7,6 @@ use crate::{
     store::{
         model::{
             conversations::SqlConversation,
-            folders::SqlFolder,
             messages::{SqlMessage, SqlNewMessage},
         },
         Role, Status,

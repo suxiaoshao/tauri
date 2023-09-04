@@ -5,7 +5,7 @@ use crate::{
     errors::{ChatGPTError, ChatGPTResult},
     store::{
         model::{
-            conversations::{SqlConversation, SqlNewConversation, UpdateConversation},
+            conversations::{SqlConversation, SqlNewConversation, SqlUpdateConversation},
             folders::SqlFolder,
             messages::SqlMessage,
         },
@@ -204,12 +204,13 @@ impl Conversation {
         if SqlFolder::path_exists(&path, conn)? {
             return Err(ChatGPTError::FolderPathExists(path));
         }
-        if old_conversation.path != path && SqlConversation::path_exists(&path, conn)? {
+        let path_updated = old_conversation.path != path;
+        if path_updated && SqlConversation::path_exists(&path, conn)? {
             return Err(ChatGPTError::ConversationPathExists(path));
         }
-        let update = UpdateConversation {
+        let update = SqlUpdateConversation {
             id,
-            path,
+            path: path.clone(),
             title,
             folder_id,
             icon,
@@ -227,6 +228,9 @@ impl Conversation {
         };
         conn.immediate_transaction(|conn| {
             update.update(conn)?;
+            if path_updated {
+                SqlMessage::move_folder(id, &path, time, conn)?;
+            }
             Ok::<(), ChatGPTError>(())
         })?;
         Ok(())
@@ -257,11 +261,44 @@ impl Conversation {
         let time = OffsetDateTime::now_utc();
         update_list
             .into_iter()
-            .map(|old| UpdateConversation::from_new_path(old, old_path_pre, new_path_pre, time))
+            .map(|old| SqlUpdateConversation::from_new_path(old, old_path_pre, new_path_pre, time))
             .try_for_each(|update| {
                 update.update(conn)?;
                 Ok::<(), ChatGPTError>(())
             })?;
+        Ok(())
+    }
+    pub fn move_folder(
+        conversation_id: i32,
+        new_folder_id: Option<i32>,
+        conn: &mut SqliteConnection,
+    ) -> ChatGPTResult<()> {
+        let SqlConversation {
+            folder_id: old_folder_id,
+            mut path,
+            ..
+        } = SqlConversation::find(conversation_id, conn)?;
+        let old_path_pre = match old_folder_id {
+            Some(folder_id) => {
+                let SqlFolder { path, .. } = SqlFolder::find(folder_id, conn)?;
+                path
+            }
+            _ => "/".to_string(),
+        };
+        let new_path_pre = match new_folder_id {
+            Some(new_folder_id) => {
+                let SqlFolder { path, .. } = SqlFolder::find(new_folder_id, conn)?;
+                path
+            }
+            None => "/".to_string(),
+        };
+        path.replace_range(0..old_path_pre.len(), &new_path_pre);
+        conn.immediate_transaction::<_, ChatGPTError, _>(|conn| {
+            let time = OffsetDateTime::now_utc();
+            SqlUpdateConversation::move_folder(conversation_id, new_folder_id, &path, time, conn)?;
+            SqlMessage::move_folder(conversation_id, &path, time, conn)?;
+            Ok(())
+        })?;
         Ok(())
     }
 }

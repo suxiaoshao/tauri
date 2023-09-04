@@ -105,7 +105,7 @@ impl SqlConversation {
 
 #[derive(AsChangeset, Identifiable, Debug)]
 #[diesel(table_name = conversations)]
-pub struct UpdateConversation {
+pub struct SqlUpdateConversation {
     pub(in super::super) id: i32,
     pub(in super::super) folder_id: Option<i32>,
     pub(in super::super) path: String,
@@ -124,7 +124,7 @@ pub struct UpdateConversation {
     pub(in super::super) prompt: Option<String>,
 }
 
-impl UpdateConversation {
+impl SqlUpdateConversation {
     pub fn update(self, conn: &mut SqliteConnection) -> ChatGPTResult<()> {
         diesel::update(conversations::table)
             .filter(conversations::id.eq(self.id))
@@ -174,5 +174,22 @@ impl UpdateConversation {
             info,
             prompt,
         }
+    }
+    pub fn move_folder(
+        id: i32,
+        folder: Option<i32>,
+        path: &str,
+        time: OffsetDateTime,
+        conn: &mut SqliteConnection,
+    ) -> ChatGPTResult<()> {
+        diesel::update(conversations::table)
+            .filter(conversations::id.eq(id))
+            .set((
+                conversations::path.eq(path),
+                conversations::updated_time.eq(time),
+                conversations::folder_id.eq(folder),
+            ))
+            .execute(conn)?;
+        Ok(())
     }
 }
