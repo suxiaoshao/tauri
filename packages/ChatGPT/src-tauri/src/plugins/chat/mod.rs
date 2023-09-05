@@ -24,8 +24,7 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for ChatPlugin {
             add_conversation,
             update_conversation,
             delete_conversation,
-            move_conversation
-        ,
+            move_conversation,
             chat_data::get_chat_data,
             add_folder,
             update_folder,

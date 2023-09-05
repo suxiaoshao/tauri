@@ -1,9 +1,5 @@
 import { ChevronRight, ExpandMore } from '@mui/icons-material';
-import {
-  selectConversations,
-  selectSelectedNodeId,
-  setSelected,
-} from '@chatgpt/features/Conversations/conversationSlice';
+import { selectChatData, selectSelectedNodeId, setSelected } from '@chatgpt/features/Conversations/conversationSlice';
 import { useAppDispatch, useAppSelector } from '@chatgpt/app/hooks';
 import { useCallback } from 'react';
 import { TreeView } from '@mui/lab';
@@ -12,7 +8,7 @@ import ConversationItem from './components/ConversationItem';
 import { getSelectedFromNodeId } from '@chatgpt/utils/chatData';
 
 export default function ConversationTree() {
-  const { conversations, folders } = useAppSelector(selectConversations);
+  const { conversations, folders } = useAppSelector(selectChatData);
   const selectedNodeId = useAppSelector(selectSelectedNodeId);
   const dispatch = useAppDispatch();
   const handleSelect = useCallback(

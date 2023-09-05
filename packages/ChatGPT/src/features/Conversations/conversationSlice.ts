@@ -52,7 +52,8 @@ export const conversationSlice = createSlice({
 
 export const { setChatData, setSelected, updateMessage } = conversationSlice.actions;
 
-export const selectConversations = (state: RootState) => state.conversation.value;
+export const selectChatData = (state: RootState) => state.conversation.value;
+export const SELECT_FOLDERS = (state: RootState) => state.conversation.value.folders;
 export const selectSelected = (
   state: RootState,
 ): Enum<SelectedType.Conversation, Conversation> | Enum<SelectedType.Folder, Folder> | Enum<SelectedType.None> => {

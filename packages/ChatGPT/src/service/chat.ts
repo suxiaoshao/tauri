@@ -65,3 +65,12 @@ export async function fetchMessage(params: FetchMessageParams) {
 export async function getChatData(): Promise<ChatData> {
   return await appInvoke<unknown, ChatData>('plugin:chat|get_chat_data', undefined);
 }
+
+export interface MoveConversationParams {
+  conversationId: number;
+  folderId: number | null;
+}
+
+export async function moveConversation(params: MoveConversationParams) {
+  await appInvoke<MoveConversationParams, unknown>('plugin:chat|move_conversation', params);
+}
