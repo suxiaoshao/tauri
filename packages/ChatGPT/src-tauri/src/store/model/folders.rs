@@ -119,4 +119,21 @@ impl SqlUpdateFolder {
             updated_time: time,
         }
     }
+    pub fn move_folder(
+        id: i32,
+        new_parent_id: Option<i32>,
+        path: &str,
+        time: OffsetDateTime,
+        conn: &mut SqliteConnection,
+    ) -> ChatGPTResult<()> {
+        diesel::update(folders::table)
+            .filter(folders::id.eq(id))
+            .set((
+                folders::parent_id.eq(new_parent_id),
+                folders::path.eq(path),
+                folders::updated_time.eq(time),
+            ))
+            .execute(conn)?;
+        Ok(())
+    }
 }

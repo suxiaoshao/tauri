@@ -164,6 +164,42 @@ impl Folder {
             })?;
         Ok(())
     }
+    pub fn move_folder(
+        id: i32,
+        new_parent_id: Option<i32>,
+        conn: &mut SqliteConnection,
+    ) -> ChatGPTResult<()> {
+        let SqlFolder {
+            parent_id: old_parent_id,
+            mut path,
+            ..
+        } = SqlFolder::find(id, conn)?;
+        let old_path = path.clone();
+        let old_path_pre = match old_parent_id {
+            Some(parent_id) => {
+                let SqlFolder { path, .. } = SqlFolder::find(parent_id, conn)?;
+                path
+            }
+            _ => "/".to_string(),
+        };
+        let new_path_pre = match new_parent_id {
+            Some(parent_id) => {
+                let SqlFolder { path, .. } = SqlFolder::find(parent_id, conn)?;
+                path
+            }
+            _ => "/".to_string(),
+        };
+        path.replace_range(0..old_path_pre.len(), &new_path_pre);
+        conn.immediate_transaction::<_, ChatGPTError, _>(|conn| {
+            let time = OffsetDateTime::now_utc();
+            SqlUpdateFolder::move_folder(id, new_parent_id, &path, time, conn)?;
+            Self::update_path(&old_path, &path, conn)?;
+            Conversation::update_path(&old_path, &path, conn)?;
+            Message::update_path(&old_path, &path, conn)?;
+            Ok(())
+        })?;
+        Ok(())
+    }
 }
 
 #[derive(Deserialize)]
