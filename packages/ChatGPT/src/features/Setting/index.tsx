@@ -1,16 +1,29 @@
-import { Box, Button, InputLabel, MenuItem, TextField } from '@mui/material';
+import {
+  Box,
+  Button,
+  InputLabel,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  MenuItem,
+  TextField,
+} from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
-import { invoke } from '@tauri-apps/api/tauri';
 import { appWindow } from '@tauri-apps/api/window';
 import { useAppSelector } from '../../app/hooks';
 import { ConfigSliceType, Theme } from './configSlice';
+import { Settings } from '@mui/icons-material';
+import { useCallback } from 'react';
+import useConfig from '@chatgpt/hooks/useConfig';
+import useSettingKey from '@chatgpt/hooks/useSettingKey';
+import { createSettingWindow, setConfigSevice } from '@chatgpt/service/config';
 
-export default function Setting() {
+function Setting() {
   const initData = useAppSelector((state) => state.config);
   const { register, handleSubmit, control } = useForm<ConfigSliceType>({ defaultValues: initData });
 
   const onSubmit = handleSubmit(async (data) => {
-    await invoke('plugin:config|set_config', { data });
+    await setConfigSevice({ data });
     await appWindow.close();
   });
   return (
@@ -54,3 +67,23 @@ export default function Setting() {
     </Box>
   );
 }
+
+function SettingItem() {
+  useConfig();
+  useSettingKey();
+  const handleSetting = useCallback(async () => {
+    await createSettingWindow();
+  }, []);
+  return (
+    <ListItemButton onClick={handleSetting}>
+      <ListItemIcon>
+        <Settings />
+      </ListItemIcon>
+      <ListItemText primary="Setting" />
+    </ListItemButton>
+  );
+}
+
+Setting.Item = SettingItem;
+
+export default Setting;

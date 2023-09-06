@@ -1,69 +1,39 @@
 use diesel::prelude::*;
-use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
 
 use crate::{
-    errors::{ChatGPTError, ChatGPTResult},
-    store::{
-        schema::messages,
-        types::{Role, Status},
-    },
+    errors::ChatGPTResult,
+    store::{schema::messages, types::Status},
 };
-use diesel::expression_methods::TextExpressionMethods;
-
-#[derive(Debug, Queryable, Serialize, Clone, Deserialize, PartialEq, Eq)]
-pub struct Message {
-    pub id: i32,
-    #[serde(rename = "conversationId")]
-    pub conversation_id: i32,
-    pub role: Role,
-    pub content: String,
-    pub status: Status,
-    #[serde(rename = "createdTime")]
-    pub created_time: OffsetDateTime,
-    #[serde(rename = "updatedTime")]
-    pub updated_time: OffsetDateTime,
-    #[serde(rename = "startTime")]
-    pub start_time: OffsetDateTime,
-    #[serde(rename = "endTime")]
-    pub end_time: OffsetDateTime,
-}
-#[derive(Deserialize, Debug)]
-pub struct NewMessage {
-    pub conversation_id: i32,
-    pub role: Role,
-    pub content: String,
-    pub status: Status,
-}
-
-impl NewMessage {
-    pub fn new(conversation_id: i32, role: Role, content: String, status: Status) -> Self {
-        Self {
-            conversation_id,
-            role,
-            content,
-            status,
-        }
-    }
-}
 
 #[derive(Insertable)]
 #[diesel(table_name = messages)]
-struct SqlNewMessage {
-    conversation_id: i32,
-    role: String,
-    content: String,
-    status: String,
-    created_time: OffsetDateTime,
-    updated_time: OffsetDateTime,
-    start_time: OffsetDateTime,
-    end_time: OffsetDateTime,
+pub struct SqlNewMessage {
+    pub(in super::super) conversation_id: i32,
+    pub(in super::super) conversation_path: String,
+    pub(in super::super) role: String,
+    pub(in super::super) content: String,
+    pub(in super::super) status: String,
+    pub(in super::super) created_time: OffsetDateTime,
+    pub(in super::super) updated_time: OffsetDateTime,
+    pub(in super::super) start_time: OffsetDateTime,
+    pub(in super::super) end_time: OffsetDateTime,
+}
+
+impl SqlNewMessage {
+    pub fn insert(&self, conn: &mut SqliteConnection) -> ChatGPTResult<()> {
+        diesel::insert_into(messages::table)
+            .values(self)
+            .execute(conn)?;
+        Ok(())
+    }
 }
 
 #[derive(Debug, Queryable)]
 pub struct SqlMessage {
     pub id: i32,
     pub conversation_id: i32,
+    pub(in super::super) conversation_path: String,
     pub role: String,
     pub content: String,
     pub status: String,
@@ -73,66 +43,28 @@ pub struct SqlMessage {
     pub end_time: OffsetDateTime,
 }
 
-impl TryFrom<SqlMessage> for Message {
-    type Error = ChatGPTError;
-
-    fn try_from(value: SqlMessage) -> Result<Self, Self::Error> {
-        Ok(Message {
-            id: value.id,
-            conversation_id: value.conversation_id,
-            role: value.role.parse()?,
-            content: value.content,
-            status: value.status.parse()?,
-            created_time: value.created_time,
-            updated_time: value.updated_time,
-            start_time: value.start_time,
-            end_time: value.end_time,
-        })
+impl SqlMessage {
+    pub fn last(conn: &mut SqliteConnection) -> ChatGPTResult<Self> {
+        messages::table
+            .order(messages::id.desc())
+            .first(conn)
+            .map_err(|e| e.into())
     }
-}
-
-impl Message {
-    pub fn insert(
-        NewMessage {
-            conversation_id,
-            role,
-            content,
-            status,
-        }: NewMessage,
-        conn: &mut SqliteConnection,
-    ) -> ChatGPTResult<Message> {
-        let time = OffsetDateTime::now_local()?;
-
-        let new_message = SqlNewMessage {
-            conversation_id,
-            role: role.to_string(),
-            content,
-            status: status.to_string(),
-            created_time: time,
-            updated_time: time,
-            start_time: time,
-            end_time: time,
-        };
-        diesel::insert_into(messages::table)
-            .values(&new_message)
-            .execute(conn)?;
-        let message: SqlMessage = messages::table.order(messages::id.desc()).first(conn)?;
-        Message::try_from(message)
-    }
-    pub fn messages_by_conversation_id(
+    pub fn query_by_conversation_id(
         conversation_id: i32,
         conn: &mut SqliteConnection,
-    ) -> ChatGPTResult<Vec<Message>> {
-        let messages: Vec<SqlMessage> = messages::table
+    ) -> ChatGPTResult<Vec<Self>> {
+        messages::table
             .filter(messages::conversation_id.eq(conversation_id))
-            .load::<SqlMessage>(conn)?;
-        messages
-            .into_iter()
-            .map(TryFrom::try_from)
-            .collect::<ChatGPTResult<_>>()
+            .load(conn)
+            .map_err(|e| e.into())
     }
-    pub fn add_content(id: i32, content: String, conn: &mut SqliteConnection) -> ChatGPTResult<()> {
-        let time = OffsetDateTime::now_local()?;
+    pub fn add_content(
+        id: i32,
+        content: String,
+        time: OffsetDateTime,
+        conn: &mut SqliteConnection,
+    ) -> ChatGPTResult<()> {
         diesel::update(messages::table.filter(messages::id.eq(id)))
             .set((
                 messages::content.eq(messages::content.concat(content)),
@@ -145,9 +77,9 @@ impl Message {
     pub fn update_status(
         id: i32,
         status: Status,
+        time: OffsetDateTime,
         conn: &mut SqliteConnection,
     ) -> ChatGPTResult<()> {
-        let time = OffsetDateTime::now_local()?;
         diesel::update(messages::table.filter(messages::id.eq(id)))
             .set((
                 messages::status.eq(status.to_string()),
@@ -157,8 +89,63 @@ impl Message {
             .execute(conn)?;
         Ok(())
     }
-    pub fn find(id: i32, conn: &mut SqliteConnection) -> ChatGPTResult<Message> {
-        let message: SqlMessage = messages::table.filter(messages::id.eq(id)).first(conn)?;
-        Message::try_from(message)
+    pub fn find(id: i32, conn: &mut SqliteConnection) -> ChatGPTResult<Self> {
+        messages::table
+            .filter(messages::id.eq(id))
+            .first(conn)
+            .map_err(|e| e.into())
+    }
+    pub fn delete_by_conversation_id(
+        conversation_id: i32,
+        conn: &mut SqliteConnection,
+    ) -> ChatGPTResult<()> {
+        diesel::delete(messages::table.filter(messages::conversation_id.eq(conversation_id)))
+            .execute(conn)?;
+        Ok(())
+    }
+    pub fn delete_by_path(path: &str, conn: &mut SqliteConnection) -> ChatGPTResult<()> {
+        let path = format!("{}/%", path);
+        diesel::delete(messages::table.filter(messages::conversation_path.like(path)))
+            .execute(conn)?;
+        Ok(())
+    }
+    pub fn find_by_path_pre(path: &str, conn: &mut SqliteConnection) -> ChatGPTResult<Vec<Self>> {
+        let path = format!("{}/%", path);
+        messages::table
+            .filter(messages::conversation_path.like(path))
+            .load::<Self>(conn)
+            .map_err(|e| e.into())
+    }
+    pub fn update_path(
+        id: i32,
+        mut path: String,
+        old_path_pre: &str,
+        new_path_pre: &str,
+        time: OffsetDateTime,
+        conn: &mut SqliteConnection,
+    ) -> ChatGPTResult<()> {
+        path.replace_range(0..old_path_pre.len(), new_path_pre);
+        diesel::update(messages::table.filter(messages::id.eq(id)))
+            .set((
+                messages::conversation_path.eq(path),
+                messages::updated_time.eq(time),
+            ))
+            .execute(conn)?;
+        Ok(())
+    }
+    pub fn move_folder(
+        conversation_id: i32,
+        path: &str,
+        time: OffsetDateTime,
+        conn: &mut SqliteConnection,
+    ) -> ChatGPTResult<()> {
+        diesel::update(messages::table)
+            .filter(messages::conversation_id.eq(conversation_id))
+            .set((
+                messages::conversation_path.eq(path),
+                messages::updated_time.eq(time),
+            ))
+            .execute(conn)?;
+        Ok(())
     }
 }

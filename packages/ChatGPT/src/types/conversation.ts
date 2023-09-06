@@ -3,6 +3,7 @@ import { Mode, Model } from '@chatgpt/types/common';
 
 export interface Conversation {
   id: number;
+  folderId: number | null;
   title: string;
   icon: string;
   mode: Mode;
@@ -22,6 +23,7 @@ export interface Conversation {
 
 export interface NewConversation {
   title: string;
+  folderId: number | null;
   icon: string;
   mode: Mode;
   model: Model;

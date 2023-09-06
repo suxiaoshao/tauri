@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AppThunkAction, type RootState } from '../../app/store';
-import { invoke } from '@tauri-apps/api';
+import { getConfig } from '@chatgpt/service/config';
 
 export enum Theme {
   Dark = 'dark',
@@ -35,6 +35,6 @@ export const selectApiKey = (state: RootState) => state.config.apiKey;
 export default themeSlice.reducer;
 
 export const fetchConfig = (): AppThunkAction => async (dispatch) => {
-  const data = await invoke<ConfigSliceType>('plugin:config|get_config');
+  const data = await getConfig();
   dispatch(setConfig(data));
 };

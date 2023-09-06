@@ -1,6 +1,6 @@
 import { Box } from '@mui/material';
 import ChatForm from './components/ChatForm';
-import Header from './components/Header';
+import Header from './components/ConversationHeader';
 import MessageHistory from './components/MessageHistory.tsx';
 import { Conversation } from '@chatgpt/types/conversation';
 import { Reducer, useReducer } from 'react';
@@ -49,7 +49,11 @@ export default function ConversationDetail({ conversation }: ConversationDetailP
       <Box sx={{ flex: '1 1 0', overflowY: 'auto' }}>
         <MessageHistory messages={conversation.messages} />
       </Box>
-      <ChatForm fetchingMessageDispatch={fetchingMessageDispatch} fetchingMessage={fetchingMessage} />
+      <ChatForm
+        conversationId={conversation.id}
+        fetchingMessageDispatch={fetchingMessageDispatch}
+        fetchingMessage={fetchingMessage}
+      />
     </Box>
   );
 }

@@ -114,6 +114,10 @@ pub enum ChatGPTError {
     InvalidModel(String),
     #[error("窗口不存在")]
     WindowNotFound,
+    #[error("conversation path exists:{}",.0)]
+    ConversationPathExists(String),
+    #[error("folder path exists:{}",.0)]
+    FolderPathExists(String),
 }
 
 impl From<tauri::Error> for ChatGPTError {

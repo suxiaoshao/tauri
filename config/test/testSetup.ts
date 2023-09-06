@@ -1,4 +1,4 @@
-import marchers from '@testing-library/jest-dom/matchers';
+import * as marchers from '@testing-library/jest-dom/matchers';
 import { TestingLibraryMatchers } from '@testing-library/jest-dom/matchers';
 import { expect } from 'vitest';
 
