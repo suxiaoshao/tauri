@@ -1,30 +1,35 @@
 import { Folder } from '@chatgpt/types/folder';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import { Collapse, ListItemText, MenuItem } from '@mui/material';
-import { useCallback, useContext, useState } from 'react';
+import { useCallback, useContext, useMemo, useState } from 'react';
 import { FolderSelectContext } from '.';
 
 export interface FolderSelectItemProps {
   folder: Folder;
+  disabled?: boolean;
 }
 
-export default function FolderSelectItem({ folder }: FolderSelectItemProps) {
-  const { selectedId, onSelect } = useContext(FolderSelectContext);
+export default function FolderSelectItem({ folder, disabled: parentDisabled }: FolderSelectItemProps) {
+  const { selectedId, onSelect, disabledFolderIds } = useContext(FolderSelectContext);
   const [open, setOpen] = useState(false);
   const handleClick = useCallback(() => {
     onSelect(folder.id);
     setOpen((value) => !value);
   }, [folder.id, onSelect]);
+  const disabled = useMemo(
+    () => disabledFolderIds.includes(folder.id) || parentDisabled,
+    [disabledFolderIds, folder.id, parentDisabled],
+  );
   return (
     <>
-      <MenuItem selected={selectedId === folder.id} onClick={handleClick}>
+      <MenuItem disabled={disabled} selected={selectedId === folder.id} onClick={handleClick}>
         <ListItemText primary={folder.name} secondary={folder.path} />
         {open ? <ExpandLess /> : <ExpandMore />}
       </MenuItem>
       {folder.folders.length > 0 && (
         <Collapse in={open} timeout="auto" unmountOnExit sx={{ pl: 2 }}>
           {folder.folders.map((folder) => (
-            <FolderSelectItem key={folder.id} folder={folder} />
+            <FolderSelectItem disabled={disabled} key={folder.id} folder={folder} />
           ))}
         </Collapse>
       )}

@@ -7,26 +7,33 @@ import React, { ForwardedRef, createContext, useMemo } from 'react';
 export type FolderSelectContextType = {
   selectedId: number | null;
   onSelect: (id: number | null) => void;
+  disabledFolderIds: number[];
 };
 
 export const FolderSelectContext = createContext<FolderSelectContextType>({
   selectedId: null,
   onSelect: () => {},
+  disabledFolderIds: [],
 });
 
 export interface FolderSelectProps {
   value: number | null;
   onChange: (id: number | null) => void;
+  disabledFolderIds?: number[];
 }
 
-function FolderSelect({ value, onChange }: FolderSelectProps, ref: ForwardedRef<HTMLUListElement>) {
+function FolderSelect(
+  { value, onChange, disabledFolderIds = [] }: FolderSelectProps,
+  ref: ForwardedRef<HTMLUListElement>,
+) {
   const folders = useAppSelector(SELECT_FOLDERS);
   const contextValue = useMemo<FolderSelectContextType>(() => {
     return {
       selectedId: value,
       onSelect: onChange,
+      disabledFolderIds,
     };
-  }, [onChange, value]);
+  }, [disabledFolderIds, onChange, value]);
   return (
     <FolderSelectContext.Provider value={contextValue}>
       <MenuList ref={ref}>

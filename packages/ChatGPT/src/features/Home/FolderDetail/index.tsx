@@ -1,6 +1,6 @@
 import { Folder } from '@chatgpt/types/folder';
 import { List, Box } from '@mui/material';
-import FolderHeader from './components/Header';
+import FolderHeader from './components/FolderHeader';
 import ContentList from './components/ContentList';
 import ContentEmpty from './components/ContentEmpty';
 

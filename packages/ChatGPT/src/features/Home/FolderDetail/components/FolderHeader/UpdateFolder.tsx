@@ -1,17 +1,17 @@
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography } from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
-import { useCallback, useState } from 'react';
 import { useAppDispatch } from '@chatgpt/app/hooks';
-import { fetchConversations } from '@chatgpt/features/Conversations/conversationSlice';
-import { Folder, NewFolder } from '@chatgpt/types/folder';
 import FolderEdit, { FolderForm } from '@chatgpt/components/FolderEdit';
-import { Delete } from '@mui/icons-material';
-import { deleteFolder, updateFolder } from '@chatgpt/service/chat';
+import { fetchConversations } from '@chatgpt/features/Conversations/conversationSlice';
+import { updateFolder } from '@chatgpt/service/chat';
+import { Folder, NewFolder } from '@chatgpt/types/folder';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton } from '@mui/material';
+import { useCallback, useState } from 'react';
+import EditIcon from '@mui/icons-material/Edit';
+
 export interface FolderHeaderProps {
   folder: Folder;
 }
 
-export default function FolderHeader({ folder }: FolderHeaderProps) {
+export default function UpdateFolder({ folder }: FolderHeaderProps) {
   const dispatch = useAppDispatch();
   const [open, setOpen] = useState(false);
   const handleOpen = useCallback(() => setOpen(true), []);
@@ -27,42 +27,10 @@ export default function FolderHeader({ folder }: FolderHeaderProps) {
     },
     [folder.parentId, folder.id, dispatch, handleClose],
   );
-  const handleDelete = useCallback(async () => {
-    await deleteFolder({ id: folder.id });
-    dispatch(fetchConversations());
-  }, [dispatch, folder.id]);
-
   return (
-    <Box
-      data-tauri-drag-region
-      sx={{
-        width: '100%',
-        display: 'flex',
-        p: 1,
-        justifyContent: 'center',
-        boxShadow: (theme) => theme.shadows[3].split(',0px')[0],
-      }}
-    >
-      <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', ml: 1 }} data-tauri-drag-region>
-        <Typography data-tauri-drag-region variant="h6" component="span" paragraph={false}>
-          {folder.name}
-        </Typography>
-        <Typography
-          sx={{ ml: 1 }}
-          data-tauri-drag-region
-          variant="body2"
-          color="inherit"
-          component="span"
-          paragraph={false}
-        >
-          {folder.path}
-        </Typography>
-      </Box>
+    <>
       <IconButton onClick={handleOpen}>
         <EditIcon />
-      </IconButton>
-      <IconButton onClick={handleDelete}>
-        <Delete />
       </IconButton>
       <Dialog
         open={open}
@@ -95,6 +63,6 @@ export default function FolderHeader({ folder }: FolderHeaderProps) {
           </Button>
         </DialogActions>
       </Dialog>
-    </Box>
+    </>
   );
 }

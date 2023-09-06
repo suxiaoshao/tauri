@@ -74,3 +74,12 @@ export interface MoveConversationParams {
 export async function moveConversation(params: MoveConversationParams) {
   await appInvoke<MoveConversationParams, unknown>('plugin:chat|move_conversation', params);
 }
+
+export interface MoveFolderParams {
+  id: number;
+  parentId: number | null;
+}
+
+export async function moveFolder(params: MoveFolderParams) {
+  await appInvoke<MoveFolderParams, unknown>('plugin:chat|move_folder', params);
+}
