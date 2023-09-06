@@ -11,13 +11,13 @@ mod plugin;
 mod store;
 
 fn main() -> ClipResult<()> {
-    tauri::Builder::default()
-        .setup(|app| {
-            #[cfg(target_os = "macos")]
-            app.set_activation_policy(tauri::ActivationPolicy::Accessory);
-            Ok(())
-        })
-        .plugin(plugin::clipboard::ClipboardPlugin)
+    let app = tauri::Builder::default();
+    #[cfg(target_os = "macos")]
+    let app = app.setup(|app| {
+        app.set_activation_policy(tauri::ActivationPolicy::Accessory);
+        Ok(())
+    });
+    app.plugin(plugin::clipboard::ClipboardPlugin)
         .plugin(plugin::window::WindowPlugin)
         .plugin(tauri_plugin_positioner::init())
         .plugin(plugin::tracing::TracingPlugin)
@@ -28,6 +28,5 @@ fn main() -> ClipResult<()> {
                 .build(),
         )
         .run(tauri::generate_context!())?;
-
     Ok(())
 }

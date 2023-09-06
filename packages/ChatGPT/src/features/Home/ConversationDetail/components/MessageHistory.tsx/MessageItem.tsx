@@ -24,7 +24,7 @@ export default function MessageItem({ message }: MessageItemProps) {
     if (message.status === Status.Loading) {
       return <CircularProgress size={20} sx={{ mr: 2, mt: 1 }} color="inherit" />;
     }
-    return <CheckCircleOutlineOutlined fontSize={'small'} sx={{ mr: 2, mt: 1 }} />;
+    return <CheckCircleOutlineOutlined fontSize={'small'} sx={{ mr: 2, mt: 2 }} />;
   }, [message.status]);
   return (
     <>
@@ -37,9 +37,9 @@ export default function MessageItem({ message }: MessageItemProps) {
           minHeight: '56px',
         }}
       >
-        <Avatar sx={{ ml: 1, mt: 1 }} src={logo} />
+        <Avatar sx={{ ml: 2, mt: 2 }} src={logo} />
         <CustomMarkdown
-          sx={{ m: 1, mt: 2.5, flex: '1 1 0', width: (theme) => `calc(100% - ${theme.spacing(11.5)})` }}
+          sx={{ m: 2, mt: 3.5, flex: '1 1 0', width: (theme) => `calc(100% - ${theme.spacing(11.5)})` }}
           value={message.content}
         />
         {loading}
