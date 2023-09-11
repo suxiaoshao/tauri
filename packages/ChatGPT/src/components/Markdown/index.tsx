@@ -208,13 +208,15 @@ const option: MarkdownToJSX.Options = {
   },
 };
 export default function CustomMarkdown({ value, ...props }: MarkdownProps): JSX.Element {
+  const [ref, setRef] = React.useState<HTMLDivElement | null>(null);
   useEffect(() => {
+    if (ref === null) return;
     startTransition(() => {
-      Prism.highlightAll();
+      Prism.highlightAllUnder(ref);
     });
-  }, [value]);
+  }, [value, ref]);
   return (
-    <Box {...props}>
+    <Box {...props} ref={setRef}>
       <MarkdownSource options={option}>{value}</MarkdownSource>
     </Box>
   );

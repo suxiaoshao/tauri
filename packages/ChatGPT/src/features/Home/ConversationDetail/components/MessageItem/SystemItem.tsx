@@ -1,6 +1,7 @@
 import CustomMarkdown from '@chatgpt/components/Markdown';
 import { Message } from '@chatgpt/types/message';
 import { Avatar, Box, Divider } from '@mui/material';
+import { MarkdownSx } from './const';
 
 export interface SystemItemProps {
   message: Message;
@@ -20,7 +21,7 @@ export default function SystemItem({ message }: SystemItemProps) {
       >
         <Avatar sx={{ ml: 2, mt: 2, backgroundColor: 'transparent' }}>🤖</Avatar>
         <CustomMarkdown
-          sx={{ m: 2, mt: 3.5, flex: '1 1 0', width: (theme) => `calc(100% - ${theme.spacing(9)})` }}
+          sx={{ ...MarkdownSx, width: (theme) => `calc(100% - ${theme.spacing(9)})` }}
           value={message.content}
         />
       </Box>
