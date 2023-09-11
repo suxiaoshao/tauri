@@ -1,6 +1,4 @@
 [workspace]
-
-
 members = [
     "packages/http-client/src-tauri",
     "packages/movie",
@@ -9,5 +7,6 @@ members = [
     "packages/Hclipboard/src-tauri",
     "packages/ChatGPT/src-tauri",
 ]
+resolver = "2"
 [profile.release]
 strip = "symbols"
