@@ -4,6 +4,8 @@ import CustomMarkdown from '@chatgpt/components/Markdown';
 import { Message } from '@chatgpt/types/message';
 import { CheckCircleOutlineOutlined } from '@mui/icons-material';
 import { MarkdownSx, ToolSx } from '../const';
+import DeleteMessageIcon from '../components/DeleteMessageIcon';
+import ToolBar from '../components/ToolBar';
 
 export interface NormalItemProps {
   message: Message;
@@ -22,11 +24,11 @@ export default function NormalItem({ message }: NormalItemProps) {
         }}
       >
         <Avatar sx={{ ml: 2, mt: 2 }} src={assistant} />
-        <CustomMarkdown
-          sx={{ ...MarkdownSx, width: (theme) => `calc(100% - ${theme.spacing(15.5)})` }}
-          value={message.content}
-        />
-        <CheckCircleOutlineOutlined fontSize={'small'} sx={ToolSx} />
+        <CustomMarkdown sx={{ ...MarkdownSx }} value={message.content} />
+        <ToolBar>
+          <CheckCircleOutlineOutlined fontSize={'small'} sx={ToolSx} />
+          <DeleteMessageIcon id={message.id} />
+        </ToolBar>
       </Box>
       <Divider />
     </>

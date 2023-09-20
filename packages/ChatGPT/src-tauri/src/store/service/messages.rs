@@ -155,4 +155,8 @@ impl Message {
         )?;
         Ok(())
     }
+    pub fn delete(id: i32, conn: &mut SqliteConnection) -> ChatGPTResult<()> {
+        SqlMessage::delete(id, conn)?;
+        Ok(())
+    }
 }

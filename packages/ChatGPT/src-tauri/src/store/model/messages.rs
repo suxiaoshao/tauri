@@ -148,4 +148,8 @@ impl SqlMessage {
             .execute(conn)?;
         Ok(())
     }
+    pub fn delete(id: i32, conn: &mut SqliteConnection) -> ChatGPTResult<()> {
+        diesel::delete(messages::table.filter(messages::id.eq(id))).execute(conn)?;
+        Ok(())
+    }
 }

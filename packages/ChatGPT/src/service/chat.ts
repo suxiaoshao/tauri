@@ -83,3 +83,11 @@ export interface MoveFolderParams {
 export async function moveFolder(params: MoveFolderParams) {
   await appInvoke<MoveFolderParams, unknown>('plugin:chat|move_folder', params);
 }
+
+export interface DeleteMessageParams {
+  id: number;
+}
+
+export async function deleteMessage(params: DeleteMessageParams) {
+  await appInvoke<DeleteMessageParams, unknown>('plugin:chat|delete_message', params);
+}

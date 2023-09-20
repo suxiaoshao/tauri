@@ -3,6 +3,8 @@ import assistant from '@chatgpt/assets/assistant.jpg';
 import CustomMarkdown from '@chatgpt/components/Markdown';
 import { Message } from '@chatgpt/types/message';
 import { MarkdownSx } from '../const';
+import DeleteMessageIcon from '../components/DeleteMessageIcon';
+import ToolBar from '../components/ToolBar';
 
 export interface ErrorItemProps {
   message: Message;
@@ -23,10 +25,10 @@ export default function ErrorItem({ message }: ErrorItemProps) {
         }}
       >
         <Avatar sx={{ ml: 2, mt: 2 }} src={assistant} />
-        <CustomMarkdown
-          sx={{ ...MarkdownSx, width: (theme) => `calc(100% - ${theme.spacing(15.5)})` }}
-          value={message.content}
-        />
+        <CustomMarkdown sx={{ ...MarkdownSx }} value={message.content} />
+        <ToolBar>
+          <DeleteMessageIcon id={message.id} />
+        </ToolBar>
       </Box>
       <Divider />
     </>
