@@ -10,5 +10,5 @@ export const MarkdownSx: SxProps<Theme> = {
 };
 
 export const ToolSx: SxProps<Theme> = {
-  ml: 1,
+  ml: 0,
 };

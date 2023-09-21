@@ -3,7 +3,7 @@ mod fetch;
 use serde_json::Value;
 use tauri::{AppHandle, Invoke, Manager, Runtime};
 
-use crate::store::{Conversation, DbConn, Folder, NewFolder};
+use crate::store::{Conversation, DbConn, Folder, Message, NewFolder};
 use crate::{errors::ChatGPTError, store::NewConversation};
 use crate::{errors::ChatGPTResult, store};
 
@@ -31,6 +31,7 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for ChatPlugin {
             delete_folder,
             move_folder,
             delete_message,
+            find_message
         ]);
         (handle)(invoke);
     }
@@ -114,6 +115,12 @@ async fn delete_message(state: tauri::State<'_, DbConn>, id: i32) -> ChatGPTResu
     let conn = &mut state.get()?;
     store::Message::delete(id, conn)?;
     Ok(())
+}
+#[tauri::command]
+async fn find_message(state: tauri::State<'_, DbConn>, id: i32) -> ChatGPTResult<Message> {
+    let conn = &mut state.get()?;
+    let message = store::Message::find(id, conn)?;
+    Ok(message)
 }
 
 fn setup<R: Runtime>(app: &AppHandle<R>) -> ChatGPTResult<()> {

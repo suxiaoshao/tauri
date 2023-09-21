@@ -26,6 +26,9 @@
       },
       "os": {
         "all": true
+      },
+      "notification": {
+        "all": true
       }
     },
     "bundle": {

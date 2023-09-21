@@ -1,5 +1,5 @@
 import { Delete } from '@mui/icons-material';
-import { ToolSx } from '../const';
+import { ToolSx } from '../../const';
 import { deleteMessage } from '@chatgpt/service/chat';
 import { useCallback } from 'react';
 import { useAppDispatch } from '@chatgpt/app/hooks';

@@ -16,14 +16,14 @@ import { Settings } from '@mui/icons-material';
 import { useCallback } from 'react';
 import useConfig from '@chatgpt/hooks/useConfig';
 import useSettingKey from '@chatgpt/hooks/useSettingKey';
-import { createSettingWindow, setConfigSevice } from '@chatgpt/service/config';
+import { createSettingWindow, setConfigService } from '@chatgpt/service/config';
 
 function Setting() {
   const initData = useAppSelector((state) => state.config);
   const { register, handleSubmit, control } = useForm<ConfigSliceType>({ defaultValues: initData });
 
   const onSubmit = handleSubmit(async (data) => {
-    await setConfigSevice({ data });
+    await setConfigService({ data });
     await appWindow.close();
   });
   return (

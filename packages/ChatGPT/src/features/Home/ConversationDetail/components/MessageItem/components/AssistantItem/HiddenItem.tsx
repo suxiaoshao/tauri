@@ -1,17 +1,14 @@
 import { Avatar, Box, Divider } from '@mui/material';
 import assistant from '@chatgpt/assets/assistant.jpg';
-import CustomMarkdown from '@chatgpt/components/Markdown';
 import { Message } from '@chatgpt/types/message';
-import { CheckCircleOutlineOutlined } from '@mui/icons-material';
-import { MarkdownSx, ToolSx } from '../const';
-import DeleteMessageIcon from '../components/DeleteMessageIcon';
-import ToolBar from '../components/ToolBar';
+import DeleteMessageIcon from '../ToolBar/DeleteMessageIcon';
+import ToolBar from '../ToolBar';
 
-export interface NormalItemProps {
+export interface HiddenItemProps {
   message: Message;
 }
 
-export default function NormalItem({ message }: NormalItemProps) {
+export default function HiddenItem({ message }: HiddenItemProps) {
   return (
     <>
       <Box
@@ -24,9 +21,7 @@ export default function NormalItem({ message }: NormalItemProps) {
         }}
       >
         <Avatar sx={{ ml: 2, mt: 2 }} src={assistant} />
-        <CustomMarkdown sx={{ ...MarkdownSx }} value={message.content} />
         <ToolBar>
-          <CheckCircleOutlineOutlined fontSize={'small'} sx={ToolSx} />
           <DeleteMessageIcon id={message.id} />
         </ToolBar>
       </Box>

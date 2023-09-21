@@ -10,6 +10,7 @@ const config = defineConfig({
   },
   output: {
     clean: isProduction ? true : false,
+    publicPath: '/',
   },
   builtins: {
     html: [

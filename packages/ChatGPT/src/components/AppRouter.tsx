@@ -5,6 +5,7 @@ import Setting from '../features/Setting';
 import AppDrawer from './AppDrawer';
 import AddConversation from '@chatgpt/features/Adds/AddConversation';
 import AddFolder from '@chatgpt/features/Adds/AddFolder';
+import MessagePreview from '@chatgpt/features/MessagePreview';
 
 export default function AppRouter() {
   return (
@@ -18,6 +19,7 @@ export default function AppRouter() {
         </Route>
       </Route>
       <Route path="/setting" element={<Setting />} />
+      <Route path="/message/:id" element={<MessagePreview />} />
     </Routes>
   );
 }

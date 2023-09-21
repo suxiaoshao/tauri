@@ -9,7 +9,7 @@ export interface SetConfigParams {
   data: ConfigSliceType;
 }
 
-export async function setConfigSevice(params: SetConfigParams) {
+export async function setConfigService(params: SetConfigParams) {
   await appInvoke<SetConfigParams, unknown>('plugin:config|set_config', params);
 }
 

@@ -1,9 +1,9 @@
 import { Role } from '@chatgpt/types/common';
 import { Message } from '@chatgpt/types/message';
 import { useMemo } from 'react';
-import UserItem from './UserItem';
-import AssistantItem from './AssistantItem';
-import SystemItem from './SystemItem';
+import UserItem from './components/UserItem';
+import AssistantItem from './components/AssistantItem';
+import SystemItem from './components/SystemItem';
 
 export interface MessageItemProps {
   message: Message;

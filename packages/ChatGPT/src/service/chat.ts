@@ -2,6 +2,7 @@ import { NewConversation } from '@chatgpt/types/conversation';
 import { appInvoke } from './base';
 import { NewFolder } from '@chatgpt/types/folder';
 import { ChatData } from '@chatgpt/types/chatData';
+import { Message } from '@chatgpt/types/message';
 
 export interface AddConversationParams {
   data: NewConversation;
@@ -90,4 +91,12 @@ export interface DeleteMessageParams {
 
 export async function deleteMessage(params: DeleteMessageParams) {
   await appInvoke<DeleteMessageParams, unknown>('plugin:chat|delete_message', params);
+}
+
+export interface FindMessageParams {
+  id: number;
+}
+
+export async function findMessage(params: FindMessageParams) {
+  return await appInvoke<FindMessageParams, Message>('plugin:chat|find_message', params);
 }

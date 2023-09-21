@@ -1,16 +1,17 @@
-import { Avatar, Box, CircularProgress, Divider } from '@mui/material';
-import assistant from '@chatgpt/assets/assistant.jpg';
 import CustomMarkdown from '@chatgpt/components/Markdown';
 import { Message } from '@chatgpt/types/message';
-import { MarkdownSx, ToolSx } from '../const';
-import DeleteMessageIcon from '../components/DeleteMessageIcon';
-import ToolBar from '../components/ToolBar';
+import { Avatar, Box, Divider } from '@mui/material';
+import user from '@chatgpt/assets/user.jpg';
+import { MarkdownSx } from '../const';
+import DeleteMessageIcon from './ToolBar/DeleteMessageIcon';
+import ToolBar from './ToolBar';
+import ViewIcon from './ToolBar/VitewIcon';
 
-export interface LoadingItemProps {
+export interface UserItemProps {
   message: Message;
 }
 
-export default function LoadingItem({ message }: LoadingItemProps) {
+export default function UserItem({ message }: UserItemProps) {
   return (
     <>
       <Box
@@ -22,11 +23,11 @@ export default function LoadingItem({ message }: LoadingItemProps) {
           minHeight: '56px',
         }}
       >
-        <Avatar sx={{ ml: 2, mt: 2 }} src={assistant} />
+        <Avatar sx={{ ml: 2, mt: 2 }} src={user} />
         <CustomMarkdown sx={{ ...MarkdownSx }} value={message.content} />
         <ToolBar>
-          <CircularProgress size={20} sx={ToolSx} color="inherit" />
           <DeleteMessageIcon id={message.id} />
+          <ViewIcon id={message.id} />
         </ToolBar>
       </Box>
       <Divider />
