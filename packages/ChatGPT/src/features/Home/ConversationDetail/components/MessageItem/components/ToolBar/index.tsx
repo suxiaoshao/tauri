@@ -4,5 +4,14 @@ export interface ToolBarProps {
   children: React.ReactNode;
 }
 export default function ToolBar({ children }: ToolBarProps) {
-  return <Box sx={{ mr: 2, mt: 3 }}>{children}</Box>;
+  return (
+    <Box
+      data-toolbar
+      sx={{
+        display: 'none',
+      }}
+    >
+      {children}
+    </Box>
+  );
 }

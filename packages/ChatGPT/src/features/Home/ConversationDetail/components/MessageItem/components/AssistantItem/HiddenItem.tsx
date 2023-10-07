@@ -3,6 +3,7 @@ import assistant from '@chatgpt/assets/assistant.jpg';
 import { Message } from '@chatgpt/types/message';
 import DeleteMessageIcon from '../ToolBar/DeleteMessageIcon';
 import ToolBar from '../ToolBar';
+import { MessageSx } from '../../const';
 
 export interface HiddenItemProps {
   message: Message;
@@ -11,15 +12,7 @@ export interface HiddenItemProps {
 export default function HiddenItem({ message }: HiddenItemProps) {
   return (
     <>
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'row',
-          width: '100%',
-          position: 'relative',
-          minHeight: '56px',
-        }}
-      >
+      <Box sx={MessageSx}>
         <Avatar sx={{ ml: 2, mt: 2 }} src={assistant} />
         <ToolBar>
           <DeleteMessageIcon id={message.id} />

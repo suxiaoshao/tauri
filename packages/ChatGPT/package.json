@@ -21,7 +21,7 @@
     "types": "workspace:^1.0.0"
   },
   "devDependencies": {
-    "@types/prismjs": "^1.26.0",
-    "@types/react-resizable": "^3.0.4"
+    "@types/prismjs": "^1.26.1",
+    "@types/react-resizable": "^3.0.5"
   }
 }

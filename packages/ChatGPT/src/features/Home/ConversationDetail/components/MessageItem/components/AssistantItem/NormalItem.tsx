@@ -3,10 +3,10 @@ import assistant from '@chatgpt/assets/assistant.jpg';
 import CustomMarkdown from '@chatgpt/components/Markdown';
 import { Message } from '@chatgpt/types/message';
 import { CheckCircleOutlineOutlined } from '@mui/icons-material';
-import { MarkdownSx, ToolSx } from '../../const';
+import { MarkdownSx, MessageSx, ToolSx } from '../../const';
 import DeleteMessageIcon from '../ToolBar/DeleteMessageIcon';
 import ToolBar from '../ToolBar';
-import ViewIcon from '../ToolBar/VitewIcon';
+import ViewIcon from '../ToolBar/ViewIcon';
 
 export interface NormalItemProps {
   message: Message;
@@ -15,15 +15,7 @@ export interface NormalItemProps {
 export default function NormalItem({ message }: NormalItemProps) {
   return (
     <>
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'row',
-          width: '100%',
-          position: 'relative',
-          minHeight: '56px',
-        }}
-      >
+      <Box sx={MessageSx}>
         <Avatar sx={{ ml: 2, mt: 2 }} src={assistant} />
         <CustomMarkdown sx={{ ...MarkdownSx }} value={message.content} />
         <ToolBar>

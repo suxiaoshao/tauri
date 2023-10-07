@@ -2,6 +2,7 @@ import { Preview } from '@mui/icons-material';
 import { useCallback } from 'react';
 import { ToolSx } from '../../const';
 import { WebviewWindow } from '@tauri-apps/api/window';
+import { IconButton } from '@mui/material';
 
 export interface ViewIconProp {
   id: number;
@@ -16,5 +17,9 @@ export default function ViewIcon({ id }: ViewIconProp) {
       decorations: false,
     });
   }, [id]);
-  return <Preview onClick={handleClick} fontSize={'small'} sx={ToolSx} />;
+  return (
+    <IconButton size="small" onClick={handleClick}>
+      <Preview fontSize={'small'} sx={ToolSx} />
+    </IconButton>
+  );
 }

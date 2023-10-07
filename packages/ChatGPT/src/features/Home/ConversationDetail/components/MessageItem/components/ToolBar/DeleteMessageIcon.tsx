@@ -4,6 +4,7 @@ import { deleteMessage } from '@chatgpt/service/chat';
 import { useCallback } from 'react';
 import { useAppDispatch } from '@chatgpt/app/hooks';
 import { fetchConversations } from '@chatgpt/features/Conversations/conversationSlice';
+import { IconButton } from '@mui/material';
 
 export interface DeleteMessageIconProps {
   id: number;
@@ -14,5 +15,9 @@ export default function DeleteMessageIcon({ id }: DeleteMessageIconProps) {
     await deleteMessage({ id });
     dispatch(fetchConversations());
   }, [dispatch, id]);
-  return <Delete onClick={handleClick} fontSize={'small'} sx={ToolSx} />;
+  return (
+    <IconButton size="small" onClick={handleClick}>
+      <Delete fontSize={'small'} sx={ToolSx} />
+    </IconButton>
+  );
 }
