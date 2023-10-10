@@ -28,18 +28,18 @@ fn main() -> anyhow::Result<()> {
     Ok(())
 }
 
-#[tauri::command]
+#[tauri::command(async)]
 async fn fetch(url: String, start_page: u32, end_page: u32, cookies: String) -> Result<(), String> {
     fetch::fetch_many(url, start_page, end_page, cookies)
         .await
         .map_err(|e| e.to_string())?;
     Ok(())
 }
-#[tauri::command]
-fn tags() -> Result<Vec<String>, String> {
+#[tauri::command(async)]
+async fn tags() -> Result<Vec<String>, String> {
     TagModel::all_tags().map_err(|x| x.to_string())
 }
-#[tauri::command]
+#[tauri::command(async)]
 async fn query(
     offset: Option<i64>,
     limit: Option<i64>,

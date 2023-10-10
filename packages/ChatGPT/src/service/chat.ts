@@ -100,3 +100,20 @@ export interface FindMessageParams {
 export async function findMessage(params: FindMessageParams) {
   return await appInvoke<FindMessageParams, Message>('plugin:chat|find_message', params);
 }
+
+export interface UpdateMessageContentParams {
+  id: number;
+  content: string;
+}
+
+export async function updateMessageContent(params: UpdateMessageContentParams) {
+  await appInvoke<UpdateMessageContentParams, unknown>('plugin:chat|update_message_content', params);
+}
+
+export interface ClearConversationParams {
+  id: number;
+}
+
+export async function clearConversation(params: ClearConversationParams) {
+  await appInvoke<ClearConversationParams, unknown>('plugin:chat|clear_conversation', params);
+}

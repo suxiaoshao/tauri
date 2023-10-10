@@ -94,6 +94,18 @@ function CustomEdit(
       };
     }
   }, [edit, readonly, onChangeCode]);
+  useEffect(() => {
+    if (edit !== undefined) {
+      edit.updateOptions({
+        readOnly: readonly,
+      });
+    }
+  }, [edit, readonly]);
+  useEffect(() => {
+    if (edit !== undefined && code !== edit.getValue()) {
+      edit.setValue(code);
+    }
+  }, [edit, code]);
   const format = useCallback(async () => {
     if (readonly && edit) {
       edit.updateOptions({

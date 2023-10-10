@@ -31,7 +31,9 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for ChatPlugin {
             delete_folder,
             move_folder,
             delete_message,
-            find_message
+            find_message,
+            update_message_content,
+            clear_conversation
         ]);
         (handle)(invoke);
     }
@@ -101,6 +103,13 @@ async fn move_conversation(
 }
 
 #[tauri::command]
+async fn clear_conversation(state: tauri::State<'_, DbConn>, id: i32) -> ChatGPTResult<()> {
+    let conn = &mut state.get()?;
+    Conversation::clear(id, conn)?;
+    Ok(())
+}
+
+#[tauri::command]
 async fn move_folder(
     state: tauri::State<'_, DbConn>,
     id: i32,
@@ -121,6 +130,20 @@ async fn find_message(state: tauri::State<'_, DbConn>, id: i32) -> ChatGPTResult
     let conn = &mut state.get()?;
     let message = store::Message::find(id, conn)?;
     Ok(message)
+}
+#[tauri::command]
+async fn update_message_content<R: Runtime>(
+    app: AppHandle<R>,
+    state: tauri::State<'_, DbConn>,
+    id: i32,
+    content: String,
+) -> ChatGPTResult<()> {
+    let conn = &mut state.get()?;
+    store::Message::update_content(id, content, conn)?;
+    let message = store::Message::find(id, conn)?;
+    let window = app.get_window("main").ok_or(ChatGPTError::WindowNotFound)?;
+    window.emit("message", message)?;
+    Ok(())
 }
 
 fn setup<R: Runtime>(app: &AppHandle<R>) -> ChatGPTResult<()> {

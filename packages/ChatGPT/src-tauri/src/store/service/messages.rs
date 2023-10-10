@@ -159,4 +159,13 @@ impl Message {
         SqlMessage::delete(id, conn)?;
         Ok(())
     }
+    pub fn update_content(
+        id: i32,
+        content: String,
+        conn: &mut SqliteConnection,
+    ) -> ChatGPTResult<()> {
+        let time = OffsetDateTime::now_utc();
+        SqlMessage::update_content(id, content, time, conn)?;
+        Ok(())
+    }
 }

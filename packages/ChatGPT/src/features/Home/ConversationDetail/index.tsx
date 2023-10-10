@@ -1,7 +1,7 @@
 import { Box } from '@mui/material';
 import ChatForm from './components/ChatForm';
 import Header from './components/ConversationHeader';
-import MessageHistory from './components/MessageHistory.tsx';
+import MessageHistory from './components/MessageHistory';
 import { Conversation } from '@chatgpt/types/conversation';
 import { Reducer, useReducer } from 'react';
 

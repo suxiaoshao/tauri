@@ -1,4 +1,3 @@
-import CustomEdit from '@chatgpt/components/CustomEdit';
 import usePromise from '@chatgpt/hooks/usePromise';
 import { findMessage } from '@chatgpt/service/chat';
 import notification from '@chatgpt/utils/notification';
@@ -6,6 +5,7 @@ import { CircularProgress } from '@mui/material';
 import { appWindow } from '@tauri-apps/api/window';
 import { useCallback, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
+import Success from './Success';
 
 export default function MessagePreview() {
   const { id } = useParams<{ id: string }>();
@@ -36,7 +36,7 @@ export default function MessagePreview() {
       case 'error':
         return 'error';
       case 'data':
-        return <CustomEdit sx={{ width: '100%', height: '100%' }} value={value.content} readonly language="markdown" />;
+        return <Success message={value} />;
       default:
         return <CircularProgress />;
     }
