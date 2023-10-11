@@ -1,12 +1,12 @@
-import { ConfigSliceType } from '@chatgpt/features/Setting/configSlice';
+import { ChatGptConfig } from '@chatgpt/features/Setting';
 import { appInvoke } from './base';
 
 export async function getConfig() {
-  return await appInvoke<unknown, ConfigSliceType>('plugin:config|get_config', undefined);
+  return await appInvoke<unknown, ChatGptConfig>('plugin:config|get_config', undefined);
 }
 
 export interface SetConfigParams {
-  data: ConfigSliceType;
+  data: ChatGptConfig;
 }
 
 export async function setConfigService(params: SetConfigParams) {

@@ -31,6 +31,7 @@ struct Fetch<R: Runtime> {
     message_id: i32,
     db_conn: DbConn,
     window: Window<R>,
+    url: String,
 }
 
 impl<R> FetchRunner for Fetch<R>
@@ -48,6 +49,9 @@ where
     fn on_open(&mut self) -> ChatGPTResult<()> {
         log::info!("Connection Opened!");
         Ok(())
+    }
+    fn url(&self) -> &str {
+        self.url.as_str()
     }
 
     fn on_message(&mut self, message: ChatResponse) -> ChatGPTResult<()> {
@@ -91,6 +95,7 @@ async fn _fetch<R: Runtime>(
     let window = app_handle
         .get_window("main")
         .ok_or(ChatGPTError::WindowNotFound)?;
+    let ChatGPTConfig { url, .. } = ChatGPTConfig::get(&app_handle)?;
     // get api key
     let config = ChatGPTConfig::get(&app_handle)?;
     let api_key = config.get_api_key()?.to_owned();
@@ -123,6 +128,7 @@ async fn _fetch<R: Runtime>(
         message_id,
         db_conn: state,
         window,
+        url,
     };
     fetch.fetch().await?;
 
