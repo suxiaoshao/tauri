@@ -17,6 +17,16 @@ pub enum Model {
     Gpt35_16k,
     #[serde(rename = "gpt-3.5-turbo-16k-0613")]
     Gpt35_16k0613,
+    #[serde(rename = "gpt-3.5-turbo-instruct")]
+    Gpt35instruct,
+    #[serde(rename = "gpt-3.5-turbo-instruct-0914")]
+    Gpt35instruct0914,
+    #[serde(rename = "gpt-4-0613")]
+    Gpt4_0613,
+    #[serde(rename = "gpt-4")]
+    Gpt4,
+    #[serde(rename = "gpt-4-0314")]
+    Gpt4_0314,
 }
 
 impl FromStr for Model {
@@ -29,6 +39,11 @@ impl FromStr for Model {
             "gpt-3.5-turbo-0301" => Ok(Model::Gpt35_0301),
             "gpt-3.5-turbo-16k" => Ok(Model::Gpt35_16k),
             "gpt-3.5-turbo-16k-0613" => Ok(Model::Gpt35_16k0613),
+            "gpt-3.5-turbo-instruct" => Ok(Model::Gpt35instruct),
+            "gpt-3.5-turbo-instruct-0914" => Ok(Model::Gpt35instruct0914),
+            "gpt-4-0613" => Ok(Model::Gpt4_0613),
+            "gpt-4" => Ok(Model::Gpt4),
+            "gpt-4-0314" => Ok(Model::Gpt4_0314),
             _ => Err(ChatGPTError::InvalidModel(s.to_owned())),
         }
     }
@@ -42,6 +57,11 @@ impl ToString for Model {
             Model::Gpt35_0301 => "gpt-3.5-turbo-0301".to_owned(),
             Model::Gpt35_16k => "gpt-3.5-turbo-16k".to_owned(),
             Model::Gpt35_16k0613 => "gpt-3.5-turbo-16k-0613".to_owned(),
+            Model::Gpt35instruct0914 => "gpt-3.5-turbo-instruct-0914".to_owned(),
+            Model::Gpt4_0613 => "gpt-4-0613".to_owned(),
+            Model::Gpt4 => "gpt-4".to_owned(),
+            Model::Gpt4_0314 => "gpt-4-0314".to_owned(),
+            Model::Gpt35instruct => "gpt-3.5-turbo-instruct".to_owned(),
         }
     }
 }

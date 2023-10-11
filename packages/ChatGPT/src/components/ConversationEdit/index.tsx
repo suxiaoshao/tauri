@@ -116,6 +116,11 @@ export default function ConversationEdit({ initialValues, id, sx, onSubmit: subm
             <MenuItem value={Model.Gpt35_0613}>{Model.Gpt35_0613}</MenuItem>
             <MenuItem value={Model.Gpt35_16k}>{Model.Gpt35_16k}</MenuItem>
             <MenuItem value={Model.Gpt35_16k0613}>{Model.Gpt35_16k0613}</MenuItem>
+            <MenuItem value={Model.Gpt35instruct}>{Model.Gpt35instruct}</MenuItem>
+            <MenuItem value={Model.Gpt35instruct0914}>{Model.Gpt35instruct0914}</MenuItem>
+            <MenuItem value={Model.Gpt4}>{Model.Gpt4}</MenuItem>
+            <MenuItem value={Model.Gpt4_0301}>{Model.Gpt4_0301}</MenuItem>
+            <MenuItem value={Model.Gpt4_0613}>{Model.Gpt4_0613}</MenuItem>
           </TextField>
         )}
       />
