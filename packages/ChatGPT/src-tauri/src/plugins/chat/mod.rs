@@ -9,6 +9,7 @@ use crate::{errors::ChatGPTResult, store};
 
 pub struct ChatPlugin;
 mod chat_data;
+mod export;
 
 impl<R: Runtime> tauri::plugin::Plugin<R> for ChatPlugin {
     fn name(&self) -> &'static str {
@@ -33,7 +34,8 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for ChatPlugin {
             delete_message,
             find_message,
             update_message_content,
-            clear_conversation
+            clear_conversation,
+            export::export,
         ]);
         (handle)(invoke);
     }

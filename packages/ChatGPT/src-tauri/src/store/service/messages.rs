@@ -13,6 +13,8 @@ use crate::{
     },
 };
 
+use super::utils::{deserialize_offset_date_time, serialize_offset_date_time};
+
 #[derive(Debug, Serialize, Clone, Deserialize, PartialEq, Eq)]
 pub struct Message {
     pub id: i32,
@@ -23,13 +25,29 @@ pub struct Message {
     pub role: Role,
     pub content: String,
     pub status: Status,
-    #[serde(rename = "createdTime")]
+    #[serde(
+        rename = "createdTime",
+        serialize_with = "serialize_offset_date_time",
+        deserialize_with = "deserialize_offset_date_time"
+    )]
     pub created_time: OffsetDateTime,
-    #[serde(rename = "updatedTime")]
+    #[serde(
+        rename = "updatedTime",
+        serialize_with = "serialize_offset_date_time",
+        deserialize_with = "deserialize_offset_date_time"
+    )]
     pub updated_time: OffsetDateTime,
-    #[serde(rename = "startTime")]
+    #[serde(
+        rename = "startTime",
+        serialize_with = "serialize_offset_date_time",
+        deserialize_with = "deserialize_offset_date_time"
+    )]
     pub start_time: OffsetDateTime,
-    #[serde(rename = "endTime")]
+    #[serde(
+        rename = "endTime",
+        serialize_with = "serialize_offset_date_time",
+        deserialize_with = "deserialize_offset_date_time"
+    )]
     pub end_time: OffsetDateTime,
 }
 

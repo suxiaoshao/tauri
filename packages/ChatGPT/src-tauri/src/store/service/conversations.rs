@@ -13,6 +13,8 @@ use crate::{
     },
 };
 
+use super::utils::serialize_offset_date_time;
+
 #[derive(serde::Serialize)]
 pub struct Conversation {
     pub id: i32,
@@ -23,9 +25,17 @@ pub struct Conversation {
     pub icon: String,
     pub mode: Mode,
     pub model: Model,
-    #[serde(rename = "createdTime")]
+    #[serde(
+        rename = "createdTime",
+        serialize_with = "serialize_offset_date_time",
+        deserialize_with = "deserialize_offset_date_time"
+    )]
     pub created_time: OffsetDateTime,
-    #[serde(rename = "updatedTime")]
+    #[serde(
+        rename = "updatedTime",
+        serialize_with = "serialize_offset_date_time",
+        deserialize_with = "deserialize_offset_date_time"
+    )]
     pub updated_time: OffsetDateTime,
     pub temperature: f64,
     #[serde(rename = "topP")]

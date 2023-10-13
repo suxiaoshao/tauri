@@ -117,3 +117,19 @@ export interface ClearConversationParams {
 export async function clearConversation(params: ClearConversationParams) {
   await appInvoke<ClearConversationParams, unknown>('plugin:chat|clear_conversation', params);
 }
+
+export enum ExportType {
+  JSON = 'json',
+  TXT = 'txt',
+  CSV = 'csv',
+}
+
+export interface ExportConversationParams {
+  id: number;
+  path: string;
+  exportType: ExportType;
+}
+
+export async function exportConversation(params: ExportConversationParams) {
+  await appInvoke<ExportConversationParams, unknown>('plugin:chat|export', params);
+}

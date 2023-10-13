@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { clearConversation, deleteConversation } from '@chatgpt/service/chat';
 import UpdateConversation from './UpdateConversation';
 import MoveConversation from './MoveConversation';
+import ExportConversation from './ExportConversation';
 export interface ConversationHeaderProps {
   conversation: Conversation;
 }
@@ -73,6 +74,7 @@ export default function ConversationHeader({ conversation }: ConversationHeaderP
           <CleaningServices />
         </IconButton>
       </Tooltip>
+      <ExportConversation conversation={conversation} />
     </Box>
   );
 }

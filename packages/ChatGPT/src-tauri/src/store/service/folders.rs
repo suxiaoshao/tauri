@@ -14,6 +14,8 @@ use crate::{
     },
 };
 
+use super::utils::serialize_offset_date_time;
+
 #[derive(Serialize)]
 pub struct Folder {
     pub id: i32,
@@ -21,9 +23,17 @@ pub struct Folder {
     pub path: String,
     #[serde(rename = "parentId")]
     pub parent_id: Option<i32>,
-    #[serde(rename = "createdTime")]
+    #[serde(
+        rename = "createdTime",
+        serialize_with = "serialize_offset_date_time",
+        deserialize_with = "deserialize_offset_date_time"
+    )]
     pub created_time: OffsetDateTime,
-    #[serde(rename = "updatedTime")]
+    #[serde(
+        rename = "updatedTime",
+        serialize_with = "serialize_offset_date_time",
+        deserialize_with = "deserialize_offset_date_time"
+    )]
     pub updated_time: OffsetDateTime,
     pub conversations: Vec<Conversation>,
     pub folders: Vec<Folder>,
