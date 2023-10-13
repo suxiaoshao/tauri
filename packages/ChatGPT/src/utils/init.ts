@@ -1,9 +1,10 @@
 import store from '@chatgpt/app/store';
 import { fetchConversations, updateMessage } from '@chatgpt/features/Conversations/conversationSlice';
-import { ConfigSliceType, fetchConfig, setConfig } from '@chatgpt/features/Setting/configSlice';
+import { fetchConfig, setConfig } from '@chatgpt/features/Setting/configSlice';
 import { Message } from '@chatgpt/types/message';
 import { appWindow } from '@tauri-apps/api/window';
 import { listen } from '@tauri-apps/api/event';
+import { ChatGptConfig } from '@chatgpt/features/Setting';
 
 export default async function init() {
   store.dispatch(fetchConversations());
@@ -11,7 +12,7 @@ export default async function init() {
     store.dispatch(updateMessage(response.payload));
   });
   store.dispatch(fetchConfig());
-  await listen<ConfigSliceType>('config', (event) => {
+  await listen<ChatGptConfig>('config', (event) => {
     store.dispatch(setConfig(event.payload));
   });
 }

@@ -10,11 +10,13 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [build-dependencies]
-tauri-build = { version = "1.4.0", features = [] }
+tauri-build = { version = "1.5.0", features = [] }
 
 [dependencies]
 # tauri
-tauri = { version = "1.4.1", features = [ "window-start-dragging",
+tauri = { version = "1.5.2", features = [ "dialog-open",
+  "notification-all",
+  "window-start-dragging",
   "os-all",
   "macos-private-api",
   "shell-open",
@@ -23,16 +25,16 @@ tauri = { version = "1.4.1", features = [ "window-start-dragging",
   "window-set-focus",
   "window-show",
 ] }
-serde = { version = "1.0.188", features = ["derive"] }
-serde_json = "1.0.105"
+serde = { version = "1.0.189", features = ["derive"] }
+serde_json = "1.0.107"
 
 # database
-diesel = { version = "2.1.1", features = ["sqlite", "r2d2", "numeric", "time"] }
+diesel = { version = "2.1.3", features = ["sqlite", "r2d2", "numeric", "time"] }
 libsqlite3-sys = { version = "0.26.0", features = ["bundled-windows"] }
-time = { version = "0.3.28", features = ["serde"] }
+time = { version = "0.3.29", features = ["serde"] }
 
 # 错误处理
-thiserror = "1.0.48"
+thiserror = "1.0.49"
 
 # log
 tauri-plugin-log = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "dev" }
@@ -41,11 +43,11 @@ log = "0.4.20"
 # 窗口管理
 tauri-plugin-window-state = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "dev" }
 window-shadows = "0.2.1"
-window-vibrancy = "0.4.0"
+window-vibrancy = "0.4.2"
 
 # http request
-reqwest = { version = "0.11.20", features = ["json"] }
-tokio = { version = "1.32.0", features = [
+reqwest = { version = "0.11.22", features = ["json"] }
+tokio = { version = "1.33.0", features = [
   "rt",
   "rt-multi-thread",
   "sync",
@@ -53,15 +55,16 @@ tokio = { version = "1.32.0", features = [
   "io-util",
   "macros",
 ] }
-reqwest-eventsource = "0.4.0"
+reqwest-eventsource = "0.5.0"
 futures = "0.3.28"
 
 # config
 notify = { version = "6.1.1", default-features = false, features = [
   "macos_kqueue",
 ] }
-toml = "0.7.6"
+toml = "0.8.2"
 async-trait = "0.1.73"
+csv = "1.3.0"
 
 [target.'cfg(target_os="macos")'.dependencies]
 cocoa = "0.25.0"

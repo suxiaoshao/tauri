@@ -30,12 +30,18 @@ impl Default for ThemeOption {
     }
 }
 
+fn default_url() -> String {
+    "https://api.openai.com/v1/chat/completions".to_string()
+}
+
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 pub struct ChatGPTConfig {
     #[serde(rename = "apiKey")]
     api_key: Option<String>,
     #[serde(default = "Default::default")]
     theme: ThemeOption,
+    #[serde(default = "default_url")]
+    pub url: String,
 }
 
 impl ChatGPTConfig {

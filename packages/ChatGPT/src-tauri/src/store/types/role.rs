@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use std::{fmt::Display, str::FromStr};
 
 use crate::errors::ChatGPTError;
 
@@ -26,13 +26,14 @@ impl FromStr for Role {
     }
 }
 
-impl ToString for Role {
-    fn to_string(&self) -> String {
-        match self {
-            Role::System => "system".to_owned(),
-            Role::User => "user".to_owned(),
-            Role::Assistant => "assistant".to_owned(),
-        }
+impl Display for Role {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let s = match self {
+            Role::System => "system",
+            Role::User => "user",
+            Role::Assistant => "assistant",
+        };
+        write!(f, "{}", s)
     }
 }
 

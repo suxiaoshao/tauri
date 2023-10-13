@@ -118,6 +118,12 @@ pub enum ChatGPTError {
     ConversationPathExists(String),
     #[error("folder path exists:{}",.0)]
     FolderPathExists(String),
+    #[error("csv 解析失败:{}",.0)]
+    CsvParse(
+        #[serde(skip_serializing)]
+        #[from]
+        csv::Error,
+    ),
 }
 
 impl From<tauri::Error> for ChatGPTError {

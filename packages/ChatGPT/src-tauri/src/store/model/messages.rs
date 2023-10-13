@@ -148,4 +148,22 @@ impl SqlMessage {
             .execute(conn)?;
         Ok(())
     }
+    pub fn delete(id: i32, conn: &mut SqliteConnection) -> ChatGPTResult<()> {
+        diesel::delete(messages::table.filter(messages::id.eq(id))).execute(conn)?;
+        Ok(())
+    }
+    pub fn update_content(
+        id: i32,
+        content: String,
+        time: OffsetDateTime,
+        conn: &mut SqliteConnection,
+    ) -> ChatGPTResult<()> {
+        diesel::update(messages::table.filter(messages::id.eq(id)))
+            .set((
+                messages::content.eq(content),
+                messages::updated_time.eq(time),
+            ))
+            .execute(conn)?;
+        Ok(())
+    }
 }

@@ -2,6 +2,7 @@ import { NewConversation } from '@chatgpt/types/conversation';
 import { appInvoke } from './base';
 import { NewFolder } from '@chatgpt/types/folder';
 import { ChatData } from '@chatgpt/types/chatData';
+import { Message } from '@chatgpt/types/message';
 
 export interface AddConversationParams {
   data: NewConversation;
@@ -82,4 +83,53 @@ export interface MoveFolderParams {
 
 export async function moveFolder(params: MoveFolderParams) {
   await appInvoke<MoveFolderParams, unknown>('plugin:chat|move_folder', params);
+}
+
+export interface DeleteMessageParams {
+  id: number;
+}
+
+export async function deleteMessage(params: DeleteMessageParams) {
+  await appInvoke<DeleteMessageParams, unknown>('plugin:chat|delete_message', params);
+}
+
+export interface FindMessageParams {
+  id: number;
+}
+
+export async function findMessage(params: FindMessageParams) {
+  return await appInvoke<FindMessageParams, Message>('plugin:chat|find_message', params);
+}
+
+export interface UpdateMessageContentParams {
+  id: number;
+  content: string;
+}
+
+export async function updateMessageContent(params: UpdateMessageContentParams) {
+  await appInvoke<UpdateMessageContentParams, unknown>('plugin:chat|update_message_content', params);
+}
+
+export interface ClearConversationParams {
+  id: number;
+}
+
+export async function clearConversation(params: ClearConversationParams) {
+  await appInvoke<ClearConversationParams, unknown>('plugin:chat|clear_conversation', params);
+}
+
+export enum ExportType {
+  JSON = 'json',
+  TXT = 'txt',
+  CSV = 'csv',
+}
+
+export interface ExportConversationParams {
+  id: number;
+  path: string;
+  exportType: ExportType;
+}
+
+export async function exportConversation(params: ExportConversationParams) {
+  await appInvoke<ExportConversationParams, unknown>('plugin:chat|export', params);
 }

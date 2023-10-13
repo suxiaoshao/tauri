@@ -3,11 +3,12 @@ import { Avatar, Box, IconButton, Tooltip, Typography } from '@mui/material';
 import { useCallback } from 'react';
 import { useAppDispatch } from '@chatgpt/app/hooks';
 import { fetchConversations } from '@chatgpt/features/Conversations/conversationSlice';
-import { CopyAll, Delete } from '@mui/icons-material';
+import { CleaningServices, CopyAll, Delete } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import { deleteConversation } from '@chatgpt/service/chat';
+import { clearConversation, deleteConversation } from '@chatgpt/service/chat';
 import UpdateConversation from './UpdateConversation';
 import MoveConversation from './MoveConversation';
+import ExportConversation from './ExportConversation';
 export interface ConversationHeaderProps {
   conversation: Conversation;
 }
@@ -22,6 +23,10 @@ export default function ConversationHeader({ conversation }: ConversationHeaderP
   const handleCopy = useCallback(async () => {
     navigate('/add/conversation', { state: { ...conversation, id: undefined } });
   }, [conversation, navigate]);
+  const handleClear = useCallback(async () => {
+    await clearConversation({ id: conversation.id });
+    dispatch(fetchConversations());
+  }, [conversation.id, dispatch]);
 
   return (
     <Box
@@ -64,6 +69,12 @@ export default function ConversationHeader({ conversation }: ConversationHeaderP
         </IconButton>
       </Tooltip>
       <MoveConversation conversation={conversation} />
+      <Tooltip title="clear messages">
+        <IconButton onClick={handleClear}>
+          <CleaningServices />
+        </IconButton>
+      </Tooltip>
+      <ExportConversation conversation={conversation} />
     </Box>
   );
 }

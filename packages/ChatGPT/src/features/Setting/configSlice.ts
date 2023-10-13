@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AppThunkAction, type RootState } from '../../app/store';
 import { getConfig } from '@chatgpt/service/config';
+import { ChatGptConfig } from '.';
 
 export enum Theme {
   Dark = 'dark',
@@ -8,23 +9,14 @@ export enum Theme {
   System = 'system',
 }
 
-interface ThemeOption {
-  theme: Theme;
-  color: string;
-}
-
-export type ConfigSliceType = {
-  apiKey?: string;
-  theme: ThemeOption;
-};
-
 export const themeSlice = createSlice({
   name: 'theme',
-  initialState: {} as ConfigSliceType,
+  initialState: {} as ChatGptConfig,
   reducers: {
-    setConfig: (state, action: PayloadAction<ConfigSliceType>) => {
+    setConfig: (state, action: PayloadAction<ChatGptConfig>) => {
       state.apiKey = action.payload.apiKey;
       state.theme = action.payload.theme;
+      state.url = action.payload.url;
     },
   },
 });

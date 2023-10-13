@@ -16,6 +16,7 @@ pub trait FetchRunner {
     fn on_message(&mut self, message: ChatResponse) -> ChatGPTResult<()>;
     fn on_error(&mut self, err: reqwest_eventsource::Error) -> ChatGPTResult<()>;
     fn on_close(&mut self) -> ChatGPTResult<()>;
+    fn url(&self) -> &str;
     async fn fetch(&mut self) -> ChatGPTResult<()> {
         let api_key = self.get_api_key()?;
         let body = self.get_body()?;
@@ -24,10 +25,7 @@ pub trait FetchRunner {
         let client = reqwest::ClientBuilder::new()
             .default_headers(headers)
             .build()?;
-        let mut es = client
-            .post("https://api.openai.com/v1/chat/completions")
-            .json(&body)
-            .eventsource()?;
+        let mut es = client.post(self.url()).json(&body).eventsource()?;
         while let Some(event) = es.next().await {
             match event {
                 Ok(Event::Open) => self.on_open()?,

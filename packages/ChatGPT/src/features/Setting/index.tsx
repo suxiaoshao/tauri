@@ -11,19 +11,48 @@ import {
 import { Controller, useForm } from 'react-hook-form';
 import { appWindow } from '@tauri-apps/api/window';
 import { useAppSelector } from '../../app/hooks';
-import { ConfigSliceType, Theme } from './configSlice';
+import { Theme } from './configSlice';
 import { Settings } from '@mui/icons-material';
 import { useCallback } from 'react';
 import useConfig from '@chatgpt/hooks/useConfig';
 import useSettingKey from '@chatgpt/hooks/useSettingKey';
-import { createSettingWindow, setConfigSevice } from '@chatgpt/service/config';
+import { createSettingWindow, setConfigService } from '@chatgpt/service/config';
+import * as Yup from 'yup';
+import { yupResolver } from '@hookform/resolvers/yup';
+
+const ThemeSchema = Yup.string().oneOf([Theme.Dark, Theme.Light, Theme.System], 'Invalid theme').default(Theme.System);
+
+const ThemeOptionSchema = Yup.object().shape({
+  theme: ThemeSchema,
+  color: Yup.string()
+    .matches(/^#(?:[0-9a-fA-F]{3}){1,2}$/, 'Invalid color format')
+    .default('#3271ae'),
+});
+
+const ChatGPTConfigSchema = Yup.object().shape({
+  apiKey: Yup.string().nullable(),
+  theme: ThemeOptionSchema.default({
+    /* Default ThemeOption values here */
+  }),
+  url: Yup.string(),
+});
+
+export type ChatGptConfig = Yup.InferType<typeof ChatGPTConfigSchema>;
 
 function Setting() {
   const initData = useAppSelector((state) => state.config);
-  const { register, handleSubmit, control } = useForm<ConfigSliceType>({ defaultValues: initData });
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors },
+  } = useForm<ChatGptConfig>({
+    defaultValues: initData,
+    resolver: yupResolver(ChatGPTConfigSchema),
+  });
 
   const onSubmit = handleSubmit(async (data) => {
-    await setConfigSevice({ data });
+    await setConfigService({ data });
     await appWindow.close();
   });
   return (
@@ -39,13 +68,29 @@ function Setting() {
           justifyContent: 'center',
         }}
       >
-        <TextField required {...register('apiKey', { required: true })} label="openai api key" fullWidth />
+        <TextField
+          required
+          {...register('apiKey', { required: true })}
+          label="openai api key"
+          fullWidth
+          error={!!errors.apiKey?.message}
+          helperText={errors.apiKey?.message}
+        />
         <Controller
           control={control}
           name="theme.theme"
           rules={{ required: true }}
-          render={({ field }) => (
-            <TextField required {...field} label="Theme" select fullWidth sx={{ mt: 2 }}>
+          render={({ field, fieldState }) => (
+            <TextField
+              required
+              {...field}
+              label="Theme"
+              select
+              fullWidth
+              sx={{ mt: 2 }}
+              error={!!fieldState.error?.message}
+              helperText={fieldState.error?.message}
+            >
               <MenuItem value={Theme.Dark}>{Theme.Dark}</MenuItem>
               <MenuItem value={Theme.Light}>{Theme.Light}</MenuItem>
               <MenuItem value={Theme.System}>{Theme.System}</MenuItem>
@@ -53,10 +98,20 @@ function Setting() {
           )}
         />
 
-        <InputLabel htmlFor="color-input" sx={{ mt: 2 }} required>
+        <InputLabel htmlFor="color-input" sx={{ mt: 2 }} required error={!!errors.theme?.color?.message}>
           Color
         </InputLabel>
         <Box component="input" id="color-input" type="color" {...register('theme.color', { required: true })} />
+        <Box sx={{ color: 'error.main' }}>{errors.theme?.color?.message}</Box>
+        <TextField
+          required
+          {...register('url', { required: true })}
+          label="url"
+          fullWidth
+          sx={{ mt: 2 }}
+          error={!!errors.url?.message}
+          helperText={errors.url?.message}
+        />
 
         <Box sx={{ mt: 2, width: '100%', display: 'flex', flexDirection: 'row-reverse' }}>
           <Button variant="contained" type="submit">

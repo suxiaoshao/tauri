@@ -3,12 +3,13 @@ mod fetch;
 use serde_json::Value;
 use tauri::{AppHandle, Invoke, Manager, Runtime};
 
-use crate::store::{Conversation, DbConn, Folder, NewFolder};
+use crate::store::{Conversation, DbConn, Folder, Message, NewFolder};
 use crate::{errors::ChatGPTError, store::NewConversation};
 use crate::{errors::ChatGPTResult, store};
 
 pub struct ChatPlugin;
 mod chat_data;
+mod export;
 
 impl<R: Runtime> tauri::plugin::Plugin<R> for ChatPlugin {
     fn name(&self) -> &'static str {
@@ -30,6 +31,11 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for ChatPlugin {
             update_folder,
             delete_folder,
             move_folder,
+            delete_message,
+            find_message,
+            update_message_content,
+            clear_conversation,
+            export::export,
         ]);
         (handle)(invoke);
     }
@@ -99,6 +105,13 @@ async fn move_conversation(
 }
 
 #[tauri::command]
+async fn clear_conversation(state: tauri::State<'_, DbConn>, id: i32) -> ChatGPTResult<()> {
+    let conn = &mut state.get()?;
+    Conversation::clear(id, conn)?;
+    Ok(())
+}
+
+#[tauri::command]
 async fn move_folder(
     state: tauri::State<'_, DbConn>,
     id: i32,
@@ -106,6 +119,32 @@ async fn move_folder(
 ) -> ChatGPTResult<()> {
     let conn = &mut state.get()?;
     Folder::move_folder(id, parent_id, conn)?;
+    Ok(())
+}
+#[tauri::command]
+async fn delete_message(state: tauri::State<'_, DbConn>, id: i32) -> ChatGPTResult<()> {
+    let conn = &mut state.get()?;
+    store::Message::delete(id, conn)?;
+    Ok(())
+}
+#[tauri::command]
+async fn find_message(state: tauri::State<'_, DbConn>, id: i32) -> ChatGPTResult<Message> {
+    let conn = &mut state.get()?;
+    let message = store::Message::find(id, conn)?;
+    Ok(message)
+}
+#[tauri::command]
+async fn update_message_content<R: Runtime>(
+    app: AppHandle<R>,
+    state: tauri::State<'_, DbConn>,
+    id: i32,
+    content: String,
+) -> ChatGPTResult<()> {
+    let conn = &mut state.get()?;
+    store::Message::update_content(id, content, conn)?;
+    let message = store::Message::find(id, conn)?;
+    let window = app.get_window("main").ok_or(ChatGPTError::WindowNotFound)?;
+    window.emit("message", message)?;
     Ok(())
 }
 
