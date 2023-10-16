@@ -2,7 +2,7 @@ use super::schema::novel;
 use super::schema::novel_tag;
 use super::schema::tag;
 use crate::fetch::parse_novel::{parse_count::NovelCount, Author, Novel, Title};
-use crate::{fetch::parse_novel::parse_url::UrlWithName, store::get_conn};
+use crate::{errors::FeiwenResult, fetch::parse_novel::parse_url::UrlWithName};
 use diesel::prelude::*;
 
 #[derive(Insertable, Queryable, serde::Serialize)]
@@ -22,10 +22,9 @@ pub struct NovelModel {
 }
 
 impl NovelModel {
-    pub fn into_novel(self) -> anyhow::Result<Novel> {
+    pub fn into_novel(self, conn: &mut SqliteConnection) -> FeiwenResult<Novel> {
         use super::schema::novel_tag::dsl as novel_tag_dsl;
         use super::schema::tag::dsl as tag_dsl;
-        let conn = &mut get_conn()?.get()?;
         let tags = tag_dsl::tag
             .left_join(novel_tag_dsl::novel_tag.on(novel_tag_dsl::tag_id.eq_all(tag_dsl::name)))
             .filter(novel_tag_dsl::novel_id.eq(self.id))
@@ -69,10 +68,10 @@ impl NovelModel {
         limit: i64,
         is_limit: bool,
         tag: String,
-    ) -> anyhow::Result<Vec<Novel>> {
+        conn: &mut SqliteConnection,
+    ) -> FeiwenResult<Vec<Novel>> {
         use super::schema::novel::dsl;
         use super::schema::novel_tag::dsl as novel_tag_dsl;
-        let conn = &mut get_conn()?.get()?;
         let data = dsl::novel
             .left_join(novel_tag_dsl::novel_tag.on(novel_tag_dsl::novel_id.eq_all(dsl::id)))
             .filter(dsl::is_limit.eq_all(is_limit))
@@ -95,13 +94,17 @@ impl NovelModel {
             .load::<Self>(conn)?;
         let data = data
             .into_iter()
-            .map(|n| n.into_novel())
+            .map(|n| n.into_novel(conn))
             .collect::<Result<Vec<_>, _>>()?;
         Ok(data)
     }
-    pub fn query(offset: i64, limit: i64, is_limit: bool) -> anyhow::Result<Vec<Novel>> {
+    pub fn query(
+        offset: i64,
+        limit: i64,
+        is_limit: bool,
+        conn: &mut SqliteConnection,
+    ) -> FeiwenResult<Vec<Novel>> {
         use super::schema::novel::dsl;
-        let conn = &mut get_conn()?.get()?;
         let data = dsl::novel
             .filter(dsl::is_limit.eq_all(is_limit))
             .limit(limit)
@@ -109,7 +112,7 @@ impl NovelModel {
             .load::<Self>(conn)?;
         let data = data
             .into_iter()
-            .map(|n| n.into_novel())
+            .map(|n| n.into_novel(conn))
             .collect::<Result<Vec<_>, _>>()?;
         Ok(data)
     }
@@ -145,9 +148,8 @@ pub struct TagModel {
 }
 
 impl TagModel {
-    pub fn all_tags() -> anyhow::Result<Vec<String>> {
+    pub fn all_tags(conn: &mut SqliteConnection) -> FeiwenResult<Vec<String>> {
         use super::schema::tag::dsl::*;
-        let conn = &mut get_conn()?.get()?;
         let data = tag.select(name).load::<String>(conn)?;
         Ok(data)
     }
