@@ -7,7 +7,7 @@ use diesel::{
 
 pub mod model;
 pub mod schema;
-
+pub mod types;
 pub type DbConn = Pool<ConnectionManager<SqliteConnection>>;
 
 pub fn establish_connection(url: &str) -> FeiwenResult<DbConn> {
