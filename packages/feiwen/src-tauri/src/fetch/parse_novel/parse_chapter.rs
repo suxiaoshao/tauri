@@ -7,10 +7,9 @@ use nom::{
 };
 use scraper::{Html, Selector};
 
-use super::{
-    parse_url::{parse_url, UrlWithName},
-    Title,
-};
+use crate::store::types::UrlWithName;
+
+use super::{parse_url::parse_url, Title};
 use lazy_static::lazy_static;
 
 lazy_static! {

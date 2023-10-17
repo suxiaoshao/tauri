@@ -1,10 +1,11 @@
-use std::collections::HashSet;
-
 use lazy_static::lazy_static;
 use scraper::{Html, Selector};
-use serde::{Deserialize, Serialize};
 
-use self::{parse_count::NovelCount, parse_url::UrlWithName};
+use crate::store::{
+    service::Novel,
+    types::{Author, Title},
+};
+
 mod parse_author;
 mod parse_chapter;
 pub mod parse_count;
@@ -19,28 +20,6 @@ lazy_static! {
             .unwrap();
     static ref SELECTOR_DESC: Selector =
         Selector::parse("div.col-xs-12.h5.brief-0 > span.smaller-5").unwrap();
-}
-
-#[derive(Debug, Deserialize, Serialize, Clone)]
-pub struct Novel {
-    pub title: Title,
-    pub author: Author,
-    pub latest_chapter: Title,
-    pub desc: String,
-    pub count: NovelCount,
-    pub tags: HashSet<UrlWithName>,
-    pub is_limit: bool,
-}
-#[derive(Debug, Deserialize, Serialize, Clone)]
-pub struct Title {
-    pub name: String,
-    pub id: i32,
-}
-
-#[derive(Debug, Deserialize, Serialize, Clone)]
-pub enum Author {
-    Anonymous(String),
-    Known(Title),
 }
 
 pub fn parse_page(body: String) -> Vec<Novel> {

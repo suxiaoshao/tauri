@@ -9,7 +9,7 @@
     "tauri": "tauri"
   },
   "dependencies": {
-    "emoji-regex": "^10.2.1",
+    "emoji-regex": "^10.3.0",
     "markdown-to-jsx": "^7.3.2",
     "monaco-editor": "^0.44.0",
     "monaco-themes": "^0.4.4",

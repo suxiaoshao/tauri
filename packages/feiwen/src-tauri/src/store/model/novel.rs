@@ -2,8 +2,11 @@ use diesel::{QueryDsl, SqliteConnection};
 
 use crate::{
     errors::FeiwenResult,
-    fetch::parse_novel::{parse_count::NovelCount, parse_url::UrlWithName, Author, Novel, Title},
-    store::model::tag::TagModel,
+    store::{
+        model::tag::TagModel,
+        service::Novel,
+        types::{Author, NovelCount, Title, UrlWithName},
+    },
 };
 
 use super::super::schema::novel;
@@ -120,13 +123,23 @@ impl NovelModel {
             .collect::<Result<Vec<_>, _>>()?;
         Ok(data)
     }
+    pub fn save(self, conn: &mut SqliteConnection) -> FeiwenResult<()> {
+        diesel::insert_or_ignore_into(novel::table)
+            .values(self)
+            .execute(conn)?;
+        Ok(())
+    }
+    pub fn count(conn: &mut SqliteConnection) -> FeiwenResult<i64> {
+        let count = novel::dsl::novel.count().get_result(conn)?;
+        Ok(count)
+    }
 }
 
-impl From<crate::fetch::parse_novel::Novel> for NovelModel {
-    fn from(value: crate::fetch::parse_novel::Novel) -> Self {
+impl From<Novel> for NovelModel {
+    fn from(value: Novel) -> Self {
         let (author_id, author_name) = match value.author {
-            crate::fetch::parse_novel::Author::Anonymous(name) => (None, name),
-            crate::fetch::parse_novel::Author::Known(Title { name, id }) => (Some(id), name),
+            Author::Anonymous(name) => (None, name),
+            Author::Known(Title { name, id }) => (Some(id), name),
         };
         Self {
             id: value.title.id,

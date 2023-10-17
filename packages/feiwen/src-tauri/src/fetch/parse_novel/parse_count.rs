@@ -8,17 +8,11 @@ use nom::{
     IResult,
 };
 use scraper::{Html, Selector};
-use serde::{Deserialize, Serialize};
+
+use crate::store::types::NovelCount;
 lazy_static! {
     static ref SELECTOR_COUNT: Selector =
         Selector::parse("div.col-xs-12.h5.brief-0 > span.pull-right.smaller-30 > em").unwrap();
-}
-
-#[derive(Debug, Deserialize, Serialize, Clone)]
-pub struct NovelCount {
-    pub word_count: i32,
-    pub read_count: i32,
-    pub reply_count: i32,
 }
 
 pub fn parse_count(doc: &Html) -> Option<NovelCount> {

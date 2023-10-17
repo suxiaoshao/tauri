@@ -8,10 +8,9 @@ use nom::{
 };
 use scraper::{Html, Selector};
 
-use super::{
-    parse_url::{parse_url, UrlWithName},
-    Author, Title,
-};
+use crate::store::types::UrlWithName;
+
+use super::{parse_url::parse_url, Author, Title};
 lazy_static! {
     static ref SELECTOR_AUTHOR: Selector =
         Selector::parse("div:nth-child(1) > span.pull-right.smaller-5 > a").unwrap();

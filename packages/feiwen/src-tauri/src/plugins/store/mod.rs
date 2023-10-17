@@ -1,20 +1,26 @@
 use serde_json::Value;
-use tauri::{AppHandle, Manager, Runtime};
+use tauri::{AppHandle, Invoke, Manager, Runtime};
 
 use crate::{
     errors::{FeiwenError, FeiwenResult},
     store,
 };
+mod fetch;
 
 pub struct StorePlugin;
 
 impl<R: Runtime> tauri::plugin::Plugin<R> for StorePlugin {
     fn name(&self) -> &'static str {
-        "chat"
+        "store"
     }
     fn initialize(&mut self, app: &AppHandle<R>, _: Value) -> tauri::plugin::Result<()> {
         setup(app)?;
         Ok(())
+    }
+    fn extend_api(&mut self, invoke: Invoke<R>) {
+        let handle: Box<dyn Fn(Invoke<R>) + Send + Sync> =
+            Box::new(tauri::generate_handler![fetch::fetch,]);
+        (handle)(invoke);
     }
 }
 

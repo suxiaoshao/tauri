@@ -5,8 +5,8 @@
 
 use errors::FeiwenResult;
 use log::LevelFilter;
-use plugins::LogPlugin;
-use tauri::Manager;
+use plugins::{LogPlugin, WindowPlugin};
+use tauri::{App, WindowBuilder};
 use tauri_plugin_log::LogTarget;
 
 #[macro_use]
@@ -20,11 +20,7 @@ mod store;
 fn main() -> FeiwenResult<()> {
     tauri::Builder::default()
         .setup(|app| {
-            #[cfg(debug_assertions)]
-            {
-                let win = app.get_window("main").unwrap();
-                win.open_devtools();
-            }
+            setup(app)?;
             Ok(())
         })
         .plugin(
@@ -36,6 +32,24 @@ fn main() -> FeiwenResult<()> {
         .plugin(LogPlugin)
         .plugin(tauri_plugin_window_state::Builder::default().build())
         .plugin(plugins::StorePlugin)
+        .plugin(WindowPlugin)
         .run(tauri::generate_context!())?;
+    Ok(())
+}
+
+fn setup(app: &mut App) -> FeiwenResult<()> {
+    let window = WindowBuilder::new(app, "main", tauri::WindowUrl::App("/".into()))
+        .title("废文")
+        .inner_size(800.0, 600.0)
+        .fullscreen(false)
+        .resizable(true)
+        .transparent(true);
+    // #[cfg(target_os = "macos")]
+    // let window = window
+    //     .title_bar_style(tauri::TitleBarStyle::Overlay)
+    //     .hidden_title(true);
+    #[cfg(target_os = "windows")]
+    let window = window.decorations(false);
+    window.build()?;
     Ok(())
 }

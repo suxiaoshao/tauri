@@ -1,21 +1,32 @@
 import { Box, Button, TextField } from '@mui/material';
-import { invoke } from '@tauri-apps/api/tauri';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
+import * as yup from 'yup';
+import { InferType } from 'yup';
+import { fetchData } from '../service/store';
 
-interface FetchInput {
-  url: string;
-  startPage: number;
-  endPage: number;
-  cookies: string;
-}
+const fetchInputSchema = yup.object().shape({
+  url: yup.string().url('URL must be a valid HTTP URL').required('URL is required'),
+  startPage: yup
+    .number()
+    .integer('startPage must be an integer')
+    .min(1, 'startPage must be greater than or equal to 1')
+    .required('startPage is required'),
+  endPage: yup
+    .number()
+    .integer('endPage must be an integer')
+    .min(yup.ref('startPage'), 'endPage must be greater than or equal to startPage')
+    .required('endPage is required'),
+  cookies: yup.string().required('cookies is required'),
+});
+
+export type FetchParams = InferType<typeof fetchInputSchema>;
 
 export default function Fetch() {
   const navigate = useNavigate();
-  const { register, handleSubmit } = useForm<FetchInput>();
-  const onSubmit: SubmitHandler<FetchInput> = async (formData) => {
-    invoke('fetch', { ...formData }).catch(console.error);
-    console.log(formData);
+  const { register, handleSubmit } = useForm<FetchParams>();
+  const onSubmit: SubmitHandler<FetchParams> = async (formData) => {
+    fetchData(formData);
   };
   return (
     <>

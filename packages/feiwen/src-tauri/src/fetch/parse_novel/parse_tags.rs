@@ -2,8 +2,9 @@ use std::collections::HashSet;
 
 use scraper::{ElementRef, Html, Selector};
 
-use super::parse_url::UrlWithName;
 use lazy_static::lazy_static;
+
+use crate::store::types::UrlWithName;
 
 lazy_static! {
     static ref SELECTOR_TAGS: Selector =

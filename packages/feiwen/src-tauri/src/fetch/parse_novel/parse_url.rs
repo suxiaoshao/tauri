@@ -1,11 +1,6 @@
 use scraper::{Html, Selector};
-use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Deserialize, Serialize, Clone, Hash, Eq, PartialEq)]
-pub struct UrlWithName {
-    pub name: String,
-    pub href: String,
-}
+use crate::store::types::UrlWithName;
 
 pub(in crate::fetch::parse_novel) fn parse_url(
     doc: &Html,

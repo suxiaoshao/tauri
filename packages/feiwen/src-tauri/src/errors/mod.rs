@@ -133,4 +133,15 @@ impl From<diesel::r2d2::PoolError> for FeiwenError {
     }
 }
 
+impl From<window_shadows::Error> for FeiwenError {
+    fn from(_: window_shadows::Error) -> Self {
+        Self::Shadow
+    }
+}
+impl From<window_vibrancy::Error> for FeiwenError {
+    fn from(_: window_vibrancy::Error) -> Self {
+        Self::Vibrancy
+    }
+}
+
 pub type FeiwenResult<T> = Result<T, FeiwenError>;
