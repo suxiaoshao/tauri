@@ -1,5 +1,10 @@
 import { defineConfig } from '@rspack/cli';
 import { resolve } from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+export const __filename = fileURLToPath(import.meta.url);
+export const __dirname = dirname(__filename);
 
 const isProduction = process.env.NODE_ENV === 'production';
 const port = 1420;
@@ -9,7 +14,7 @@ const config = defineConfig({
     main: './src/main.tsx',
   },
   output: {
-    clean: isProduction ? true : false,
+    clean: isProduction,
     publicPath: '/',
   },
   builtins: {
@@ -54,8 +59,14 @@ const config = defineConfig({
   },
   devtool: isProduction ? false : undefined,
   resolve: {
-    alias: {
-      '@chatgpt': resolve(process.cwd(), './src'),
+    tsConfig: {
+      configFile: resolve(__dirname, '../../tsconfig.json'),
+      references: 'auto',
+    },
+  },
+  experiments: {
+    rspackFuture: {
+      newResolver: true,
     },
   },
 });
