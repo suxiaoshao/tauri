@@ -8,7 +8,10 @@ use nom::{
 };
 use scraper::{Html, Selector};
 
-use crate::store::types::UrlWithName;
+use crate::{
+    errors::{FeiwenError, FeiwenResult},
+    store::types::UrlWithName,
+};
 
 use super::{parse_url::parse_url, Author, Title};
 lazy_static! {
@@ -18,18 +21,26 @@ lazy_static! {
         Selector::parse("div:nth-child(1) > span.pull-right.smaller-5 > span").unwrap();
 }
 
-pub fn parse_author(doc: &Html) -> Option<Author> {
+pub fn parse_author(doc: &Html) -> FeiwenResult<Author> {
     let value = match parse_url(doc, &SELECTOR_AUTHOR) {
-        Some(UrlWithName { name, href }) => {
-            let (_, id) = parse_author_url(&href).ok()?;
+        Ok(UrlWithName { name, href }) => {
+            let (_, id) = parse_author_url(&href)
+                .map_err(|err| FeiwenError::AuthorIdParse(err.to_string()))?;
             Author::Known(Title { name, id })
         }
-        None => {
-            let author = doc.select(&SELECTOR_AUTHOR_NNONYMOUS).next()?.inner_html();
+        Err(_) => {
+            let author = match doc
+                .select(&SELECTOR_AUTHOR_NNONYMOUS)
+                .next()
+                .ok_or(FeiwenError::AuthorNameParse)
+            {
+                Ok(element) => element.inner_html(),
+                Err(_) => "".to_owned(),
+            };
             Author::Anonymous(author)
         }
     };
-    Some(value)
+    Ok(value)
 }
 
 fn parse_author_url(name: &str) -> IResult<&str, i32> {

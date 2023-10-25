@@ -1,6 +1,6 @@
 -- Your SQL goes here
 create table tag
 (
-    href text not null,
+    id   integer,
     name text not null primary key
 )

@@ -102,10 +102,34 @@ pub enum FeiwenError {
     InvalidModel(String),
     #[error("窗口不存在")]
     WindowNotFound,
-    #[error("conversation path exists:{}",.0)]
-    ConversationPathExists(String),
-    #[error("folder path exists:{}",.0)]
-    FolderPathExists(String),
+    #[error("tag id解析错误:{}",.0)]
+    TagIdParse(
+        #[serde(skip_serializing)]
+        #[from]
+        url::ParseError,
+    ),
+    #[error("desc 解析错误")]
+    DescParse,
+    #[error("href 解析错误")]
+    HrefParse,
+    #[error("novel id 解析错误:{}",.0)]
+    NovelIdParse(String),
+    #[error("author id 解析错误:{}",.0)]
+    AuthorIdParse(String),
+    #[error("author name 解析错误")]
+    AuthorNameParse,
+    #[error("chapter id 解析错误:{}",.0)]
+    ChapterIdParse(String),
+    #[error("count 解析错误")]
+    CountParse,
+    #[error("word count 解析错误")]
+    WordCountParse,
+    #[error("read count 解析错误")]
+    ReadCountParse,
+    #[error("reply count 解析错误")]
+    ReplyCountParse,
+    #[error("count uint 解析错误,{}",.0)]
+    CountUintParse(String),
 }
 
 impl From<tauri::Error> for FeiwenError {

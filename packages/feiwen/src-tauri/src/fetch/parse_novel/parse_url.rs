@@ -1,13 +1,20 @@
 use scraper::{Html, Selector};
 
-use crate::store::types::UrlWithName;
+use crate::{
+    errors::{FeiwenError, FeiwenResult},
+    store::types::UrlWithName,
+};
 
 pub(in crate::fetch::parse_novel) fn parse_url(
     doc: &Html,
     selector: &Selector,
-) -> Option<UrlWithName> {
-    let title = doc.select(selector).next()?;
+) -> FeiwenResult<UrlWithName> {
+    let title = doc.select(selector).next().ok_or(FeiwenError::HrefParse)?;
     let name = title.inner_html();
-    let href = title.value().attr("href")?.to_string();
-    Some(UrlWithName { name, href })
+    let href = title
+        .value()
+        .attr("href")
+        .ok_or(FeiwenError::HrefParse)?
+        .to_string();
+    Ok(UrlWithName { name, href })
 }

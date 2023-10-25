@@ -7,9 +7,11 @@ use crate::{
     errors::{FeiwenError, FeiwenResult},
     store::{
         model::{NovelModel, NovelTagModel, TagModel},
-        types::{Author, NovelCount, Title, UrlWithName},
+        types::{Author, NovelCount, Title},
     },
 };
+
+use super::Tag;
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct Novel {
@@ -18,7 +20,7 @@ pub struct Novel {
     pub latest_chapter: Title,
     pub desc: String,
     pub count: NovelCount,
-    pub tags: HashSet<UrlWithName>,
+    pub tags: HashSet<Tag>,
     pub is_limit: bool,
 }
 
@@ -32,7 +34,7 @@ impl Novel {
         let novel_tags = self
             .tags
             .iter()
-            .map(|UrlWithName { name, .. }| NovelTagModel {
+            .map(|Tag { name, .. }| NovelTagModel {
                 novel_id: self.title.id,
                 tag_id: name.clone(),
             })

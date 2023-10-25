@@ -4,8 +4,8 @@ use crate::{
     errors::FeiwenResult,
     store::{
         model::tag::TagModel,
-        service::Novel,
-        types::{Author, NovelCount, Title, UrlWithName},
+        service::{Novel, Tag},
+        types::{Author, NovelCount, Title},
     },
 };
 
@@ -35,7 +35,7 @@ impl NovelModel {
         let tags = tag_dsl::tag
             .left_join(novel_tag_dsl::novel_tag.on(novel_tag_dsl::tag_id.eq_all(tag_dsl::name)))
             .filter(novel_tag_dsl::novel_id.eq(self.id))
-            .select((tag_dsl::href, tag_dsl::name))
+            .select((tag_dsl::id, tag_dsl::name))
             .load::<TagModel>(conn)?;
         let novel = Novel {
             title: Title {
@@ -62,9 +62,9 @@ impl NovelModel {
             },
             tags: tags
                 .into_iter()
-                .map(|t| UrlWithName {
+                .map(|t| Tag {
                     name: t.name,
-                    href: t.href,
+                    id: t.id,
                 })
                 .collect(),
         };

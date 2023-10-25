@@ -7,7 +7,10 @@ use nom::{
 };
 use scraper::{Html, Selector};
 
-use crate::store::types::UrlWithName;
+use crate::{
+    errors::{FeiwenError, FeiwenResult},
+    store::types::UrlWithName,
+};
 
 use super::{parse_url::parse_url, Title};
 use lazy_static::lazy_static;
@@ -17,10 +20,11 @@ lazy_static! {
         Selector::parse("div.col-xs-12.h5.brief > span.grayout.smaller-20 > a").unwrap();
 }
 
-pub fn parse_chapter(doc: &Html) -> Option<Title> {
+pub fn parse_chapter(doc: &Html) -> FeiwenResult<Title> {
     let UrlWithName { name, href } = parse_url(doc, &SELECTOR_CHAPTER)?;
-    let (_, id) = parse_chapter_url(&href).ok()?;
-    Some(Title { name, id })
+    let (_, id) =
+        parse_chapter_url(&href).map_err(|err| FeiwenError::ChapterIdParse(err.to_string()))?;
+    Ok(Title { name, id })
 }
 
 fn parse_chapter_url(name: &str) -> IResult<&str, i32> {

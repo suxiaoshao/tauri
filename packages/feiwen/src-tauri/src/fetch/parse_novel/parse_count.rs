@@ -9,27 +9,44 @@ use nom::{
 };
 use scraper::{Html, Selector};
 
-use crate::store::types::NovelCount;
+use crate::{
+    errors::{FeiwenError, FeiwenResult},
+    store::types::NovelCount,
+};
 lazy_static! {
     static ref SELECTOR_COUNT: Selector =
         Selector::parse("div.col-xs-12.h5.brief-0 > span.pull-right.smaller-30 > em").unwrap();
 }
 
-pub fn parse_count(doc: &Html) -> Option<NovelCount> {
-    let mut count = doc.select(&SELECTOR_COUNT).next()?.text();
-    let word_count = count.next()?.split('/').next()?;
-    let read_count = count.next()?.split('/').next()?;
-    let reply_count = count.next()?;
+pub fn parse_count(doc: &Html) -> FeiwenResult<NovelCount> {
+    let mut count = doc
+        .select(&SELECTOR_COUNT)
+        .next()
+        .ok_or(FeiwenError::CountParse)?
+        .text();
+    let word_count = count
+        .next()
+        .ok_or(FeiwenError::WordCountParse)?
+        .split('/')
+        .next()
+        .ok_or(FeiwenError::WordCountParse)?;
+    let read_count = count
+        .next()
+        .ok_or(FeiwenError::ReadCountParse)?
+        .split('/')
+        .next()
+        .ok_or(FeiwenError::ReadCountParse)?;
+    let reply_count = count.next().ok_or(FeiwenError::ReplyCountParse)?;
     let word_count = parse_num_with_unit(word_count)?;
     let read_count = parse_num_with_unit(read_count)?;
     let reply_count = parse_num_with_unit(reply_count)?;
-    Some(NovelCount {
+    Ok(NovelCount {
         word_count,
         read_count,
         reply_count,
     })
 }
-fn parse_num_with_unit(num: &str) -> Option<i32> {
+fn parse_num_with_unit(num: &str) -> FeiwenResult<i32> {
     fn inner_parse(num: &str) -> IResult<&str, i32> {
         #[derive(Clone, Copy)]
         enum Flag {
@@ -50,6 +67,6 @@ fn parse_num_with_unit(num: &str) -> Option<i32> {
         };
         Ok((input, num as i32))
     }
-    let (_, num) = inner_parse(num).ok()?;
-    Some(num)
+    let (_, num) = inner_parse(num).map_err(|err| FeiwenError::CountUintParse(err.to_string()))?;
+    Ok(num)
 }

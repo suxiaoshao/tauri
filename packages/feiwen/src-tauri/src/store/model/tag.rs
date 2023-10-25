@@ -1,11 +1,11 @@
-use crate::{errors::FeiwenResult, store::types::UrlWithName};
+use crate::{errors::FeiwenResult, store::service::Tag};
 
 use super::super::schema::tag;
 use diesel::prelude::*;
 #[derive(Queryable, Insertable, Debug)]
 #[diesel(table_name = tag)]
 pub struct TagModel {
-    pub href: String,
+    pub id: Option<i32>,
     pub name: String,
 }
 
@@ -14,18 +14,6 @@ impl TagModel {
         let data = tag::table.select(tag::name).load::<String>(conn)?;
         Ok(data)
     }
-}
-
-impl From<&UrlWithName> for TagModel {
-    fn from(value: &UrlWithName) -> Self {
-        Self {
-            href: value.href.clone(),
-            name: value.name.clone(),
-        }
-    }
-}
-
-impl TagModel {
     pub fn save(tags: Vec<TagModel>, conn: &mut SqliteConnection) -> FeiwenResult<()> {
         diesel::insert_or_ignore_into(tag::table)
             .values(tags)
@@ -33,3 +21,14 @@ impl TagModel {
         Ok(())
     }
 }
+
+impl From<&Tag> for TagModel {
+    fn from(url: &Tag) -> Self {
+        Self {
+            id: url.id,
+            name: url.name.clone(),
+        }
+    }
+}
+
+impl TagModel {}

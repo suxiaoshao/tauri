@@ -8,9 +8,6 @@ use log::LevelFilter;
 use plugins::{LogPlugin, WindowPlugin};
 use tauri::{App, WindowBuilder};
 use tauri_plugin_log::LogTarget;
-
-#[macro_use]
-extern crate diesel;
 mod errors;
 pub mod fetch;
 pub mod plugins;

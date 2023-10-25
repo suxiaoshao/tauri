@@ -37,6 +37,6 @@ async fn fetch_one(
     client: &Client,
 ) -> FeiwenResult<Vec<Novel>> {
     let body = get_content::get_content(url, page, cookies, client).await?;
-    let data = parse_page(body);
+    let data = parse_page(body)?;
     Ok(data)
 }
