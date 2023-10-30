@@ -1,9 +1,9 @@
 use serde_json::Value;
-use tauri::{AppHandle, Invoke, Manager, Runtime};
+use tauri::{AppHandle, Invoke, Manager, Runtime, State};
 
 use crate::{
     errors::{FeiwenError, FeiwenResult},
-    store,
+    store::{self, service::Tag, DbConn},
 };
 mod fetch;
 
@@ -19,7 +19,7 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for StorePlugin {
     }
     fn extend_api(&mut self, invoke: Invoke<R>) {
         let handle: Box<dyn Fn(Invoke<R>) + Send + Sync> =
-            Box::new(tauri::generate_handler![fetch::fetch,]);
+            Box::new(tauri::generate_handler![fetch::fetch, get_tags]);
         (handle)(invoke);
     }
 }
@@ -37,4 +37,9 @@ fn setup<R: Runtime>(app: &AppHandle<R>) -> FeiwenResult<()> {
     let conn = store::establish_connection(&data_path)?;
     app.manage(conn);
     Ok(())
+}
+#[tauri::command(async)]
+async fn get_tags(state: State<'_, DbConn>) -> FeiwenResult<Vec<Tag>> {
+    let conn = &mut state.get()?;
+    Tag::tags(conn)
 }

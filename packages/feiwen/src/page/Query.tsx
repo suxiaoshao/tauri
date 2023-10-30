@@ -1,5 +1,5 @@
+import { getTags } from '@feiwen/service/store';
 import { Box, Button } from '@mui/material';
-import { invoke } from '@tauri-apps/api';
 import { useNavigate } from 'react-router-dom';
 
 export default function Query() {
@@ -9,7 +9,7 @@ export default function Query() {
       Home<Button onClick={() => navigate('/fetch')}>获取数据</Button>
       <Button
         onClick={async () => {
-          const data = await invoke<string[]>('tags');
+          const data = await getTags();
           console.log(data);
         }}
       >

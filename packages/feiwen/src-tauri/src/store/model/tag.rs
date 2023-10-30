@@ -1,7 +1,9 @@
 use crate::{errors::FeiwenResult, store::service::Tag};
 
-use super::super::schema::tag;
-use diesel::prelude::*;
+use super::super::schema::{novel_tag, tag};
+use diesel::dsl::count;
+use diesel::{prelude::*, QueryDsl};
+
 #[derive(Queryable, Insertable, Debug)]
 #[diesel(table_name = tag)]
 pub struct TagModel {
@@ -10,8 +12,13 @@ pub struct TagModel {
 }
 
 impl TagModel {
-    pub fn all_tags(conn: &mut SqliteConnection) -> FeiwenResult<Vec<String>> {
-        let data = tag::table.select(tag::name).load::<String>(conn)?;
+    pub fn all_tags(conn: &mut SqliteConnection) -> FeiwenResult<Vec<Self>> {
+        let data = tag::table
+            .inner_join(novel_tag::table.on(tag::name.eq(novel_tag::tag_id)))
+            .select((tag::id, tag::name))
+            .group_by(tag::name)
+            .order(count(novel_tag::tag_id).desc())
+            .load(conn)?;
         Ok(data)
     }
     pub fn save(tags: Vec<TagModel>, conn: &mut SqliteConnection) -> FeiwenResult<()> {
@@ -30,5 +37,3 @@ impl From<&Tag> for TagModel {
         }
     }
 }
-
-impl TagModel {}
