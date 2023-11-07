@@ -1,8 +1,20 @@
+/*
+ * @Author: suxiaoshao suxiaoshao@gmail.com
+ * @Date: 2023-09-06 17:14:35
+ * @LastEditors: suxiaoshao suxiaoshao@gmail.com
+ * @LastEditTime: 2023-11-07 12:25:51
+ * @FilePath: /tauri/packages/ChatGPT/src/features/Conversations/index.tsx
+ */
 import { ChevronRight, ExpandMore } from '@mui/icons-material';
-import { selectChatData, selectSelectedNodeId, setSelected } from '@chatgpt/features/Conversations/conversationSlice';
+import {
+  fetchConversations,
+  selectChatData,
+  selectSelectedNodeId,
+  setSelected,
+} from '@chatgpt/features/Conversations/conversationSlice';
 import { useAppDispatch, useAppSelector } from '@chatgpt/app/hooks';
-import { useCallback } from 'react';
-import { TreeView } from '@mui/lab';
+import { useCallback, useEffect } from 'react';
+import { TreeView } from '@mui/x-tree-view';
 import FolderItem from './components/FolderItem';
 import ConversationItem from './components/ConversationItem';
 import { getSelectedFromNodeId } from '@chatgpt/utils/chatData';
@@ -17,6 +29,9 @@ export default function ConversationTree() {
     },
     [dispatch],
   );
+  useEffect(() => {
+    dispatch(fetchConversations());
+  }, [dispatch]);
   return (
     <TreeView
       aria-label="file system navigator"

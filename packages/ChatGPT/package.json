@@ -9,6 +9,7 @@
     "tauri": "tauri"
   },
   "dependencies": {
+    "@mui/x-tree-view": "^6.17.0",
     "emoji-regex": "^10.3.0",
     "markdown-to-jsx": "^7.3.2",
     "monaco-editor": "^0.44.0",
@@ -22,6 +23,7 @@
   },
   "devDependencies": {
     "@types/prismjs": "^1.26.2",
-    "@types/react-resizable": "^3.0.6"
+    "@types/react-resizable": "^3.0.6",
+    "monaco-editor-webpack-plugin": "^7.1.0"
   }
 }

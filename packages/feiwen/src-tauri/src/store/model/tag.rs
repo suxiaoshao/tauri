@@ -12,12 +12,18 @@ pub struct TagModel {
 }
 
 impl TagModel {
-    pub fn all_tags(conn: &mut SqliteConnection) -> FeiwenResult<Vec<Self>> {
+    pub fn all_tags(
+        offset: i64,
+        limit: i64,
+        conn: &mut SqliteConnection,
+    ) -> FeiwenResult<Vec<Self>> {
         let data = tag::table
             .inner_join(novel_tag::table.on(tag::name.eq(novel_tag::tag_id)))
             .select((tag::id, tag::name))
             .group_by(tag::name)
             .order(count(novel_tag::tag_id).desc())
+            .offset(offset)
+            .limit(limit)
             .load(conn)?;
         Ok(data)
     }

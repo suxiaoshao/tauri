@@ -19,8 +19,8 @@ impl From<TagModel> for Tag {
 }
 
 impl Tag {
-    pub fn tags(conn: &mut SqliteConnection) -> FeiwenResult<Vec<Self>> {
-        let tags = TagModel::all_tags(conn)?;
+    pub fn tags(offset: i64, limit: i64, conn: &mut SqliteConnection) -> FeiwenResult<Vec<Self>> {
+        let tags = TagModel::all_tags(offset, limit, conn)?;
         let tags = tags
             .into_iter()
             .map(|tag| tag.into())

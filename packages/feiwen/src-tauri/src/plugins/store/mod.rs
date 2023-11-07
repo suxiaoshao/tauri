@@ -39,7 +39,14 @@ fn setup<R: Runtime>(app: &AppHandle<R>) -> FeiwenResult<()> {
     Ok(())
 }
 #[tauri::command(async)]
-async fn get_tags(state: State<'_, DbConn>) -> FeiwenResult<Vec<Tag>> {
+async fn get_tags(
+    state: State<'_, DbConn>,
+    page: Option<i64>,
+    page_size: Option<i64>,
+) -> FeiwenResult<Vec<Tag>> {
+    let page = page.unwrap_or(1);
+    let page_size = page_size.unwrap_or(50);
+    let offset = (page - 1) * page_size;
     let conn = &mut state.get()?;
-    Tag::tags(conn)
+    Tag::tags(offset, page_size, conn)
 }
