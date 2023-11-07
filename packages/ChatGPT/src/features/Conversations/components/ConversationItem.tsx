@@ -1,6 +1,13 @@
+/*
+ * @Author: suxiaoshao suxiaoshao@gmail.com
+ * @Date: 2023-09-06 17:14:35
+ * @LastEditors: suxiaoshao suxiaoshao@gmail.com
+ * @LastEditTime: 2023-11-07 11:34:06
+ * @FilePath: /tauri/packages/ChatGPT/src/features/Conversations/components/ConversationItem.tsx
+ */
 import { Conversation } from '@chatgpt/types/conversation';
 import { getNodeIdByConversation } from '@chatgpt/utils/chatData';
-import { TreeItem } from '@mui/lab';
+import { TreeItem } from '@mui/x-tree-view';
 import { Avatar, Box, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 

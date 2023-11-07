@@ -26,7 +26,7 @@ export type ConversationForm = InferType<typeof conversationSchema>;
 
 const DefaultValues: Partial<NewConversation> = {
   mode: Mode.Contextual,
-  model: Model.Gpt35_0613,
+  model: Model.Gpt35,
   temperature: 1,
   topP: 1,
   n: 1,
@@ -111,16 +111,11 @@ export default function ConversationEdit({ initialValues, id, sx, onSubmit: subm
             sx={{ mt: 2 }}
             {...field}
           >
-            <MenuItem value={Model.Gpt35}>{Model.Gpt35}</MenuItem>
-            <MenuItem value={Model.Gpt35_0301}>{Model.Gpt35_0301}</MenuItem>
-            <MenuItem value={Model.Gpt35_0613}>{Model.Gpt35_0613}</MenuItem>
-            <MenuItem value={Model.Gpt35_16k}>{Model.Gpt35_16k}</MenuItem>
-            <MenuItem value={Model.Gpt35_16k0613}>{Model.Gpt35_16k0613}</MenuItem>
-            <MenuItem value={Model.Gpt35instruct}>{Model.Gpt35instruct}</MenuItem>
-            <MenuItem value={Model.Gpt35instruct0914}>{Model.Gpt35instruct0914}</MenuItem>
-            <MenuItem value={Model.Gpt4}>{Model.Gpt4}</MenuItem>
-            <MenuItem value={Model.Gpt4_0301}>{Model.Gpt4_0301}</MenuItem>
-            <MenuItem value={Model.Gpt4_0613}>{Model.Gpt4_0613}</MenuItem>
+            {Object.values(Model).map((model) => (
+              <MenuItem key={model} value={model}>
+                {model}
+              </MenuItem>
+            ))}
           </TextField>
         )}
       />

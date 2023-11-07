@@ -1,4 +1,6 @@
-table! {
+// @generated automatically by Diesel CLI.
+
+diesel::table! {
     novel (id) {
         id -> Integer,
         name -> Text,
@@ -14,21 +16,21 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     novel_tag (novel_id, tag_id) {
         novel_id -> Integer,
         tag_id -> Text,
     }
 }
 
-table! {
+diesel::table! {
     tag (name) {
-        href -> Text,
+        id -> Nullable<Integer>,
         name -> Text,
     }
 }
 
-allow_tables_to_appear_in_same_query!(
+diesel::allow_tables_to_appear_in_same_query!(
     novel,
     novel_tag,
     tag,

@@ -50,14 +50,7 @@
     "updater": {
       "active": false
     },
-    "windows": [
-      {
-        "fullscreen": false,
-        "height": 600,
-        "resizable": true,
-        "title": "废文",
-        "width": 800
-      }
-    ]
+    "windows": [],
+    "macOSPrivateApi": true
   }
 }

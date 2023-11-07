@@ -1,10 +1,14 @@
-use std::collections::HashSet;
-
 use lazy_static::lazy_static;
 use scraper::{Html, Selector};
-use serde::{Deserialize, Serialize};
 
-use self::{parse_count::NovelCount, parse_url::UrlWithName};
+use crate::{
+    errors::{FeiwenError, FeiwenResult},
+    store::{
+        service::Novel,
+        types::{Author, Title},
+    },
+};
+
 mod parse_author;
 mod parse_chapter;
 pub mod parse_count;
@@ -21,47 +25,29 @@ lazy_static! {
         Selector::parse("div.col-xs-12.h5.brief-0 > span.smaller-5").unwrap();
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone)]
-pub struct Novel {
-    pub title: Title,
-    pub author: Author,
-    pub latest_chapter: Title,
-    pub desc: String,
-    pub count: NovelCount,
-    pub tags: HashSet<UrlWithName>,
-    pub is_limit: bool,
-}
-#[derive(Debug, Deserialize, Serialize, Clone)]
-pub struct Title {
-    pub name: String,
-    pub id: i32,
-}
-
-#[derive(Debug, Deserialize, Serialize, Clone)]
-pub enum Author {
-    Anonymous(String),
-    Known(Title),
-}
-
-pub fn parse_page(body: String) -> Vec<Novel> {
+pub fn parse_page(body: String) -> FeiwenResult<Vec<Novel>> {
     let document = Html::parse_document(&body);
     let novels = document
         .select(&SELECTOR_ARTICLE)
         .map(|x| Html::parse_document(&x.inner_html()))
-        .filter_map(parse_novel)
-        .collect::<Vec<_>>();
-    novels
+        .map(parse_novel)
+        .collect::<FeiwenResult<Vec<_>>>()?;
+    Ok(novels)
 }
 
-fn parse_novel(doc: Html) -> Option<Novel> {
+fn parse_novel(doc: Html) -> FeiwenResult<Novel> {
     let title = parse_title::parse_title(&doc)?;
     let author = parse_author::parse_author(&doc)?;
     let latest_chapter = parse_chapter::parse_chapter(&doc)?;
-    let desc = doc.select(&SELECTOR_DESC).next()?.inner_html();
+    let desc = doc
+        .select(&SELECTOR_DESC)
+        .next()
+        .ok_or(FeiwenError::DescParse)?
+        .inner_html();
     let count = parse_count::parse_count(&doc)?;
-    let tags = parse_tags::parse_tags(&doc);
+    let tags = parse_tags::parse_tags(&doc)?;
     let is_limit = doc.select(&SELECTOR_RAT).next().is_some();
-    Some(Novel {
+    Ok(Novel {
         title,
         author,
         latest_chapter,

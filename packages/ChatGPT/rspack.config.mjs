@@ -1,5 +1,18 @@
+/*
+ * @Author: suxiaoshao suxiaoshao@gmail.com
+ * @Date: 2023-10-13 12:58:34
+ * @LastEditors: suxiaoshao suxiaoshao@gmail.com
+ * @LastEditTime: 2023-11-07 11:38:39
+ * @FilePath: /tauri/packages/ChatGPT/rspack.config.mjs
+ */
 import { defineConfig } from '@rspack/cli';
 import { resolve } from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import MonacoWebpackPlugin from 'monaco-editor-webpack-plugin';
+
+export const __filename = fileURLToPath(import.meta.url);
+export const __dirname = dirname(__filename);
 
 const isProduction = process.env.NODE_ENV === 'production';
 const port = 1420;
@@ -9,7 +22,7 @@ const config = defineConfig({
     main: './src/main.tsx',
   },
   output: {
-    clean: isProduction ? true : false,
+    clean: isProduction,
     publicPath: '/',
   },
   builtins: {
@@ -54,9 +67,16 @@ const config = defineConfig({
   },
   devtool: isProduction ? false : undefined,
   resolve: {
-    alias: {
-      '@chatgpt': resolve(process.cwd(), './src'),
+    tsConfig: {
+      configFile: resolve(__dirname, '../../tsconfig.json'),
+      references: 'auto',
     },
   },
+  experiments: {
+    rspackFuture: {
+      newResolver: true,
+    },
+  },
+  plugins: [new MonacoWebpackPlugin()],
 });
 export default config;

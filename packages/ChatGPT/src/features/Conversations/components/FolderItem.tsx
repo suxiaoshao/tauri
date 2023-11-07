@@ -1,5 +1,12 @@
+/*
+ * @Author: suxiaoshao suxiaoshao@gmail.com
+ * @Date: 2023-09-06 17:14:35
+ * @LastEditors: suxiaoshao suxiaoshao@gmail.com
+ * @LastEditTime: 2023-11-07 11:34:33
+ * @FilePath: /tauri/packages/ChatGPT/src/features/Conversations/components/FolderItem.tsx
+ */
 import { Folder } from '@chatgpt/types/folder';
-import { TreeItem } from '@mui/lab';
+import { TreeItem } from '@mui/x-tree-view';
 import ConversationItem from './ConversationItem';
 import { getNodeIdByFolder } from '@chatgpt/utils/chatData';
 import { Box, Typography } from '@mui/material';

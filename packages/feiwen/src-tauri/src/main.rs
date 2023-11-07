@@ -3,55 +3,50 @@
     windows_subsystem = "windows"
 )]
 
-use fetch::parse_novel::Novel;
-use store::model::{NovelModel, TagModel};
-use tauri::Manager;
-
-#[macro_use]
-extern crate diesel;
+use errors::FeiwenResult;
+use log::LevelFilter;
+use plugins::{LogPlugin, WindowPlugin};
+use tauri::{App, WindowBuilder};
+use tauri_plugin_log::LogTarget;
+mod errors;
 pub mod fetch;
+pub mod plugins;
 mod query;
 mod store;
 
-fn main() -> anyhow::Result<()> {
+fn main() -> FeiwenResult<()> {
     tauri::Builder::default()
         .setup(|app| {
-            #[cfg(debug_assertions)]
-            {
-                let win = app.get_window("main").unwrap();
-                win.open_devtools();
-            }
+            setup(app)?;
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![fetch, tags, query])
+        .plugin(
+            tauri_plugin_log::Builder::default()
+                .level(LevelFilter::Info)
+                .targets([LogTarget::LogDir, LogTarget::Stdout, LogTarget::Webview])
+                .build(),
+        )
+        .plugin(LogPlugin)
+        .plugin(tauri_plugin_window_state::Builder::default().build())
+        .plugin(plugins::StorePlugin)
+        .plugin(WindowPlugin)
         .run(tauri::generate_context!())?;
     Ok(())
 }
 
-#[tauri::command(async)]
-async fn fetch(url: String, start_page: u32, end_page: u32, cookies: String) -> Result<(), String> {
-    fetch::fetch_many(url, start_page, end_page, cookies)
-        .await
-        .map_err(|e| e.to_string())?;
+fn setup(app: &mut App) -> FeiwenResult<()> {
+    let window = WindowBuilder::new(app, "main", tauri::WindowUrl::App("/".into()))
+        .title("废文")
+        .inner_size(800.0, 600.0)
+        .fullscreen(false)
+        .resizable(true)
+        .transparent(true);
+    // #[cfg(target_os = "macos")]
+    // let window = window
+    //     .title_bar_style(tauri::TitleBarStyle::Overlay)
+    //     .hidden_title(true);
+    #[cfg(target_os = "windows")]
+    let window = window.decorations(false);
+    window.build()?;
     Ok(())
-}
-#[tauri::command(async)]
-async fn tags() -> Result<Vec<String>, String> {
-    TagModel::all_tags().map_err(|x| x.to_string())
-}
-#[tauri::command(async)]
-async fn query(
-    offset: Option<i64>,
-    limit: Option<i64>,
-    is_limit: bool,
-    tag: Option<String>,
-) -> Result<Vec<Novel>, String> {
-    let offset = offset.unwrap_or(0);
-    let limit = limit.unwrap_or(100);
-    let limit = if limit > 100 { 100 } else { limit };
-    match tag {
-        Some(tag) => NovelModel::query_with_tag(offset, limit, is_limit, tag),
-        None => NovelModel::query(offset, limit, is_limit),
-    }
-    .map_err(|x| x.to_string())
 }

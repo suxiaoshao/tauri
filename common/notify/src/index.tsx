@@ -1,13 +1,30 @@
+/*
+ * @Author: suxiaoshao suxiaoshao@gmail.com
+ * @Date: 2023-08-09 16:54:34
+ * @LastEditors: suxiaoshao suxiaoshao@gmail.com
+ * @LastEditTime: 2023-11-07 12:29:28
+ * @FilePath: /tauri/common/notify/src/index.tsx
+ */
 import { IconButton } from '@mui/material';
 import { OptionsObject, SnackbarMessage, useSnackbar, SnackbarProvider as SourceSnackbarProvider } from 'notistack';
 import { ReactNode, useEffect, useRef } from 'react';
 import { Subject } from 'rxjs';
 import { Close } from '@mui/icons-material';
+import { isPermissionGranted, requestPermission, sendNotification } from '@tauri-apps/api/notification';
 
 export type SnackbarData = [SnackbarMessage, OptionsObject?];
 const snackbarSubject = new Subject<SnackbarData>();
-export function enqueueSnackbar(...data: SnackbarData) {
+export async function enqueueSnackbar(...data: SnackbarData) {
   snackbarSubject.next(data);
+  let permissionGranted = await isPermissionGranted();
+  if (!permissionGranted) {
+    const permission = await requestPermission();
+    permissionGranted = permission === 'granted';
+  }
+  if (permissionGranted) {
+    sendNotification('Tauri is awesome!');
+    sendNotification({ title: 'TAURI', body: 'Tauri is awesome!' });
+  }
 }
 function useSnackbarInit() {
   const { enqueueSnackbar: open } = useSnackbar();

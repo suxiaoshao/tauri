@@ -6,10 +6,12 @@ use nom::{
 };
 use scraper::{Html, Selector};
 
-use super::{
-    parse_url::{parse_url, UrlWithName},
-    Title,
+use crate::{
+    errors::{FeiwenError, FeiwenResult},
+    store::types::UrlWithName,
 };
+
+use super::{parse_url::parse_url, Title};
 use lazy_static::lazy_static;
 
 lazy_static! {
@@ -17,10 +19,11 @@ lazy_static! {
         Selector::parse("div:nth-child(1) > span:nth-child(1) > a").unwrap();
 }
 
-pub fn parse_title(doc: &Html) -> Option<Title> {
+pub fn parse_title(doc: &Html) -> FeiwenResult<Title> {
     let UrlWithName { name, href } = parse_url(doc, &SELECTOR_NOVEL)?;
-    let (_, id) = parse_novel_url(&href).ok()?;
-    Some(Title { name, id })
+    let (_, id) =
+        parse_novel_url(&href).map_err(|err| FeiwenError::NovelIdParse(err.to_string()))?;
+    Ok(Title { name, id })
 }
 
 fn parse_novel_url(name: &str) -> IResult<&str, i32> {

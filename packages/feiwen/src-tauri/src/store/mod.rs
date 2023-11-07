@@ -1,83 +1,46 @@
-use crate::fetch::parse_novel::{parse_url::UrlWithName, Novel};
-use anyhow::Ok;
+use crate::errors::{FeiwenError, FeiwenResult};
 use diesel::{
+    connection::SimpleConnection,
     r2d2::{ConnectionManager, Pool},
-    QueryDsl, RunQueryDsl, SqliteConnection,
+    SqliteConnection,
 };
-use std::path::PathBuf;
-
-use self::model::NovelTagModel;
 
 pub mod model;
 pub mod schema;
+pub mod service;
+pub mod types;
+pub type DbConn = Pool<ConnectionManager<SqliteConnection>>;
 
-pub fn get_data_path() -> anyhow::Result<PathBuf> {
-    let path = tauri::api::path::data_dir().ok_or_else(|| anyhow::anyhow!("获取路径错误"))?;
-    std::fs::create_dir_all(&path)?;
-    let path = path.join("feiwen/data.sqlite");
-    Ok(path)
-}
-type SqlitePool = Pool<ConnectionManager<SqliteConnection>>;
-
-pub fn get_conn() -> anyhow::Result<SqlitePool> {
-    let path = get_data_path()?;
-    let path = path.to_str().ok_or_else(|| anyhow::anyhow!("路径错误"))?;
-    let manager = ConnectionManager::<SqliteConnection>::new(path);
-    // Refer to the `r2d2` documentation for more methods to use
-    // when building a connection pool
+pub fn establish_connection(url: &str) -> FeiwenResult<DbConn> {
+    let not_exists = check_data_file(url)?;
+    let manager = ConnectionManager::<SqliteConnection>::new(url);
     let pool = Pool::builder().test_on_check_out(true).build(manager)?;
+    if not_exists {
+        create_tables(&pool)?;
+    }
     Ok(pool)
 }
 
-pub struct StoreManager {
-    conn: SqlitePool,
+fn check_data_file(url: &str) -> FeiwenResult<bool> {
+    use std::{fs::File, path::Path};
+    let path = Path::new(url);
+    if !path.exists() {
+        std::fs::create_dir_all(path.parent().ok_or(FeiwenError::Path)?)?;
+        File::create(path)?;
+        return Ok(true);
+    }
+    Ok(false)
 }
-
-impl StoreManager {
-    pub fn new() -> anyhow::Result<Self> {
-        let conn = get_conn()?;
-        Ok(Self { conn })
-    }
-    pub fn add_novels(&self, novels: Vec<Novel>) -> anyhow::Result<()> {
-        for data in novels {
-            self.add_novel(data)?;
-        }
-        Ok(())
-    }
-    fn add_novel(&self, data: Novel) -> anyhow::Result<()> {
-        use schema::novel;
-        use schema::novel_tag;
-        use schema::tag;
-        let tags = data
-            .tags
-            .iter()
-            .map(|tag| tag.into())
-            .collect::<Vec<crate::store::model::TagModel>>();
-        let novel_tags = data
-            .tags
-            .iter()
-            .map(|UrlWithName { name, .. }| NovelTagModel {
-                novel_id: data.title.id,
-                tag_id: name.clone(),
-            })
-            .collect::<Vec<NovelTagModel>>();
-        let data: model::NovelModel = data.into();
-        let conn = &mut self.conn.get()?;
-        diesel::insert_or_ignore_into(novel::table)
-            .values(&data)
-            .execute(conn)?;
-        diesel::insert_or_ignore_into(tag::table)
-            .values(&tags)
-            .execute(conn)?;
-        diesel::insert_or_ignore_into(novel_tag::table)
-            .values(&novel_tags)
-            .execute(conn)?;
-        Ok(())
-    }
-    pub fn len(&self) -> anyhow::Result<i64> {
-        use schema::novel::dsl::*;
-        let conn = &mut self.conn.get()?;
-        let data = novel.count().get_result(conn)?;
-        Ok(data)
-    }
+fn create_tables(conn: &DbConn) -> FeiwenResult<()> {
+    let conn = &mut conn.get()?;
+    conn.batch_execute(include_str!(
+        "../../migrations/2022-05-15-162950_novel/up.sql"
+    ))?;
+    conn.batch_execute(include_str!(
+        "../../migrations/2022-05-15-163112_tag/up.sql"
+    ))?;
+    conn.batch_execute(include_str!(
+        "../../migrations/2022-05-16-064913_novel_tag/up.sql"
+    ))?;
+    Ok(())
 }

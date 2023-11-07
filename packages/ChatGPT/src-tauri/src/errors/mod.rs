@@ -1,97 +1,42 @@
+use serde::{ser::SerializeStruct, Serialize, Serializer};
 use thiserror::Error;
 
-#[derive(Error, Debug, serde::Serialize)]
+#[derive(Error, Debug)]
 pub enum ChatGPTError {
     #[error("获取不了配置路径")]
     ConfigPath,
     #[error("初始化错误:{}",.0)]
-    Setup(
-        #[serde(skip_serializing)]
-        #[source]
-        tauri::Error,
-    ),
+    Setup(#[source] tauri::Error),
     #[error("tauri错误:{}",.0)]
-    Tauri(
-        #[serde(skip_serializing)]
-        #[source]
-        tauri::Error,
-    ),
+    Tauri(#[source] tauri::Error),
     #[error("数据库错误:{}",.0)]
-    Sqlite(
-        #[serde(skip_serializing)]
-        #[source]
-        diesel::result::Error,
-    ),
+    Sqlite(#[source] diesel::result::Error),
     #[error("数据库连接错误:{}",.0)]
-    Connection(
-        #[serde(skip_serializing)]
-        #[source]
-        diesel::ConnectionError,
-    ),
+    Connection(#[source] diesel::ConnectionError),
     #[error("数据库连接池错误:{}",.0)]
-    Pool(
-        #[serde(skip_serializing)]
-        #[source]
-        diesel::r2d2::PoolError,
-    ),
+    Pool(#[source] diesel::r2d2::PoolError),
     #[error("数据库连接池获取链接错误:{}",.0)]
-    GetConnection(
-        #[serde(skip_serializing)]
-        #[from]
-        diesel::r2d2::Error,
-    ),
+    GetConnection(#[from] diesel::r2d2::Error),
     #[error("文件系统错误:{}",.0)]
-    Fs(
-        #[serde(skip_serializing)]
-        #[from]
-        std::io::Error,
-    ),
+    Fs(#[from] std::io::Error),
     #[error("页面shadow错误")]
     Shadow,
     #[error("页面透明效果错误")]
     Vibrancy,
     #[error("请求头构造错误:{}",.0)]
-    HeaderParse(
-        #[serde(skip_serializing)]
-        #[from]
-        reqwest::header::InvalidHeaderValue,
-    ),
+    HeaderParse(#[from] reqwest::header::InvalidHeaderValue),
     #[error("请求错误:{}",.0)]
-    Request(
-        #[serde(skip_serializing)]
-        #[from]
-        reqwest::Error,
-    ),
+    Request(#[from] reqwest::Error),
     #[error("toml解析错误:{}",.0)]
-    TomlParse(
-        #[serde(skip_serializing)]
-        #[from]
-        toml::de::Error,
-    ),
+    TomlParse(#[from] toml::de::Error),
     #[error("toml序列化错误:{}",.0)]
-    TomlSerialize(
-        #[serde(skip_serializing)]
-        #[from]
-        toml::ser::Error,
-    ),
+    TomlSerialize(#[from] toml::ser::Error),
     #[error("notify watcher错误:{}",.0)]
-    Notify(
-        #[serde(skip_serializing)]
-        #[from]
-        notify::Error,
-    ),
+    Notify(#[from] notify::Error),
     #[error("eventsource错误:{}",.0)]
-    EventSource(
-        #[serde(skip_serializing)]
-        #[from]
-        reqwest_eventsource::CannotCloneRequestError,
-    ),
+    EventSource(#[from] reqwest_eventsource::CannotCloneRequestError),
     #[error("serde_json错误:{}",.0)]
-    SerdeJson(
-        #[serde(skip_serializing)]
-        #[from]
-        serde_json::Error,
-    ),
+    SerdeJson(#[from] serde_json::Error),
     #[error("api key未设置")]
     ApiKeyNotSet,
     #[error("无父文件夹")]
@@ -105,11 +50,7 @@ pub enum ChatGPTError {
     #[error("无效的消息状态:{}",.0)]
     InvalidMessageStatus(String),
     #[error("无效的时间格式:{}",.0)]
-    InvalidTimeFormat(
-        #[serde(skip_serializing)]
-        #[from]
-        time::error::IndeterminateOffset,
-    ),
+    InvalidTimeFormat(#[from] time::error::IndeterminateOffset),
     #[error("无效的 model:{}",.0)]
     InvalidModel(String),
     #[error("窗口不存在")]
@@ -119,11 +60,113 @@ pub enum ChatGPTError {
     #[error("folder path exists:{}",.0)]
     FolderPathExists(String),
     #[error("csv 解析失败:{}",.0)]
-    CsvParse(
-        #[serde(skip_serializing)]
-        #[from]
-        csv::Error,
-    ),
+    CsvParse(#[from] csv::Error),
+}
+
+impl Serialize for ChatGPTError {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut state = serializer.serialize_struct("ChatGPTError", 3)?;
+        state.serialize_field("message", &self.to_string())?;
+        match self {
+            ChatGPTError::ConfigPath => {
+                state.serialize_field("code", "ConfigPath")?;
+            }
+            ChatGPTError::Setup(_) => {
+                state.serialize_field("code", "Setup")?;
+            }
+            ChatGPTError::Tauri(_) => {
+                state.serialize_field("code", "Tauri")?;
+            }
+            ChatGPTError::Sqlite(_) => {
+                state.serialize_field("code", "Sqlite")?;
+            }
+            ChatGPTError::Connection(_) => {
+                state.serialize_field("code", "Connection")?;
+            }
+            ChatGPTError::Pool(_) => {
+                state.serialize_field("code", "Pool")?;
+            }
+            ChatGPTError::GetConnection(_) => {
+                state.serialize_field("code", "GetConnection")?;
+            }
+            ChatGPTError::Fs(_) => {
+                state.serialize_field("code", "Fs")?;
+            }
+            ChatGPTError::Shadow => {
+                state.serialize_field("code", "Shadow")?;
+            }
+            ChatGPTError::Vibrancy => {
+                state.serialize_field("code", "Vibrancy")?;
+            }
+            ChatGPTError::HeaderParse(_) => {
+                state.serialize_field("code", "HeaderParse")?;
+            }
+            ChatGPTError::Request(_) => {
+                state.serialize_field("code", "Request")?;
+            }
+            ChatGPTError::TomlParse(_) => {
+                state.serialize_field("code", "TomlParse")?;
+            }
+            ChatGPTError::TomlSerialize(_) => {
+                state.serialize_field("code", "TomlSerialize")?;
+            }
+            ChatGPTError::Notify(_) => {
+                state.serialize_field("code", "Notify")?;
+            }
+            ChatGPTError::EventSource(_) => {
+                state.serialize_field("code", "EventSource")?;
+            }
+            ChatGPTError::SerdeJson(_) => {
+                state.serialize_field("code", "SerdeJson")?;
+            }
+            ChatGPTError::ApiKeyNotSet => {
+                state.serialize_field("code", "ApiKeyNotSet")?;
+            }
+            ChatGPTError::Path => {
+                state.serialize_field("code", "Path")?;
+            }
+            ChatGPTError::DbPath => {
+                state.serialize_field("code", "DbPath")?;
+            }
+            ChatGPTError::InvalidMode(mode) => {
+                state.serialize_field("code", "InvalidMode")?;
+                state.serialize_field("data", mode)?;
+            }
+            ChatGPTError::InvalidRole(role) => {
+                state.serialize_field("code", "InvalidRole")?;
+                state.serialize_field("data", role)?;
+            }
+            ChatGPTError::InvalidMessageStatus(status) => {
+                state.serialize_field("code", "InvalidMessageStatus")?;
+                state.serialize_field("data", status)?;
+            }
+            ChatGPTError::InvalidTimeFormat(_) => {
+                state.serialize_field("code", "InvalidTimeFormat")?;
+            }
+            ChatGPTError::InvalidModel(model) => {
+                state.serialize_field("code", "InvalidModel")?;
+                state.serialize_field("data", model)?;
+            }
+            ChatGPTError::WindowNotFound => {
+                state.serialize_field("code", "WindowNotFound")?;
+            }
+            ChatGPTError::ConversationPathExists(path) => {
+                state.serialize_field("code", "ConversationPathExists")?;
+                state.serialize_field("data", path)?;
+            }
+            ChatGPTError::FolderPathExists(path) => {
+                state.serialize_field("code", "FolderPathExists")?;
+                state.serialize_field("data", path)?;
+            }
+            ChatGPTError::CsvParse(_) => {
+                state.serialize_field("code", "CsvParse")?;
+            }
+        }
+        state.end()
+    }
 }
 
 impl From<tauri::Error> for ChatGPTError {
