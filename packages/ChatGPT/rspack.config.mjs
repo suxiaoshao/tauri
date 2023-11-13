@@ -1,8 +1,8 @@
 /*
  * @Author: suxiaoshao suxiaoshao@gmail.com
  * @Date: 2023-10-13 12:58:34
- * @LastEditors: suxiaoshao suxiaoshao@gmail.com
- * @LastEditTime: 2023-11-07 11:38:39
+ * @LastEditors: suxiaoshao suxiaoshao@gamil.com
+ * @LastEditTime: 2023-11-13 22:40:18
  * @FilePath: /tauri/packages/ChatGPT/rspack.config.mjs
  */
 import { defineConfig } from '@rspack/cli';
@@ -10,6 +10,8 @@ import { resolve } from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import MonacoWebpackPlugin from 'monaco-editor-webpack-plugin';
+import ReactRefreshPlugin from '@rspack/plugin-react-refresh';
+import HtmlPlugin from '@rspack/plugin-html';
 
 export const __filename = fileURLToPath(import.meta.url);
 export const __dirname = dirname(__filename);
@@ -25,13 +27,6 @@ const config = defineConfig({
     clean: isProduction,
     publicPath: '/',
   },
-  builtins: {
-    html: [
-      {
-        template: './index.html',
-      },
-    ],
-  },
   module: {
     rules: [
       {
@@ -45,6 +40,28 @@ const config = defineConfig({
       {
         test: /\.jpg$/,
         type: 'asset',
+      },
+      {
+        test: /\.tsx?$/,
+        use: {
+          loader: 'builtin:swc-loader',
+          options: {
+            sourceMap: true,
+            jsc: {
+              parser: {
+                syntax: 'typescript',
+                tsx: true,
+              },
+              transform: {
+                react: {
+                  runtime: 'automatic',
+                  development: !isProduction,
+                  refresh: !isProduction,
+                },
+              },
+            },
+          },
+        },
       },
     ],
   },
@@ -75,8 +92,16 @@ const config = defineConfig({
   experiments: {
     rspackFuture: {
       newResolver: true,
+      disableTransformByDefault: true,
     },
   },
-  plugins: [new MonacoWebpackPlugin()],
+  plugins: [
+    ...(isProduction ? [] : [new ReactRefreshPlugin()]),
+    new MonacoWebpackPlugin({}),
+    new HtmlPlugin.default({
+      template: './index.html',
+      chunks: ['main'],
+    }),
+  ],
 });
 export default config;

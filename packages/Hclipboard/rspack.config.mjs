@@ -1,7 +1,16 @@
+/*
+ * @Author: suxiaoshao suxiaoshao@gamil.com
+ * @Date: 2023-07-14 20:55:11
+ * @LastEditors: suxiaoshao suxiaoshao@gamil.com
+ * @LastEditTime: 2023-11-13 22:43:59
+ * @FilePath: tauri\packages\Hclipboard\rspack.config.mjs
+ */
 import { defineConfig } from '@rspack/cli';
 import { resolve } from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import ReactRefreshPlugin from '@rspack/plugin-react-refresh';
+import HtmlPlugin from '@rspack/plugin-html';
 
 export const __filename = fileURLToPath(import.meta.url);
 export const __dirname = dirname(__filename);
@@ -14,13 +23,6 @@ const config = defineConfig({
     main: './src/main.tsx',
   },
   output: {},
-  builtins: {
-    html: [
-      {
-        template: './index.html',
-      },
-    ],
-  },
   module: {
     rules: [
       {
@@ -34,6 +36,28 @@ const config = defineConfig({
       {
         test: /\.jpg$/,
         type: 'asset',
+      },
+      {
+        test: /\.tsx?$/,
+        use: {
+          loader: 'builtin:swc-loader',
+          options: {
+            sourceMap: true,
+            jsc: {
+              parser: {
+                syntax: 'typescript',
+                tsx: true,
+              },
+              transform: {
+                react: {
+                  runtime: 'automatic',
+                  development: !isProduction,
+                  refresh: !isProduction,
+                },
+              },
+            },
+          },
+        },
       },
     ],
   },
@@ -64,7 +88,15 @@ const config = defineConfig({
   experiments: {
     rspackFuture: {
       newResolver: true,
+      disableTransformByDefault: true,
     },
   },
+  plugins: [
+    ...(isProduction ? [] : [new ReactRefreshPlugin()]),
+    new HtmlPlugin.default({
+      template: './index.html',
+      chunks: ['main'],
+    }),
+  ],
 });
 export default config;
