@@ -39,7 +39,7 @@ create table conversations
 
 insert
 into conversations (title, path, icon, mode, model, created_time, updated_time, info, prompt)
-values ('默认', '/默认', '🤖', 'contextual', 'gpt-3.5-turbo-0613', (SELECT datetime('now')),
+values ('默认', '/默认', '🤖', 'contextual', 'gpt-3.5-turbo', (SELECT datetime('now')),
         (SELECT datetime('now')),
         '默认', null);
 
