@@ -12,7 +12,7 @@
     "@mui/x-tree-view": "^6.17.0",
     "emoji-regex": "^10.3.0",
     "markdown-to-jsx": "^7.3.2",
-    "monaco-editor": "^0.44.0",
+    "monaco-editor": "^0.45.0",
     "monaco-themes": "^0.4.4",
     "notify": "workspace:^1.0.0",
     "prism-themes": "^1.9.0",
