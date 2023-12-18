@@ -1,8 +1,8 @@
 /*
  * @Author: suxiaoshao suxiaoshao@gmail.com
  * @Date: 2023-08-09 16:54:34
- * @LastEditors: suxiaoshao suxiaoshao@gmail.com
- * @LastEditTime: 2023-11-07 12:29:28
+ * @LastEditors: suxiaoshao suxiaoshao@gamil.com
+ * @LastEditTime: 2023-12-19 00:28:36
  * @FilePath: /tauri/common/notify/src/index.tsx
  */
 import { IconButton } from '@mui/material';
@@ -41,7 +41,7 @@ export function SnackbarProvider({ children }: { children: ReactNode }): JSX.Ele
   const ref = useRef<SourceSnackbarProvider>(null);
   function InnerUseComponent() {
     useSnackbarInit();
-    return <>{children}</>;
+    return children;
   }
   return (
     <SourceSnackbarProvider
