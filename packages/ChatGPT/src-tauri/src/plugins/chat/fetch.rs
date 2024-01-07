@@ -32,6 +32,7 @@ struct Fetch<R: Runtime> {
     db_conn: DbConn,
     window: Window<R>,
     url: String,
+    http_proxy: Option<String>,
 }
 
 impl<R> FetchRunner for Fetch<R>
@@ -44,6 +45,9 @@ where
 
     fn get_api_key(&self) -> ChatGPTResult<&str> {
         Ok(&self.api_key)
+    }
+    fn get_http_proxy(&self) -> ChatGPTResult<&Option<String>> {
+        Ok(&self.http_proxy)
     }
 
     fn on_open(&mut self) -> ChatGPTResult<()> {
@@ -95,7 +99,9 @@ async fn _fetch<R: Runtime>(
     let window = app_handle
         .get_window("main")
         .ok_or(ChatGPTError::WindowNotFound)?;
-    let ChatGPTConfig { url, .. } = ChatGPTConfig::get(&app_handle)?;
+    let ChatGPTConfig {
+        url, http_proxy, ..
+    } = ChatGPTConfig::get(&app_handle)?;
     // get api key
     let config = ChatGPTConfig::get(&app_handle)?;
     let api_key = config.get_api_key()?.to_owned();
@@ -129,6 +135,7 @@ async fn _fetch<R: Runtime>(
         db_conn: state,
         window,
         url,
+        http_proxy,
     };
     fetch.fetch().await?;
 

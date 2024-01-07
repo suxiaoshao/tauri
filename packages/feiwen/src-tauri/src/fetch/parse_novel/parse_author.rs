@@ -1,4 +1,10 @@
-use lazy_static::lazy_static;
+/*
+ * @Author: suxiaoshao suxiaoshao@gmail.com
+ * @Date: 2024-01-06 01:08:42
+ * @LastEditors: suxiaoshao suxiaoshao@gmail.com
+ * @LastEditTime: 2024-01-07 19:24:15
+ * @FilePath: /tauri/packages/feiwen/src-tauri/src/fetch/parse_novel/parse_author.rs
+ */
 use nom::{
     bytes::complete::{tag, take_till},
     combinator::complete,
@@ -6,6 +12,7 @@ use nom::{
     sequence::tuple,
     IResult,
 };
+use once_cell::sync::Lazy;
 use scraper::{Html, Selector};
 
 use crate::{
@@ -14,12 +21,10 @@ use crate::{
 };
 
 use super::{parse_url::parse_url, Author, Title};
-lazy_static! {
-    static ref SELECTOR_AUTHOR: Selector =
-        Selector::parse("div:nth-child(1) > span.pull-right.smaller-5 > a").unwrap();
-    static ref SELECTOR_AUTHOR_NNONYMOUS: Selector =
-        Selector::parse("div:nth-child(1) > span.pull-right.smaller-5 > span").unwrap();
-}
+static SELECTOR_AUTHOR: Lazy<Selector> =
+    Lazy::new(|| Selector::parse("div:nth-child(1) > span.pull-right.smaller-5 > a").unwrap());
+static SELECTOR_AUTHOR_NNONYMOUS: Lazy<Selector> =
+    Lazy::new(|| Selector::parse("div:nth-child(1) > span.pull-right.smaller-5 > span").unwrap());
 
 pub fn parse_author(doc: &Html) -> FeiwenResult<Author> {
     let value = match parse_url(doc, &SELECTOR_AUTHOR) {

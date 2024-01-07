@@ -1,4 +1,11 @@
-use lazy_static::lazy_static;
+/*
+ * @Author: suxiaoshao suxiaoshao@gmail.com
+ * @Date: 2024-01-06 01:08:42
+ * @LastEditors: suxiaoshao suxiaoshao@gmail.com
+ * @LastEditTime: 2024-01-07 19:23:04
+ * @FilePath: /tauri/packages/feiwen/src-tauri/src/fetch/parse_novel/mod.rs
+ */
+use once_cell::sync::Lazy;
 use scraper::{Html, Selector};
 
 use crate::{
@@ -16,14 +23,13 @@ mod parse_tags;
 mod parse_title;
 pub mod parse_url;
 
-lazy_static! {
-    static ref SELECTOR_ARTICLE: Selector = Selector::parse("article > div").unwrap();
-    static ref SELECTOR_RAT: Selector =
-        Selector::parse("div:nth-child(1) > span:nth-child(1) > span.badge.bianyuan-tag.badge-tag")
-            .unwrap();
-    static ref SELECTOR_DESC: Selector =
-        Selector::parse("div.col-xs-12.h5.brief-0 > span.smaller-5").unwrap();
-}
+static SELECTOR_ARTICLE: Lazy<Selector> = Lazy::new(|| Selector::parse("article > div").unwrap());
+static SELECTOR_RAT: Lazy<Selector> = Lazy::new(|| {
+    Selector::parse("div:nth-child(1) > span:nth-child(1) > span.badge.bianyuan-tag.badge-tag")
+        .unwrap()
+});
+static SELECTOR_DESC: Lazy<Selector> =
+    Lazy::new(|| Selector::parse("div.col-xs-12.h5.brief-0 > span.smaller-5").unwrap());
 
 pub fn parse_page(body: String) -> FeiwenResult<Vec<Novel>> {
     let document = Html::parse_document(&body);
