@@ -1,4 +1,10 @@
-use lazy_static::lazy_static;
+/*
+ * @Author: suxiaoshao suxiaoshao@gmail.com
+ * @Date: 2024-01-06 01:08:42
+ * @LastEditors: suxiaoshao suxiaoshao@gmail.com
+ * @LastEditTime: 2024-01-07 19:25:25
+ * @FilePath: /tauri/packages/feiwen/src-tauri/src/fetch/parse_novel/parse_count.rs
+ */
 use nom::{
     branch::alt,
     bytes::complete::tag,
@@ -7,16 +13,16 @@ use nom::{
     sequence::tuple,
     IResult,
 };
+use once_cell::sync::Lazy;
 use scraper::{Html, Selector};
 
 use crate::{
     errors::{FeiwenError, FeiwenResult},
     store::types::NovelCount,
 };
-lazy_static! {
-    static ref SELECTOR_COUNT: Selector =
-        Selector::parse("div.col-xs-12.h5.brief-0 > span.pull-right.smaller-30 > em").unwrap();
-}
+static SELECTOR_COUNT: Lazy<Selector> = Lazy::new(|| {
+    Selector::parse("div.col-xs-12.h5.brief-0 > span.pull-right.smaller-30 > em").unwrap()
+});
 
 pub fn parse_count(doc: &Html) -> FeiwenResult<NovelCount> {
     let mut count = doc

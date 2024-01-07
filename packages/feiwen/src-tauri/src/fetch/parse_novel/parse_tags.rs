@@ -1,15 +1,18 @@
+/*
+ * @Author: suxiaoshao suxiaoshao@gmail.com
+ * @Date: 2024-01-06 01:08:42
+ * @LastEditors: suxiaoshao suxiaoshao@gmail.com
+ * @LastEditTime: 2024-01-07 19:25:48
+ * @FilePath: /tauri/packages/feiwen/src-tauri/src/fetch/parse_novel/parse_tags.rs
+ */
+use crate::{errors::FeiwenResult, store::service::Tag};
+use once_cell::sync::Lazy;
+use scraper::{ElementRef, Html, Selector};
 use std::collections::HashSet;
 
-use scraper::{ElementRef, Html, Selector};
-
-use lazy_static::lazy_static;
-
-use crate::{errors::FeiwenResult, store::service::Tag};
-
-lazy_static! {
-    static ref SELECTOR_TAGS: Selector =
-        Selector::parse("div.col-xs-12.h5.brief > span.pull-right.smaller-20 > i > a").unwrap();
-}
+static SELECTOR_TAGS: Lazy<Selector> = Lazy::new(|| {
+    Selector::parse("div.col-xs-12.h5.brief > span.pull-right.smaller-20 > i > a").unwrap()
+});
 
 pub fn parse_tags(doc: &Html) -> FeiwenResult<HashSet<Tag>> {
     let tags = doc

@@ -4,7 +4,7 @@
   "version": "0.2.0",
   "type": "module",
   "scripts": {
-    "dev": "rsbuild dev --open",
+    "dev": "rsbuild dev",
     "build": "rsbuild build",
     "preview": "rsbuild preview",
     "tauri": "tauri"
@@ -12,7 +12,7 @@
   "dependencies": {
     "@mui/x-tree-view": "^6.17.0",
     "emoji-regex": "^10.3.0",
-    "markdown-to-jsx": "^7.3.2",
+    "markdown-to-jsx": "^7.4.0",
     "monaco-editor": "^0.45.0",
     "monaco-themes": "^0.4.4",
     "notify": "workspace:^1.0.0",

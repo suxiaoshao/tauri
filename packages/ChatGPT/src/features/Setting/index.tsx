@@ -34,7 +34,8 @@ const ChatGPTConfigSchema = Yup.object().shape({
   theme: ThemeOptionSchema.default({
     /* Default ThemeOption values here */
   }),
-  url: Yup.string(),
+  url: Yup.string().url(),
+  http_proxy: Yup.string().optional().url(),
 });
 
 export type ChatGptConfig = Yup.InferType<typeof ChatGPTConfigSchema>;
@@ -111,6 +112,14 @@ function Setting() {
           sx={{ mt: 2 }}
           error={!!errors.url?.message}
           helperText={errors.url?.message}
+        />
+        <TextField
+          {...register('http_proxy', { setValueAs: (value) => (value?.trim()?.length > 0 ? value : undefined) })}
+          label="http_proxy"
+          fullWidth
+          sx={{ mt: 2 }}
+          error={!!errors.http_proxy?.message}
+          helperText={errors.http_proxy?.message}
         />
 
         <Box sx={{ mt: 2, width: '100%', display: 'flex', flexDirection: 'row-reverse' }}>

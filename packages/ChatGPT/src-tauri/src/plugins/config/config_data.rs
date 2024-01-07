@@ -1,3 +1,10 @@
+/*
+ * @Author: suxiaoshao suxiaoshao@gmail.com
+ * @Date: 2024-01-06 01:08:42
+ * @LastEditors: suxiaoshao suxiaoshao@gmail.com
+ * @LastEditTime: 2024-01-07 20:31:25
+ * @FilePath: /tauri/packages/ChatGPT/src-tauri/src/plugins/config/config_data.rs
+ */
 use std::{io::ErrorKind, path::PathBuf};
 
 use serde::{Deserialize, Serialize};
@@ -42,6 +49,7 @@ pub struct ChatGPTConfig {
     theme: ThemeOption,
     #[serde(default = "default_url")]
     pub url: String,
+    pub http_proxy: Option<String>,
 }
 
 impl ChatGPTConfig {
