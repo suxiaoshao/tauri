@@ -9,7 +9,7 @@ use crate::{
             folders::SqlFolder,
             messages::SqlMessage,
         },
-        Message, Mode, Model,
+        Message, Mode,
     },
 };
 
@@ -24,7 +24,7 @@ pub struct Conversation {
     pub title: String,
     pub icon: String,
     pub mode: Mode,
-    pub model: Model,
+    pub model: String,
     #[serde(
         rename = "createdTime",
         serialize_with = "serialize_offset_date_time",
@@ -59,7 +59,7 @@ pub struct NewConversation {
     folder_id: Option<i32>,
     icon: String,
     mode: Mode,
-    model: Model,
+    model: String,
     temperature: f64,
     #[serde(rename = "topP")]
     top_p: f64,
@@ -169,7 +169,7 @@ impl Conversation {
             title,
             icon,
             mode: mode.parse()?,
-            model: model.parse()?,
+            model,
             temperature,
             top_p,
             n,

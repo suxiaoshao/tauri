@@ -1,6 +1,9 @@
 import {
   Box,
   Button,
+  FormLabel,
+  IconButton,
+  InputAdornment,
   InputLabel,
   ListItemButton,
   ListItemIcon,
@@ -8,37 +11,34 @@ import {
   MenuItem,
   TextField,
 } from '@mui/material';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import { appWindow } from '@tauri-apps/api/window';
 import { useAppSelector } from '../../app/hooks';
 import { Theme } from './configSlice';
-import { Settings } from '@mui/icons-material';
+import { Add, Delete, Settings } from '@mui/icons-material';
 import { useCallback } from 'react';
 import useConfig from '@chatgpt/hooks/useConfig';
 import useSettingKey from '@chatgpt/hooks/useSettingKey';
 import { createSettingWindow, setConfigService } from '@chatgpt/service/config';
-import * as Yup from 'yup';
-import { yupResolver } from '@hookform/resolvers/yup';
+import { string, object, enum_, Input, regex, required, url, optional, array } from 'valibot';
+import { valibotResolver } from '@hookform/resolvers/valibot';
 
-const ThemeSchema = Yup.string().oneOf([Theme.Dark, Theme.Light, Theme.System], 'Invalid theme').default(Theme.System);
+const ThemeSchema = enum_(Theme);
 
-const ThemeOptionSchema = Yup.object().shape({
+const ThemeOptionSchema = object({
   theme: ThemeSchema,
-  color: Yup.string()
-    .matches(/^#(?:[0-9a-fA-F]{3}){1,2}$/, 'Invalid color format')
-    .default('#3271ae'),
+  color: string([regex(/^#(?:[0-9a-fA-F]{3}){1,2}$/, 'Invalid color format')]),
 });
 
-const ChatGPTConfigSchema = Yup.object().shape({
-  apiKey: Yup.string().nullable(),
-  theme: ThemeOptionSchema.default({
-    /* Default ThemeOption values here */
-  }),
-  url: Yup.string().url(),
-  http_proxy: Yup.string().optional().url(),
+const ChatGPTConfigSchema = object({
+  apiKey: string(),
+  theme: ThemeOptionSchema,
+  url: optional(string([url()])),
+  http_proxy: optional(string([url()])),
+  models: array(string()),
 });
 
-export type ChatGptConfig = Yup.InferType<typeof ChatGPTConfigSchema>;
+export type ChatGptConfig = Input<typeof ChatGPTConfigSchema>;
 
 function Setting() {
   const initData = useAppSelector((state) => state.config);
@@ -49,7 +49,12 @@ function Setting() {
     formState: { errors },
   } = useForm<ChatGptConfig>({
     defaultValues: initData,
-    resolver: yupResolver(ChatGPTConfigSchema),
+    resolver: valibotResolver(ChatGPTConfigSchema),
+  });
+  const { fields, append, remove } = useFieldArray({
+    control,
+    // @ts-ignore
+    name: 'models',
   });
 
   const onSubmit = handleSubmit(async (data) => {
@@ -57,7 +62,15 @@ function Setting() {
     await appWindow.close();
   });
   return (
-    <Box sx={{ width: '100%', height: '100%', backgroundColor: 'transparent' }}>
+    <Box
+      sx={{
+        width: '100%',
+        height: '100%',
+        backgroundColor: 'transparent',
+        position: 'relative',
+        overflowY: 'auto!important',
+      }}
+    >
       <Box
         component="form"
         onSubmit={onSubmit}
@@ -122,12 +135,44 @@ function Setting() {
           helperText={errors.http_proxy?.message}
         />
 
-        <Box sx={{ mt: 2, width: '100%', display: 'flex', flexDirection: 'row-reverse' }}>
-          <Button variant="contained" type="submit">
-            submit
-          </Button>
+        <FormLabel sx={{ mt: 2 }} required>
+          Models
+        </FormLabel>
+
+        {fields.map((field, index) => (
+          <TextField
+            key={field.id}
+            sx={{ mt: 2 }}
+            required
+            {...register(`models.${index}`, { required: true })}
+            label="model"
+            fullWidth
+            error={!!errors.models?.[index]?.message}
+            helperText={errors.models?.[index]?.message}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={() => remove(index)}>
+                    <Delete />
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
+        ))}
+        <Box sx={{ mt: 1 }}>
+          <IconButton onClick={() => append('')}>
+            <Add />
+          </IconButton>
         </Box>
       </Box>
+      <Button
+        variant="contained"
+        type="submit"
+        sx={{ position: 'fixed', right: (theme) => theme.spacing(2), bottom: (theme) => theme.spacing(2) }}
+      >
+        submit
+      </Button>
     </Box>
   );
 }

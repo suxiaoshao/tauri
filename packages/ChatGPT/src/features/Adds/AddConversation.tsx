@@ -1,3 +1,10 @@
+/*
+ * @Author: suxiaoshao suxiaoshao@gmail.com
+ * @Date: 2024-01-06 01:08:42
+ * @LastEditors: suxiaoshao suxiaoshao@gmail.com
+ * @LastEditTime: 2024-01-29 20:45:04
+ * @FilePath: /tauri/packages/ChatGPT/src/features/Adds/AddConversation.tsx
+ */
 import { Box, Typography, Toolbar, IconButton, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import PublishIcon from '@mui/icons-material/Publish';
 import ConversationEdit, { ConversationForm } from '../../components/ConversationEdit';
@@ -19,9 +26,9 @@ function AddConversation() {
       await addConversation({
         data: {
           ...data,
-          info: info?.trim() || null,
-          prompt: prompt?.trim() || null,
-          folderId,
+          info: info?.trim(),
+          prompt: prompt?.trim(),
+          folderId: folderId ?? undefined,
         } satisfies NewConversation,
       });
       dispatch(fetchConversations());

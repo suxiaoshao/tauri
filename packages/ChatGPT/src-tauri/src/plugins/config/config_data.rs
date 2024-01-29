@@ -2,7 +2,7 @@
  * @Author: suxiaoshao suxiaoshao@gmail.com
  * @Date: 2024-01-06 01:08:42
  * @LastEditors: suxiaoshao suxiaoshao@gmail.com
- * @LastEditTime: 2024-01-07 20:31:25
+ * @LastEditTime: 2024-01-29 18:46:20
  * @FilePath: /tauri/packages/ChatGPT/src-tauri/src/plugins/config/config_data.rs
  */
 use std::{io::ErrorKind, path::PathBuf};
@@ -41,6 +41,17 @@ fn default_url() -> String {
     "https://api.openai.com/v1/chat/completions".to_string()
 }
 
+fn default_models() -> Vec<String> {
+    vec![
+        "gpt-3.5-turbo".to_string(),
+        "gpt-3.5-turbo-16k".to_string(),
+        "gpt-3.5-turbo-instruct".to_string(),
+        "gpt-4".to_string(),
+        "gpt-4-turbo-preview".to_string(),
+        "gpt-4-vision-preview".to_string(),
+    ]
+}
+
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 pub struct ChatGPTConfig {
     #[serde(rename = "apiKey")]
@@ -50,6 +61,8 @@ pub struct ChatGPTConfig {
     #[serde(default = "default_url")]
     pub url: String,
     pub http_proxy: Option<String>,
+    #[serde(default = "default_models")]
+    pub models: Vec<String>,
 }
 
 impl ChatGPTConfig {

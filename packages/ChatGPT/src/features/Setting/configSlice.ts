@@ -2,7 +2,7 @@
  * @Author: suxiaoshao suxiaoshao@gmail.com
  * @Date: 2024-01-06 01:08:42
  * @LastEditors: suxiaoshao suxiaoshao@gmail.com
- * @LastEditTime: 2024-01-07 20:38:20
+ * @LastEditTime: 2024-01-29 19:02:09
  * @FilePath: /tauri/packages/ChatGPT/src/features/Setting/configSlice.ts
  */
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
@@ -16,8 +16,8 @@ export enum Theme {
   System = 'system',
 }
 
-export const themeSlice = createSlice({
-  name: 'theme',
+export const configSlice = createSlice({
+  name: 'config',
   initialState: {} as ChatGptConfig,
   reducers: {
     setConfig: (state, action: PayloadAction<ChatGptConfig>) => {
@@ -25,14 +25,19 @@ export const themeSlice = createSlice({
       state.theme = action.payload.theme;
       state.url = action.payload.url;
       state.http_proxy = action.payload.http_proxy;
+      state.models = action.payload.models;
     },
   },
+  selectors: {
+    selectApiKey: (state) => state.apiKey,
+    selectModels: (state) => state.models,
+  },
 });
-export const { setConfig } = themeSlice.actions;
+export const { setConfig } = configSlice.actions;
 
-export const selectApiKey = (state: RootState) => state.config.apiKey;
+export const { selectApiKey, selectModels } = configSlice.selectors;
 
-export default themeSlice.reducer;
+export default configSlice.reducer;
 
 export const fetchConfig = (): AppThunkAction => async (dispatch) => {
   const data = await getConfig();

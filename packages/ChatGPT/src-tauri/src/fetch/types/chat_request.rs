@@ -1,12 +1,19 @@
+/*
+ * @Author: suxiaoshao suxiaoshao@gmail.com
+ * @Date: 2024-01-06 01:08:42
+ * @LastEditors: suxiaoshao suxiaoshao@gmail.com
+ * @LastEditTime: 2024-01-29 14:35:38
+ * @FilePath: /tauri/packages/ChatGPT/src-tauri/src/fetch/types/chat_request.rs
+ */
 use serde::{Deserialize, Serialize};
 
-use crate::store::{Conversation, Model};
+use crate::store::Conversation;
 
 use super::message::Message;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ChatRequest {
-    pub model: Model,
+    pub model: String,
     pub messages: Vec<Message>,
     pub stream: bool,
     temperature: f64,
