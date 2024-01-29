@@ -20,14 +20,12 @@ import {
 import { useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { ThemeSliceType, updateColor, useAppDispatch, useAppSelector } from '../themeSlice';
-import { string, object } from 'yup';
-import { yupResolver } from '@hookform/resolvers/yup';
+import { string, object, regex, picklist } from 'valibot';
+import { valibotResolver } from '@hookform/resolvers/valibot';
 
 const createColorSchema = object({
-  color: string()
-    .required('主题色不能为空')
-    .matches(/^#[0-9a-fA-F]{6}$/, '主题色格式不正确'),
-  colorSetting: string().oneOf(['light', 'dark', 'system']).required('主题模式不能为空'),
+  color: string([regex(/^#(?:[0-9a-fA-F]{3}){1,2}$/, 'Invalid color format')]),
+  colorSetting: picklist(['light', 'dark', 'system']),
 });
 
 export default function ThemeDrawerItem() {
@@ -45,7 +43,7 @@ export default function ThemeDrawerItem() {
     formState: { errors },
   } = useForm<FormData>({
     defaultValues: theme,
-    resolver: yupResolver(createColorSchema),
+    resolver: valibotResolver(createColorSchema),
   });
   const dispatch = useAppDispatch();
   const onSubmit: SubmitHandler<FormData> = async ({ color, colorSetting }) => {

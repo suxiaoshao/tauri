@@ -1,3 +1,10 @@
+/*
+ * @Author: suxiaoshao suxiaoshao@gmail.com
+ * @Date: 2024-01-06 01:08:42
+ * @LastEditors: suxiaoshao suxiaoshao@gmail.com
+ * @LastEditTime: 2024-01-29 20:44:17
+ * @FilePath: /tauri/packages/ChatGPT/src/features/Home/ConversationDetail/components/ConversationHeader/UpdateConversation.tsx
+ */
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Tooltip } from '@mui/material';
 import { useCallback, useState } from 'react';
 import EditIcon from '@mui/icons-material/Edit';
@@ -21,9 +28,9 @@ export default function UpdateConversation({ conversation }: UpdateConversationP
       await updateConversation({
         data: {
           ...data,
-          info: info?.trim() || null,
-          prompt: prompt?.trim() || null,
-          folderId: conversation.folderId,
+          info: info?.trim(),
+          prompt: prompt?.trim(),
+          folderId: conversation.folderId ?? undefined,
         } satisfies NewConversation,
         id: conversation.id,
       });

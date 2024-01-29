@@ -1,3 +1,10 @@
+/*
+ * @Author: suxiaoshao suxiaoshao@gmail.com
+ * @Date: 2024-01-06 01:08:42
+ * @LastEditors: suxiaoshao suxiaoshao@gmail.com
+ * @LastEditTime: 2024-01-29 20:58:40
+ * @FilePath: /tauri/common/theme/src/index.tsx
+ */
 import React, { useEffect } from 'react';
 import { createTheme, CssBaseline, ThemeProvider } from '@mui/material';
 import '@fontsource/roboto/300.css';

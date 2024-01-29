@@ -1,14 +1,19 @@
+/*
+ * @Author: suxiaoshao suxiaoshao@gmail.com
+ * @Date: 2024-01-06 01:08:42
+ * @LastEditors: suxiaoshao suxiaoshao@gmail.com
+ * @LastEditTime: 2024-01-29 21:03:59
+ * @FilePath: /tauri/packages/ChatGPT/src/components/FolderEdit/index.tsx
+ */
 import { NewFolder } from '@chatgpt/types/folder';
-import { yupResolver } from '@hookform/resolvers/yup';
+import { valibotResolver } from '@hookform/resolvers/valibot';
 import { Box, TextField, BoxProps } from '@mui/material';
 import { useForm, Resolver } from 'react-hook-form';
-import { object, string, InferType } from 'yup';
+import { object, string, Input } from 'valibot';
 
-const folderSchema = object().shape({
-  name: string().required(),
-});
+const folderSchema = object({ name: string() });
 
-export type FolderForm = InferType<typeof folderSchema>;
+export type FolderForm = Input<typeof folderSchema>;
 
 const DefaultValues: Partial<NewFolder> = {};
 
@@ -23,7 +28,7 @@ export default function FolderEdit({ initialValues, id, sx, onSubmit: submit, ..
     handleSubmit,
     formState: { errors },
   } = useForm<FolderForm>({
-    resolver: yupResolver(folderSchema) as Resolver<FolderForm, unknown>,
+    resolver: valibotResolver(folderSchema) as Resolver<FolderForm, unknown>,
     defaultValues: initialValues ?? DefaultValues,
   });
   const onSubmit = handleSubmit(submit);

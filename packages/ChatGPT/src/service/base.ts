@@ -2,13 +2,13 @@
  * @Author: suxiaoshao suxiaoshao@gmail.com
  * @Date: 2023-09-06 17:14:35
  * @LastEditors: suxiaoshao suxiaoshao@gmail.com
- * @LastEditTime: 2023-11-07 12:31:04
+ * @LastEditTime: 2024-01-29 21:04:08
  * @FilePath: /tauri/packages/ChatGPT/src/service/base.ts
  */
 import { invoke } from '@tauri-apps/api';
 import { InvokeArgs } from '@tauri-apps/api/tauri';
 import { enqueueSnackbar } from 'notify';
-import * as yup from 'yup';
+import { object, optional, string, enum_, parseAsync } from 'valibot';
 
 export type ChatGPTError = {
   code: ChatGPTErrorCodes;
@@ -48,14 +48,12 @@ export enum ChatGPTErrorCodes {
   CsvParse = 'CsvParse',
 }
 
-// Define the ChatGPTErrorCodes as yup string literals
-const ChatGPTErrorCodesSchema = yup.mixed<ChatGPTErrorCodes>().oneOf(Object.values(ChatGPTErrorCodes));
+const ChatGPTErrorCodesSchema = enum_(ChatGPTErrorCodes);
 
-// Define the yup schema for ChatGPTError
-const ChatGPTErrorSchema = yup.object().shape({
-  code: ChatGPTErrorCodesSchema.required(),
-  message: yup.string().required(),
-  data: yup.string().optional(), // Make 'data' optional
+const ChatGPTErrorSchema = object({
+  code: ChatGPTErrorCodesSchema,
+  message: string(),
+  data: optional(string()),
 });
 
 export async function appInvoke<P, R>(cmd: string, params: P): Promise<R> {
@@ -69,7 +67,7 @@ export async function appInvoke<P, R>(cmd: string, params: P): Promise<R> {
       await enqueueSnackbar(e, { variant: 'error' });
     } else {
       try {
-        const err = await ChatGPTErrorSchema.validate(e);
+        const err = await parseAsync(ChatGPTErrorSchema, e);
         await enqueueSnackbar(err.message, { variant: 'error' });
       } catch (error) {
         console.error('Validation failed:', error);

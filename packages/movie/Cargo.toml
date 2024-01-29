@@ -23,8 +23,8 @@ tokio = { version = "1.35.1", features = [
 ] }
 
 # 存储
-serde = { version = "1.0.195", features = ["derive"] }
-serde_json = "1.0.111"
+serde = { version = "1.0.196", features = ["derive"] }
+serde_json = "1.0.112"
 
 # 参数
-clap = { version = "4.4.13", features = ["derive"] }
+clap = { version = "4.4.18", features = ["derive"] }

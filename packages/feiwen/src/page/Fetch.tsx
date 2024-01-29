@@ -1,26 +1,32 @@
+/*
+ * @Author: suxiaoshao suxiaoshao@gmail.com
+ * @Date: 2024-01-06 01:08:42
+ * @LastEditors: suxiaoshao suxiaoshao@gmail.com
+ * @LastEditTime: 2024-01-29 20:56:39
+ * @FilePath: /tauri/packages/feiwen/src/page/Fetch.tsx
+ */
 import { Box, Button, TextField } from '@mui/material';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
-import * as yup from 'yup';
-import { InferType } from 'yup';
+import { Input, object, string, url, number, integer, minValue, forward, custom } from 'valibot';
 import { fetchData } from '../service/store';
 
-const fetchInputSchema = yup.object().shape({
-  url: yup.string().url('URL must be a valid HTTP URL').required('URL is required'),
-  startPage: yup
-    .number()
-    .integer('startPage must be an integer')
-    .min(1, 'startPage must be greater than or equal to 1')
-    .required('startPage is required'),
-  endPage: yup
-    .number()
-    .integer('endPage must be an integer')
-    .min(yup.ref('startPage'), 'endPage must be greater than or equal to startPage')
-    .required('endPage is required'),
-  cookies: yup.string().required('cookies is required'),
-});
+const fetchInputSchema = object(
+  {
+    url: string([url()]),
+    startPage: number([integer(), minValue(1)]),
+    endPage: number([integer(), minValue(1)]),
+    cookies: string(),
+  },
+  [
+    forward(
+      custom((input) => input.startPage < input.endPage, 'endPage must be greater than or equal to startPage'),
+      ['endPage'],
+    ),
+  ],
+);
 
-export type FetchParams = InferType<typeof fetchInputSchema>;
+export type FetchParams = Input<typeof fetchInputSchema>;
 
 export default function Fetch() {
   const navigate = useNavigate();

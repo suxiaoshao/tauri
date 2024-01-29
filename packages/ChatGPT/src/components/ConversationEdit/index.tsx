@@ -1,38 +1,40 @@
-import { Mode, Model } from '@chatgpt/types/common';
+import { useAppSelector } from '@chatgpt/app/hooks';
+import store from '@chatgpt/app/store';
+import { selectModels } from '@chatgpt/features/Setting/configSlice';
+import { Mode } from '@chatgpt/types/common';
 import { NewConversation } from '@chatgpt/types/conversation';
-import { yupResolver } from '@hookform/resolvers/yup';
+import { valibotResolver } from '@hookform/resolvers/valibot';
 import { Box, TextField, MenuItem, FormControlLabel, Checkbox, BoxProps } from '@mui/material';
-import emojiRegex from 'emoji-regex';
 import { useState } from 'react';
 import { useForm, Controller, Resolver } from 'react-hook-form';
-import { object, string, number, InferType } from 'yup';
+import { object, string, number, Input, emoji, enum_, minValue, maxValue, length, integer, optional } from 'valibot';
 
-const conversationSchema = object<NewConversation>().shape({
-  title: string().required(),
-  icon: string().matches(emojiRegex(), 'Icon should is emoji').required(),
-  mode: string().oneOf([Mode.AssistantOnly, Mode.Contextual, Mode.Single]).required(),
-  model: string().required().oneOf(Object.values(Model)),
-  temperature: number().min(0).max(1).required(),
-  topP: number().min(0).max(1).required(),
-  n: number().min(1).integer().required(),
-  maxTokens: number().min(1).integer().nullable(),
-  presencePenalty: number().min(-2).max(2).required(),
-  frequencyPenalty: number().min(-2).max(2).required(),
-  info: string().nullable(),
-  prompt: string().nullable(),
+const conversationSchema = object({
+  title: string(),
+  icon: string([emoji(), length(1)]),
+  mode: enum_(Mode),
+  model: string(),
+  temperature: number([minValue(0), maxValue(1)]),
+  topP: number([minValue(0), maxValue(1)]),
+  n: number([minValue(1), integer()]),
+  maxTokens: optional(number([minValue(1), integer()])),
+  presencePenalty: number([minValue(-2), maxValue(2)]),
+  frequencyPenalty: number([minValue(-2), maxValue(2)]),
+  info: optional(string()),
+  prompt: optional(string()),
 });
 
-export type ConversationForm = InferType<typeof conversationSchema>;
+export type ConversationForm = Input<typeof conversationSchema>;
 
-const DefaultValues: Partial<NewConversation> = {
+const getDefaultValues = (): Partial<NewConversation> => ({
   mode: Mode.Contextual,
-  model: Model.Gpt35,
+  model: store.getState().config.models.at(0),
   temperature: 1,
   topP: 1,
   n: 1,
   presencePenalty: 0,
   frequencyPenalty: 0,
-};
+});
 
 export interface ConversationEditProps extends Omit<BoxProps, 'component' | 'id' | 'onSubmit'> {
   initialValues?: NewConversation;
@@ -46,11 +48,12 @@ export default function ConversationEdit({ initialValues, id, sx, onSubmit: subm
     formState: { errors },
     control,
   } = useForm<ConversationForm>({
-    resolver: yupResolver(conversationSchema) as Resolver<ConversationForm, unknown>,
-    defaultValues: initialValues ?? DefaultValues,
+    resolver: valibotResolver(conversationSchema) as Resolver<ConversationForm, unknown>,
+    defaultValues: initialValues ?? getDefaultValues(),
   });
   const onSubmit = handleSubmit(submit);
   const [openMaxTokens, setOpenMaxTokens] = useState(false);
+  const models = useAppSelector(selectModels);
   return (
     <Box
       {...props}
@@ -111,7 +114,7 @@ export default function ConversationEdit({ initialValues, id, sx, onSubmit: subm
             sx={{ mt: 2 }}
             {...field}
           >
-            {Object.values(Model).map((model) => (
+            {models.map((model) => (
               <MenuItem key={model} value={model}>
                 {model}
               </MenuItem>
