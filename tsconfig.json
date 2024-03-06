@@ -17,10 +17,10 @@
     "jsx": "react-jsx",
     "paths": {
       "@chatgpt/*": ["./packages/ChatGPT/src/*"],
-      "@feiwen/*": ["./packages/feiwen/src/*"],
+      "@feiwen/*": ["./packages/feiwen/src/*"]
     },
-    "types": ["./config/types/types.d.ts"],
+    "types": ["./config/types/types.d.ts"]
   },
   "include": ["packages/*/src", "packages/*/rspack.config.mjs", "common/*/src"],
-  "exclude": ["./**/node_modules", "node_modules"],
+  "exclude": ["./**/node_modules", "node_modules"]
 }

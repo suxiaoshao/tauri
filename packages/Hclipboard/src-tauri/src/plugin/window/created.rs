@@ -1,3 +1,10 @@
+/*
+ * @Author: suxiaoshao suxiaoshao@gmail.com
+ * @Date: 2024-01-06 01:08:42
+ * @LastEditors: suxiaoshao suxiaoshao@gmail.com
+ * @LastEditTime: 2024-03-07 00:24:24
+ * @FilePath: /self-tools/Users/sushao/Documents/code/tauri/packages/Hclipboard/src-tauri/src/plugin/window/created.rs
+ */
 use tauri::Runtime;
 use window_shadows::set_shadow;
 #[cfg(target_os = "windows")]

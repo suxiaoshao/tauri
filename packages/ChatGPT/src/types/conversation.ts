@@ -2,7 +2,7 @@
  * @Author: suxiaoshao suxiaoshao@gmail.com
  * @Date: 2024-01-06 01:08:42
  * @LastEditors: suxiaoshao suxiaoshao@gmail.com
- * @LastEditTime: 2024-01-29 20:44:51
+ * @LastEditTime: 2024-03-07 00:43:38
  * @FilePath: /tauri/packages/ChatGPT/src/types/conversation.ts
  */
 import { Message } from '@chatgpt/types/message';
@@ -37,9 +37,9 @@ export interface NewConversation {
   temperature: number;
   topP: number;
   n: number;
-  maxTokens?: number | undefined;
+  maxTokens?: number | null;
   presencePenalty: number;
   frequencyPenalty: number;
-  info?: string | undefined;
-  prompt?: string | undefined;
+  info?: string | null;
+  prompt?: string | null;
 }

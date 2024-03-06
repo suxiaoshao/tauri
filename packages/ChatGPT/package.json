@@ -11,8 +11,8 @@
   },
   "dependencies": {
     "@mui/x-tree-view": "^6.17.0",
-    "markdown-to-jsx": "^7.4.0",
-    "monaco-editor": "^0.45.0",
+    "markdown-to-jsx": "^7.4.1",
+    "monaco-editor": "^0.46.0",
     "monaco-themes": "^0.4.4",
     "notify": "workspace:^1.0.0",
     "prism-themes": "^1.9.0",
