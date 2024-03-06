@@ -1,3 +1,10 @@
+/*
+ * @Author: suxiaoshao suxiaoshao@gmail.com
+ * @Date: 2024-01-06 01:08:42
+ * @LastEditors: suxiaoshao suxiaoshao@gmail.com
+ * @LastEditTime: 2024-03-07 00:42:35
+ * @FilePath: /self-tools/Users/sushao/Documents/code/tauri/packages/Hclipboard/src/pages/Home/index.tsx
+ */
 import { Box, List, TextField } from '@mui/material';
 import { useForm } from 'react-hook-form';
 import { useCallback, useEffect, useState } from 'react';
@@ -56,7 +63,6 @@ export default function Home() {
         placeholder="搜索"
         sx={{ margin: 1 }}
         {...register('searchData')}
-        autoFocus
         inputProps={{ spellcheck: 'false' }}
       />
       <List sx={{ flex: '1 1 0', overflowY: 'auto', width: '100%' }}>

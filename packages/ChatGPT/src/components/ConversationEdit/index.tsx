@@ -7,21 +7,21 @@ import { valibotResolver } from '@hookform/resolvers/valibot';
 import { Box, TextField, MenuItem, FormControlLabel, Checkbox, BoxProps } from '@mui/material';
 import { useState } from 'react';
 import { useForm, Controller, Resolver } from 'react-hook-form';
-import { object, string, number, Input, emoji, enum_, minValue, maxValue, length, integer, optional } from 'valibot';
+import { object, string, number, Input, emoji, enum_, minValue, maxValue, integer, nullable } from 'valibot';
 
 const conversationSchema = object({
   title: string(),
-  icon: string([emoji(), length(1)]),
+  icon: string([emoji()]),
   mode: enum_(Mode),
   model: string(),
   temperature: number([minValue(0), maxValue(1)]),
   topP: number([minValue(0), maxValue(1)]),
   n: number([minValue(1), integer()]),
-  maxTokens: optional(number([minValue(1), integer()])),
+  maxTokens: nullable(number([minValue(1), integer()])),
   presencePenalty: number([minValue(-2), maxValue(2)]),
   frequencyPenalty: number([minValue(-2), maxValue(2)]),
-  info: optional(string()),
-  prompt: optional(string()),
+  info: nullable(string()),
+  prompt: nullable(string()),
 });
 
 export type ConversationForm = Input<typeof conversationSchema>;
