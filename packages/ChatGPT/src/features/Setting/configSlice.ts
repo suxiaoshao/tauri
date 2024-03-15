@@ -2,7 +2,7 @@
  * @Author: suxiaoshao suxiaoshao@gmail.com
  * @Date: 2024-01-06 01:08:42
  * @LastEditors: suxiaoshao suxiaoshao@gmail.com
- * @LastEditTime: 2024-01-29 19:02:09
+ * @LastEditTime: 2024-03-15 09:57:43
  * @FilePath: /tauri/packages/ChatGPT/src/features/Setting/configSlice.ts
  */
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
@@ -24,7 +24,7 @@ export const configSlice = createSlice({
       state.apiKey = action.payload.apiKey;
       state.theme = action.payload.theme;
       state.url = action.payload.url;
-      state.http_proxy = action.payload.http_proxy;
+      state.httpProxy = action.payload.httpProxy;
       state.models = action.payload.models;
     },
   },

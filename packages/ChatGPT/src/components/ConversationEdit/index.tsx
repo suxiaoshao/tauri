@@ -155,11 +155,11 @@ export default function ConversationEdit({ initialValues, id, sx, onSubmit: subm
         helperText={errors.temperature?.message}
         required
         label="Temperature"
-        type="number"
+        // type="number"
         {...register('temperature', { required: true, min: 0, max: 1 })}
         sx={{ mt: 2 }}
         fullWidth
-        inputProps={{ min: 0, max: 1, step: 0.01 }}
+        inputProps={{ min: 0, max: 1, step: 0.01, inputmode: 'numeric', pattern: '[0-9]*' }}
       />
       <TextField
         error={!!errors.topP?.message}
