@@ -7,8 +7,11 @@
 import { defineConfig } from '@rsbuild/core';
 import { pluginReact } from '@rsbuild/plugin-react';
 import { resolve } from 'path';
+import { RsdoctorRspackPlugin } from '@rsdoctor/rspack-plugin';
+import { pluginLightningcss } from '@rsbuild/plugin-lightningcss';
+import { codeInspectorPlugin } from 'code-inspector-plugin';
 export default defineConfig({
-  plugins: [pluginReact()],
+  plugins: [pluginReact(), pluginLightningcss()],
   server: {
     port: 1420,
   },
@@ -25,6 +28,14 @@ export default defineConfig({
           references: 'auto',
         },
       },
+    },
+    bundlerChain: (chain) => {
+      if (process.env.RSDOCTOR) {
+        chain.plugin('rsdoctor').use(new RsdoctorRspackPlugin());
+      }
+      if (process.env.NODE_ENV === 'development') {
+        chain.plugin('code-inspector').use(codeInspectorPlugin({ bundler: 'rspack' }));
+      }
     },
   },
 });

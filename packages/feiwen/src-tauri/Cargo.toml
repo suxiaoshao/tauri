@@ -7,7 +7,6 @@ license = ""
 repository = ""
 default-run = "feiwen"
 edition = "2021"
-rust-version = "1.57"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -15,32 +14,32 @@ rust-version = "1.57"
 tauri-build = { version = "1.5.1", features = [] }
 
 [dependencies]
-serde = { version = "1.0.197", features = ["derive"] }
-serde_json = "1.0.114"
-tauri = { version = "1.1.4", features = ["macos-private-api", "api-all"] }
+serde = { version = "1.0.198", features = ["derive"] }
+serde_json = "1.0.116"
+tauri = { version = "1.6.1", features = ["macos-private-api", "api-all"] }
 
 # log
 tauri-plugin-log = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v1" }
-log = "0.4.18"
+log = "0.4.21"
 
 # database
-diesel = { version = "2.0.4", features = ["sqlite", "r2d2"] }
-libsqlite3-sys = { version = "0.27.0", features = ["bundled"] }
-time = { version = "0.3.13", features = ["serde"] }
+diesel = { version = "2.1.5", features = ["sqlite", "r2d2"] }
+libsqlite3-sys = { version = "0.28.0", features = ["bundled"] }
+time = { version = "0.3.36", features = ["serde"] }
 
 # http
-reqwest = "0.11.18"
-async-trait = "0.1.77"
+reqwest = "0.12.3"
+async-trait = "0.1.80"
 
 # html
 scraper = "0.19.0"
 nom = "7.1.3"
-once_cell = "1.17.2"
+once_cell = "1.19.0"
 futures = "0.3.30"
-thiserror = "1.0.57"
+thiserror = "1.0.58"
 
 # config
-toml = "0.5.11"
+toml = "0.8.12"
 
 # 窗口管理
 tauri-plugin-window-state = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v1" }

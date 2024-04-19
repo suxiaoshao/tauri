@@ -2,7 +2,7 @@
  * @Author: suxiaoshao suxiaoshao@gmail.com
  * @Date: 2023-09-06 17:14:35
  * @LastEditors: suxiaoshao suxiaoshao@gmail.com
- * @LastEditTime: 2023-11-07 11:34:33
+ * @LastEditTime: 2024-04-19 08:02:13
  * @FilePath: /tauri/packages/ChatGPT/src/features/Conversations/components/FolderItem.tsx
  */
 import { Folder } from '@chatgpt/types/folder';
@@ -21,7 +21,7 @@ export default function FolderItem({ folder }: FolderItemProps) {
   const navigate = useNavigate();
   return (
     <TreeItem
-      nodeId={getNodeIdByFolder(folder)}
+      itemId={getNodeIdByFolder(folder)}
       label={
         <Box
           sx={{
