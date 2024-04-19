@@ -8,6 +8,7 @@ import { Box, TextField, MenuItem, FormControlLabel, Checkbox, BoxProps } from '
 import { useState } from 'react';
 import { useForm, Controller, Resolver } from 'react-hook-form';
 import { object, string, number, Input, emoji, enum_, minValue, maxValue, integer, nullable } from 'valibot';
+import NumberField from '../NumberField';
 
 const conversationSchema = object({
   title: string(),
@@ -150,56 +151,51 @@ export default function ConversationEdit({ initialValues, id, sx, onSubmit: subm
         multiline
         maxRows={4}
       />
-      <TextField
+      <NumberField
         error={!!errors.temperature?.message}
         helperText={errors.temperature?.message}
         required
         label="Temperature"
-        type="number"
         {...register('temperature', { required: true, min: 0, max: 1 })}
         sx={{ mt: 2 }}
         fullWidth
-        inputProps={{ min: 0, max: 1, step: 0.01 }}
+        inputProps={{ min: 0, max: 1, step: 0.01, inputmode: 'numeric', pattern: '[0-9]*' }}
       />
-      <TextField
+      <NumberField
         error={!!errors.topP?.message}
         helperText={errors.topP?.message}
         required
         label="Top P"
-        type="number"
         {...register('topP', { required: true, min: 0, max: 1 })}
         sx={{ mt: 2 }}
         fullWidth
         inputProps={{ min: 0, max: 1, step: 0.01 }}
       />
-      <TextField
+      <NumberField
         error={!!errors.n?.message}
         helperText={errors.n?.message}
         required
         label="N"
-        type="number"
         {...register('n', { required: true })}
         sx={{ mt: 2 }}
         fullWidth
         inputProps={{ min: 1, step: 1 }}
       />
-      <TextField
+      <NumberField
         error={!!errors.presencePenalty?.message}
         helperText={errors.presencePenalty?.message}
         required
         label="Presence Penalty"
-        type="number"
         {...register('presencePenalty', { required: true })}
         sx={{ mt: 2 }}
         fullWidth
         inputProps={{ min: -2, max: 2, step: 0.01 }}
       />
-      <TextField
+      <NumberField
         error={!!errors.frequencyPenalty?.message}
         helperText={errors.frequencyPenalty?.message}
         required
         label="Frequency Penalty"
-        type="number"
         {...register('frequencyPenalty', { required: true })}
         sx={{ mt: 2 }}
         fullWidth
@@ -211,11 +207,10 @@ export default function ConversationEdit({ initialValues, id, sx, onSubmit: subm
         sx={{ mt: 1 }}
       />
       {openMaxTokens && (
-        <TextField
+        <NumberField
           error={!!errors.maxTokens?.message}
           helperText={errors.maxTokens?.message}
           label="Frequency Penalty"
-          type="number"
           {...register('maxTokens', { required: true })}
           sx={{ mt: 1 }}
           fullWidth

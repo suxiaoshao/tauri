@@ -34,7 +34,7 @@ const ChatGPTConfigSchema = object({
   apiKey: string(),
   theme: ThemeOptionSchema,
   url: optional(string([url()])),
-  http_proxy: optional(string([url()])),
+  httpProxy: optional(string([url()])),
   models: array(string()),
 });
 
@@ -70,10 +70,10 @@ function Setting() {
         position: 'relative',
         overflowY: 'auto!important',
       }}
+      component="form"
+      onSubmit={onSubmit}
     >
       <Box
-        component="form"
-        onSubmit={onSubmit}
         sx={{
           p: 2,
           paddingX: 4,
@@ -127,12 +127,12 @@ function Setting() {
           helperText={errors.url?.message}
         />
         <TextField
-          {...register('http_proxy', { setValueAs: (value) => (value?.trim()?.length > 0 ? value : undefined) })}
-          label="http_proxy"
+          {...register('httpProxy', { setValueAs: (value) => (value?.trim()?.length > 0 ? value : undefined) })}
+          label="Http Proxy"
           fullWidth
           sx={{ mt: 2 }}
-          error={!!errors.http_proxy?.message}
-          helperText={errors.http_proxy?.message}
+          error={!!errors.httpProxy?.message}
+          helperText={errors.httpProxy?.message}
         />
 
         <FormLabel sx={{ mt: 2 }} required>

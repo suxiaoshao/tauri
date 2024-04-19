@@ -26,16 +26,16 @@ tauri = { version = "1.6.1", features = [
   "window-set-focus",
   "window-show",
 ] }
-serde = { version = "1.0.197", features = ["derive"] }
-serde_json = "1.0.114"
+serde = { version = "1.0.198", features = ["derive"] }
+serde_json = "1.0.116"
 
 # database
-diesel = { version = "2.1.4", features = ["sqlite", "r2d2", "numeric", "time"] }
-libsqlite3-sys = { version = "0.27.0", features = ["bundled-windows"] }
-time = { version = "0.3.34", features = ["serde"] }
+diesel = { version = "2.1.5", features = ["sqlite", "r2d2", "numeric", "time"] }
+libsqlite3-sys = { version = "0.28.0", features = ["bundled-windows"] }
+time = { version = "0.3.36", features = ["serde"] }
 
 # 错误处理
-thiserror = "1.0.57"
+thiserror = "1.0.58"
 
 # log
 tauri-plugin-log = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v1" }
@@ -47,8 +47,8 @@ window-shadows = "0.2.2"
 window-vibrancy = "0.4.0"
 
 # http request
-reqwest = { version = "0.11.24", features = ["json"] }
-tokio = { version = "1.36.0", features = [
+reqwest = { version = "0.12.3", features = ["json"] }
+tokio = { version = "1.37.0", features = [
   "rt",
   "rt-multi-thread",
   "sync",
@@ -56,15 +56,15 @@ tokio = { version = "1.36.0", features = [
   "io-util",
   "macros",
 ] }
-reqwest-eventsource = "0.5.0"
+reqwest-eventsource = "0.6.0"
 futures = "0.3.30"
 
 # config
 notify = { version = "6.1.1", default-features = false, features = [
   "macos_kqueue",
 ] }
-toml = "0.8.10"
-async-trait = "0.1.77"
+toml = "0.8.12"
+async-trait = "0.1.80"
 csv = "1.3.0"
 
 [target.'cfg(target_os="macos")'.dependencies]
@@ -77,4 +77,4 @@ custom-protocol = ["tauri/custom-protocol"]
 
 [dev-dependencies]
 dotenv = "0.15.0"
-anyhow = "1.0.80"
+anyhow = "1.0.82"

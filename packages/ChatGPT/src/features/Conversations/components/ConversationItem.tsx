@@ -2,7 +2,7 @@
  * @Author: suxiaoshao suxiaoshao@gmail.com
  * @Date: 2023-09-06 17:14:35
  * @LastEditors: suxiaoshao suxiaoshao@gmail.com
- * @LastEditTime: 2023-11-07 11:34:06
+ * @LastEditTime: 2024-04-19 04:07:38
  * @FilePath: /tauri/packages/ChatGPT/src/features/Conversations/components/ConversationItem.tsx
  */
 import { Conversation } from '@chatgpt/types/conversation';
@@ -19,7 +19,7 @@ export default function ConversationItem({ conversation }: ConversationItemProps
   const navigate = useNavigate();
   return (
     <TreeItem
-      nodeId={getNodeIdByConversation(conversation)}
+      itemId={getNodeIdByConversation(conversation)}
       label={
         <Box
           sx={{
