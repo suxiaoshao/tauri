@@ -72,6 +72,7 @@ pub struct NewConversation {
     frequency_penalty: f64,
     info: Option<String>,
     prompt: Option<String>,
+    template_id: i32,
 }
 
 impl Conversation {
@@ -94,6 +95,7 @@ impl Conversation {
             frequency_penalty,
             info,
             prompt,
+            template_id,
         }: NewConversation,
         conn: &mut SqliteConnection,
     ) -> ChatGPTResult<()> {
@@ -116,18 +118,10 @@ impl Conversation {
             path,
             folder_id,
             icon,
-            mode: mode.to_string(),
-            model: model.to_string(),
-            temperature,
-            top_p,
-            n,
-            max_tokens,
-            presence_penalty,
-            frequency_penalty,
             info,
-            prompt,
             created_time: time,
             updated_time: time,
+            template_id,
         };
         sql_new.insert(conn)?;
         Ok(())
@@ -146,42 +140,35 @@ impl Conversation {
             folder_id,
             title,
             icon,
-            mode,
-            model,
-            temperature,
-            top_p,
-            n,
-            max_tokens,
-            presence_penalty,
-            frequency_penalty,
             created_time,
             updated_time,
             info,
-            prompt,
+            template_id,
         }: SqlConversation,
         conn: &mut SqliteConnection,
     ) -> ChatGPTResult<Conversation> {
         let messages = Message::messages_by_conversation_id(id, conn)?;
-        Ok(Conversation {
-            id,
-            path,
-            folder_id,
-            title,
-            icon,
-            mode: mode.parse()?,
-            model,
-            temperature,
-            top_p,
-            n,
-            max_tokens,
-            presence_penalty,
-            frequency_penalty,
-            created_time,
-            updated_time,
-            info,
-            prompt,
-            messages,
-        })
+        todo!();
+        // Ok(Conversation {
+        //     id,
+        //     path,
+        //     folder_id,
+        //     title,
+        //     icon,
+        //     mode: mode.parse()?,
+        //     model,
+        //     temperature,
+        //     top_p,
+        //     n,
+        //     max_tokens,
+        //     presence_penalty,
+        //     frequency_penalty,
+        //     created_time,
+        //     updated_time,
+        //     info,
+        //     prompt,
+        //     messages,
+        // })
     }
     pub fn update(
         id: i32,
@@ -199,6 +186,7 @@ impl Conversation {
             frequency_penalty,
             info,
             prompt,
+            template_id,
         }: NewConversation,
         conn: &mut SqliteConnection,
     ) -> ChatGPTResult<()> {
@@ -224,17 +212,8 @@ impl Conversation {
             title,
             folder_id,
             icon,
-            mode: mode.to_string(),
-            model: model.to_string(),
-            temperature,
-            top_p,
-            n,
-            max_tokens,
-            presence_penalty,
-            frequency_penalty,
             updated_time: time,
             info,
-            prompt,
         };
         conn.immediate_transaction(|conn| {
             update.update(conn)?;

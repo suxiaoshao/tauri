@@ -151,12 +151,7 @@ async fn update_message_content<R: Runtime>(
 fn setup<R: Runtime>(app: &AppHandle<R>) -> ChatGPTResult<()> {
     use tauri::api::path::*;
     //data path
-    let data_path = app_config_dir(&app.config())
-        .ok_or(ChatGPTError::DbPath)?
-        .join("history.sqlite3")
-        .to_str()
-        .ok_or(ChatGPTError::DbPath)?
-        .to_string();
+    let data_path = app_config_dir(&app.config()).ok_or(ChatGPTError::DbPath)?;
     // database connection
     let conn = store::establish_connection(&data_path)?;
     app.manage(conn);

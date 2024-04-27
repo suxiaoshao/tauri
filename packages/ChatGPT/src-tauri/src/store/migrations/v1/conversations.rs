@@ -1,7 +1,8 @@
-use super::super::schema::conversations;
 use crate::errors::ChatGPTResult;
 use diesel::prelude::*;
 use time::OffsetDateTime;
+
+use super::schema::conversations;
 
 #[derive(Insertable)]
 #[diesel(table_name = conversations)]
@@ -10,10 +11,18 @@ pub struct SqlNewConversation {
     pub(in super::super) path: String,
     pub(in super::super) folder_id: Option<i32>,
     pub(in super::super) icon: String,
+    pub(in super::super) mode: String,
+    pub(in super::super) model: String,
+    pub(in super::super) temperature: f64,
+    pub(in super::super) top_p: f64,
+    pub(in super::super) n: i64,
+    pub(in super::super) max_tokens: Option<i64>,
+    pub(in super::super) presence_penalty: f64,
+    pub(in super::super) frequency_penalty: f64,
     pub(in super::super) created_time: OffsetDateTime,
     pub(in super::super) updated_time: OffsetDateTime,
     pub(in super::super) info: Option<String>,
-    pub(in super::super) template_id: i32,
+    pub(in super::super) prompt: Option<String>,
 }
 
 impl SqlNewConversation {
@@ -33,10 +42,18 @@ pub struct SqlConversation {
     pub(in super::super) path: String,
     pub(in super::super) title: String,
     pub(in super::super) icon: String,
+    pub(in super::super) mode: String,
+    pub(in super::super) model: String,
+    pub(in super::super) temperature: f64,
+    pub(in super::super) top_p: f64,
+    pub(in super::super) n: i64,
+    pub(in super::super) max_tokens: Option<i64>,
+    pub(in super::super) presence_penalty: f64,
+    pub(in super::super) frequency_penalty: f64,
     pub(in super::super) created_time: OffsetDateTime,
     pub(in super::super) updated_time: OffsetDateTime,
     pub(in super::super) info: Option<String>,
-    pub(in super::super) template_id: i32,
+    pub(in super::super) prompt: Option<String>,
 }
 
 impl SqlConversation {
@@ -95,8 +112,17 @@ pub struct SqlUpdateConversation {
     pub(in super::super) path: String,
     pub(in super::super) title: String,
     pub(in super::super) icon: String,
+    pub(in super::super) mode: String,
+    pub(in super::super) model: String,
+    pub(in super::super) temperature: f64,
+    pub(in super::super) top_p: f64,
+    pub(in super::super) n: i64,
+    pub(in super::super) max_tokens: Option<i64>,
+    pub(in super::super) presence_penalty: f64,
+    pub(in super::super) frequency_penalty: f64,
     pub(in super::super) updated_time: OffsetDateTime,
     pub(in super::super) info: Option<String>,
+    pub(in super::super) prompt: Option<String>,
 }
 
 impl SqlUpdateConversation {
@@ -113,8 +139,17 @@ impl SqlUpdateConversation {
             folder_id,
             title,
             icon,
-            mut path,
+            mode,
+            model,
+            temperature,
+            top_p,
+            n,
+            max_tokens,
+            presence_penalty,
+            frequency_penalty,
             info,
+            prompt,
+            mut path,
             ..
         }: SqlConversation,
         old_path_pre: &str,
@@ -128,8 +163,17 @@ impl SqlUpdateConversation {
             path,
             title,
             icon,
+            mode,
+            model,
+            temperature,
+            top_p,
+            n,
+            max_tokens,
+            presence_penalty,
+            frequency_penalty,
             updated_time: time,
             info,
+            prompt,
         }
     }
     pub fn move_folder(

@@ -70,14 +70,13 @@ fn export_txt(messages: Vec<Message>, path: PathBuf) -> ChatGPTResult<()> {
 #[cfg(test)]
 mod test {
     use diesel::{
-        connection::SimpleConnection,
         r2d2::{ConnectionManager, Pool},
         SqliteConnection,
     };
 
     use crate::{
         errors::ChatGPTResult,
-        store::{self, DbConn, NewMessage},
+        store::{self, create_tables, DbConn, NewMessage},
     };
 
     #[test]
@@ -100,15 +99,8 @@ mod test {
     pub fn establish_connection() -> ChatGPTResult<DbConn> {
         let manager = ConnectionManager::<SqliteConnection>::new("file::memory:");
         let pool = Pool::builder().test_on_check_out(true).build(manager)?;
-        create_tables(&pool)?;
+        let mut conn = pool.get()?;
+        create_tables(&mut conn)?;
         Ok(pool)
-    }
-
-    fn create_tables(conn: &DbConn) -> ChatGPTResult<()> {
-        conn.get()?
-            .batch_execute(include_str!(
-                "../../../migrations/2023-07-25-025504_create_table/up.sql"
-            ))
-            .map_err(|e| e.into())
     }
 }

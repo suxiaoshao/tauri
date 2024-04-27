@@ -37,9 +37,9 @@
     "valibot": "^0.30.0"
   },
   "devDependencies": {
-    "@rsbuild/core": "^0.6.3",
-    "@rsbuild/plugin-lightningcss": "^0.6.3",
-    "@rsbuild/plugin-react": "^0.6.3",
+    "@rsbuild/core": "^0.6.4",
+    "@rsbuild/plugin-lightningcss": "^0.6.4",
+    "@rsbuild/plugin-react": "^0.6.4",
     "@rsdoctor/rspack-plugin": "^0.1.10",
     "@tauri-apps/cli": "^1.5.11",
     "@testing-library/jest-dom": "^6.4.2",
@@ -48,7 +48,7 @@
     "@types/react-dom": "^18.2.25",
     "@types/react-router-dom": "^5.3.3",
     "@vitest/coverage-v8": "^1.5.0",
-    "code-inspector-plugin": "^0.12.1",
+    "code-inspector-plugin": "^0.12.2",
     "git-cz": "^4.9.0",
     "husky": "^9.0.11",
     "jsdom": "^24.0.0",
