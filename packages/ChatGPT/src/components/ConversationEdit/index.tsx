@@ -13,29 +13,21 @@ import NumberField from '../NumberField';
 const conversationSchema = object({
   title: string(),
   icon: string([emoji()]),
-  mode: enum_(Mode),
-  model: string(),
-  temperature: number([minValue(0), maxValue(1)]),
-  topP: number([minValue(0), maxValue(1)]),
-  n: number([minValue(1), integer()]),
-  maxTokens: nullable(number([minValue(1), integer()])),
-  presencePenalty: number([minValue(-2), maxValue(2)]),
-  frequencyPenalty: number([minValue(-2), maxValue(2)]),
+  // mode: enum_(Mode),
+  // model: string(),
+  // temperature: number([minValue(0), maxValue(1)]),
+  // topP: number([minValue(0), maxValue(1)]),
+  // n: number([minValue(1), integer()]),
+  // maxTokens: nullable(number([minValue(1), integer()])),
+  // presencePenalty: number([minValue(-2), maxValue(2)]),
+  // frequencyPenalty: number([minValue(-2), maxValue(2)]),
   info: nullable(string()),
-  prompt: nullable(string()),
+  templateId: number([integer()]),
 });
 
 export type ConversationForm = Input<typeof conversationSchema>;
 
-const getDefaultValues = (): Partial<NewConversation> => ({
-  mode: Mode.Contextual,
-  model: store.getState().config.models.at(0),
-  temperature: 1,
-  topP: 1,
-  n: 1,
-  presencePenalty: 0,
-  frequencyPenalty: 0,
-});
+const getDefaultValues = (): Partial<NewConversation> => ({});
 
 export interface ConversationEditProps extends Omit<BoxProps, 'component' | 'id' | 'onSubmit'> {
   initialValues?: NewConversation;
@@ -79,7 +71,8 @@ export default function ConversationEdit({ initialValues, id, sx, onSubmit: subm
         label="Title"
         fullWidth
       />
-      <Controller
+      {/* todo:conversation template migration */}
+      {/* <Controller
         control={control}
         name="mode"
         rules={{ required: true }}
@@ -122,7 +115,7 @@ export default function ConversationEdit({ initialValues, id, sx, onSubmit: subm
             ))}
           </TextField>
         )}
-      />
+      /> */}
 
       <TextField
         error={!!errors.icon?.message}
@@ -141,7 +134,7 @@ export default function ConversationEdit({ initialValues, id, sx, onSubmit: subm
         fullWidth
         sx={{ mt: 2 }}
       />
-      <TextField
+      {/* <TextField
         error={!!errors.prompt?.message}
         helperText={errors.prompt?.message}
         {...register('prompt')}
@@ -217,7 +210,7 @@ export default function ConversationEdit({ initialValues, id, sx, onSubmit: subm
           inputProps={{ min: 1, step: 1 }}
           required
         />
-      )}
+      )} */}
     </Box>
   );
 }

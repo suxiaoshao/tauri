@@ -37,6 +37,7 @@ pub struct Conversation {
     pub updated_time: OffsetDateTime,
     pub info: Option<String>,
     pub messages: Vec<Message>,
+    #[serde(rename = "templateId")]
     pub template_id: i32,
 }
 
@@ -47,6 +48,7 @@ pub struct NewConversation {
     folder_id: Option<i32>,
     icon: String,
     info: Option<String>,
+    #[serde(rename = "templateId")]
     template_id: i32,
 }
 

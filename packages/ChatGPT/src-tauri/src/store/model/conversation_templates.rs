@@ -1,12 +1,12 @@
-use crate::{errors::ChatGPTResult, store::Mode};
-
 /*
  * @Author: suxiaoshao suxiaoshao@gmail.com
  * @Date: 2024-04-26 19:18:35
  * @LastEditors: suxiaoshao suxiaoshao@gmail.com
- * @LastEditTime: 2024-04-28 07:23:04
+ * @LastEditTime: 2024-04-28 08:45:08
  * @FilePath: /tauri/packages/ChatGPT/src-tauri/src/store/model/conversation_templates.rs
  */
+use crate::{errors::ChatGPTResult, store::Mode};
+
 use super::super::schema::conversation_templates;
 use diesel::prelude::*;
 use time::OffsetDateTime;
@@ -88,6 +88,10 @@ impl SqlConversationTemplate {
     }
     pub fn find(id: i32, conn: &mut SqliteConnection) -> ChatGPTResult<Self> {
         let data = conversation_templates::table.find(id).first::<Self>(conn)?;
+        Ok(data)
+    }
+    pub fn all(conn: &mut SqliteConnection) -> ChatGPTResult<Vec<Self>> {
+        let data = conversation_templates::table.load::<Self>(conn)?;
         Ok(data)
     }
 }

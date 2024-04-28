@@ -2,7 +2,7 @@
  * @Author: suxiaoshao suxiaoshao@gmail.com
  * @Date: 2024-04-28 04:23:22
  * @LastEditors: suxiaoshao suxiaoshao@gmail.com
- * @LastEditTime: 2024-04-28 07:27:40
+ * @LastEditTime: 2024-04-29 02:56:27
  * @FilePath: /tauri/packages/ChatGPT/src-tauri/src/store/service/conversation_templates.rs
  */
 
@@ -58,27 +58,86 @@ pub struct ConversationTemplate {
 
 impl ConversationTemplate {
     pub fn find(id: i32, conn: &mut SqliteConnection) -> ChatGPTResult<Self> {
-        let sql_conversation_template = SqlConversationTemplate::find(id, conn)?;
+        let SqlConversationTemplate {
+            id,
+            name,
+            icon,
+            mode,
+            model,
+            temperature,
+            top_p,
+            n,
+            max_tokens,
+            presence_penalty,
+            frequency_penalty,
+            created_time,
+            updated_time,
+        } = SqlConversationTemplate::find(id, conn)?;
         let sql_prompts = SqlConversationTemplatePrompt::find_by_template_id(id, conn)?;
         let prompts = sql_prompts
             .into_iter()
             .map(ConversationTemplatePrompt::try_from)
             .collect::<ChatGPTResult<Vec<ConversationTemplatePrompt>>>()?;
         Ok(Self {
-            id: sql_conversation_template.id,
-            name: sql_conversation_template.name,
-            icon: sql_conversation_template.icon,
-            mode: sql_conversation_template.mode.parse()?,
-            model: sql_conversation_template.model,
-            created_time: sql_conversation_template.created_time,
-            updated_time: sql_conversation_template.updated_time,
-            temperature: sql_conversation_template.temperature,
-            top_p: sql_conversation_template.top_p,
-            n: sql_conversation_template.n,
-            max_tokens: sql_conversation_template.max_tokens,
-            presence_penalty: sql_conversation_template.presence_penalty,
-            frequency_penalty: sql_conversation_template.frequency_penalty,
+            id,
+            name,
+            icon,
+            mode: mode.parse()?,
+            model,
+            created_time,
+            updated_time,
+            temperature,
+            top_p,
+            n,
+            max_tokens,
+            presence_penalty,
+            frequency_penalty,
             prompts,
         })
+    }
+    pub fn all(conn: &mut SqliteConnection) -> ChatGPTResult<Vec<Self>> {
+        let sql_conversation_templates = SqlConversationTemplate::all(conn)?;
+        let sql_conversation_template_prompts = SqlConversationTemplatePrompt::all(conn)?;
+        let mut conversation_templates = Vec::new();
+        for SqlConversationTemplate {
+            id,
+            name,
+            icon,
+            mode,
+            model,
+            temperature,
+            top_p,
+            n,
+            max_tokens,
+            presence_penalty,
+            frequency_penalty,
+            created_time,
+            updated_time,
+        } in sql_conversation_templates
+        {
+            let prompts = sql_conversation_template_prompts
+                .iter()
+                .filter(|prompt| prompt.template_id == id)
+                .cloned()
+                .map(ConversationTemplatePrompt::try_from)
+                .collect::<ChatGPTResult<Vec<ConversationTemplatePrompt>>>()?;
+            conversation_templates.push(Self {
+                id,
+                name,
+                icon,
+                mode: mode.parse()?,
+                model,
+                created_time,
+                updated_time,
+                temperature,
+                top_p,
+                n,
+                max_tokens,
+                presence_penalty,
+                frequency_penalty,
+                prompts,
+            });
+        }
+        Ok(conversation_templates)
     }
 }

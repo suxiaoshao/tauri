@@ -3,6 +3,7 @@ import { appInvoke } from './base';
 import { NewFolder } from '@chatgpt/types/folder';
 import { ChatData } from '@chatgpt/types/chatData';
 import { Message } from '@chatgpt/types/message';
+import { ConversationTemplate } from '@chatgpt/types/conversation_template';
 
 export interface AddConversationParams {
   data: NewConversation;
@@ -132,4 +133,19 @@ export interface ExportConversationParams {
 
 export async function exportConversation(params: ExportConversationParams) {
   await appInvoke<ExportConversationParams, unknown>('plugin:chat|export', params);
+}
+
+export async function allConversationTemplates(): Promise<ConversationTemplate[]> {
+  return await appInvoke<unknown, ConversationTemplate[]>('plugin:chat|all_conversation_templates', undefined);
+}
+
+export interface FindConversationTemplateParams {
+  id: number;
+}
+
+export async function findConversationTemplate(params: FindConversationTemplateParams) {
+  return await appInvoke<FindConversationTemplateParams, ConversationTemplate>(
+    'plugin:chat|find_conversation_template',
+    params,
+  );
 }

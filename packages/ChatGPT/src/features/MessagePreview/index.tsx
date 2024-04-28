@@ -1,3 +1,10 @@
+/*
+ * @Author: suxiaoshao suxiaoshao@gmail.com
+ * @Date: 2024-01-06 01:08:42
+ * @LastEditors: suxiaoshao suxiaoshao@gmail.com
+ * @LastEditTime: 2024-04-29 02:17:06
+ * @FilePath: /tauri/packages/ChatGPT/src/features/MessagePreview/index.tsx
+ */
 import usePromise from '@chatgpt/hooks/usePromise';
 import { findMessage } from '@chatgpt/service/chat';
 import notification from '@chatgpt/utils/notification';
@@ -6,6 +13,8 @@ import { appWindow } from '@tauri-apps/api/window';
 import { useCallback, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import Success from './Success';
+import ErrorInfo from '@chatgpt/components/ErrorInfo';
+import Loading from '@chatgpt/components/Loading';
 
 export default function MessagePreview() {
   const { id } = useParams<{ id: string }>();
@@ -28,17 +37,17 @@ export default function MessagePreview() {
       throw e;
     }
   }, [id]);
-  const { tag, value } = usePromise(fn);
+  const [{ tag, value }] = usePromise(fn);
   const content = useMemo(() => {
     switch (tag) {
       case 'loading':
-        return <CircularProgress />;
+        return <Loading sx={{ width: '100%', height: '100%' }} />;
       case 'error':
-        return 'error';
+        return <ErrorInfo error={value} refetch={fn} />;
       case 'data':
         return <Success message={value} />;
       default:
-        return <CircularProgress />;
+        return <Loading sx={{ width: '100%', height: '100%' }} />;
     }
   }, [tag, value]);
   return content;

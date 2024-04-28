@@ -1,3 +1,10 @@
+/*
+ * @Author: suxiaoshao suxiaoshao@gmail.com
+ * @Date: 2024-01-06 01:08:42
+ * @LastEditors: suxiaoshao suxiaoshao@gmail.com
+ * @LastEditTime: 2024-04-29 02:46:17
+ * @FilePath: /tauri/packages/ChatGPT/src/features/Home/FolderDetail/components/ContentList.tsx
+ */
 import { useAppDispatch } from '@chatgpt/app/hooks';
 import { SelectedType, setSelected } from '@chatgpt/features/Conversations/conversationSlice';
 import { Conversation } from '@chatgpt/types/conversation';

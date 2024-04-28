@@ -2,7 +2,7 @@
  * @Author: suxiaoshao suxiaoshao@gmail.com
  * @Date: 2024-04-28 04:28:20
  * @LastEditors: suxiaoshao suxiaoshao@gmail.com
- * @LastEditTime: 2024-04-28 07:26:36
+ * @LastEditTime: 2024-04-28 20:46:01
  * @FilePath: /tauri/packages/ChatGPT/src-tauri/src/store/service/conversation_template_prompts.rs
  */
 use time::OffsetDateTime;
@@ -17,6 +17,7 @@ use super::utils::serialize_offset_date_time;
 #[derive(serde::Serialize)]
 pub struct ConversationTemplatePrompt {
     pub id: i32,
+    #[serde(rename = "templateId")]
     pub template_id: i32,
     pub prompt: String,
     pub role: Role,
