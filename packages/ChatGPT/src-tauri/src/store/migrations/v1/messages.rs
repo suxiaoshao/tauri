@@ -1,39 +1,19 @@
+/*
+ * @Author: suxiaoshao suxiaoshao@gmail.com
+ * @Date: 2024-04-24 19:33:52
+ * @LastEditors: suxiaoshao suxiaoshao@gmail.com
+ * @LastEditTime: 2024-04-28 06:36:02
+ * @FilePath: /tauri/packages/ChatGPT/src-tauri/src/store/migrations/v1/messages.rs
+ */
 use diesel::prelude::*;
 use time::OffsetDateTime;
 
-use crate::{
-    errors::ChatGPTResult,
-    store::{schema::messages, types::Status},
-};
-
-#[derive(Insertable)]
-#[diesel(table_name = messages)]
-pub struct SqlNewMessage {
-    pub(in super::super) conversation_id: i32,
-    pub(in super::super) conversation_path: String,
-    pub(in super::super) role: String,
-    pub(in super::super) content: String,
-    pub(in super::super) status: String,
-    pub(in super::super) created_time: OffsetDateTime,
-    pub(in super::super) updated_time: OffsetDateTime,
-    pub(in super::super) start_time: OffsetDateTime,
-    pub(in super::super) end_time: OffsetDateTime,
-}
-
-impl SqlNewMessage {
-    pub fn insert(&self, conn: &mut SqliteConnection) -> ChatGPTResult<()> {
-        diesel::insert_into(messages::table)
-            .values(self)
-            .execute(conn)?;
-        Ok(())
-    }
-}
-
+use crate::{errors::ChatGPTResult, store::schema::messages};
 #[derive(Debug, Queryable)]
-pub struct SqlMessage {
+pub struct SqlMessageV1 {
     pub id: i32,
     pub conversation_id: i32,
-    pub(in super::super) conversation_path: String,
+    pub(in crate::store) conversation_path: String,
     pub role: String,
     pub content: String,
     pub status: String,
@@ -43,127 +23,10 @@ pub struct SqlMessage {
     pub end_time: OffsetDateTime,
 }
 
-impl SqlMessage {
-    pub fn last(conn: &mut SqliteConnection) -> ChatGPTResult<Self> {
+impl SqlMessageV1 {
+    pub fn all(conn: &mut SqliteConnection) -> ChatGPTResult<Vec<Self>> {
         messages::table
-            .order(messages::id.desc())
-            .first(conn)
+            .load::<SqlMessageV1>(conn)
             .map_err(|e| e.into())
-    }
-    pub fn query_by_conversation_id(
-        conversation_id: i32,
-        conn: &mut SqliteConnection,
-    ) -> ChatGPTResult<Vec<Self>> {
-        messages::table
-            .filter(messages::conversation_id.eq(conversation_id))
-            .load(conn)
-            .map_err(|e| e.into())
-    }
-    pub fn add_content(
-        id: i32,
-        content: String,
-        time: OffsetDateTime,
-        conn: &mut SqliteConnection,
-    ) -> ChatGPTResult<()> {
-        diesel::update(messages::table.filter(messages::id.eq(id)))
-            .set((
-                messages::content.eq(messages::content.concat(content)),
-                messages::updated_time.eq(time),
-                messages::end_time.eq(time),
-            ))
-            .execute(conn)?;
-        Ok(())
-    }
-    pub fn update_status(
-        id: i32,
-        status: Status,
-        time: OffsetDateTime,
-        conn: &mut SqliteConnection,
-    ) -> ChatGPTResult<()> {
-        diesel::update(messages::table.filter(messages::id.eq(id)))
-            .set((
-                messages::status.eq(status.to_string()),
-                messages::updated_time.eq(time),
-                messages::end_time.eq(time),
-            ))
-            .execute(conn)?;
-        Ok(())
-    }
-    pub fn find(id: i32, conn: &mut SqliteConnection) -> ChatGPTResult<Self> {
-        messages::table
-            .filter(messages::id.eq(id))
-            .first(conn)
-            .map_err(|e| e.into())
-    }
-    pub fn delete_by_conversation_id(
-        conversation_id: i32,
-        conn: &mut SqliteConnection,
-    ) -> ChatGPTResult<()> {
-        diesel::delete(messages::table.filter(messages::conversation_id.eq(conversation_id)))
-            .execute(conn)?;
-        Ok(())
-    }
-    pub fn delete_by_path(path: &str, conn: &mut SqliteConnection) -> ChatGPTResult<()> {
-        let path = format!("{}/%", path);
-        diesel::delete(messages::table.filter(messages::conversation_path.like(path)))
-            .execute(conn)?;
-        Ok(())
-    }
-    pub fn find_by_path_pre(path: &str, conn: &mut SqliteConnection) -> ChatGPTResult<Vec<Self>> {
-        let path = format!("{}/%", path);
-        messages::table
-            .filter(messages::conversation_path.like(path))
-            .load::<Self>(conn)
-            .map_err(|e| e.into())
-    }
-    pub fn update_path(
-        id: i32,
-        mut path: String,
-        old_path_pre: &str,
-        new_path_pre: &str,
-        time: OffsetDateTime,
-        conn: &mut SqliteConnection,
-    ) -> ChatGPTResult<()> {
-        path.replace_range(0..old_path_pre.len(), new_path_pre);
-        diesel::update(messages::table.filter(messages::id.eq(id)))
-            .set((
-                messages::conversation_path.eq(path),
-                messages::updated_time.eq(time),
-            ))
-            .execute(conn)?;
-        Ok(())
-    }
-    pub fn move_folder(
-        conversation_id: i32,
-        path: &str,
-        time: OffsetDateTime,
-        conn: &mut SqliteConnection,
-    ) -> ChatGPTResult<()> {
-        diesel::update(messages::table)
-            .filter(messages::conversation_id.eq(conversation_id))
-            .set((
-                messages::conversation_path.eq(path),
-                messages::updated_time.eq(time),
-            ))
-            .execute(conn)?;
-        Ok(())
-    }
-    pub fn delete(id: i32, conn: &mut SqliteConnection) -> ChatGPTResult<()> {
-        diesel::delete(messages::table.filter(messages::id.eq(id))).execute(conn)?;
-        Ok(())
-    }
-    pub fn update_content(
-        id: i32,
-        content: String,
-        time: OffsetDateTime,
-        conn: &mut SqliteConnection,
-    ) -> ChatGPTResult<()> {
-        diesel::update(messages::table.filter(messages::id.eq(id)))
-            .set((
-                messages::content.eq(content),
-                messages::updated_time.eq(time),
-            ))
-            .execute(conn)?;
-        Ok(())
     }
 }

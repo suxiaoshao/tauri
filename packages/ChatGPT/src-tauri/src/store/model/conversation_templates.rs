@@ -4,7 +4,7 @@ use crate::{errors::ChatGPTResult, store::Mode};
  * @Author: suxiaoshao suxiaoshao@gmail.com
  * @Date: 2024-04-26 19:18:35
  * @LastEditors: suxiaoshao suxiaoshao@gmail.com
- * @LastEditTime: 2024-04-28 03:39:07
+ * @LastEditTime: 2024-04-28 07:23:04
  * @FilePath: /tauri/packages/ChatGPT/src-tauri/src/store/model/conversation_templates.rs
  */
 use super::super::schema::conversation_templates;
@@ -47,14 +47,14 @@ impl SqlNewConversationTemplate {
         }
     }
     pub fn insert(self, conn: &mut SqliteConnection) -> ChatGPTResult<()> {
-        let new = diesel::insert_into(conversation_templates::table)
+        diesel::insert_into(conversation_templates::table)
             .values(self)
             .execute(conn)?;
         Ok(())
     }
 }
 
-#[derive(Queryable, AsChangeset, Debug)]
+#[derive(Queryable, AsChangeset, Debug, Insertable)]
 #[diesel(table_name = conversation_templates)]
 pub struct SqlConversationTemplate {
     pub(in super::super) id: i32,
@@ -76,5 +76,18 @@ impl SqlConversationTemplate {
     pub fn first(conn: &mut SqliteConnection) -> ChatGPTResult<Self> {
         let first = conversation_templates::table.first::<Self>(conn)?;
         Ok(first)
+    }
+    pub fn migration_save(
+        data: Vec<SqlConversationTemplate>,
+        conn: &mut SqliteConnection,
+    ) -> ChatGPTResult<()> {
+        diesel::insert_into(conversation_templates::table)
+            .values(data)
+            .execute(conn)?;
+        Ok(())
+    }
+    pub fn find(id: i32, conn: &mut SqliteConnection) -> ChatGPTResult<Self> {
+        let data = conversation_templates::table.find(id).first::<Self>(conn)?;
+        Ok(data)
     }
 }

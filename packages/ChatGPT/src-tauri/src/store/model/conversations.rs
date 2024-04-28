@@ -25,7 +25,7 @@ impl SqlNewConversation {
     }
 }
 
-#[derive(Queryable, AsChangeset, Debug)]
+#[derive(Queryable, AsChangeset, Debug, Insertable)]
 #[diesel(table_name = conversations)]
 pub struct SqlConversation {
     pub(in super::super) id: i32,
@@ -85,6 +85,15 @@ impl SqlConversation {
             .load::<Self>(conn)
             .map_err(|e| e.into())
     }
+    pub fn migration_save(
+        conversations: Vec<Self>,
+        conn: &mut SqliteConnection,
+    ) -> ChatGPTResult<()> {
+        diesel::insert_into(conversations::table)
+            .values(conversations)
+            .execute(conn)?;
+        Ok(())
+    }
 }
 
 #[derive(AsChangeset, Identifiable, Debug)]
@@ -97,6 +106,7 @@ pub struct SqlUpdateConversation {
     pub(in super::super) icon: String,
     pub(in super::super) updated_time: OffsetDateTime,
     pub(in super::super) info: Option<String>,
+    pub(in super::super) template_id: i32,
 }
 
 impl SqlUpdateConversation {
@@ -115,6 +125,7 @@ impl SqlUpdateConversation {
             icon,
             mut path,
             info,
+            template_id,
             ..
         }: SqlConversation,
         old_path_pre: &str,
@@ -130,6 +141,7 @@ impl SqlUpdateConversation {
             icon,
             updated_time: time,
             info,
+            template_id,
         }
     }
     pub fn move_folder(

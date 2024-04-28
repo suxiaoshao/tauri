@@ -69,20 +69,16 @@ fn export_txt(messages: Vec<Message>, path: PathBuf) -> ChatGPTResult<()> {
 
 #[cfg(test)]
 mod test {
-    use diesel::{
-        r2d2::{ConnectionManager, Pool},
-        SqliteConnection,
-    };
+    use diesel::{Connection, SqliteConnection};
 
     use crate::{
         errors::ChatGPTResult,
-        store::{self, create_tables, DbConn, NewMessage},
+        store::{self, create_tables, NewMessage},
     };
 
     #[test]
     fn test_export_csv() -> ChatGPTResult<()> {
-        let conn = establish_connection()?;
-        let conn = &mut conn.get()?;
+        let conn = &mut establish_connection()?;
         let new_message = NewMessage {
             conversation_id: 1,
             role: store::Role::User,
@@ -96,11 +92,9 @@ mod test {
         std::fs::remove_file("test.csv")?;
         Ok(())
     }
-    pub fn establish_connection() -> ChatGPTResult<DbConn> {
-        let manager = ConnectionManager::<SqliteConnection>::new("file::memory:");
-        let pool = Pool::builder().test_on_check_out(true).build(manager)?;
-        let mut conn = pool.get()?;
+    pub fn establish_connection() -> ChatGPTResult<SqliteConnection> {
+        let mut conn = SqliteConnection::establish("file::memory:")?;
         create_tables(&mut conn)?;
-        Ok(pool)
+        Ok(conn)
     }
 }

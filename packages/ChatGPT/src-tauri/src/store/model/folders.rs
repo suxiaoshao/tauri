@@ -1,10 +1,11 @@
-use crate::errors::ChatGPTResult;
+use crate::{errors::ChatGPTResult, store::migrations::v1::SqlFolderV1};
 
 use super::super::schema::folders;
 use diesel::prelude::*;
 use time::OffsetDateTime;
 
-#[derive(Queryable, Debug)]
+#[derive(Queryable, Debug, Insertable)]
+#[diesel(table_name = folders)]
 pub struct SqlFolder {
     pub(in super::super) id: i32,
     pub(in super::super) name: String,
@@ -12,6 +13,28 @@ pub struct SqlFolder {
     pub(in super::super) parent_id: Option<i32>,
     pub(in super::super) created_time: OffsetDateTime,
     pub(in super::super) updated_time: OffsetDateTime,
+}
+
+impl From<SqlFolderV1> for SqlFolder {
+    fn from(
+        SqlFolderV1 {
+            id,
+            name,
+            path,
+            parent_id,
+            created_time,
+            updated_time,
+        }: SqlFolderV1,
+    ) -> Self {
+        Self {
+            id,
+            name,
+            path,
+            parent_id,
+            created_time,
+            updated_time,
+        }
+    }
 }
 
 impl SqlFolder {
@@ -58,6 +81,12 @@ impl SqlFolder {
             .filter(folders::path.like(path))
             .load::<Self>(conn)
             .map_err(|e| e.into())
+    }
+    pub fn migration_save(data: Vec<SqlFolder>, conn: &mut SqliteConnection) -> ChatGPTResult<()> {
+        diesel::insert_into(folders::table)
+            .values(data)
+            .execute(conn)?;
+        Ok(())
     }
 }
 

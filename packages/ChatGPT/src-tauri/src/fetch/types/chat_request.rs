@@ -2,12 +2,12 @@
  * @Author: suxiaoshao suxiaoshao@gmail.com
  * @Date: 2024-01-06 01:08:42
  * @LastEditors: suxiaoshao suxiaoshao@gmail.com
- * @LastEditTime: 2024-01-29 14:35:38
+ * @LastEditTime: 2024-04-28 07:30:56
  * @FilePath: /tauri/packages/ChatGPT/src-tauri/src/fetch/types/chat_request.rs
  */
 use serde::{Deserialize, Serialize};
 
-use crate::store::Conversation;
+use crate::store::{Conversation, ConversationTemplate, Role};
 
 use super::message::Message;
 
@@ -26,7 +26,8 @@ pub struct ChatRequest {
 
 impl ChatRequest {
     pub fn new(
-        Conversation {
+        Conversation { messages, .. }: Conversation,
+        ConversationTemplate {
             mode,
             model,
             temperature,
@@ -35,20 +36,13 @@ impl ChatRequest {
             max_tokens,
             presence_penalty,
             frequency_penalty,
-            prompt,
-            messages,
+            prompts,
             ..
-        }: Conversation,
+        }: ConversationTemplate,
         content: String,
     ) -> Self {
-        let mut messages = messages
-            .into_iter()
-            .filter_map(|msg| Message::from_conversation(msg, mode))
-            .collect::<Vec<_>>();
-        if let Some(prompt) = prompt {
-            messages.insert(0, Message::new(crate::store::Role::User, prompt));
-        }
-        messages.push(Message::new(crate::store::Role::User, content));
+        let mut messages = Message::from_conversations(prompts, messages, mode);
+        messages.push(Message::new(Role::User, content));
         Self {
             model,
             messages,

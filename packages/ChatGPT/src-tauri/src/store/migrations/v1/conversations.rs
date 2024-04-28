@@ -1,62 +1,39 @@
+/*
+ * @Author: suxiaoshao suxiaoshao@gmail.com
+ * @Date: 2024-04-24 19:33:52
+ * @LastEditors: suxiaoshao suxiaoshao@gmail.com
+ * @LastEditTime: 2024-04-28 06:47:06
+ * @FilePath: /tauri/packages/ChatGPT/src-tauri/src/store/migrations/v1/conversations.rs
+ */
 use crate::errors::ChatGPTResult;
 use diesel::prelude::*;
 use time::OffsetDateTime;
 
 use super::schema::conversations;
 
-#[derive(Insertable)]
-#[diesel(table_name = conversations)]
-pub struct SqlNewConversation {
-    pub(in super::super) title: String,
-    pub(in super::super) path: String,
-    pub(in super::super) folder_id: Option<i32>,
-    pub(in super::super) icon: String,
-    pub(in super::super) mode: String,
-    pub(in super::super) model: String,
-    pub(in super::super) temperature: f64,
-    pub(in super::super) top_p: f64,
-    pub(in super::super) n: i64,
-    pub(in super::super) max_tokens: Option<i64>,
-    pub(in super::super) presence_penalty: f64,
-    pub(in super::super) frequency_penalty: f64,
-    pub(in super::super) created_time: OffsetDateTime,
-    pub(in super::super) updated_time: OffsetDateTime,
-    pub(in super::super) info: Option<String>,
-    pub(in super::super) prompt: Option<String>,
-}
-
-impl SqlNewConversation {
-    pub fn insert(self, conn: &mut SqliteConnection) -> ChatGPTResult<()> {
-        diesel::insert_into(conversations::table)
-            .values(self)
-            .execute(conn)?;
-        Ok(())
-    }
-}
-
 #[derive(Queryable, AsChangeset, Debug)]
 #[diesel(table_name = conversations)]
-pub struct SqlConversation {
-    pub(in super::super) id: i32,
-    pub(in super::super) folder_id: Option<i32>,
-    pub(in super::super) path: String,
-    pub(in super::super) title: String,
-    pub(in super::super) icon: String,
-    pub(in super::super) mode: String,
-    pub(in super::super) model: String,
-    pub(in super::super) temperature: f64,
-    pub(in super::super) top_p: f64,
-    pub(in super::super) n: i64,
-    pub(in super::super) max_tokens: Option<i64>,
-    pub(in super::super) presence_penalty: f64,
-    pub(in super::super) frequency_penalty: f64,
-    pub(in super::super) created_time: OffsetDateTime,
-    pub(in super::super) updated_time: OffsetDateTime,
-    pub(in super::super) info: Option<String>,
-    pub(in super::super) prompt: Option<String>,
+pub struct SqlConversationV1 {
+    pub(in crate::store) id: i32,
+    pub(in crate::store) folder_id: Option<i32>,
+    pub(in crate::store) path: String,
+    pub(in crate::store) title: String,
+    pub(in crate::store) icon: String,
+    pub(in crate::store) mode: String,
+    pub(in crate::store) model: String,
+    pub(in crate::store) temperature: f64,
+    pub(in crate::store) top_p: f64,
+    pub(in crate::store) n: i64,
+    pub(in crate::store) max_tokens: Option<i64>,
+    pub(in crate::store) presence_penalty: f64,
+    pub(in crate::store) frequency_penalty: f64,
+    pub(in crate::store) created_time: OffsetDateTime,
+    pub(in crate::store) updated_time: OffsetDateTime,
+    pub(in crate::store) info: Option<String>,
+    pub(in crate::store) prompt: Option<String>,
 }
 
-impl SqlConversation {
+impl SqlConversationV1 {
     pub fn find(id: i32, conn: &mut SqliteConnection) -> ChatGPTResult<Self> {
         conversations::table
             .find(id)
@@ -102,95 +79,9 @@ impl SqlConversation {
             .load::<Self>(conn)
             .map_err(|e| e.into())
     }
-}
-
-#[derive(AsChangeset, Identifiable, Debug)]
-#[diesel(table_name = conversations)]
-pub struct SqlUpdateConversation {
-    pub(in super::super) id: i32,
-    pub(in super::super) folder_id: Option<i32>,
-    pub(in super::super) path: String,
-    pub(in super::super) title: String,
-    pub(in super::super) icon: String,
-    pub(in super::super) mode: String,
-    pub(in super::super) model: String,
-    pub(in super::super) temperature: f64,
-    pub(in super::super) top_p: f64,
-    pub(in super::super) n: i64,
-    pub(in super::super) max_tokens: Option<i64>,
-    pub(in super::super) presence_penalty: f64,
-    pub(in super::super) frequency_penalty: f64,
-    pub(in super::super) updated_time: OffsetDateTime,
-    pub(in super::super) info: Option<String>,
-    pub(in super::super) prompt: Option<String>,
-}
-
-impl SqlUpdateConversation {
-    pub fn update(self, conn: &mut SqliteConnection) -> ChatGPTResult<()> {
-        diesel::update(conversations::table)
-            .filter(conversations::id.eq(self.id))
-            .set(self)
-            .execute(conn)?;
-        Ok(())
-    }
-    pub fn from_new_path(
-        SqlConversation {
-            id,
-            folder_id,
-            title,
-            icon,
-            mode,
-            model,
-            temperature,
-            top_p,
-            n,
-            max_tokens,
-            presence_penalty,
-            frequency_penalty,
-            info,
-            prompt,
-            mut path,
-            ..
-        }: SqlConversation,
-        old_path_pre: &str,
-        new_path_pre: &str,
-        time: OffsetDateTime,
-    ) -> Self {
-        path.replace_range(0..old_path_pre.len(), new_path_pre);
-        Self {
-            id,
-            folder_id,
-            path,
-            title,
-            icon,
-            mode,
-            model,
-            temperature,
-            top_p,
-            n,
-            max_tokens,
-            presence_penalty,
-            frequency_penalty,
-            updated_time: time,
-            info,
-            prompt,
-        }
-    }
-    pub fn move_folder(
-        id: i32,
-        folder: Option<i32>,
-        path: &str,
-        time: OffsetDateTime,
-        conn: &mut SqliteConnection,
-    ) -> ChatGPTResult<()> {
-        diesel::update(conversations::table)
-            .filter(conversations::id.eq(id))
-            .set((
-                conversations::path.eq(path),
-                conversations::updated_time.eq(time),
-                conversations::folder_id.eq(folder),
-            ))
-            .execute(conn)?;
-        Ok(())
+    pub fn all(conn: &mut SqliteConnection) -> ChatGPTResult<Vec<Self>> {
+        conversations::table
+            .load::<Self>(conn)
+            .map_err(|e| e.into())
     }
 }
