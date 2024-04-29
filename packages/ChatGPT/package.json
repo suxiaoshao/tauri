@@ -19,7 +19,9 @@
     "prismjs": "^1.29.0",
     "react-resizable": "^3.0.5",
     "theme": "workspace:^",
-    "types": "workspace:^"
+    "types": "workspace:^",
+    "details": "workspace:^",
+    "time": "workspace:^"
   },
   "devDependencies": {
     "@types/prismjs": "^1.26.3",
