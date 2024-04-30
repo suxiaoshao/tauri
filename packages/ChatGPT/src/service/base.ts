@@ -2,13 +2,13 @@
  * @Author: suxiaoshao suxiaoshao@gmail.com
  * @Date: 2023-09-06 17:14:35
  * @LastEditors: suxiaoshao suxiaoshao@gmail.com
- * @LastEditTime: 2024-01-29 21:04:08
+ * @LastEditTime: 2024-05-01 02:42:45
  * @FilePath: /tauri/packages/ChatGPT/src/service/base.ts
  */
 import { invoke } from '@tauri-apps/api';
 import { InvokeArgs } from '@tauri-apps/api/tauri';
 import { enqueueSnackbar } from 'notify';
-import { object, optional, string, enum_, parseAsync } from 'valibot';
+import { object, string, enum_, parseAsync, nullish } from 'valibot';
 
 export type ChatGPTError = {
   code: ChatGPTErrorCodes;
@@ -46,6 +46,7 @@ export enum ChatGPTErrorCodes {
   ConversationPathExists = 'ConversationPathExists',
   FolderPathExists = 'FolderPathExists',
   CsvParse = 'CsvParse',
+  TemplateHasConversation = 'TemplateHasConversation',
 }
 
 const ChatGPTErrorCodesSchema = enum_(ChatGPTErrorCodes);
@@ -53,7 +54,7 @@ const ChatGPTErrorCodesSchema = enum_(ChatGPTErrorCodes);
 const ChatGPTErrorSchema = object({
   code: ChatGPTErrorCodesSchema,
   message: string(),
-  data: optional(string()),
+  data: nullish(string()),
 });
 
 export async function appInvoke<P, R>(cmd: string, params: P): Promise<R> {

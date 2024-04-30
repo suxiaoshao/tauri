@@ -10,18 +10,10 @@ pub struct SqlNewConversation {
     pub(in super::super) path: String,
     pub(in super::super) folder_id: Option<i32>,
     pub(in super::super) icon: String,
-    pub(in super::super) mode: String,
-    pub(in super::super) model: String,
-    pub(in super::super) temperature: f64,
-    pub(in super::super) top_p: f64,
-    pub(in super::super) n: i64,
-    pub(in super::super) max_tokens: Option<i64>,
-    pub(in super::super) presence_penalty: f64,
-    pub(in super::super) frequency_penalty: f64,
     pub(in super::super) created_time: OffsetDateTime,
     pub(in super::super) updated_time: OffsetDateTime,
     pub(in super::super) info: Option<String>,
-    pub(in super::super) prompt: Option<String>,
+    pub(in super::super) template_id: i32,
 }
 
 impl SqlNewConversation {
@@ -33,7 +25,7 @@ impl SqlNewConversation {
     }
 }
 
-#[derive(Queryable, AsChangeset, Debug)]
+#[derive(Queryable, AsChangeset, Debug, Insertable)]
 #[diesel(table_name = conversations)]
 pub struct SqlConversation {
     pub(in super::super) id: i32,
@@ -41,18 +33,10 @@ pub struct SqlConversation {
     pub(in super::super) path: String,
     pub(in super::super) title: String,
     pub(in super::super) icon: String,
-    pub(in super::super) mode: String,
-    pub(in super::super) model: String,
-    pub(in super::super) temperature: f64,
-    pub(in super::super) top_p: f64,
-    pub(in super::super) n: i64,
-    pub(in super::super) max_tokens: Option<i64>,
-    pub(in super::super) presence_penalty: f64,
-    pub(in super::super) frequency_penalty: f64,
     pub(in super::super) created_time: OffsetDateTime,
     pub(in super::super) updated_time: OffsetDateTime,
     pub(in super::super) info: Option<String>,
-    pub(in super::super) prompt: Option<String>,
+    pub(in super::super) template_id: i32,
 }
 
 impl SqlConversation {
@@ -101,6 +85,26 @@ impl SqlConversation {
             .load::<Self>(conn)
             .map_err(|e| e.into())
     }
+    pub fn migration_save(
+        conversations: Vec<Self>,
+        conn: &mut SqliteConnection,
+    ) -> ChatGPTResult<()> {
+        diesel::insert_into(conversations::table)
+            .values(conversations)
+            .execute(conn)?;
+        Ok(())
+    }
+    /// check conversation exists by template_id
+    pub fn exists_by_template_id(
+        template_id: i32,
+        conn: &mut SqliteConnection,
+    ) -> ChatGPTResult<bool> {
+        let count = diesel::select(diesel::dsl::exists(
+            conversations::table.filter(conversations::template_id.eq(template_id)),
+        ))
+        .get_result(conn)?;
+        Ok(count)
+    }
 }
 
 #[derive(AsChangeset, Identifiable, Debug)]
@@ -111,17 +115,9 @@ pub struct SqlUpdateConversation {
     pub(in super::super) path: String,
     pub(in super::super) title: String,
     pub(in super::super) icon: String,
-    pub(in super::super) mode: String,
-    pub(in super::super) model: String,
-    pub(in super::super) temperature: f64,
-    pub(in super::super) top_p: f64,
-    pub(in super::super) n: i64,
-    pub(in super::super) max_tokens: Option<i64>,
-    pub(in super::super) presence_penalty: f64,
-    pub(in super::super) frequency_penalty: f64,
     pub(in super::super) updated_time: OffsetDateTime,
     pub(in super::super) info: Option<String>,
-    pub(in super::super) prompt: Option<String>,
+    pub(in super::super) template_id: i32,
 }
 
 impl SqlUpdateConversation {
@@ -138,17 +134,9 @@ impl SqlUpdateConversation {
             folder_id,
             title,
             icon,
-            mode,
-            model,
-            temperature,
-            top_p,
-            n,
-            max_tokens,
-            presence_penalty,
-            frequency_penalty,
-            info,
-            prompt,
             mut path,
+            info,
+            template_id,
             ..
         }: SqlConversation,
         old_path_pre: &str,
@@ -162,17 +150,9 @@ impl SqlUpdateConversation {
             path,
             title,
             icon,
-            mode,
-            model,
-            temperature,
-            top_p,
-            n,
-            max_tokens,
-            presence_penalty,
-            frequency_penalty,
             updated_time: time,
             info,
-            prompt,
+            template_id,
         }
     }
     pub fn move_folder(

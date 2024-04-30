@@ -2,7 +2,7 @@
  * @Author: suxiaoshao suxiaoshao@gmail.com
  * @Date: 2024-01-06 01:08:42
  * @LastEditors: suxiaoshao suxiaoshao@gmail.com
- * @LastEditTime: 2024-01-29 20:45:04
+ * @LastEditTime: 2024-04-28 20:49:26
  * @FilePath: /tauri/packages/ChatGPT/src/features/Adds/AddConversation.tsx
  */
 import { Box, Typography, Toolbar, IconButton, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
@@ -15,19 +15,18 @@ import { useMatch, useNavigate, useLocation } from 'react-router-dom';
 import { Add } from '@mui/icons-material';
 import { NewConversation } from '@chatgpt/types/conversation';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
-import { addConversation } from '@chatgpt/service/chat';
+import { addConversation } from '@chatgpt/service/chat/mutation';
 
 function AddConversation() {
   const dispatch = useAppDispatch();
   const folderId = useAppSelector(selectSelectedFolderId);
   const navigate = useNavigate();
   const handleSubmit = useCallback(
-    async ({ info, prompt, ...data }: ConversationForm) => {
+    async ({ info, ...data }: ConversationForm) => {
       await addConversation({
         data: {
           ...data,
           info: info?.trim(),
-          prompt: prompt?.trim(),
           folderId: folderId ?? undefined,
         } satisfies NewConversation,
       });

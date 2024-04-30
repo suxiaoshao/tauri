@@ -1,3 +1,10 @@
+/*
+ * @Author: suxiaoshao suxiaoshao@gmail.com
+ * @Date: 2024-01-06 01:08:42
+ * @LastEditors: suxiaoshao suxiaoshao@gmail.com
+ * @LastEditTime: 2024-05-01 03:30:54
+ * @FilePath: /tauri/common/theme/src/themeSlice.ts
+ */
 import { createSlice, EnhancedStore, PayloadAction } from '@reduxjs/toolkit';
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 import { argbFromHex, themeFromSourceColor } from '@material/material-color-utilities';

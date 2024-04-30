@@ -1,8 +1,9 @@
 import { NewConversation } from '@chatgpt/types/conversation';
-import { appInvoke } from './base';
+import { appInvoke } from '../base';
 import { NewFolder } from '@chatgpt/types/folder';
-import { ChatData } from '@chatgpt/types/chatData';
-import { Message } from '@chatgpt/types/message';
+import { NewConversationTemplate } from '@chatgpt/types/conversation_template';
+import store from '@chatgpt/app/store';
+import { fetchTemplates } from '@chatgpt/features/Template/templateSlice';
 
 export interface AddConversationParams {
   data: NewConversation;
@@ -54,19 +55,6 @@ export async function updateFolder(params: UpdateFolderParams) {
   await appInvoke<UpdateFolderParams, unknown>('plugin:chat|update_folder', params);
 }
 
-export interface FetchMessageParams {
-  id: number;
-  content: string;
-}
-
-export async function fetchMessage(params: FetchMessageParams) {
-  await appInvoke<FetchMessageParams, unknown>('plugin:chat|fetch', params);
-}
-
-export async function getChatData(): Promise<ChatData> {
-  return await appInvoke<unknown, ChatData>('plugin:chat|get_chat_data', undefined);
-}
-
 export interface MoveConversationParams {
   conversationId: number;
   folderId: number | null;
@@ -91,14 +79,6 @@ export interface DeleteMessageParams {
 
 export async function deleteMessage(params: DeleteMessageParams) {
   await appInvoke<DeleteMessageParams, unknown>('plugin:chat|delete_message', params);
-}
-
-export interface FindMessageParams {
-  id: number;
-}
-
-export async function findMessage(params: FindMessageParams) {
-  return await appInvoke<FindMessageParams, Message>('plugin:chat|find_message', params);
 }
 
 export interface UpdateMessageContentParams {
@@ -132,4 +112,33 @@ export interface ExportConversationParams {
 
 export async function exportConversation(params: ExportConversationParams) {
   await appInvoke<ExportConversationParams, unknown>('plugin:chat|export', params);
+}
+
+export interface DeleteConversationParams {
+  id: number;
+}
+
+export async function deleteConversationTemplate(params: DeleteConversationParams) {
+  await appInvoke<DeleteConversationParams, unknown>('plugin:chat|delete_conversation_template', params);
+  store.dispatch(fetchTemplates());
+}
+
+export interface AddConversationTemplateParams {
+  data: NewConversationTemplate;
+}
+
+export async function addConversationTemplate(params: AddConversationTemplateParams) {
+  const id = await appInvoke<AddConversationTemplateParams, number>('plugin:chat|add_conversation_template', params);
+  store.dispatch(fetchTemplates());
+  return id;
+}
+
+export interface UpdateConversationTemplateParams {
+  data: NewConversationTemplate;
+  id: number;
+}
+
+export async function updateConversationTemplate(params: UpdateConversationTemplateParams) {
+  await appInvoke<UpdateConversationTemplateParams, unknown>('plugin:chat|update_conversation_template', params);
+  store.dispatch(fetchTemplates());
 }

@@ -10,16 +10,18 @@
     "tauri": "tauri"
   },
   "dependencies": {
-    "@mui/x-tree-view": "^7.2.0",
+    "@mui/x-tree-view": "^7.3.1",
     "markdown-to-jsx": "^7.4.7",
-    "monaco-editor": "^0.47.0",
+    "monaco-editor": "^0.48.0",
     "monaco-themes": "^0.4.4",
     "notify": "workspace:^",
     "prism-themes": "^1.9.0",
     "prismjs": "^1.29.0",
     "react-resizable": "^3.0.5",
     "theme": "workspace:^",
-    "types": "workspace:^"
+    "types": "workspace:^",
+    "details": "workspace:^",
+    "time": "workspace:^"
   },
   "devDependencies": {
     "@types/prismjs": "^1.26.3",

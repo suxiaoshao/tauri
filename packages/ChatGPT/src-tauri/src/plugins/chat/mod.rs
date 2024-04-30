@@ -3,7 +3,9 @@ mod fetch;
 use serde_json::Value;
 use tauri::{AppHandle, Invoke, Manager, Runtime};
 
-use crate::store::{Conversation, DbConn, Folder, Message, NewFolder};
+use crate::store::{
+    Conversation, ConversationTemplate, DbConn, Folder, Message, NewConversationTemplate, NewFolder,
+};
 use crate::{errors::ChatGPTError, store::NewConversation};
 use crate::{errors::ChatGPTResult, store};
 
@@ -36,6 +38,11 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for ChatPlugin {
             update_message_content,
             clear_conversation,
             export::export,
+            all_conversation_templates,
+            find_conversation_template,
+            delete_conversation_template,
+            update_conversation_template,
+            add_conversation_template
         ]);
         (handle)(invoke);
     }
@@ -148,15 +155,60 @@ async fn update_message_content<R: Runtime>(
     Ok(())
 }
 
+#[tauri::command]
+async fn all_conversation_templates(
+    state: tauri::State<'_, DbConn>,
+) -> ChatGPTResult<Vec<ConversationTemplate>> {
+    let conn = &mut state.get()?;
+    let conversations = ConversationTemplate::all(conn)?;
+    Ok(conversations)
+}
+
+#[tauri::command]
+async fn find_conversation_template(
+    state: tauri::State<'_, DbConn>,
+    id: i32,
+) -> ChatGPTResult<ConversationTemplate> {
+    let conn = &mut state.get()?;
+    let conversation = ConversationTemplate::find(id, conn)?;
+    Ok(conversation)
+}
+
+#[tauri::command]
+async fn delete_conversation_template(
+    state: tauri::State<'_, DbConn>,
+    id: i32,
+) -> ChatGPTResult<()> {
+    let conn = &mut state.get()?;
+    ConversationTemplate::delete(id, conn)?;
+    Ok(())
+}
+
+#[tauri::command]
+async fn update_conversation_template(
+    state: tauri::State<'_, DbConn>,
+    id: i32,
+    data: NewConversationTemplate,
+) -> ChatGPTResult<()> {
+    let conn = &mut state.get()?;
+    ConversationTemplate::update(data, id, conn)?;
+    Ok(())
+}
+
+#[tauri::command]
+async fn add_conversation_template(
+    state: tauri::State<'_, DbConn>,
+    data: NewConversationTemplate,
+) -> ChatGPTResult<i32> {
+    let conn = &mut state.get()?;
+    let id = data.insert(conn)?;
+    Ok(id)
+}
+
 fn setup<R: Runtime>(app: &AppHandle<R>) -> ChatGPTResult<()> {
     use tauri::api::path::*;
     //data path
-    let data_path = app_config_dir(&app.config())
-        .ok_or(ChatGPTError::DbPath)?
-        .join("history.sqlite3")
-        .to_str()
-        .ok_or(ChatGPTError::DbPath)?
-        .to_string();
+    let data_path = app_config_dir(&app.config()).ok_or(ChatGPTError::DbPath)?;
     // database connection
     let conn = store::establish_connection(&data_path)?;
     app.manage(conn);

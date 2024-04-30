@@ -1,5 +1,12 @@
+/*
+ * @Author: suxiaoshao suxiaoshao@gmail.com
+ * @Date: 2024-01-06 01:08:42
+ * @LastEditors: suxiaoshao suxiaoshao@gmail.com
+ * @LastEditTime: 2024-04-29 22:15:38
+ * @FilePath: /tauri/packages/ChatGPT/src/features/MessagePreview/Success.tsx
+ */
 import CustomEdit from '@chatgpt/components/CustomEdit';
-import { updateMessageContent } from '@chatgpt/service/chat';
+import { updateMessageContent } from '@chatgpt/service/chat/mutation';
 import { Message } from '@chatgpt/types/message';
 import { Edit, Preview, Upload } from '@mui/icons-material';
 import { Box, IconButton, ToggleButton, ToggleButtonGroup, Tooltip } from '@mui/material';
@@ -10,8 +17,7 @@ import { useSearchParams } from 'react-router-dom';
 export interface SuccessProps {
   message: Message;
 }
-
-enum Alignment {
+export enum Alignment {
   preview = 'preview',
   edit = 'edit',
 }

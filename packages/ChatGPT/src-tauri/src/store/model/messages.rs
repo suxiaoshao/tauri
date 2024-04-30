@@ -3,7 +3,7 @@ use time::OffsetDateTime;
 
 use crate::{
     errors::ChatGPTResult,
-    store::{schema::messages, types::Status},
+    store::{migrations::v1::SqlMessageV1, schema::messages, types::Status},
 };
 
 #[derive(Insertable)]
@@ -29,7 +29,8 @@ impl SqlNewMessage {
     }
 }
 
-#[derive(Debug, Queryable)]
+#[derive(Debug, Queryable, Insertable)]
+#[diesel(table_name = messages)]
 pub struct SqlMessage {
     pub id: i32,
     pub conversation_id: i32,
@@ -41,6 +42,36 @@ pub struct SqlMessage {
     pub updated_time: OffsetDateTime,
     pub start_time: OffsetDateTime,
     pub end_time: OffsetDateTime,
+}
+
+impl From<SqlMessageV1> for SqlMessage {
+    fn from(
+        SqlMessageV1 {
+            id,
+            conversation_id,
+            conversation_path,
+            role,
+            content,
+            status,
+            created_time,
+            updated_time,
+            start_time,
+            end_time,
+        }: SqlMessageV1,
+    ) -> Self {
+        Self {
+            id,
+            conversation_id,
+            conversation_path,
+            role,
+            content,
+            status,
+            created_time,
+            updated_time,
+            start_time,
+            end_time,
+        }
+    }
 }
 
 impl SqlMessage {
@@ -163,6 +194,12 @@ impl SqlMessage {
                 messages::content.eq(content),
                 messages::updated_time.eq(time),
             ))
+            .execute(conn)?;
+        Ok(())
+    }
+    pub fn migration_save(data: Vec<SqlMessage>, conn: &mut SqliteConnection) -> ChatGPTResult<()> {
+        diesel::insert_into(messages::table)
+            .values(data)
             .execute(conn)?;
         Ok(())
     }

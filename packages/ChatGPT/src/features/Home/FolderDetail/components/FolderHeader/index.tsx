@@ -4,7 +4,7 @@ import { useAppDispatch } from '@chatgpt/app/hooks';
 import { fetchConversations } from '@chatgpt/features/Conversations/conversationSlice';
 import { Folder } from '@chatgpt/types/folder';
 import { Delete } from '@mui/icons-material';
-import { deleteFolder } from '@chatgpt/service/chat';
+import { deleteFolder } from '@chatgpt/service/chat/mutation';
 import UpdateFolder from './UpdateFolder';
 import MoveFolder from './MoveFolder';
 export interface FolderHeaderProps {

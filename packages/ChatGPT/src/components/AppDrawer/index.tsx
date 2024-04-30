@@ -1,3 +1,10 @@
+/*
+ * @Author: suxiaoshao suxiaoshao@gmail.com
+ * @Date: 2024-01-06 01:08:42
+ * @LastEditors: suxiaoshao suxiaoshao@gmail.com
+ * @LastEditTime: 2024-04-28 21:15:54
+ * @FilePath: /tauri/packages/ChatGPT/src/components/AppDrawer/index.tsx
+ */
 import { Box, Divider, List, Toolbar } from '@mui/material';
 import { Outlet } from 'react-router-dom';
 import AddConversation from '@chatgpt/features/Adds/AddConversation';
@@ -8,6 +15,7 @@ import usePlatform from '@chatgpt/hooks/usePlatform';
 import ConversationTree from '@chatgpt/features/Conversations';
 import Setting from '@chatgpt/features/Setting';
 import 'react-resizable/css/styles.css';
+import ConversationTemplateList from '@chatgpt/features/Template/List';
 export default function AppDrawer() {
   const [drawerWidth, setDrawerWidth] = useState(250);
   const platform = usePlatform();
@@ -57,6 +65,7 @@ export default function AppDrawer() {
             <List>
               <AddConversation.Item />
               <AddFolder.Item />
+              <ConversationTemplateList.Item />
               <Setting.Item />
             </List>
           </Box>
@@ -69,7 +78,7 @@ export default function AppDrawer() {
           height: `100%`,
         }}
       >
-        <Outlet />D
+        <Outlet />
       </Box>
     </Box>
   );

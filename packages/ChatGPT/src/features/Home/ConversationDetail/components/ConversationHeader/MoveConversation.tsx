@@ -13,7 +13,7 @@ import DriveFileMoveIcon from '@mui/icons-material/DriveFileMove';
 import { useCallback, useState } from 'react';
 import FolderSelect from '@chatgpt/components/FolderSelect';
 import { Controller, useForm } from 'react-hook-form';
-import { MoveConversationParams, moveConversation } from '@chatgpt/service/chat';
+import { MoveConversationParams, moveConversation } from '@chatgpt/service/chat/mutation';
 import { useAppDispatch } from '@chatgpt/app/hooks';
 import { fetchConversations } from '@chatgpt/features/Conversations/conversationSlice';
 

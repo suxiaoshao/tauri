@@ -1,41 +1,29 @@
+/*
+ * @Author: suxiaoshao suxiaoshao@gmail.com
+ * @Date: 2024-04-19 12:09:18
+ * @LastEditors: suxiaoshao suxiaoshao@gmail.com
+ * @LastEditTime: 2024-05-01 03:52:35
+ * @FilePath: /tauri/packages/ChatGPT/src/components/ConversationEdit/index.tsx
+ */
 import { useAppSelector } from '@chatgpt/app/hooks';
-import store from '@chatgpt/app/store';
-import { selectModels } from '@chatgpt/features/Setting/configSlice';
-import { Mode } from '@chatgpt/types/common';
+import TemplateInfo from '@chatgpt/features/Template/components/TemplateInfo';
+import { selectTemplates } from '@chatgpt/features/Template/templateSlice';
 import { NewConversation } from '@chatgpt/types/conversation';
 import { valibotResolver } from '@hookform/resolvers/valibot';
-import { Box, TextField, MenuItem, FormControlLabel, Checkbox, BoxProps } from '@mui/material';
-import { useState } from 'react';
-import { useForm, Controller, Resolver } from 'react-hook-form';
-import { object, string, number, Input, emoji, enum_, minValue, maxValue, integer, nullable } from 'valibot';
-import NumberField from '../NumberField';
+import { Box, TextField, BoxProps, MenuItem, ListItemAvatar, ListItemText, Avatar, ListItem } from '@mui/material';
+import { useForm, Resolver, Controller } from 'react-hook-form';
+import { object, string, number, Input, emoji, integer, nullish } from 'valibot';
 
 const conversationSchema = object({
   title: string(),
   icon: string([emoji()]),
-  mode: enum_(Mode),
-  model: string(),
-  temperature: number([minValue(0), maxValue(1)]),
-  topP: number([minValue(0), maxValue(1)]),
-  n: number([minValue(1), integer()]),
-  maxTokens: nullable(number([minValue(1), integer()])),
-  presencePenalty: number([minValue(-2), maxValue(2)]),
-  frequencyPenalty: number([minValue(-2), maxValue(2)]),
-  info: nullable(string()),
-  prompt: nullable(string()),
+  info: nullish(string()),
+  templateId: number([integer()]),
 });
 
 export type ConversationForm = Input<typeof conversationSchema>;
 
-const getDefaultValues = (): Partial<NewConversation> => ({
-  mode: Mode.Contextual,
-  model: store.getState().config.models.at(0),
-  temperature: 1,
-  topP: 1,
-  n: 1,
-  presencePenalty: 0,
-  frequencyPenalty: 0,
-});
+const getDefaultValues = (): Partial<NewConversation> => ({});
 
 export interface ConversationEditProps extends Omit<BoxProps, 'component' | 'id' | 'onSubmit'> {
   initialValues?: NewConversation;
@@ -46,15 +34,14 @@ export default function ConversationEdit({ initialValues, id, sx, onSubmit: subm
   const {
     register,
     handleSubmit,
-    formState: { errors },
     control,
+    formState: { errors },
   } = useForm<ConversationForm>({
     resolver: valibotResolver(conversationSchema) as Resolver<ConversationForm, unknown>,
     defaultValues: initialValues ?? getDefaultValues(),
   });
   const onSubmit = handleSubmit(submit);
-  const [openMaxTokens, setOpenMaxTokens] = useState(false);
-  const models = useAppSelector(selectModels);
+  const templates = useAppSelector(selectTemplates);
   return (
     <Box
       {...props}
@@ -79,51 +66,6 @@ export default function ConversationEdit({ initialValues, id, sx, onSubmit: subm
         label="Title"
         fullWidth
       />
-      <Controller
-        control={control}
-        name="mode"
-        rules={{ required: true }}
-        render={({ field, fieldState }) => (
-          <TextField
-            error={!!fieldState?.error?.message}
-            helperText={fieldState?.error?.message}
-            select
-            label="Mode"
-            required
-            fullWidth
-            sx={{ mt: 2 }}
-            {...field}
-          >
-            <MenuItem value={Mode.Contextual}>{Mode.Contextual}</MenuItem>
-            <MenuItem value={Mode.Single}>{Mode.Single}</MenuItem>
-            <MenuItem value={Mode.AssistantOnly}>{Mode.AssistantOnly}</MenuItem>
-          </TextField>
-        )}
-      />
-      <Controller
-        control={control}
-        name="model"
-        rules={{ required: true }}
-        render={({ field, fieldState }) => (
-          <TextField
-            error={!!fieldState?.error?.message}
-            helperText={fieldState?.error?.message}
-            select
-            label="Model"
-            required
-            fullWidth
-            sx={{ mt: 2 }}
-            {...field}
-          >
-            {models.map((model) => (
-              <MenuItem key={model} value={model}>
-                {model}
-              </MenuItem>
-            ))}
-          </TextField>
-        )}
-      />
-
       <TextField
         error={!!errors.icon?.message}
         helperText={errors.icon?.message}
@@ -141,83 +83,46 @@ export default function ConversationEdit({ initialValues, id, sx, onSubmit: subm
         fullWidth
         sx={{ mt: 2 }}
       />
-      <TextField
-        error={!!errors.prompt?.message}
-        helperText={errors.prompt?.message}
-        {...register('prompt')}
-        label="Prompt"
-        fullWidth
-        sx={{ mt: 2 }}
-        multiline
-        maxRows={4}
+      <Controller
+        control={control}
+        name="templateId"
+        rules={{ required: true }}
+        render={({ field, fieldState }) => (
+          <TextField
+            error={!!fieldState?.error?.message}
+            helperText={fieldState?.error?.message}
+            select
+            label="Model"
+            required
+            fullWidth
+            sx={{
+              mt: 2,
+            }}
+            SelectProps={{
+              MenuProps: {
+                sx: {
+                  '& .MuiMenu-paper': {
+                    backgroundColor: (theme) => theme.palette.background.paper + 'a0',
+                    backdropFilter: 'blur(20px)',
+                  },
+                },
+              },
+            }}
+            {...field}
+          >
+            {templates.map(({ id, name, icon, description, mode }) => (
+              <MenuItem key={id} value={id}>
+                <ListItem dense sx={{ p: 0 }}>
+                  <ListItemAvatar>
+                    <Avatar sx={{ bgcolor: 'transparent' }}>{icon}</Avatar>
+                  </ListItemAvatar>
+                  <ListItemText primary={name} secondary={<TemplateInfo description={description} mode={mode} />} />
+                </ListItem>
+              </MenuItem>
+            ))}
+          </TextField>
+        )}
       />
-      <NumberField
-        error={!!errors.temperature?.message}
-        helperText={errors.temperature?.message}
-        required
-        label="Temperature"
-        {...register('temperature', { required: true, min: 0, max: 1 })}
-        sx={{ mt: 2 }}
-        fullWidth
-        inputProps={{ min: 0, max: 1, step: 0.01, inputmode: 'numeric', pattern: '[0-9]*' }}
-      />
-      <NumberField
-        error={!!errors.topP?.message}
-        helperText={errors.topP?.message}
-        required
-        label="Top P"
-        {...register('topP', { required: true, min: 0, max: 1 })}
-        sx={{ mt: 2 }}
-        fullWidth
-        inputProps={{ min: 0, max: 1, step: 0.01 }}
-      />
-      <NumberField
-        error={!!errors.n?.message}
-        helperText={errors.n?.message}
-        required
-        label="N"
-        {...register('n', { required: true })}
-        sx={{ mt: 2 }}
-        fullWidth
-        inputProps={{ min: 1, step: 1 }}
-      />
-      <NumberField
-        error={!!errors.presencePenalty?.message}
-        helperText={errors.presencePenalty?.message}
-        required
-        label="Presence Penalty"
-        {...register('presencePenalty', { required: true })}
-        sx={{ mt: 2 }}
-        fullWidth
-        inputProps={{ min: -2, max: 2, step: 0.01 }}
-      />
-      <NumberField
-        error={!!errors.frequencyPenalty?.message}
-        helperText={errors.frequencyPenalty?.message}
-        required
-        label="Frequency Penalty"
-        {...register('frequencyPenalty', { required: true })}
-        sx={{ mt: 2 }}
-        fullWidth
-        inputProps={{ min: -2, max: 2, step: 0.01 }}
-      />
-      <FormControlLabel
-        control={<Checkbox checked={openMaxTokens} onChange={(_, check) => setOpenMaxTokens(check)} />}
-        label="Open Max Tokens"
-        sx={{ mt: 1 }}
-      />
-      {openMaxTokens && (
-        <NumberField
-          error={!!errors.maxTokens?.message}
-          helperText={errors.maxTokens?.message}
-          label="Frequency Penalty"
-          {...register('maxTokens', { required: true })}
-          sx={{ mt: 1 }}
-          fullWidth
-          inputProps={{ min: 1, step: 1 }}
-          required
-        />
-      )}
     </Box>
   );
 }

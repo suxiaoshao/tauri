@@ -20,7 +20,7 @@ import {
 import IosShareIcon from '@mui/icons-material/IosShare';
 import { useCallback, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { ExportConversationParams, ExportType, exportConversation } from '@chatgpt/service/chat';
+import { ExportConversationParams, ExportType, exportConversation } from '@chatgpt/service/chat/mutation';
 import { useAppDispatch } from '@chatgpt/app/hooks';
 import { fetchConversations } from '@chatgpt/features/Conversations/conversationSlice';
 import { dialog } from '@tauri-apps/api';

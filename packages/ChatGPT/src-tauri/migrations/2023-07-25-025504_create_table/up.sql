@@ -12,13 +12,12 @@ create table folders
     foreign key (parent_id) references folders (id)
 );
 
-create table conversations
+CREATE TABLE conversation_templates
 (
-    id                INTEGER primary key autoincrement not null,
-    folder_id         INTEGER,
-    path              TEXT                              not null,
-    title             TEXT                              not null,
+    id                Integer PRIMARY KEY AUTOINCREMENT not null,
+    name              TEXT                              NOT NULL,
     icon              TEXT                              not null,
+    description       TEXT,
     mode              TEXT                              not null check ( mode in ('contextual', 'single', 'assistant-only') )     default 'contextual',
     model             TEXT                              not null,
     temperature       DOUBLE                            not null check ( temperature >= 0.0 and temperature <= 1.0 )              default 1.0,
@@ -27,21 +26,37 @@ create table conversations
     max_tokens        BIGINT check ( max_tokens >= 1 )                                                                            default null,
     presence_penalty  DOUBLE                            not null check ( presence_penalty >= -2.0 and presence_penalty <= 2.0 )   default 0.0,
     frequency_penalty DOUBLE                            not null check ( frequency_penalty >= -2.0 and frequency_penalty <= 2.0 ) default 0.0,
-    created_time      DateTime                          not null,
-    updated_time      DateTime                          not null,
-    info              TEXT,
-    prompt            TEXT,
+    created_time      DATETIME                          NOT NULL,
+    updated_time      DATETIME                          NOT NULL
+);
+
+create table conversation_template_prompts
+(
+    id           INTEGER PRIMARY KEY AUTOINCREMENT not null,
+    template_id  INTEGER                           not null,
+    prompt       TEXT                              not null,
+    role         TEXT                              not null check ( role in ('system', 'user', 'assistant') ),
+    created_time DATETIME                          NOT NULL,
+    updated_time DATETIME                          NOT NULL,
+    FOREIGN KEY (template_id) REFERENCES conversation_templates (id)
+);
+
+create table conversations
+(
+    id           INTEGER primary key autoincrement not null,
+    folder_id    INTEGER,
+    path         TEXT                              not null,
+    title        TEXT                              not null,
+    icon         TEXT                              not null,
+    created_time DateTime                          not null,
+    updated_time DateTime                          not null,
+    info         TEXT,
+    template_id  INTEGER                           not null,
     foreign key (folder_id) references folders (id),
+    FOREIGN KEY (template_id) REFERENCES conversation_templates (id),
     unique (path)
 );
 
-
-
-insert
-into conversations (title, path, icon, mode, model, created_time, updated_time, info, prompt)
-values ('默认', '/默认', '🤖', 'contextual', 'gpt-3.5-turbo', (SELECT datetime('now')),
-        (SELECT datetime('now')),
-        '默认', null);
 
 create table messages
 (

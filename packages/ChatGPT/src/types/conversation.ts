@@ -2,7 +2,7 @@
  * @Author: suxiaoshao suxiaoshao@gmail.com
  * @Date: 2024-01-06 01:08:42
  * @LastEditors: suxiaoshao suxiaoshao@gmail.com
- * @LastEditTime: 2024-03-07 00:43:38
+ * @LastEditTime: 2024-04-28 20:44:52
  * @FilePath: /tauri/packages/ChatGPT/src/types/conversation.ts
  */
 import { Message } from '@chatgpt/types/message';
@@ -13,33 +13,17 @@ export interface Conversation {
   folderId: number | undefined;
   title: string;
   icon: string;
-  mode: Mode;
-  model: string;
   createdTime: string;
   updatedTime: string;
-  temperature: number;
-  topP: number;
-  n: number;
-  maxTokens?: number | undefined;
-  presencePenalty: number;
-  frequencyPenalty: number;
   info?: string | undefined;
-  prompt?: string | undefined;
   messages: Message[];
+  templateId: number;
 }
 
 export interface NewConversation {
   title: string;
   folderId: number | undefined;
   icon: string;
-  mode: Mode;
-  model: string;
-  temperature: number;
-  topP: number;
-  n: number;
-  maxTokens?: number | null;
-  presencePenalty: number;
-  frequencyPenalty: number;
   info?: string | null;
-  prompt?: string | null;
+  templateId: number;
 }

@@ -112,8 +112,11 @@ async fn _fetch<R: Runtime>(
     // get conversation
     let conversation = Conversation::find(id, conn)?;
 
+    // get conversation template
+    let template = crate::store::ConversationTemplate::find(conversation.template_id, conn)?;
+
     // get request
-    let chat_request = ChatRequest::new(conversation, content.clone());
+    let chat_request = ChatRequest::new(conversation, template, content.clone());
 
     // insert user message
     let user_new_message = NewMessage::new(id, Role::User, content, Status::Normal);
