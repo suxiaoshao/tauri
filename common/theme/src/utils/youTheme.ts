@@ -1,3 +1,10 @@
+/*
+ * @Author: suxiaoshao suxiaoshao@gmail.com
+ * @Date: 2024-01-06 01:08:42
+ * @LastEditors: suxiaoshao suxiaoshao@gmail.com
+ * @LastEditTime: 2024-05-01 03:50:23
+ * @FilePath: /tauri/common/theme/src/utils/youTheme.ts
+ */
 import { hexFromArgb, Scheme } from '@material/material-color-utilities';
 import { ThemeOptions } from '@mui/material';
 
@@ -34,6 +41,26 @@ export function youThemeToMuiTheme(theme: ReturnType<Scheme['toJSON']>, mode: 'd
         secondary: hexFromArgb(theme.onSurface),
         disabled: hexFromArgb(theme.onSurfaceVariant),
       },
+      tertiary: {
+        main: hexFromArgb(theme.tertiary),
+        contrastText: hexFromArgb(theme.onTertiary),
+      },
     },
   } satisfies ThemeOptions;
+}
+
+declare module '@mui/material/styles' {
+  interface Palette {
+    tertiary: Palette['primary'];
+  }
+
+  interface PaletteOptions {
+    tertiary?: PaletteOptions['primary'];
+  }
+}
+
+declare module '@mui/material/Chip' {
+  interface ChipPropsColorOverrides {
+    tertiary: true;
+  }
 }

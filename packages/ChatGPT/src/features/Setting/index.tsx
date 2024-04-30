@@ -20,7 +20,7 @@ import { useCallback } from 'react';
 import useConfig from '@chatgpt/hooks/useConfig';
 import useSettingKey from '@chatgpt/hooks/useSettingKey';
 import { createSettingWindow, setConfigService } from '@chatgpt/service/config';
-import { string, object, enum_, Input, regex, required, url, optional, array } from 'valibot';
+import { string, object, enum_, Input, regex, url, array, nullish } from 'valibot';
 import { valibotResolver } from '@hookform/resolvers/valibot';
 
 const ThemeSchema = enum_(Theme);
@@ -33,8 +33,8 @@ const ThemeOptionSchema = object({
 const ChatGPTConfigSchema = object({
   apiKey: string(),
   theme: ThemeOptionSchema,
-  url: optional(string([url()])),
-  httpProxy: optional(string([url()])),
+  url: nullish(string([url()])),
+  httpProxy: nullish(string([url()])),
   models: array(string()),
 });
 

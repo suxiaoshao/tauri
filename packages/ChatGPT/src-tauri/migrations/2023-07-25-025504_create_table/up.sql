@@ -17,6 +17,7 @@ CREATE TABLE conversation_templates
     id                Integer PRIMARY KEY AUTOINCREMENT not null,
     name              TEXT                              NOT NULL,
     icon              TEXT                              not null,
+    description       TEXT,
     mode              TEXT                              not null check ( mode in ('contextual', 'single', 'assistant-only') )     default 'contextual',
     model             TEXT                              not null,
     temperature       DOUBLE                            not null check ( temperature >= 0.0 and temperature <= 1.0 )              default 1.0,

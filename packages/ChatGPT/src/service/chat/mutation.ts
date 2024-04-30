@@ -128,8 +128,9 @@ export interface AddConversationTemplateParams {
 }
 
 export async function addConversationTemplate(params: AddConversationTemplateParams) {
-  await appInvoke<AddConversationTemplateParams, unknown>('plugin:chat|add_conversation_template', params);
+  const id = await appInvoke<AddConversationTemplateParams, number>('plugin:chat|add_conversation_template', params);
   store.dispatch(fetchTemplates());
+  return id;
 }
 
 export interface UpdateConversationTemplateParams {

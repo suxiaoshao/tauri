@@ -2,7 +2,7 @@
  * @Author: suxiaoshao suxiaoshao@gmail.com
  * @Date: 2024-04-28 20:59:43
  * @LastEditors: suxiaoshao suxiaoshao@gmail.com
- * @LastEditTime: 2024-04-30 22:06:19
+ * @LastEditTime: 2024-05-01 02:26:45
  * @FilePath: /tauri/packages/ChatGPT/src/features/Template/Detail/index.tsx
  */
 import usePromise from '@chatgpt/hooks/usePromise';
@@ -13,9 +13,11 @@ import { useParams } from 'react-router-dom';
 import TemplateDetailHeader from './components/Header';
 import Loading from '@chatgpt/components/Loading';
 import ErrorInfo from '@chatgpt/components/ErrorInfo';
-import TemplateDetailEdit from './components/Edit';
+import TemplateEdit, { TemplateForm } from '../components/TemplateEdit';
 import { Alignment } from '@chatgpt/features/MessagePreview/Success';
 import TemplateDetailView from './components/View';
+import { updateConversationTemplate } from '@chatgpt/service/chat/mutation';
+import { enqueueSnackbar } from 'notify';
 
 export default function ConversationTemplateDetail() {
   const [alignment, setAlignment] = useState(Alignment.preview);
@@ -49,7 +51,7 @@ export default function ConversationTemplateDetail() {
   // formId
   const formId = useMemo(() => {
     if (data.tag === 'data') {
-      return `${data.value.id}-form`;
+      return `template-${data.value.id}-form`;
     }
     return '';
   }, [data]);
@@ -66,11 +68,13 @@ export default function ConversationTemplateDetail() {
           case Alignment.preview:
             return <TemplateDetailView data={data.value} />;
           case Alignment.edit:
-            const onSuccess = () => {
+            const onSubmit = async (formData: TemplateForm) => {
+              await updateConversationTemplate({ data: formData, id: data.value.id });
+              enqueueSnackbar('Template updated successfully', { variant: 'success' });
               refresh();
               setAlignment(Alignment.preview);
             };
-            return <TemplateDetailEdit onSuccess={onSuccess} id={formId} data={data.value} />;
+            return <TemplateEdit onSubmit={onSubmit} id={formId} initialValues={data.value} />;
         }
       default:
         return <Loading sx={{ width: '100%', height: '100%' }} />;

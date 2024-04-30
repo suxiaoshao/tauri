@@ -2,32 +2,32 @@
  * @Author: suxiaoshao suxiaoshao@gmail.com
  * @Date: 2024-04-29 06:38:37
  * @LastEditors: suxiaoshao suxiaoshao@gmail.com
- * @LastEditTime: 2024-04-30 23:55:52
+ * @LastEditTime: 2024-05-01 02:43:52
  * @FilePath: /tauri/packages/ChatGPT/src/features/Template/Detail/components/Edit.tsx
  */
 import { useAppSelector } from '@chatgpt/app/hooks';
+import store from '@chatgpt/app/store';
 import NumberField from '@chatgpt/components/NumberField';
 import { selectModels } from '@chatgpt/features/Setting/configSlice';
-import { updateConversationTemplate } from '@chatgpt/service/chat/mutation';
 import { Mode, Role } from '@chatgpt/types/common';
 import { ConversationTemplate } from '@chatgpt/types/conversation_template';
 import { valibotResolver } from '@hookform/resolvers/valibot';
 import { Add, Delete } from '@mui/icons-material';
 import { Box, Checkbox, FormControlLabel, FormLabel, IconButton, MenuItem, TextField } from '@mui/material';
-import { enqueueSnackbar } from 'notify';
 import { useState } from 'react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
-import { Input, array, emoji, enum_, integer, maxValue, minValue, nullable, number, object, string } from 'valibot';
+import { Input, array, emoji, enum_, integer, maxValue, minValue, nullish, number, object, string } from 'valibot';
 
 const templateSchema = object({
   name: string(),
   icon: string([emoji()]),
+  description: nullish(string()),
   mode: enum_(Mode),
   model: string(),
   temperature: number([minValue(0), maxValue(1)]),
   topP: number([minValue(0), maxValue(1)]),
   n: number([minValue(1), integer()]),
-  maxTokens: nullable(number([minValue(1), integer()])),
+  maxTokens: nullish(number([minValue(1), integer()])),
   presencePenalty: number([minValue(-2), maxValue(2)]),
   frequencyPenalty: number([minValue(-2), maxValue(2)]),
   prompts: array(
@@ -40,13 +40,23 @@ const templateSchema = object({
 
 export type TemplateForm = Input<typeof templateSchema>;
 
-export interface TemplateDetailEditProps {
-  data: ConversationTemplate;
+const getDefaultValues = (): Partial<TemplateForm> => ({
+  mode: Mode.Contextual,
+  model: store.getState().config.models.at(0),
+  temperature: 1,
+  topP: 1,
+  n: 1,
+  presencePenalty: 0,
+  frequencyPenalty: 0,
+});
+
+export interface TemplateEditProps {
+  initialValues?: ConversationTemplate;
   id: string;
-  onSuccess: () => void;
+  onSubmit: (newTemplate: TemplateForm) => Promise<void>;
 }
 
-export default function TemplateDetailEdit({ data, id, onSuccess }: TemplateDetailEditProps) {
+export default function TemplateEdit({ initialValues, id, onSubmit }: TemplateEditProps) {
   const {
     register,
     handleSubmit,
@@ -54,7 +64,7 @@ export default function TemplateDetailEdit({ data, id, onSuccess }: TemplateDeta
     control,
   } = useForm<TemplateForm>({
     resolver: valibotResolver(templateSchema),
-    defaultValues: data,
+    defaultValues: initialValues ?? getDefaultValues(),
   });
   const [openMaxTokens, setOpenMaxTokens] = useState(false);
   const models = useAppSelector(selectModels);
@@ -62,18 +72,13 @@ export default function TemplateDetailEdit({ data, id, onSuccess }: TemplateDeta
     control,
     name: 'prompts',
   });
-  const onSubmit = handleSubmit(async (formData) => {
-    await updateConversationTemplate({ data: formData, id: data.id });
-    enqueueSnackbar('Template updated successfully', { variant: 'success' });
-    onSuccess();
-  });
 
   return (
     <Box
       sx={{ flex: '1 1 0', display: 'flex', flexDirection: 'column', position: 'relative', overflowY: 'auto', p: 2 }}
       component="form"
       id={id}
-      onSubmit={onSubmit}
+      onSubmit={handleSubmit(onSubmit)}
     >
       <TextField
         error={!!errors.name?.message}
@@ -89,6 +94,14 @@ export default function TemplateDetailEdit({ data, id, onSuccess }: TemplateDeta
         label="Icon"
         required
         {...register('icon', { required: true })}
+        fullWidth
+        sx={{ mt: 2 }}
+      />
+      <TextField
+        error={!!errors.description?.message}
+        helperText={errors.description?.message}
+        {...register('description')}
+        label="Description"
         fullWidth
         sx={{ mt: 2 }}
       />

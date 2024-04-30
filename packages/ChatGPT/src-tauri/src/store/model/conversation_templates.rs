@@ -2,7 +2,7 @@
  * @Author: suxiaoshao suxiaoshao@gmail.com
  * @Date: 2024-04-26 19:18:35
  * @LastEditors: suxiaoshao suxiaoshao@gmail.com
- * @LastEditTime: 2024-04-30 04:54:43
+ * @LastEditTime: 2024-05-01 02:15:54
  * @FilePath: /tauri/packages/ChatGPT/src-tauri/src/store/model/conversation_templates.rs
  */
 use crate::{errors::ChatGPTResult, store::Mode};
@@ -16,6 +16,7 @@ use time::OffsetDateTime;
 pub struct SqlNewConversationTemplate {
     pub(in super::super) name: String,
     pub(in super::super) icon: String,
+    pub(in super::super) description: Option<String>,
     pub(in super::super) mode: String,
     pub(in super::super) model: String,
     pub(in super::super) temperature: f64,
@@ -36,7 +37,7 @@ impl SqlNewConversationTemplate {
             icon: "🤖".to_string(),
             mode: (Mode::Contextual).to_string(),
             model: "gpt-3.5-turbo".to_string(),
-            temperature: 0.0,
+            temperature: 1.0,
             top_p: 1.0,
             n: 1,
             max_tokens: None,
@@ -44,6 +45,7 @@ impl SqlNewConversationTemplate {
             frequency_penalty: 0.0,
             created_time: now,
             updated_time: now,
+            description: None,
         }
     }
     pub fn insert(self, conn: &mut SqliteConnection) -> ChatGPTResult<()> {
@@ -60,6 +62,7 @@ pub struct SqlConversationTemplate {
     pub(in super::super) id: i32,
     pub(in super::super) name: String,
     pub(in super::super) icon: String,
+    pub(in super::super) description: Option<String>,
     pub(in super::super) mode: String,
     pub(in super::super) model: String,
     pub(in super::super) temperature: f64,
@@ -108,6 +111,7 @@ pub struct SqlUpdateConversationTemplate {
     pub(in super::super) id: i32,
     pub(in super::super) name: String,
     pub(in super::super) icon: String,
+    pub(in super::super) description: Option<String>,
     pub(in super::super) mode: String,
     pub(in super::super) model: String,
     pub(in super::super) temperature: f64,

@@ -2,7 +2,7 @@
  * @Author: suxiaoshao suxiaoshao@gmail.com
  * @Date: 2024-04-28 04:23:22
  * @LastEditors: suxiaoshao suxiaoshao@gmail.com
- * @LastEditTime: 2024-04-30 04:59:36
+ * @LastEditTime: 2024-05-01 03:04:57
  * @FilePath: /tauri/packages/ChatGPT/src-tauri/src/store/service/conversation_templates.rs
  */
 
@@ -34,6 +34,7 @@ pub struct ConversationTemplate {
     pub id: i32,
     pub name: String,
     pub icon: String,
+    pub description: Option<String>,
     pub mode: Mode,
     pub model: String,
     #[serde(
@@ -77,6 +78,7 @@ impl ConversationTemplate {
             frequency_penalty,
             created_time,
             updated_time,
+            description,
         } = SqlConversationTemplate::find(id, conn)?;
         let sql_prompts = SqlConversationTemplatePrompt::find_by_template_id(id, conn)?;
         let prompts = sql_prompts
@@ -98,6 +100,7 @@ impl ConversationTemplate {
             presence_penalty,
             frequency_penalty,
             prompts,
+            description,
         })
     }
     pub fn all(conn: &mut SqliteConnection) -> ChatGPTResult<Vec<Self>> {
@@ -118,6 +121,7 @@ impl ConversationTemplate {
             frequency_penalty,
             created_time,
             updated_time,
+            description,
         } in sql_conversation_templates
         {
             let prompts = sql_conversation_template_prompts
@@ -141,6 +145,7 @@ impl ConversationTemplate {
                 presence_penalty,
                 frequency_penalty,
                 prompts,
+                description,
             });
         }
         Ok(conversation_templates)
@@ -158,6 +163,7 @@ impl ConversationTemplate {
             presence_penalty,
             frequency_penalty,
             prompts,
+            description,
         }: NewConversationTemplate,
         id: i32,
         conn: &mut SqliteConnection,
@@ -178,6 +184,7 @@ impl ConversationTemplate {
                 presence_penalty,
                 frequency_penalty,
                 updated_time: time,
+                description,
             };
             sql_new.update(conn)?;
 
@@ -213,6 +220,7 @@ impl ConversationTemplate {
 pub struct NewConversationTemplate {
     pub name: String,
     pub icon: String,
+    pub description: Option<String>,
     pub mode: Mode,
     pub model: String,
     pub temperature: f64,
@@ -229,7 +237,7 @@ pub struct NewConversationTemplate {
 }
 
 impl NewConversationTemplate {
-    pub fn insert(self, conn: &mut SqliteConnection) -> ChatGPTResult<()> {
+    pub fn insert(self, conn: &mut SqliteConnection) -> ChatGPTResult<i32> {
         let NewConversationTemplate {
             name,
             icon,
@@ -242,6 +250,7 @@ impl NewConversationTemplate {
             presence_penalty,
             frequency_penalty,
             prompts,
+            description,
         } = self;
         let time = OffsetDateTime::now_utc();
         conn.immediate_transaction(|conn| {
@@ -259,6 +268,7 @@ impl NewConversationTemplate {
                 frequency_penalty,
                 created_time: time,
                 updated_time: time,
+                description,
             };
             sql_new.insert(conn)?;
 
@@ -275,7 +285,7 @@ impl NewConversationTemplate {
                 })
                 .collect::<Vec<SqlNewConversationTemplatePrompt>>();
             SqlNewConversationTemplatePrompt::save_many(prompts, conn)?;
-            Ok(())
+            Ok(id)
         })
     }
 }

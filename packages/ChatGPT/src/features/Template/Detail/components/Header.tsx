@@ -2,7 +2,7 @@
  * @Author: suxiaoshao suxiaoshao@gmail.com
  * @Date: 2024-04-29 06:00:04
  * @LastEditors: suxiaoshao suxiaoshao@gmail.com
- * @LastEditTime: 2024-05-01 00:43:42
+ * @LastEditTime: 2024-05-01 03:14:09
  * @FilePath: /tauri/packages/ChatGPT/src/features/Template/Detail/components/header.tsx
  */
 import { PromiseData } from '@chatgpt/hooks/usePromise';
@@ -80,7 +80,7 @@ export default function TemplateDetailHeader({
     switch (tag) {
       case 'data':
         const handleDelete = async () => {
-          deleteConversationTemplate({ id: value.id });
+          await deleteConversationTemplate({ id: value.id });
           navigate(-1);
           enqueueSnackbar('Conversation template deleted', { variant: 'success' });
         };

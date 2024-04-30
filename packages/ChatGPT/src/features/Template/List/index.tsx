@@ -2,7 +2,7 @@
  * @Author: suxiaoshao suxiaoshao@gmail.com
  * @Date: 2024-04-28 20:59:49
  * @LastEditors: suxiaoshao suxiaoshao@gmail.com
- * @LastEditTime: 2024-05-01 00:03:53
+ * @LastEditTime: 2024-05-01 03:19:24
  * @FilePath: /tauri/packages/ChatGPT/src/features/Template/List/index.tsx
  */
 import { Apps } from '@mui/icons-material';
@@ -12,6 +12,7 @@ import TemplateListHeader from './components/Header';
 import { useCallback, useMemo } from 'react';
 import { useAppSelector } from '@chatgpt/app/hooks';
 import { selectTemplates } from '../templateSlice';
+import TemplateInfo from '../components/TemplateInfo';
 function ConversationTemplateList() {
   const templates = useAppSelector(selectTemplates);
   const navigate = useNavigate();
@@ -24,12 +25,12 @@ function ConversationTemplateList() {
   const content = useMemo(
     () => (
       <List sx={{ flex: '1 1 0', overflowY: 'auto' }}>
-        {templates.map((template) => (
-          <ListItemButton key={template.id} onClick={() => handleClick(template.id)}>
+        {templates.map(({ id, icon, description, mode, name }) => (
+          <ListItemButton key={id} onClick={() => handleClick(id)}>
             <ListItemAvatar>
-              <Avatar sx={{ bgcolor: 'transparent' }}>{template.icon}</Avatar>
+              <Avatar sx={{ bgcolor: 'transparent' }}>{icon}</Avatar>
             </ListItemAvatar>
-            <ListItemText primary={template.name} secondary={template.mode} />
+            <ListItemText primary={name} secondary={<TemplateInfo description={description} mode={mode} />} />
           </ListItemButton>
         ))}
       </List>

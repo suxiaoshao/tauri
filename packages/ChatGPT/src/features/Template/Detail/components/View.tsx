@@ -2,22 +2,12 @@
  * @Author: suxiaoshao suxiaoshao@gmail.com
  * @Date: 2024-04-29 22:08:21
  * @LastEditors: suxiaoshao suxiaoshao@gmail.com
- * @LastEditTime: 2024-04-30 02:27:59
+ * @LastEditTime: 2024-05-01 02:45:51
  * @FilePath: /tauri/packages/ChatGPT/src/features/Template/Detail/components/View.tsx
  */
 import CustomMarkdown from '@chatgpt/components/Markdown';
 import { ConversationTemplate } from '@chatgpt/types/conversation_template';
-import {
-  Avatar,
-  Box,
-  Divider,
-  FormLabel,
-  List,
-  ListItem,
-  ListItemAvatar,
-  ListItemText,
-  Typography,
-} from '@mui/material';
+import { Avatar, Box, Divider, List, ListItem, ListItemAvatar, ListItemText, Typography } from '@mui/material';
 import { Details, DetailsItem } from 'details';
 import React, { useMemo } from 'react';
 import system from '@chatgpt/assets/system.png';
@@ -44,6 +34,7 @@ export default function TemplateDetailView({ data }: TemplateDetailViewProps) {
       { label: 'Max Tokens', value: data.maxTokens },
       { label: 'Created At', value: format(data.createdTime) },
       { label: 'Updated At', value: format(data.updatedTime) },
+      { label: 'Description', value: data.description, span: 3 },
     ],
     [data],
   );

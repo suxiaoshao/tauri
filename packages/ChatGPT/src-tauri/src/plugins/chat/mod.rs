@@ -199,10 +199,10 @@ async fn update_conversation_template(
 async fn add_conversation_template(
     state: tauri::State<'_, DbConn>,
     data: NewConversationTemplate,
-) -> ChatGPTResult<()> {
+) -> ChatGPTResult<i32> {
     let conn = &mut state.get()?;
-    data.insert(conn)?;
-    Ok(())
+    let id = data.insert(conn)?;
+    Ok(id)
 }
 
 fn setup<R: Runtime>(app: &AppHandle<R>) -> ChatGPTResult<()> {

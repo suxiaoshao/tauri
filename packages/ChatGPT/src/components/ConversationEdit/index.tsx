@@ -2,21 +2,22 @@
  * @Author: suxiaoshao suxiaoshao@gmail.com
  * @Date: 2024-04-19 12:09:18
  * @LastEditors: suxiaoshao suxiaoshao@gmail.com
- * @LastEditTime: 2024-05-01 00:45:17
+ * @LastEditTime: 2024-05-01 03:52:35
  * @FilePath: /tauri/packages/ChatGPT/src/components/ConversationEdit/index.tsx
  */
 import { useAppSelector } from '@chatgpt/app/hooks';
+import TemplateInfo from '@chatgpt/features/Template/components/TemplateInfo';
 import { selectTemplates } from '@chatgpt/features/Template/templateSlice';
 import { NewConversation } from '@chatgpt/types/conversation';
 import { valibotResolver } from '@hookform/resolvers/valibot';
 import { Box, TextField, BoxProps, MenuItem, ListItemAvatar, ListItemText, Avatar, ListItem } from '@mui/material';
 import { useForm, Resolver, Controller } from 'react-hook-form';
-import { object, string, number, Input, emoji, integer, nullable } from 'valibot';
+import { object, string, number, Input, emoji, integer, nullish } from 'valibot';
 
 const conversationSchema = object({
   title: string(),
   icon: string([emoji()]),
-  info: nullable(string()),
+  info: nullish(string()),
   templateId: number([integer()]),
 });
 
@@ -109,13 +110,13 @@ export default function ConversationEdit({ initialValues, id, sx, onSubmit: subm
             }}
             {...field}
           >
-            {templates.map(({ id, name, icon, mode }) => (
+            {templates.map(({ id, name, icon, description, mode }) => (
               <MenuItem key={id} value={id}>
                 <ListItem dense sx={{ p: 0 }}>
                   <ListItemAvatar>
                     <Avatar sx={{ bgcolor: 'transparent' }}>{icon}</Avatar>
                   </ListItemAvatar>
-                  <ListItemText primary={name} secondary={mode} />
+                  <ListItemText primary={name} secondary={<TemplateInfo description={description} mode={mode} />} />
                 </ListItem>
               </MenuItem>
             ))}

@@ -2,7 +2,7 @@
  * @Author: suxiaoshao suxiaoshao@gmail.com
  * @Date: 2024-04-24 19:32:30
  * @LastEditors: suxiaoshao suxiaoshao@gmail.com
- * @LastEditTime: 2024-04-30 04:27:39
+ * @LastEditTime: 2024-05-01 01:12:22
  * @FilePath: /tauri/packages/ChatGPT/src-tauri/src/store/migrations/mod.rs
  */
 use crate::{
@@ -101,6 +101,7 @@ fn get_conversations(
             frequency_penalty,
             created_time,
             updated_time,
+            description: info.clone(),
         };
         v2_templates.push(template);
         let conversation = SqlConversation {

@@ -2,14 +2,15 @@
  * @Author: suxiaoshao suxiaoshao@gmail.com
  * @Date: 2024-04-28 22:32:11
  * @LastEditors: suxiaoshao suxiaoshao@gmail.com
- * @LastEditTime: 2024-04-30 23:44:07
+ * @LastEditTime: 2024-05-01 01:26:12
  * @FilePath: /tauri/packages/ChatGPT/src/features/Template/List/header.tsx
  */
 import { Box, IconButton, Typography } from '@mui/material';
-import { Refresh } from '@mui/icons-material';
+import { Add, Create, Refresh } from '@mui/icons-material';
 import { useCallback } from 'react';
 import { useAppDispatch, useAppSelector } from '@chatgpt/app/hooks';
-import { fetchTemplates, selectTemplateCount, selectTemplates } from '../../templateSlice';
+import { fetchTemplates, selectTemplateCount } from '../../templateSlice';
+import { useNavigate } from 'react-router-dom';
 
 export default function TemplateListHeader() {
   const count = useAppSelector(selectTemplateCount);
@@ -17,6 +18,10 @@ export default function TemplateListHeader() {
   const refresh = useCallback(() => {
     dispatch(fetchTemplates());
   }, [dispatch]);
+  const navigate = useNavigate();
+  const goToCreate = useCallback(() => {
+    navigate('/template/create');
+  }, [navigate]);
   return (
     <Box
       data-tauri-drag-region
@@ -45,6 +50,9 @@ export default function TemplateListHeader() {
       </Box>
       <IconButton onClick={refresh}>
         <Refresh />
+      </IconButton>
+      <IconButton onClick={goToCreate}>
+        <Add />
       </IconButton>
     </Box>
   );
