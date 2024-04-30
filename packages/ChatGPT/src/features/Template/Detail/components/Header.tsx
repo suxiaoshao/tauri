@@ -2,7 +2,7 @@
  * @Author: suxiaoshao suxiaoshao@gmail.com
  * @Date: 2024-04-29 06:00:04
  * @LastEditors: suxiaoshao suxiaoshao@gmail.com
- * @LastEditTime: 2024-04-30 22:07:30
+ * @LastEditTime: 2024-05-01 00:43:42
  * @FilePath: /tauri/packages/ChatGPT/src/features/Template/Detail/components/header.tsx
  */
 import { PromiseData } from '@chatgpt/hooks/usePromise';
@@ -13,7 +13,8 @@ import { useNavigate } from 'react-router-dom';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import { useMemo } from 'react';
 import { Alignment } from '@chatgpt/features/MessagePreview/Success';
-import { deleteConversationTemplate } from '@chatgpt/service/chat';
+import { deleteConversationTemplate } from '@chatgpt/service/chat/mutation';
+import { enqueueSnackbar } from 'notify';
 
 export interface TemplateDetailHeaderProps {
   refresh: () => void;
@@ -80,6 +81,8 @@ export default function TemplateDetailHeader({
       case 'data':
         const handleDelete = async () => {
           deleteConversationTemplate({ id: value.id });
+          navigate(-1);
+          enqueueSnackbar('Conversation template deleted', { variant: 'success' });
         };
         return (
           <Tooltip title="Delete">

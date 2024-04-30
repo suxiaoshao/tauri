@@ -10,7 +10,7 @@ import { useCallback, useState } from 'react';
 import EditIcon from '@mui/icons-material/Edit';
 import ConversationEdit, { ConversationForm } from '@chatgpt/components/ConversationEdit';
 import { Conversation, NewConversation } from '@chatgpt/types/conversation';
-import { updateConversation } from '@chatgpt/service/chat';
+import { updateConversation } from '@chatgpt/service/chat/mutation';
 import { fetchConversations } from '@chatgpt/features/Conversations/conversationSlice';
 import { useAppDispatch } from '@chatgpt/app/hooks';
 

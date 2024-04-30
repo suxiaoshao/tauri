@@ -5,7 +5,7 @@ import { useAppDispatch } from '@chatgpt/app/hooks';
 import { fetchConversations } from '@chatgpt/features/Conversations/conversationSlice';
 import { CleaningServices, CopyAll, Delete } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import { clearConversation, deleteConversation } from '@chatgpt/service/chat';
+import { clearConversation, deleteConversation } from '@chatgpt/service/chat/mutation';
 import UpdateConversation from './UpdateConversation';
 import MoveConversation from './MoveConversation';
 import ExportConversation from './ExportConversation';

@@ -2,11 +2,11 @@
  * @Author: suxiaoshao suxiaoshao@gmail.com
  * @Date: 2024-01-06 01:08:42
  * @LastEditors: suxiaoshao suxiaoshao@gmail.com
- * @LastEditTime: 2024-03-15 09:57:43
+ * @LastEditTime: 2024-04-30 23:31:45
  * @FilePath: /tauri/packages/ChatGPT/src/features/Setting/configSlice.ts
  */
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { AppThunkAction, type RootState } from '../../app/store';
+import { AppThunkAction } from '../../app/store';
 import { getConfig } from '@chatgpt/service/config';
 import { ChatGptConfig } from '.';
 

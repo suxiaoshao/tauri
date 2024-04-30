@@ -2,13 +2,15 @@
  * @Author: suxiaoshao suxiaoshao@gmail.com
  * @Date: 2024-04-19 12:09:18
  * @LastEditors: suxiaoshao suxiaoshao@gmail.com
- * @LastEditTime: 2024-04-29 06:47:34
+ * @LastEditTime: 2024-05-01 00:45:17
  * @FilePath: /tauri/packages/ChatGPT/src/components/ConversationEdit/index.tsx
  */
+import { useAppSelector } from '@chatgpt/app/hooks';
+import { selectTemplates } from '@chatgpt/features/Template/templateSlice';
 import { NewConversation } from '@chatgpt/types/conversation';
 import { valibotResolver } from '@hookform/resolvers/valibot';
-import { Box, TextField, BoxProps } from '@mui/material';
-import { useForm, Resolver } from 'react-hook-form';
+import { Box, TextField, BoxProps, MenuItem, ListItemAvatar, ListItemText, Avatar, ListItem } from '@mui/material';
+import { useForm, Resolver, Controller } from 'react-hook-form';
 import { object, string, number, Input, emoji, integer, nullable } from 'valibot';
 
 const conversationSchema = object({
@@ -31,12 +33,14 @@ export default function ConversationEdit({ initialValues, id, sx, onSubmit: subm
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
   } = useForm<ConversationForm>({
     resolver: valibotResolver(conversationSchema) as Resolver<ConversationForm, unknown>,
     defaultValues: initialValues ?? getDefaultValues(),
   });
   const onSubmit = handleSubmit(submit);
+  const templates = useAppSelector(selectTemplates);
   return (
     <Box
       {...props}
@@ -61,7 +65,6 @@ export default function ConversationEdit({ initialValues, id, sx, onSubmit: subm
         label="Title"
         fullWidth
       />
-      {/* todo: conversation change fields */}
       <TextField
         error={!!errors.icon?.message}
         helperText={errors.icon?.message}
@@ -78,6 +81,46 @@ export default function ConversationEdit({ initialValues, id, sx, onSubmit: subm
         label="Info"
         fullWidth
         sx={{ mt: 2 }}
+      />
+      <Controller
+        control={control}
+        name="templateId"
+        rules={{ required: true }}
+        render={({ field, fieldState }) => (
+          <TextField
+            error={!!fieldState?.error?.message}
+            helperText={fieldState?.error?.message}
+            select
+            label="Model"
+            required
+            fullWidth
+            sx={{
+              mt: 2,
+            }}
+            SelectProps={{
+              MenuProps: {
+                sx: {
+                  '& .MuiMenu-paper': {
+                    backgroundColor: (theme) => theme.palette.background.paper + 'a0',
+                    backdropFilter: 'blur(20px)',
+                  },
+                },
+              },
+            }}
+            {...field}
+          >
+            {templates.map(({ id, name, icon, mode }) => (
+              <MenuItem key={id} value={id}>
+                <ListItem dense sx={{ p: 0 }}>
+                  <ListItemAvatar>
+                    <Avatar sx={{ bgcolor: 'transparent' }}>{icon}</Avatar>
+                  </ListItemAvatar>
+                  <ListItemText primary={name} secondary={mode} />
+                </ListItem>
+              </MenuItem>
+            ))}
+          </TextField>
+        )}
       />
     </Box>
   );

@@ -2,14 +2,13 @@
  * @Author: suxiaoshao suxiaoshao@gmail.com
  * @Date: 2024-04-29 06:38:37
  * @LastEditors: suxiaoshao suxiaoshao@gmail.com
- * @LastEditTime: 2024-04-30 22:05:30
+ * @LastEditTime: 2024-04-30 23:55:52
  * @FilePath: /tauri/packages/ChatGPT/src/features/Template/Detail/components/Edit.tsx
  */
-
 import { useAppSelector } from '@chatgpt/app/hooks';
 import NumberField from '@chatgpt/components/NumberField';
 import { selectModels } from '@chatgpt/features/Setting/configSlice';
-import { updateConversationTemplate } from '@chatgpt/service/chat';
+import { updateConversationTemplate } from '@chatgpt/service/chat/mutation';
 import { Mode, Role } from '@chatgpt/types/common';
 import { ConversationTemplate } from '@chatgpt/types/conversation_template';
 import { valibotResolver } from '@hookform/resolvers/valibot';
@@ -93,7 +92,6 @@ export default function TemplateDetailEdit({ data, id, onSuccess }: TemplateDeta
         fullWidth
         sx={{ mt: 2 }}
       />
-      {/* todo:conversation template migration */}
       <Controller
         control={control}
         name="mode"
@@ -146,7 +144,7 @@ export default function TemplateDetailEdit({ data, id, onSuccess }: TemplateDeta
         {...register('temperature', { required: true, min: 0, max: 1 })}
         sx={{ mt: 2 }}
         fullWidth
-        inputProps={{ min: 0, max: 1, step: 0.01, inputmode: 'numeric', pattern: '[0-9]*' }}
+        inputProps={{ min: 0, max: 1, step: 0.01 }}
       />
       <NumberField
         error={!!errors.topP?.message}

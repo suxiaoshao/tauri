@@ -2,42 +2,21 @@
  * @Author: suxiaoshao suxiaoshao@gmail.com
  * @Date: 2024-04-28 22:32:11
  * @LastEditors: suxiaoshao suxiaoshao@gmail.com
- * @LastEditTime: 2024-04-29 01:44:16
+ * @LastEditTime: 2024-04-30 23:44:07
  * @FilePath: /tauri/packages/ChatGPT/src/features/Template/List/header.tsx
  */
 import { Box, IconButton, Typography } from '@mui/material';
 import { Refresh } from '@mui/icons-material';
-import { PromiseData } from '@chatgpt/hooks/usePromise';
-import { ConversationTemplate } from '@chatgpt/types/conversation_template';
-import { useMemo } from 'react';
+import { useCallback } from 'react';
+import { useAppDispatch, useAppSelector } from '@chatgpt/app/hooks';
+import { fetchTemplates, selectTemplateCount, selectTemplates } from '../../templateSlice';
 
-export interface TemplateListHeaderProps {
-  refresh: () => void;
-  data: PromiseData<ConversationTemplate[]>;
-}
-
-export default function TemplateListHeader({ refresh, data: { tag, value } }: TemplateListHeaderProps) {
-  const count = useMemo(() => {
-    switch (tag) {
-      case 'loading':
-        return null;
-      case 'data':
-        return (
-          <Typography
-            sx={{ ml: 1 }}
-            data-tauri-drag-region
-            variant="body2"
-            color="inherit"
-            component="span"
-            paragraph={false}
-          >
-            {value?.length || 0} Templates
-          </Typography>
-        );
-      default:
-        return null;
-    }
-  }, [tag, value]);
+export default function TemplateListHeader() {
+  const count = useAppSelector(selectTemplateCount);
+  const dispatch = useAppDispatch();
+  const refresh = useCallback(() => {
+    dispatch(fetchTemplates());
+  }, [dispatch]);
   return (
     <Box
       data-tauri-drag-region
@@ -53,9 +32,18 @@ export default function TemplateListHeader({ refresh, data: { tag, value } }: Te
         <Typography data-tauri-drag-region variant="h6" component="span" paragraph={false}>
           Conversation Templates
         </Typography>
-        {count}
+        <Typography
+          sx={{ ml: 1 }}
+          data-tauri-drag-region
+          variant="body2"
+          color="inherit"
+          component="span"
+          paragraph={false}
+        >
+          {count} Templates
+        </Typography>
       </Box>
-      <IconButton disabled={tag === 'loading'} onClick={refresh}>
+      <IconButton onClick={refresh}>
         <Refresh />
       </IconButton>
     </Box>

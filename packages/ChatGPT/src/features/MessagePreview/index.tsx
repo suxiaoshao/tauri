@@ -6,7 +6,7 @@
  * @FilePath: /tauri/packages/ChatGPT/src/features/MessagePreview/index.tsx
  */
 import usePromise from '@chatgpt/hooks/usePromise';
-import { findMessage } from '@chatgpt/service/chat';
+import { findMessage } from '@chatgpt/service/chat/query';
 import notification from '@chatgpt/utils/notification';
 import { CircularProgress } from '@mui/material';
 import { appWindow } from '@tauri-apps/api/window';

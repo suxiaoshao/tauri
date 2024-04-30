@@ -6,7 +6,7 @@ import { findConversation, findFolder, getFirstConversation, getNodeId } from '@
 import { Enum } from 'types';
 import { Conversation } from '@chatgpt/types/conversation';
 import { Folder } from '@chatgpt/types/folder';
-import { getChatData } from '@chatgpt/service/chat';
+import { getChatData } from '@chatgpt/service/chat/query';
 
 export enum SelectedType {
   Conversation = 'Conversation',

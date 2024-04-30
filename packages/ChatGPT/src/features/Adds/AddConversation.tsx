@@ -15,7 +15,7 @@ import { useMatch, useNavigate, useLocation } from 'react-router-dom';
 import { Add } from '@mui/icons-material';
 import { NewConversation } from '@chatgpt/types/conversation';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
-import { addConversation } from '@chatgpt/service/chat';
+import { addConversation } from '@chatgpt/service/chat/mutation';
 
 function AddConversation() {
   const dispatch = useAppDispatch();

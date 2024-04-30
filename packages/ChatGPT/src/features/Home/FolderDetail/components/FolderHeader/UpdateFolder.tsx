@@ -1,7 +1,7 @@
 import { useAppDispatch } from '@chatgpt/app/hooks';
 import FolderEdit, { FolderForm } from '@chatgpt/components/FolderEdit';
 import { fetchConversations } from '@chatgpt/features/Conversations/conversationSlice';
-import { updateFolder } from '@chatgpt/service/chat';
+import { updateFolder } from '@chatgpt/service/chat/mutation';
 import { Folder, NewFolder } from '@chatgpt/types/folder';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton } from '@mui/material';
 import { useCallback, useState } from 'react';

@@ -6,7 +6,7 @@
  * @FilePath: /tauri/packages/ChatGPT/src/features/MessagePreview/Success.tsx
  */
 import CustomEdit from '@chatgpt/components/CustomEdit';
-import { updateMessageContent } from '@chatgpt/service/chat';
+import { updateMessageContent } from '@chatgpt/service/chat/mutation';
 import { Message } from '@chatgpt/types/message';
 import { Edit, Preview, Upload } from '@mui/icons-material';
 import { Box, IconButton, ToggleButton, ToggleButtonGroup, Tooltip } from '@mui/material';

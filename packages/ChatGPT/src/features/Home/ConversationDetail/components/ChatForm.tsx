@@ -5,7 +5,7 @@ import { Dispatch } from 'react';
 import { Role } from '@chatgpt/types/common';
 import { Message } from '@chatgpt/types/message';
 import { FetchingMessageAction, FetchingMessageType } from '..';
-import { fetchMessage } from '@chatgpt/service/chat';
+import { fetchMessage } from '@chatgpt/service/chat/query';
 
 export interface ChatFormProps {
   fetchingMessageDispatch: Dispatch<FetchingMessageAction>;

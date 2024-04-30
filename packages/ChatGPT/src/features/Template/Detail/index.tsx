@@ -6,7 +6,7 @@
  * @FilePath: /tauri/packages/ChatGPT/src/features/Template/Detail/index.tsx
  */
 import usePromise from '@chatgpt/hooks/usePromise';
-import { findConversationTemplate } from '@chatgpt/service/chat';
+import { findConversationTemplate } from '@chatgpt/service/chat/query';
 import { Box } from '@mui/material';
 import { useCallback, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';

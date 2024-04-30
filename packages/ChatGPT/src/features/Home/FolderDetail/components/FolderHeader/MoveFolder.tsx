@@ -12,7 +12,7 @@ import DriveFileMoveIcon from '@mui/icons-material/DriveFileMove';
 import { useCallback, useState } from 'react';
 import FolderSelect from '@chatgpt/components/FolderSelect';
 import { Controller, useForm } from 'react-hook-form';
-import { MoveFolderParams, moveFolder } from '@chatgpt/service/chat';
+import { MoveFolderParams, moveFolder } from '@chatgpt/service/chat/mutation';
 import { useAppDispatch } from '@chatgpt/app/hooks';
 import { fetchConversations } from '@chatgpt/features/Conversations/conversationSlice';
 import { Folder } from '@chatgpt/types/folder';

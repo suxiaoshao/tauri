@@ -14,7 +14,7 @@ import { useAppDispatch, useAppSelector } from '@chatgpt/app/hooks';
 import { fetchConversations, selectSelectedFolderId } from '../Conversations/conversationSlice';
 import { useCallback } from 'react';
 import { NewFolder } from '@chatgpt/types/folder';
-import { addFolder } from '@chatgpt/service/chat';
+import { addFolder } from '@chatgpt/service/chat/mutation';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 
 function AddFolder() {
