@@ -2,7 +2,7 @@
  * @Author: suxiaoshao suxiaoshao@gmail.com
  * @Date: 2024-04-28 04:23:22
  * @LastEditors: suxiaoshao suxiaoshao@gmail.com
- * @LastEditTime: 2024-04-29 02:56:27
+ * @LastEditTime: 2024-04-30 04:59:36
  * @FilePath: /tauri/packages/ChatGPT/src-tauri/src/store/service/conversation_templates.rs
  */
 
@@ -13,10 +13,15 @@ use crate::{
     errors::ChatGPTResult,
     store::{
         model::{
-            conversation_template_prompts::SqlConversationTemplatePrompt,
-            conversation_templates::SqlConversationTemplate,
+            conversation_template_prompts::{
+                SqlConversationTemplatePrompt, SqlNewConversationTemplatePrompt,
+            },
+            conversation_templates::{
+                SqlConversationTemplate, SqlNewConversationTemplate, SqlUpdateConversationTemplate,
+            },
+            conversations::SqlConversation,
         },
-        Mode,
+        Mode, NewConversationTemplatePrompt,
     },
 };
 
@@ -139,5 +144,138 @@ impl ConversationTemplate {
             });
         }
         Ok(conversation_templates)
+    }
+    pub fn update(
+        NewConversationTemplate {
+            name,
+            icon,
+            mode,
+            model,
+            temperature,
+            top_p,
+            n,
+            max_tokens,
+            presence_penalty,
+            frequency_penalty,
+            prompts,
+        }: NewConversationTemplate,
+        id: i32,
+        conn: &mut SqliteConnection,
+    ) -> ChatGPTResult<()> {
+        let time = OffsetDateTime::now_utc();
+        conn.immediate_transaction(|conn| {
+            // Update the conversation template
+            let sql_new = SqlUpdateConversationTemplate {
+                id,
+                name,
+                icon,
+                mode: mode.to_string(),
+                model,
+                temperature,
+                top_p,
+                n,
+                max_tokens,
+                presence_penalty,
+                frequency_penalty,
+                updated_time: time,
+            };
+            sql_new.update(conn)?;
+
+            // delete the old prompts and insert the new prompts
+            SqlConversationTemplatePrompt::delete_by_template_id(id, conn)?;
+            let prompts = prompts
+                .into_iter()
+                .map(|prompt| SqlNewConversationTemplatePrompt {
+                    template_id: id,
+                    prompt: prompt.prompt,
+                    role: prompt.role.to_string(),
+                    created_time: time,
+                    updated_time: time,
+                })
+                .collect::<Vec<SqlNewConversationTemplatePrompt>>();
+            SqlNewConversationTemplatePrompt::save_many(prompts, conn)?;
+            Ok(())
+        })
+    }
+    pub fn delete(id: i32, conn: &mut SqliteConnection) -> ChatGPTResult<()> {
+        conn.immediate_transaction(|conn| {
+            if SqlConversation::exists_by_template_id(id, conn)? {
+                return Err(crate::errors::ChatGPTError::TemplateHasConversation);
+            }
+            SqlConversationTemplatePrompt::delete_by_template_id(id, conn)?;
+            SqlConversationTemplate::delete_by_id(id, conn)?;
+            Ok(())
+        })
+    }
+}
+
+#[derive(serde::Deserialize)]
+pub struct NewConversationTemplate {
+    pub name: String,
+    pub icon: String,
+    pub mode: Mode,
+    pub model: String,
+    pub temperature: f64,
+    #[serde(rename = "topP")]
+    pub top_p: f64,
+    pub n: i64,
+    #[serde(rename = "maxTokens")]
+    pub max_tokens: Option<i64>,
+    #[serde(rename = "presencePenalty")]
+    pub presence_penalty: f64,
+    #[serde(rename = "frequencyPenalty")]
+    pub frequency_penalty: f64,
+    pub prompts: Vec<NewConversationTemplatePrompt>,
+}
+
+impl NewConversationTemplate {
+    pub fn insert(self, conn: &mut SqliteConnection) -> ChatGPTResult<()> {
+        let NewConversationTemplate {
+            name,
+            icon,
+            mode,
+            model,
+            temperature,
+            top_p,
+            n,
+            max_tokens,
+            presence_penalty,
+            frequency_penalty,
+            prompts,
+        } = self;
+        let time = OffsetDateTime::now_utc();
+        conn.immediate_transaction(|conn| {
+            // Insert the new conversation template
+            let sql_new = SqlNewConversationTemplate {
+                name,
+                icon,
+                mode: mode.to_string(),
+                model,
+                temperature,
+                top_p,
+                n,
+                max_tokens,
+                presence_penalty,
+                frequency_penalty,
+                created_time: time,
+                updated_time: time,
+            };
+            sql_new.insert(conn)?;
+
+            // Insert the prompts
+            let SqlConversationTemplate { id, .. } = SqlConversationTemplate::first(conn)?;
+            let prompts = prompts
+                .into_iter()
+                .map(|prompt| SqlNewConversationTemplatePrompt {
+                    template_id: id,
+                    prompt: prompt.prompt,
+                    role: prompt.role.to_string(),
+                    created_time: time,
+                    updated_time: time,
+                })
+                .collect::<Vec<SqlNewConversationTemplatePrompt>>();
+            SqlNewConversationTemplatePrompt::save_many(prompts, conn)?;
+            Ok(())
+        })
     }
 }

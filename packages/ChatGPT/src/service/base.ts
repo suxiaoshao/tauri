@@ -2,7 +2,7 @@
  * @Author: suxiaoshao suxiaoshao@gmail.com
  * @Date: 2023-09-06 17:14:35
  * @LastEditors: suxiaoshao suxiaoshao@gmail.com
- * @LastEditTime: 2024-01-29 21:04:08
+ * @LastEditTime: 2024-04-30 05:15:19
  * @FilePath: /tauri/packages/ChatGPT/src/service/base.ts
  */
 import { invoke } from '@tauri-apps/api';
@@ -46,6 +46,7 @@ export enum ChatGPTErrorCodes {
   ConversationPathExists = 'ConversationPathExists',
   FolderPathExists = 'FolderPathExists',
   CsvParse = 'CsvParse',
+  TemplateHasConversation = 'TemplateHasConversation',
 }
 
 const ChatGPTErrorCodesSchema = enum_(ChatGPTErrorCodes);

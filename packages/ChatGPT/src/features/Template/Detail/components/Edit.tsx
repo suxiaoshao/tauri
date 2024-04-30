@@ -2,18 +2,20 @@
  * @Author: suxiaoshao suxiaoshao@gmail.com
  * @Date: 2024-04-29 06:38:37
  * @LastEditors: suxiaoshao suxiaoshao@gmail.com
- * @LastEditTime: 2024-04-29 20:38:52
+ * @LastEditTime: 2024-04-30 22:05:30
  * @FilePath: /tauri/packages/ChatGPT/src/features/Template/Detail/components/Edit.tsx
  */
 
 import { useAppSelector } from '@chatgpt/app/hooks';
 import NumberField from '@chatgpt/components/NumberField';
 import { selectModels } from '@chatgpt/features/Setting/configSlice';
+import { updateConversationTemplate } from '@chatgpt/service/chat';
 import { Mode, Role } from '@chatgpt/types/common';
 import { ConversationTemplate } from '@chatgpt/types/conversation_template';
 import { valibotResolver } from '@hookform/resolvers/valibot';
 import { Add, Delete } from '@mui/icons-material';
 import { Box, Checkbox, FormControlLabel, FormLabel, IconButton, MenuItem, TextField } from '@mui/material';
+import { enqueueSnackbar } from 'notify';
 import { useState } from 'react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import { Input, array, emoji, enum_, integer, maxValue, minValue, nullable, number, object, string } from 'valibot';
@@ -41,9 +43,11 @@ export type TemplateForm = Input<typeof templateSchema>;
 
 export interface TemplateDetailEditProps {
   data: ConversationTemplate;
+  id: string;
+  onSuccess: () => void;
 }
 
-export default function TemplateDetailEdit({ data }: TemplateDetailEditProps) {
+export default function TemplateDetailEdit({ data, id, onSuccess }: TemplateDetailEditProps) {
   const {
     register,
     handleSubmit,
@@ -59,11 +63,18 @@ export default function TemplateDetailEdit({ data }: TemplateDetailEditProps) {
     control,
     name: 'prompts',
   });
+  const onSubmit = handleSubmit(async (formData) => {
+    await updateConversationTemplate({ data: formData, id: data.id });
+    enqueueSnackbar('Template updated successfully', { variant: 'success' });
+    onSuccess();
+  });
 
   return (
     <Box
       sx={{ flex: '1 1 0', display: 'flex', flexDirection: 'column', position: 'relative', overflowY: 'auto', p: 2 }}
       component="form"
+      id={id}
+      onSubmit={onSubmit}
     >
       <TextField
         error={!!errors.name?.message}

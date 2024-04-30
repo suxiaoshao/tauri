@@ -2,7 +2,7 @@
  * @Author: suxiaoshao suxiaoshao@gmail.com
  * @Date: 2024-04-24 19:32:30
  * @LastEditors: suxiaoshao suxiaoshao@gmail.com
- * @LastEditTime: 2024-04-28 08:07:36
+ * @LastEditTime: 2024-04-30 04:27:39
  * @FilePath: /tauri/packages/ChatGPT/src-tauri/src/store/migrations/mod.rs
  */
 use crate::{
@@ -46,7 +46,7 @@ pub(in crate::store) fn v1_to_v2(
     let (v2_conversations, v2_templates, v2_prompts) = get_conversations(conversations);
     SqlConversationTemplate::migration_save(v2_templates, v2_conn)?;
     SqlConversation::migration_save(v2_conversations, v2_conn)?;
-    SqlNewConversationTemplatePrompt::migration_save(v2_prompts, v2_conn)?;
+    SqlNewConversationTemplatePrompt::save_many(v2_prompts, v2_conn)?;
 
     // migrate messages
     let v2_messages = messages

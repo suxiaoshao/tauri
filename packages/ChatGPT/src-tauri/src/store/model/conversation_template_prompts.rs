@@ -2,7 +2,7 @@
  * @Author: suxiaoshao suxiaoshao@gmail.com
  * @Date: 2024-04-26 19:18:23
  * @LastEditors: suxiaoshao suxiaoshao@gmail.com
- * @LastEditTime: 2024-04-28 20:12:51
+ * @LastEditTime: 2024-04-30 04:27:21
  * @FilePath: /tauri/packages/ChatGPT/src-tauri/src/store/model/conversation_template_prompts.rs
  */
 use crate::errors::ChatGPTResult;
@@ -21,7 +21,7 @@ pub struct SqlNewConversationTemplatePrompt {
 }
 
 impl SqlNewConversationTemplatePrompt {
-    pub fn migration_save(
+    pub fn save_many(
         prompts: Vec<SqlNewConversationTemplatePrompt>,
         conn: &mut SqliteConnection,
     ) -> ChatGPTResult<()> {
@@ -57,5 +57,16 @@ impl SqlConversationTemplatePrompt {
         let prompts =
             conversation_template_prompts::table.load::<SqlConversationTemplatePrompt>(conn)?;
         Ok(prompts)
+    }
+    pub fn delete_by_template_id(
+        template_id: i32,
+        conn: &mut SqliteConnection,
+    ) -> ChatGPTResult<()> {
+        diesel::delete(
+            conversation_template_prompts::table
+                .filter(conversation_template_prompts::template_id.eq(template_id)),
+        )
+        .execute(conn)?;
+        Ok(())
     }
 }

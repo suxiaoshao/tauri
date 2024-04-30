@@ -2,23 +2,25 @@
  * @Author: suxiaoshao suxiaoshao@gmail.com
  * @Date: 2024-04-29 06:00:04
  * @LastEditors: suxiaoshao suxiaoshao@gmail.com
- * @LastEditTime: 2024-04-29 22:20:56
+ * @LastEditTime: 2024-04-30 22:07:30
  * @FilePath: /tauri/packages/ChatGPT/src/features/Template/Detail/components/header.tsx
  */
 import { PromiseData } from '@chatgpt/hooks/usePromise';
 import { ConversationTemplate } from '@chatgpt/types/conversation_template';
-import { Edit, Preview, Refresh } from '@mui/icons-material';
-import { Avatar, Box, IconButton, Skeleton, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
+import { Delete, Edit, Preview, Refresh, Save } from '@mui/icons-material';
+import { Avatar, Box, IconButton, Skeleton, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import { useMemo } from 'react';
 import { Alignment } from '@chatgpt/features/MessagePreview/Success';
+import { deleteConversationTemplate } from '@chatgpt/service/chat';
 
 export interface TemplateDetailHeaderProps {
   refresh: () => void;
   data: PromiseData<ConversationTemplate>;
   alignment: Alignment;
   handleAlignment: (event: React.MouseEvent<HTMLElement>, newAlignment: string | null) => void;
+  formId: string;
 }
 
 export default function TemplateDetailHeader({
@@ -26,6 +28,7 @@ export default function TemplateDetailHeader({
   refresh,
   alignment,
   handleAlignment,
+  formId,
 }: TemplateDetailHeaderProps) {
   const navigate = useNavigate();
   const content = useMemo(() => {
@@ -72,6 +75,42 @@ export default function TemplateDetailHeader({
         );
     }
   }, [tag, value]);
+  const deleteButton = useMemo(() => {
+    switch (tag) {
+      case 'data':
+        const handleDelete = async () => {
+          deleteConversationTemplate({ id: value.id });
+        };
+        return (
+          <Tooltip title="Delete">
+            <IconButton onClick={handleDelete}>
+              <Delete />
+            </IconButton>
+          </Tooltip>
+        );
+      default:
+        return null;
+    }
+  }, [tag, value]);
+  const submitButton = useMemo(() => {
+    switch (tag) {
+      case 'data':
+        switch (alignment) {
+          case Alignment.edit:
+            return (
+              <Tooltip title="Save">
+                <IconButton type="submit" form={formId}>
+                  <Save />
+                </IconButton>
+              </Tooltip>
+            );
+          default:
+            return null;
+        }
+      default:
+        return null;
+    }
+  }, [tag, value, formId, alignment]);
   return (
     <Box
       data-tauri-drag-region
@@ -81,6 +120,8 @@ export default function TemplateDetailHeader({
         p: 1,
         justifyContent: 'center',
         boxShadow: (theme) => theme.shadows[3].split(',0px')[0],
+        alignItems: 'center',
+        gap: 1,
       }}
     >
       <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center' }} data-tauri-drag-region>
@@ -97,9 +138,13 @@ export default function TemplateDetailHeader({
           <Edit />
         </ToggleButton>
       </ToggleButtonGroup>
-      <IconButton disabled={tag === 'loading'} onClick={refresh}>
-        <Refresh />
-      </IconButton>
+      <Box>
+        <IconButton disabled={tag === 'loading'} onClick={refresh}>
+          <Refresh />
+        </IconButton>
+        {deleteButton}
+        {submitButton}
+      </Box>
     </Box>
   );
 }

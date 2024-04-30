@@ -61,6 +61,8 @@ pub enum ChatGPTError {
     FolderPathExists(String),
     #[error("csv 解析失败:{}",.0)]
     CsvParse(#[from] csv::Error),
+    #[error("这个 template 的 conversation 还存在,不能删除")]
+    TemplateHasConversation,
 }
 
 impl Serialize for ChatGPTError {
@@ -163,6 +165,9 @@ impl Serialize for ChatGPTError {
             }
             ChatGPTError::CsvParse(_) => {
                 state.serialize_field("code", "CsvParse")?;
+            }
+            ChatGPTError::TemplateHasConversation => {
+                state.serialize_field("code", "TemplateHasConversation")?;
             }
         }
         state.end()

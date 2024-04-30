@@ -2,7 +2,7 @@
  * @Author: suxiaoshao suxiaoshao@gmail.com
  * @Date: 2024-04-28 20:59:43
  * @LastEditors: suxiaoshao suxiaoshao@gmail.com
- * @LastEditTime: 2024-04-29 22:23:14
+ * @LastEditTime: 2024-04-30 22:06:19
  * @FilePath: /tauri/packages/ChatGPT/src/features/Template/Detail/index.tsx
  */
 import usePromise from '@chatgpt/hooks/usePromise';
@@ -46,6 +46,14 @@ export default function ConversationTemplateDetail() {
   }, [id]);
   const [data, refresh] = usePromise(fn);
 
+  // formId
+  const formId = useMemo(() => {
+    if (data.tag === 'data') {
+      return `${data.value.id}-form`;
+    }
+    return '';
+  }, [data]);
+
   // render content
   const content: JSX.Element = useMemo(() => {
     switch (data.tag) {
@@ -58,7 +66,11 @@ export default function ConversationTemplateDetail() {
           case Alignment.preview:
             return <TemplateDetailView data={data.value} />;
           case Alignment.edit:
-            return <TemplateDetailEdit data={data.value} />;
+            const onSuccess = () => {
+              refresh();
+              setAlignment(Alignment.preview);
+            };
+            return <TemplateDetailEdit onSuccess={onSuccess} id={formId} data={data.value} />;
         }
       default:
         return <Loading sx={{ width: '100%', height: '100%' }} />;
@@ -74,7 +86,13 @@ export default function ConversationTemplateDetail() {
         backgroundColor: 'transparent',
       }}
     >
-      <TemplateDetailHeader alignment={alignment} handleAlignment={handleAlignment} data={data} refresh={refresh} />
+      <TemplateDetailHeader
+        formId={formId}
+        alignment={alignment}
+        handleAlignment={handleAlignment}
+        data={data}
+        refresh={refresh}
+      />
       {content}
     </Box>
   );

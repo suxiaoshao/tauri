@@ -94,6 +94,17 @@ impl SqlConversation {
             .execute(conn)?;
         Ok(())
     }
+    /// check conversation exists by template_id
+    pub fn exists_by_template_id(
+        template_id: i32,
+        conn: &mut SqliteConnection,
+    ) -> ChatGPTResult<bool> {
+        let count = diesel::select(diesel::dsl::exists(
+            conversations::table.filter(conversations::template_id.eq(template_id)),
+        ))
+        .get_result(conn)?;
+        Ok(count)
+    }
 }
 
 #[derive(AsChangeset, Identifiable, Debug)]

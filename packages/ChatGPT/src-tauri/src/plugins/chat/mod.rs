@@ -3,7 +3,9 @@ mod fetch;
 use serde_json::Value;
 use tauri::{AppHandle, Invoke, Manager, Runtime};
 
-use crate::store::{Conversation, ConversationTemplate, DbConn, Folder, Message, NewFolder};
+use crate::store::{
+    Conversation, ConversationTemplate, DbConn, Folder, Message, NewConversationTemplate, NewFolder,
+};
 use crate::{errors::ChatGPTError, store::NewConversation};
 use crate::{errors::ChatGPTResult, store};
 
@@ -37,7 +39,10 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for ChatPlugin {
             clear_conversation,
             export::export,
             all_conversation_templates,
-            find_conversation_template
+            find_conversation_template,
+            delete_conversation_template,
+            update_conversation_template,
+            add_conversation_template
         ]);
         (handle)(invoke);
     }
@@ -167,6 +172,37 @@ async fn find_conversation_template(
     let conn = &mut state.get()?;
     let conversation = ConversationTemplate::find(id, conn)?;
     Ok(conversation)
+}
+
+#[tauri::command]
+async fn delete_conversation_template(
+    state: tauri::State<'_, DbConn>,
+    id: i32,
+) -> ChatGPTResult<()> {
+    let conn = &mut state.get()?;
+    ConversationTemplate::delete(id, conn)?;
+    Ok(())
+}
+
+#[tauri::command]
+async fn update_conversation_template(
+    state: tauri::State<'_, DbConn>,
+    id: i32,
+    data: NewConversationTemplate,
+) -> ChatGPTResult<()> {
+    let conn = &mut state.get()?;
+    ConversationTemplate::update(data, id, conn)?;
+    Ok(())
+}
+
+#[tauri::command]
+async fn add_conversation_template(
+    state: tauri::State<'_, DbConn>,
+    data: NewConversationTemplate,
+) -> ChatGPTResult<()> {
+    let conn = &mut state.get()?;
+    data.insert(conn)?;
+    Ok(())
 }
 
 fn setup<R: Runtime>(app: &AppHandle<R>) -> ChatGPTResult<()> {

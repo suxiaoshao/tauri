@@ -2,7 +2,7 @@
  * @Author: suxiaoshao suxiaoshao@gmail.com
  * @Date: 2024-04-28 04:28:20
  * @LastEditors: suxiaoshao suxiaoshao@gmail.com
- * @LastEditTime: 2024-04-28 20:46:01
+ * @LastEditTime: 2024-04-30 05:06:08
  * @FilePath: /tauri/packages/ChatGPT/src-tauri/src/store/service/conversation_template_prompts.rs
  */
 use time::OffsetDateTime;
@@ -48,4 +48,10 @@ impl TryFrom<SqlConversationTemplatePrompt> for ConversationTemplatePrompt {
             updated_time: value.updated_time,
         })
     }
+}
+
+#[derive(serde::Deserialize)]
+pub struct NewConversationTemplatePrompt {
+    pub prompt: String,
+    pub role: Role,
 }

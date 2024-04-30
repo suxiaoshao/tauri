@@ -2,7 +2,7 @@
  * @Author: suxiaoshao suxiaoshao@gmail.com
  * @Date: 2024-04-26 19:18:35
  * @LastEditors: suxiaoshao suxiaoshao@gmail.com
- * @LastEditTime: 2024-04-28 08:45:08
+ * @LastEditTime: 2024-04-30 04:54:43
  * @FilePath: /tauri/packages/ChatGPT/src-tauri/src/store/model/conversation_templates.rs
  */
 use crate::{errors::ChatGPTResult, store::Mode};
@@ -74,7 +74,9 @@ pub struct SqlConversationTemplate {
 
 impl SqlConversationTemplate {
     pub fn first(conn: &mut SqliteConnection) -> ChatGPTResult<Self> {
-        let first = conversation_templates::table.first::<Self>(conn)?;
+        let first = conversation_templates::table
+            .order(conversation_templates::id.desc())
+            .first::<Self>(conn)?;
         Ok(first)
     }
     pub fn migration_save(
@@ -93,5 +95,35 @@ impl SqlConversationTemplate {
     pub fn all(conn: &mut SqliteConnection) -> ChatGPTResult<Vec<Self>> {
         let data = conversation_templates::table.load::<Self>(conn)?;
         Ok(data)
+    }
+    pub fn delete_by_id(id: i32, conn: &mut SqliteConnection) -> ChatGPTResult<()> {
+        diesel::delete(conversation_templates::table.find(id)).execute(conn)?;
+        Ok(())
+    }
+}
+
+#[derive(AsChangeset, Identifiable, Debug)]
+#[diesel(table_name = conversation_templates)]
+pub struct SqlUpdateConversationTemplate {
+    pub(in super::super) id: i32,
+    pub(in super::super) name: String,
+    pub(in super::super) icon: String,
+    pub(in super::super) mode: String,
+    pub(in super::super) model: String,
+    pub(in super::super) temperature: f64,
+    pub(in super::super) top_p: f64,
+    pub(in super::super) n: i64,
+    pub(in super::super) max_tokens: Option<i64>,
+    pub(in super::super) presence_penalty: f64,
+    pub(in super::super) frequency_penalty: f64,
+    pub(in super::super) updated_time: OffsetDateTime,
+}
+
+impl SqlUpdateConversationTemplate {
+    pub fn update(self, conn: &mut SqliteConnection) -> ChatGPTResult<()> {
+        diesel::update(conversation_templates::table.find(self.id))
+            .set(self)
+            .execute(conn)?;
+        Ok(())
     }
 }
