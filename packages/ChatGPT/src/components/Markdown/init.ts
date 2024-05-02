@@ -1,3 +1,10 @@
+/*
+ * @Author: suxiaoshao suxiaoshao@gmail.com
+ * @Date: 2024-01-06 01:08:42
+ * @LastEditors: suxiaoshao suxiaoshao@gmail.com
+ * @LastEditTime: 2024-05-01 05:07:07
+ * @FilePath: /self-tools/Users/sushao/Documents/code/tauri/packages/ChatGPT/src/components/Markdown/init.ts
+ */
 /* plugin */
 import 'prismjs/plugins/line-numbers/prism-line-numbers.min';
 import 'prismjs/plugins/line-numbers/prism-line-numbers.css';

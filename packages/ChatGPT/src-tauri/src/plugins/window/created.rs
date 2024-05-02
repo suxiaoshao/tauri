@@ -1,3 +1,10 @@
+/*
+ * @Author: suxiaoshao suxiaoshao@gmail.com
+ * @Date: 2024-01-06 01:08:42
+ * @LastEditors: suxiaoshao suxiaoshao@gmail.com
+ * @LastEditTime: 2024-05-01 10:32:36
+ * @FilePath: /tauri/packages/ChatGPT/src-tauri/src/plugins/window/created.rs
+ */
 use tauri::Runtime;
 use window_shadows::set_shadow;
 #[cfg(target_os = "windows")]

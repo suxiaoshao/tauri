@@ -5,7 +5,10 @@
  * @LastEditTime: 2024-05-01 02:15:54
  * @FilePath: /tauri/packages/ChatGPT/src-tauri/src/store/model/conversation_templates.rs
  */
-use crate::{errors::ChatGPTResult, store::Mode};
+use crate::{
+    errors::ChatGPTResult,
+    store::{migrations::v2::SqlConversationTemplateV2, Mode},
+};
 
 use super::super::schema::conversation_templates;
 use diesel::prelude::*;
@@ -73,6 +76,44 @@ pub struct SqlConversationTemplate {
     pub(in super::super) frequency_penalty: f64,
     pub(in super::super) created_time: OffsetDateTime,
     pub(in super::super) updated_time: OffsetDateTime,
+}
+
+impl From<SqlConversationTemplateV2> for SqlConversationTemplate {
+    fn from(
+        SqlConversationTemplateV2 {
+            id,
+            name,
+            icon,
+            description,
+            mode,
+            model,
+            temperature,
+            top_p,
+            n,
+            max_tokens,
+            presence_penalty,
+            frequency_penalty,
+            created_time,
+            updated_time,
+        }: SqlConversationTemplateV2,
+    ) -> Self {
+        Self {
+            id,
+            name,
+            icon,
+            description,
+            mode,
+            model,
+            temperature,
+            top_p,
+            n,
+            max_tokens,
+            presence_penalty,
+            frequency_penalty,
+            created_time,
+            updated_time,
+        }
+    }
 }
 
 impl SqlConversationTemplate {

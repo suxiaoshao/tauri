@@ -1,5 +1,5 @@
 use super::super::schema::conversations;
-use crate::errors::ChatGPTResult;
+use crate::{errors::ChatGPTResult, store::migrations::v2::SqlConversationV2};
 use diesel::prelude::*;
 use time::OffsetDateTime;
 
@@ -37,6 +37,34 @@ pub struct SqlConversation {
     pub(in super::super) updated_time: OffsetDateTime,
     pub(in super::super) info: Option<String>,
     pub(in super::super) template_id: i32,
+}
+
+impl From<SqlConversationV2> for SqlConversation {
+    fn from(
+        SqlConversationV2 {
+            id,
+            folder_id,
+            path,
+            title,
+            icon,
+            created_time,
+            updated_time,
+            info,
+            template_id,
+        }: SqlConversationV2,
+    ) -> Self {
+        Self {
+            id,
+            folder_id,
+            path,
+            title,
+            icon,
+            created_time,
+            updated_time,
+            info,
+            template_id,
+        }
+    }
 }
 
 impl SqlConversation {

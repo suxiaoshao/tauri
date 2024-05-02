@@ -2,7 +2,7 @@
  * @Author: suxiaoshao suxiaoshao@gmail.com
  * @Date: 2024-01-06 01:08:42
  * @LastEditors: suxiaoshao suxiaoshao@gmail.com
- * @LastEditTime: 2024-03-07 00:24:24
+ * @LastEditTime: 2024-05-01 10:32:05
  * @FilePath: /self-tools/Users/sushao/Documents/code/tauri/packages/Hclipboard/src-tauri/src/plugin/window/created.rs
  */
 use tauri::Runtime;
@@ -10,7 +10,7 @@ use window_shadows::set_shadow;
 #[cfg(target_os = "windows")]
 use window_vibrancy::apply_mica;
 #[cfg(target_os = "macos")]
-use window_vibrancy::{apply_vibrancy, NSVisualEffectMaterial};
+use window_vibrancy::{apply_vibrancy, NSVisualEffectMaterial, NSVisualEffectState};
 
 use crate::error::ClipResult;
 
@@ -24,7 +24,12 @@ fn window_beatify<R: Runtime>(window: &tauri::Window<R>) -> ClipResult<()> {
     set_shadow(window, true)?;
     // 修改背景
     #[cfg(target_os = "macos")]
-    apply_vibrancy(window, NSVisualEffectMaterial::HudWindow, None, None)?;
+    apply_vibrancy(
+        window,
+        NSVisualEffectMaterial::HudWindow,
+        Some(NSVisualEffectState::Active),
+        None,
+    )?;
     #[cfg(target_os = "windows")]
     {
         window.set_decorations(false)?;

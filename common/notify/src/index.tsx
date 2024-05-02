@@ -1,8 +1,8 @@
 /*
  * @Author: suxiaoshao suxiaoshao@gmail.com
  * @Date: 2023-08-09 16:54:34
- * @LastEditors: suxiaoshao suxiaoshao@gamil.com
- * @LastEditTime: 2023-12-19 00:28:36
+ * @LastEditors: suxiaoshao suxiaoshao@gmail.com
+ * @LastEditTime: 2024-05-01 10:38:37
  * @FilePath: /tauri/common/notify/src/index.tsx
  */
 import { IconButton } from '@mui/material';
@@ -12,7 +12,7 @@ import { Subject } from 'rxjs';
 import { Close } from '@mui/icons-material';
 import { isPermissionGranted, requestPermission, sendNotification } from '@tauri-apps/api/notification';
 
-export type SnackbarData = [SnackbarMessage, OptionsObject?];
+export type SnackbarData = [string, OptionsObject?];
 const snackbarSubject = new Subject<SnackbarData>();
 export async function enqueueSnackbar(...data: SnackbarData) {
   snackbarSubject.next(data);
@@ -22,8 +22,7 @@ export async function enqueueSnackbar(...data: SnackbarData) {
     permissionGranted = permission === 'granted';
   }
   if (permissionGranted) {
-    sendNotification('Tauri is awesome!');
-    sendNotification({ title: 'TAURI', body: 'Tauri is awesome!' });
+    sendNotification(data[0]);
   }
 }
 function useSnackbarInit() {

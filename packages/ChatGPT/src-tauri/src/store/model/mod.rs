@@ -10,3 +10,4 @@ pub(in crate::store) mod conversation_templates;
 pub(in crate::store) mod conversations;
 pub(in crate::store) mod folders;
 pub(in crate::store) mod messages;
+pub(in crate::store) mod temporary_conversations;

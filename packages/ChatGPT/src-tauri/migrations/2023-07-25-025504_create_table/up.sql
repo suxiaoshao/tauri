@@ -57,6 +57,16 @@ create table conversations
     unique (path)
 );
 
+create table temporary_conversations
+(
+    id           INTEGER primary key autoincrement not null,
+    created_time DateTime                          not null,
+    updated_time DateTime                          not null,
+    template_id  INTEGER                           not null,
+    hotkeys      TEXT                              not null,
+    FOREIGN KEY (template_id) REFERENCES conversation_templates (id)
+);
+
 
 create table messages
 (

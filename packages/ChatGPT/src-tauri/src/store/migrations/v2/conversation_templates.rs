@@ -1,24 +1,24 @@
 /*
  * @Author: suxiaoshao suxiaoshao@gmail.com
- * @Date: 2024-04-24 19:33:52
+ * @Date: 2024-04-26 19:18:35
  * @LastEditors: suxiaoshao suxiaoshao@gmail.com
- * @LastEditTime: 2024-04-28 06:47:06
- * @FilePath: /tauri/packages/ChatGPT/src-tauri/src/store/migrations/v1/conversations.rs
+ * @LastEditTime: 2024-05-01 02:15:54
+ * @FilePath: /tauri/packages/ChatGPT/src-tauri/src/store/model/conversation_templates.rs
  */
 use crate::errors::ChatGPTResult;
+
 use diesel::prelude::*;
 use time::OffsetDateTime;
 
-use super::schema::conversations;
+use super::schema::conversation_templates;
 
-#[derive(Queryable, AsChangeset, Debug)]
-#[diesel(table_name = conversations)]
-pub struct SqlConversationV1 {
+#[derive(Queryable, AsChangeset, Debug, Insertable)]
+#[diesel(table_name = conversation_templates)]
+pub struct SqlConversationTemplateV2 {
     pub(in crate::store) id: i32,
-    pub(in crate::store) folder_id: Option<i32>,
-    pub(in crate::store) path: String,
-    pub(in crate::store) title: String,
+    pub(in crate::store) name: String,
     pub(in crate::store) icon: String,
+    pub(in crate::store) description: Option<String>,
     pub(in crate::store) mode: String,
     pub(in crate::store) model: String,
     pub(in crate::store) temperature: f64,
@@ -29,14 +29,11 @@ pub struct SqlConversationV1 {
     pub(in crate::store) frequency_penalty: f64,
     pub(in crate::store) created_time: OffsetDateTime,
     pub(in crate::store) updated_time: OffsetDateTime,
-    pub(in crate::store) info: Option<String>,
-    pub(in crate::store) prompt: Option<String>,
 }
 
-impl SqlConversationV1 {
+impl SqlConversationTemplateV2 {
     pub fn all(conn: &mut SqliteConnection) -> ChatGPTResult<Vec<Self>> {
-        conversations::table
-            .load::<Self>(conn)
-            .map_err(|e| e.into())
+        let data = conversation_templates::table.load::<Self>(conn)?;
+        Ok(data)
     }
 }

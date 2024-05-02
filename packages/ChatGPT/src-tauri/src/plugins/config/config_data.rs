@@ -2,7 +2,7 @@
  * @Author: suxiaoshao suxiaoshao@gmail.com
  * @Date: 2024-01-06 01:08:42
  * @LastEditors: suxiaoshao suxiaoshao@gmail.com
- * @LastEditTime: 2024-03-15 09:58:17
+ * @LastEditTime: 2024-05-01 10:33:44
  * @FilePath: /tauri/packages/ChatGPT/src-tauri/src/plugins/config/config_data.rs
  */
 use std::{io::ErrorKind, path::PathBuf};
@@ -47,8 +47,7 @@ fn default_models() -> Vec<String> {
         "gpt-3.5-turbo-16k".to_string(),
         "gpt-3.5-turbo-instruct".to_string(),
         "gpt-4".to_string(),
-        "gpt-4-turbo-preview".to_string(),
-        "gpt-4-vision-preview".to_string(),
+        "gpt-4-turbo".to_string(),
     ]
 }
 

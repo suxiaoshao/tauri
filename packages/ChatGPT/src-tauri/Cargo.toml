@@ -15,18 +15,18 @@ tauri-build = { version = "1.5.1", features = [] }
 [dependencies]
 # tauri
 tauri = { version = "1.6.2", features = [
-  "dialog-open",
-  "notification-all",
-  "window-start-dragging",
-  "os-all",
-  "macos-private-api",
-  "shell-open",
-  "window-close",
-  "window-create",
-  "window-set-focus",
-  "window-show",
+    "dialog-open",
+    "notification-all",
+    "window-start-dragging",
+    "os-all",
+    "macos-private-api",
+    "shell-open",
+    "window-close",
+    "window-create",
+    "window-set-focus",
+    "window-show",
 ] }
-serde = { version = "1.0.199", features = ["derive"] }
+serde = { version = "1.0.200", features = ["derive"] }
 serde_json = "1.0.116"
 
 # database
@@ -49,19 +49,19 @@ window-vibrancy = "0.4.3"
 # http request
 reqwest = { version = "0.12.4", features = ["json"] }
 tokio = { version = "1.37.0", features = [
-  "rt",
-  "rt-multi-thread",
-  "sync",
-  "fs",
-  "io-util",
-  "macros",
+    "rt",
+    "rt-multi-thread",
+    "sync",
+    "fs",
+    "io-util",
+    "macros",
 ] }
 reqwest-eventsource = "0.6.0"
 futures = "0.3.30"
 
 # config
 notify = { version = "6.1.1", default-features = false, features = [
-  "macos_kqueue",
+    "macos_kqueue",
 ] }
 toml = "0.8.12"
 async-trait = "0.1.80"

@@ -17,19 +17,21 @@ pub use conversations::SqlConversationV1;
 pub use folders::SqlFolderV1;
 pub use messages::SqlMessageV1;
 
-pub struct AllData {
+pub struct AllDataV1 {
     pub conversations: Vec<conversations::SqlConversationV1>,
     pub folders: Vec<folders::SqlFolderV1>,
     pub messages: Vec<messages::SqlMessageV1>,
 }
 
-pub fn get_all_data(conn: &mut SqliteConnection) -> ChatGPTResult<AllData> {
-    let all_conversations = conversations::SqlConversationV1::all(conn)?;
-    let all_folders = folders::SqlFolderV1::all(conn)?;
-    let all_messages = messages::SqlMessageV1::all(conn)?;
-    Ok(AllData {
-        conversations: all_conversations,
-        folders: all_folders,
-        messages: all_messages,
-    })
+impl AllDataV1 {
+    pub fn new(conn: &mut SqliteConnection) -> ChatGPTResult<Self> {
+        let all_conversations = conversations::SqlConversationV1::all(conn)?;
+        let all_folders = folders::SqlFolderV1::all(conn)?;
+        let all_messages = messages::SqlMessageV1::all(conn)?;
+        Ok(AllDataV1 {
+            conversations: all_conversations,
+            folders: all_folders,
+            messages: all_messages,
+        })
+    }
 }
