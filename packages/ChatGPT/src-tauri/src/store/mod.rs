@@ -89,17 +89,14 @@ impl StoreVersion {
             v2_filepath.exists(),
             v3_filepath.exists(),
         ) {
-            (true, false, false) => {
-                let conn = get_dbconn(&v1_filepath)?;
-                Ok(StoreVersion::V1 {
-                    conn,
-                    v1_db: SqliteConnection::establish(
-                        v1_filepath.to_str().ok_or(ChatGPTError::DbPath)?,
-                    )?,
-                })
-            }
+            (true, false, false) => Ok(StoreVersion::V1 {
+                conn: get_dbconn(&v3_filepath)?,
+                v1_db: SqliteConnection::establish(
+                    v1_filepath.to_str().ok_or(ChatGPTError::DbPath)?,
+                )?,
+            }),
             (_, true, false) => Ok(StoreVersion::V2 {
-                conn: get_dbconn(&v2_filepath)?,
+                conn: get_dbconn(&v3_filepath)?,
                 v2_db: SqliteConnection::establish(
                     v2_filepath.to_str().ok_or(ChatGPTError::DbPath)?,
                 )?,

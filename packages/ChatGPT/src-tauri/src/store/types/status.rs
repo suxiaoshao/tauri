@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use std::{fmt::Display, str::FromStr};
 
 use crate::errors::ChatGPTError;
 
@@ -28,13 +28,13 @@ impl FromStr for Status {
     }
 }
 
-impl ToString for Status {
-    fn to_string(&self) -> String {
+impl Display for Status {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Status::Normal => "normal".to_owned(),
-            Status::Hidden => "hidden".to_owned(),
-            Status::Loading => "loading".to_owned(),
-            Status::Error => "error".to_owned(),
+            Status::Normal => f.write_str("normal"),
+            Status::Hidden => f.write_str("hidden"),
+            Status::Loading => f.write_str("loading"),
+            Status::Error => f.write_str("error"),
         }
     }
 }

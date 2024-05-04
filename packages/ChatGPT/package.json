@@ -11,17 +11,18 @@
   },
   "dependencies": {
     "@mui/x-tree-view": "^7.3.1",
+    "details": "workspace:^",
     "markdown-to-jsx": "^7.4.7",
     "monaco-editor": "^0.48.0",
     "monaco-themes": "^0.4.4",
     "notify": "workspace:^",
     "prism-themes": "^1.9.0",
     "prismjs": "^1.29.0",
+    "react-hotkeys-hook": "^4.5.0",
     "react-resizable": "^3.0.5",
     "theme": "workspace:^",
-    "types": "workspace:^",
-    "details": "workspace:^",
-    "time": "workspace:^"
+    "time": "workspace:^",
+    "types": "workspace:^"
   },
   "devDependencies": {
     "@types/prismjs": "^1.26.3",

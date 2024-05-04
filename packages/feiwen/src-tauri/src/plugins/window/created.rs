@@ -40,6 +40,7 @@ fn window_beatify<R: Runtime>(window: &tauri::Window<R>) -> FeiwenResult<()> {
 use tauri::Window;
 
 pub trait WindowExt {
+    #[allow(dead_code)]
     #[cfg(target_os = "macos")]
     fn set_transparent_titlebar(&self, thickness: ToolbarThickness);
 }
