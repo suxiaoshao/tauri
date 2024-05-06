@@ -1,14 +1,12 @@
 import { useAppSelector } from '@chatgpt/app/hooks';
 import TemplateInfo from '@chatgpt/features/Template/components/TemplateInfo';
 import { selectTemplates } from '@chatgpt/features/Template/templateSlice';
-import { Avatar, List, ListItemAvatar, ListItemButton, ListItemText } from '@mui/material';
-import { useState } from 'react';
+import { Avatar, Box, Divider, InputBase, List, ListItemAvatar, ListItemButton, ListItemText } from '@mui/material';
+import { useEffect, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
-import './index.css';
 export default function TemporaryList() {
   const templates = useAppSelector(selectTemplates);
   const [seletedIndex, setSeletedIndex] = useState<number | null>(null);
-  const [ref, setRef] = useState<HTMLUListElement | null>(null);
   useHotkeys(
     'up',
     (event) => {
@@ -20,7 +18,7 @@ export default function TemporaryList() {
         return prev;
       });
     },
-    {},
+    { enableOnFormTags: ['INPUT'] },
     [seletedIndex, templates],
   );
   useHotkeys(
@@ -34,21 +32,40 @@ export default function TemporaryList() {
         return 0;
       });
     },
-    {
-      document: document,
-    },
+    { enableOnFormTags: ['INPUT'] },
     [seletedIndex, templates],
   );
+  const [inputRef, setInputRef] = useState<HTMLInputElement | null>(null);
+  useEffect(() => {
+    if (inputRef) {
+      inputRef.focus();
+    }
+  }, [inputRef]);
   return (
-    <List dense ref={setRef} sx={{ width: '100%', height: '100%', overflowY: 'auto!important' }}>
-      {templates.map(({ id, icon, name, description, mode }, index) => (
-        <ListItemButton dense selected={index === seletedIndex} key={id}>
-          <ListItemAvatar>
-            <Avatar sx={{ bgcolor: 'transparent' }}>{icon}</Avatar>
-          </ListItemAvatar>
-          <ListItemText primary={name} secondary={<TemplateInfo description={description} mode={mode} />} />
-        </ListItemButton>
-      ))}
-    </List>
+    <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <InputBase
+        sx={{
+          flex: '0 0 auto',
+          p: 1.5,
+          pl: 2,
+          pr: 2,
+        }}
+        placeholder="Search Google Maps"
+        inputProps={{ 'aria-label': 'search google maps' }}
+        inputRef={setInputRef}
+        data-tauri-drag-region
+      />
+      <Divider />
+      <List dense sx={{ flex: '1 1 0' }}>
+        {templates.map(({ id, icon, name, description, mode }, index) => (
+          <ListItemButton dense selected={index === seletedIndex} key={id}>
+            <ListItemAvatar>
+              <Avatar sx={{ bgcolor: 'transparent' }}>{icon}</Avatar>
+            </ListItemAvatar>
+            <ListItemText primary={name} secondary={<TemplateInfo description={description} mode={mode} />} />
+          </ListItemButton>
+        ))}
+      </List>
+    </Box>
   );
 }

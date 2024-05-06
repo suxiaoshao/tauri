@@ -9,10 +9,12 @@ mod chat;
 mod config;
 mod log_plugin;
 mod temporary_conversation;
+mod tray;
 mod window;
 
 pub use chat::ChatPlugin;
 pub use config::ConfigPlugin;
 pub use log_plugin::LogPlugin;
 pub use temporary_conversation::TemporaryConversationPlugin;
+pub use tray::TrayPlugin;
 pub use window::WindowPlugin;

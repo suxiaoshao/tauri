@@ -2,7 +2,7 @@
  * @Author: suxiaoshao suxiaoshao@gmail.com
  * @Date: 2024-05-02 10:09:55
  * @LastEditors: suxiaoshao suxiaoshao@gmail.com
- * @LastEditTime: 2024-05-04 05:56:52
+ * @LastEditTime: 2024-05-06 08:29:08
  * @FilePath: /tauri/packages/ChatGPT/src-tauri/src/plugins/temporary_conversation/mod.rs
  */
 use serde_json::Value;
@@ -28,23 +28,16 @@ pub fn manager_global_shortcut<R: Runtime>(app: &AppHandle<R>) -> tauri::plugin:
     let app = app.clone();
     // 全局快捷键
     manager
-        .register(
-            if cfg!(target_os = "macos") {
-                "Option+F"
-            } else {
-                "Alt+F"
-            },
-            move || {
-                if let Err(err) = on_short(&app) {
-                    log::warn!("global shortcut error:{}", err)
-                };
-            },
-        )
+        .register("Option+F", move || {
+            if let Err(err) = on_short(&app) {
+                log::warn!("global shortcut error:{}", err)
+            };
+        })
         .map_err(tauri::Error::Runtime)?;
     Ok(())
 }
 
-fn on_short<R: Runtime>(app: &AppHandle<R>) -> ChatGPTResult<()> {
+pub fn on_short<R: Runtime>(app: &AppHandle<R>) -> ChatGPTResult<()> {
     match app.get_window(TEMPORARY_WINDOW) {
         Some(window) => {
             if window.is_visible()? {

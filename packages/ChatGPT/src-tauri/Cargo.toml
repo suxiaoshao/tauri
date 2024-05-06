@@ -14,7 +14,7 @@ tauri-build = { version = "1.5.1", features = [] }
 
 [dependencies]
 # tauri
-tauri = { version = "1.6.2", features = [
+tauri = { version = "1.6.2", features = [ "system-tray",
     "dialog-open",
     "notification-all",
     "window-start-dragging",
