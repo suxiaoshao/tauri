@@ -5,14 +5,14 @@
  * @LastEditTime: 2024-05-01 10:33:44
  * @FilePath: /tauri/packages/ChatGPT/src-tauri/src/plugins/config/config_data.rs
  */
-use std::{io::ErrorKind, path::PathBuf};
+use std::{collections::HashSet, io::ErrorKind, path::PathBuf};
 
 use serde::{Deserialize, Serialize};
 use tauri::{api::path::app_config_dir, Runtime};
 
 use crate::errors::{ChatGPTError, ChatGPTResult};
 
-#[derive(Debug, Clone, Copy, Default, Deserialize, Serialize)]
+#[derive(Debug, Clone, Copy, Default, Deserialize, Serialize, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
 enum Theme {
     Dark,
@@ -22,7 +22,7 @@ enum Theme {
     System,
 }
 
-#[derive(Debug, Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq)]
 struct ThemeOption {
     theme: Theme,
     color: String,
@@ -41,17 +41,17 @@ fn default_url() -> String {
     "https://api.openai.com/v1/chat/completions".to_string()
 }
 
-fn default_models() -> Vec<String> {
-    vec![
-        "gpt-3.5-turbo".to_string(),
-        "gpt-3.5-turbo-16k".to_string(),
-        "gpt-3.5-turbo-instruct".to_string(),
-        "gpt-4".to_string(),
-        "gpt-4-turbo".to_string(),
-    ]
+fn default_models() -> HashSet<String> {
+    let mut models = HashSet::new();
+    models.insert("gpt-3.5-turbo".to_string());
+    models.insert("gpt-3.5-turbo-16k".to_string());
+    models.insert("gpt-3.5-turbo-instruct".to_string());
+    models.insert("gpt-4".to_string());
+    models.insert("gpt-4-turbo".to_string());
+    models
 }
 
-#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+#[derive(Clone, Debug, Default, Deserialize, Serialize, PartialEq, Eq)]
 pub struct ChatGPTConfig {
     #[serde(rename = "apiKey")]
     api_key: Option<String>,
@@ -62,7 +62,9 @@ pub struct ChatGPTConfig {
     #[serde(rename = "httpProxy")]
     pub http_proxy: Option<String>,
     #[serde(default = "default_models")]
-    pub models: Vec<String>,
+    pub models: HashSet<String>,
+    #[serde(rename = "temporaryHotkey")]
+    pub temporary_hotkey: Option<String>,
 }
 
 impl ChatGPTConfig {

@@ -3,7 +3,7 @@
 
 use errors::ChatGPTResult;
 use log::LevelFilter;
-use plugins::LogPlugin;
+use plugins::{LogPlugin, MainConfigListener, TemporaryHotkeyListener};
 use tauri::{App, WindowBuilder};
 use tauri_plugin_log::LogTarget;
 
@@ -27,7 +27,11 @@ fn main() -> ChatGPTResult<()> {
         .plugin(LogPlugin)
         .plugin(plugins::WindowPlugin)
         .plugin(tauri_plugin_window_state::Builder::default().build())
-        .plugin(plugins::ConfigPlugin)
+        .plugin(
+            plugins::ConfigPlugin::new()
+                .add_listen(MainConfigListener)
+                .add_listen(TemporaryHotkeyListener),
+        )
         .plugin(plugins::ChatPlugin)
         .plugin(plugins::TemporaryConversationPlugin)
         .plugin(plugins::TrayPlugin)

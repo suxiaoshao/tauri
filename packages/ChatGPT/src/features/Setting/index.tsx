@@ -14,7 +14,7 @@ import {
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import { appWindow } from '@tauri-apps/api/window';
 import { useAppSelector } from '../../app/hooks';
-import { Theme } from './configSlice';
+import { selectConfig } from './configSlice';
 import { Add, Delete, Settings } from '@mui/icons-material';
 import { useCallback } from 'react';
 import useConfig from '@chatgpt/hooks/useConfig';
@@ -22,32 +22,36 @@ import useSettingKey from '@chatgpt/hooks/useSettingKey';
 import { createSettingWindow, setConfigService } from '@chatgpt/service/config';
 import { string, object, enum_, Input, regex, url, array, nullish } from 'valibot';
 import { valibotResolver } from '@hookform/resolvers/valibot';
+import HotkeyInput from '@chatgpt/components/HotkeyInput';
 
-const ThemeSchema = enum_(Theme);
-
-const ThemeOptionSchema = object({
-  theme: ThemeSchema,
-  color: string([regex(/^#(?:[0-9a-fA-F]{3}){1,2}$/, 'Invalid color format')]),
-});
+export enum Theme {
+  Dark = 'dark',
+  Light = 'light',
+  System = 'system',
+}
 
 const ChatGPTConfigSchema = object({
   apiKey: string(),
-  theme: ThemeOptionSchema,
+  theme: object({
+    theme: enum_(Theme),
+    color: string([regex(/^#(?:[0-9a-fA-F]{3}){1,2}$/, 'Invalid color format')]),
+  }),
   url: nullish(string([url()])),
   httpProxy: nullish(string([url()])),
   models: array(string()),
+  temporaryHotkey: nullish(string()),
 });
 
-export type ChatGptConfig = Input<typeof ChatGPTConfigSchema>;
+export type Config = Input<typeof ChatGPTConfigSchema>;
 
 function Setting() {
-  const initData = useAppSelector((state) => state.config);
+  const initData = useAppSelector(selectConfig);
   const {
     register,
     handleSubmit,
     control,
     formState: { errors },
-  } = useForm<ChatGptConfig>({
+  } = useForm<Config>({
     defaultValues: initData,
     resolver: valibotResolver(ChatGPTConfigSchema),
   });
@@ -133,6 +137,20 @@ function Setting() {
           sx={{ mt: 2 }}
           error={!!errors.httpProxy?.message}
           helperText={errors.httpProxy?.message}
+        />
+        <Controller
+          control={control}
+          name="temporaryHotkey"
+          render={({ field, fieldState }) => (
+            <HotkeyInput
+              {...field}
+              label="Temporary Conversation Hotkey"
+              fullWidth
+              sx={{ mt: 2 }}
+              error={!!fieldState.error?.message}
+              helperText={fieldState.error?.message}
+            />
+          )}
         />
 
         <FormLabel sx={{ mt: 2 }} required>

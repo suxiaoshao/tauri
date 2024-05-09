@@ -2,13 +2,15 @@
  * @Author: suxiaoshao suxiaoshao@gmail.com
  * @Date: 2024-05-02 10:09:55
  * @LastEditors: suxiaoshao suxiaoshao@gmail.com
- * @LastEditTime: 2024-05-06 08:29:08
+ * @LastEditTime: 2024-05-09 20:19:17
  * @FilePath: /tauri/packages/ChatGPT/src-tauri/src/plugins/temporary_conversation/mod.rs
  */
 use serde_json::Value;
 use tauri::{AppHandle, GlobalShortcutManager, Manager, Runtime, WindowBuilder};
 
 use crate::errors::ChatGPTResult;
+
+use super::{ChatGPTConfig, Listenable};
 
 pub struct TemporaryConversationPlugin;
 
@@ -23,12 +25,19 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for TemporaryConversationPlugin {
         Ok(())
     }
 }
-pub fn manager_global_shortcut<R: Runtime>(app: &AppHandle<R>) -> tauri::plugin::Result<()> {
+pub fn manager_global_shortcut<R: Runtime>(app: &AppHandle<R>) -> ChatGPTResult<()> {
+    let ChatGPTConfig {
+        temporary_hotkey, ..
+    } = ChatGPTConfig::get(app)?;
+    let temporary_hotkey = match temporary_hotkey {
+        Some(data) => data,
+        None => return Ok(()),
+    };
     let mut manager = app.global_shortcut_manager();
     let app = app.clone();
     // 全局快捷键
     manager
-        .register("Option+F", move || {
+        .register(&temporary_hotkey, move || {
             if let Err(err) = on_short(&app) {
                 log::warn!("global shortcut error:{}", err)
             };
@@ -81,4 +90,41 @@ fn create_window<R: Runtime>(app: &AppHandle<R>) -> ChatGPTResult<()> {
         window.set_transparent_titlebar()?;
     }
     Ok(())
+}
+
+pub struct TemporaryHotkeyListener;
+
+impl Listenable for TemporaryHotkeyListener {
+    fn listen<R: Runtime>(
+        &self,
+        old_value: &ChatGPTConfig,
+        new_value: &ChatGPTConfig,
+        app_handle: &tauri::AppHandle<R>,
+    ) -> ChatGPTResult<()> {
+        if old_value.temporary_hotkey == new_value.temporary_hotkey {
+            return Ok(());
+        }
+        if let Some(old_temporary) = &old_value.temporary_hotkey {
+            let mut manager = app_handle.global_shortcut_manager();
+            manager.unregister(old_temporary).map_err(|err| {
+                log::warn!("unregister global shortcut error:{}", err);
+                tauri::Error::Runtime(err)
+            })?;
+        }
+        if let Some(new_temporary) = &new_value.temporary_hotkey {
+            let mut manager = app_handle.global_shortcut_manager();
+            let app = app_handle.clone();
+            manager
+                .register(new_temporary, move || {
+                    if let Err(err) = on_short(&app) {
+                        log::warn!("global shortcut error:{}", err)
+                    };
+                })
+                .map_err(|err| {
+                    log::warn!("register global shortcut error:{}", err);
+                    tauri::Error::Runtime(err)
+                })?;
+        }
+        Ok(())
+    }
 }

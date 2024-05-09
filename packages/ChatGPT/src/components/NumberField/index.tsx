@@ -8,7 +8,7 @@
 import { TextField, TextFieldProps } from '@mui/material';
 import React, { useImperativeHandle } from 'react';
 
-function fixedForwardRef<T, P = {}>(
+export function fixedForwardRef<T, P = {}>(
   render: (props: P, ref: React.Ref<T>) => React.ReactNode,
 ): (props: P & React.RefAttributes<T>) => React.ReactNode {
   return React.forwardRef(render) as any;

@@ -3,7 +3,7 @@ use crate::{
     fetch::{ChatRequest, ChatResponse, FetchRunner},
     store::{Conversation, DbConn, NewMessage, Role, Status},
 };
-use crate::{plugins::config::ChatGPTConfig, store::Message};
+use crate::{plugins::ChatGPTConfig, store::Message};
 use tauri::{AppHandle, Manager, Runtime, Window};
 
 #[tauri::command(async)]
@@ -99,12 +99,12 @@ async fn _fetch<R: Runtime>(
     let window = app_handle
         .get_window("main")
         .ok_or(ChatGPTError::WindowNotFound)?;
-    let ChatGPTConfig {
-        url, http_proxy, ..
-    } = ChatGPTConfig::get(&app_handle)?;
     // get api key
     let config = ChatGPTConfig::get(&app_handle)?;
     let api_key = config.get_api_key()?.to_owned();
+    let ChatGPTConfig {
+        url, http_proxy, ..
+    } = config;
 
     // get conn
     let conn = &mut state.get()?;
