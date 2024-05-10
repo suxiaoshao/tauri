@@ -1,18 +1,21 @@
-/*
- * @Author: suxiaoshao suxiaoshao@gmail.com
+/* * @Author: suxiaoshao suxiaoshao@gmail.com
  * @Date: 2024-01-06 01:08:42
  * @LastEditors: suxiaoshao suxiaoshao@gmail.com
  * @LastEditTime: 2024-05-09 20:18:56
  * @FilePath: /tauri/packages/ChatGPT/src-tauri/src/plugins/config/mod.rs
  */
+use std::time::Duration;
 use tauri::{Manager, Runtime, WindowBuilder};
+use tokio::time::interval;
 
 use crate::errors::ChatGPTResult;
+use notify::{Config, EventHandler, RecommendedWatcher, RecursiveMode, Watcher};
 mod config_data;
 mod listen;
 pub use config_data::ChatGPTConfig;
 pub use listen::Listenable;
 
+#[derive(Clone, Copy)]
 pub struct ConfigPlugin<T, P> {
     left: T,
     right: P,
@@ -21,8 +24,8 @@ impl<R, T, P> tauri::plugin::Plugin<R> for ConfigPlugin<T, P>
 where
     R: Runtime,
     ConfigPlugin<T, P>: Listenable,
-    T: Send,
-    P: Send,
+    T: Send + Copy + 'static + Sync,
+    P: Send + Copy + 'static + Sync,
 {
     fn name(&self) -> &'static str {
         "config"
@@ -32,7 +35,7 @@ where
         app: &tauri::AppHandle<R>,
         _config: serde_json::Value,
     ) -> tauri::plugin::Result<()> {
-        initialize(app)?;
+        self._initialize(app)?;
         Ok(())
     }
     fn extend_api(&mut self, invoke: tauri::Invoke<R>) {
@@ -127,33 +130,94 @@ where
         }
     }
 }
-fn initialize<R: Runtime>(app: &tauri::AppHandle<R>) -> ChatGPTResult<()> {
-    //data path
-    ChatGPTConfig::get(app)?;
-    // let path = ChatGPTConfig::path(app)?;
-    // let app2 = app.clone();
-    // let mut watcher = notify::recommended_watcher(move |res| match res {
-    //     Ok(_) => {
-    //         println!("config file changed");
-    //         match ChatGPTConfig::get(&app2) {
-    //             Ok(config) => {
-    //                 println!("config changed:{:?}", config);
-    //                 if let Err(err) = app2.emit_to("main", "config", config) {
-    //                     log::error!("emit config error:{err}");
-    //                 };
-    //             }
-    //             Err(err) => {
-    //                 log::error!("config file error:{err}");
-    //             }
-    //         };
-    //     }
-    //     Err(err) => {
-    //         log::error!("watch file error:{err}");
-    //     }
-    // })?;
-    // watcher.watch(&path, RecursiveMode::Recursive)?;
-    // println!("watch config file:{:?}", path);
-    Ok(())
+impl<T, P> ConfigPlugin<T, P>
+where
+    ConfigPlugin<T, P>: Listenable,
+    T: Send + Copy + Sync + 'static,
+    P: Send + Copy + Sync + 'static,
+{
+    fn _initialize<R: Runtime>(&self, app: &tauri::AppHandle<R>) -> ChatGPTResult<()> {
+        //data path
+        let data = ChatGPTConfig::get(app)?;
+        let path = ChatGPTConfig::path(app)?;
+        let app2 = app.clone();
+        let this = *self;
+
+        #[derive(Clone)]
+        struct WatcherData<R, T, P>
+        where
+            R: Runtime,
+            ConfigPlugin<T, P>: Listenable,
+            T: Send + Copy + Sync + 'static,
+            P: Send + Copy + Sync + 'static,
+        {
+            app: tauri::AppHandle<R>,
+            this: ConfigPlugin<T, P>,
+            old_config: ChatGPTConfig,
+        }
+
+        impl<R, T, P> EventHandler for WatcherData<R, T, P>
+        where
+            R: Runtime,
+            ConfigPlugin<T, P>: Listenable,
+            T: Send + Copy + std::marker::Sync + 'static,
+            P: Send + Copy + std::marker::Sync + 'static,
+        {
+            fn handle_event(&mut self, event: notify::Result<notify::Event>) {
+                match event {
+                    Ok(_) => {
+                        match ChatGPTConfig::get(&self.app) {
+                            Ok(config) => {
+                                let old_config = &self.old_config;
+                                if let Err(err) = self.this.listen(old_config, &config, &self.app) {
+                                    log::error!("config file listen error:{err}");
+                                };
+                                self.old_config = config;
+                            }
+                            Err(err) => {
+                                log::error!("config file error:{err}");
+                            }
+                        };
+                    }
+                    Err(err) => {
+                        log::error!("watch file error:{err}");
+                    }
+                }
+            }
+        }
+        let watcher_data = WatcherData {
+            app: app2,
+            this,
+            old_config: data,
+        };
+
+        tauri::async_runtime::spawn(async move {
+            let mut interval = interval(Duration::from_secs(2));
+
+            let mut watcher: RecommendedWatcher = match Watcher::new(
+                watcher_data,
+                Config::default().with_poll_interval(Duration::from_millis(100)),
+            ) {
+                Ok(watch) => watch,
+                Err(err) => {
+                    log::error!("watcher error:{err}");
+                    return;
+                }
+            };
+            match watcher.watch(&path, RecursiveMode::NonRecursive) {
+                Ok(_) => {}
+                Err(err) => {
+                    log::error!("watcher error:{err}");
+                    return;
+                }
+            };
+            loop {
+                interval.tick().await;
+            }
+        });
+
+        Ok(())
+    }
 }
 
 #[tauri::command]
@@ -189,6 +253,7 @@ async fn create_setting_window<R: Runtime>(
     Ok(())
 }
 
+#[derive(Clone, Copy)]
 pub struct MainConfigListener;
 
 impl Listenable for MainConfigListener {

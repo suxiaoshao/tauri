@@ -92,6 +92,7 @@ fn create_window<R: Runtime>(app: &AppHandle<R>) -> ChatGPTResult<()> {
     Ok(())
 }
 
+#[derive(Clone, Copy)]
 pub struct TemporaryHotkeyListener;
 
 impl Listenable for TemporaryHotkeyListener {
