@@ -42,12 +42,13 @@ impl Display for Status {
 #[cfg(test)]
 mod test {
     #[test]
-    fn test_mode() {
+    fn test_mode() -> anyhow::Result<()> {
         use super::Status;
-        assert_eq!("normal".parse::<Status>().unwrap(), Status::Normal);
-        assert_eq!("hidden".parse::<Status>().unwrap(), Status::Hidden);
-        assert_eq!("loading".parse::<Status>().unwrap(), Status::Loading);
-        assert_eq!("error".parse::<Status>().unwrap(), Status::Error);
+        assert_eq!("normal".parse::<Status>()?, Status::Normal);
+        assert_eq!("hidden".parse::<Status>()?, Status::Hidden);
+        assert_eq!("loading".parse::<Status>()?, Status::Loading);
+        assert_eq!("error".parse::<Status>()?, Status::Error);
         assert!("invalid".parse::<Status>().is_err());
+        Ok(())
     }
 }

@@ -46,8 +46,9 @@ mod test {
     use super::parse_novel_url;
 
     #[test]
-    fn test() {
+    fn test() -> anyhow::Result<()> {
         let input = "https://xn--pxtr7m.com/threads/165143/profile";
-        parse_novel_url(input).unwrap();
+        parse_novel_url(input)?;
+        Ok(())
     }
 }

@@ -38,14 +38,12 @@ impl Display for Mode {
 #[cfg(test)]
 mod test {
     #[test]
-    fn test_mode() {
+    fn test_mode() -> anyhow::Result<()> {
         use super::Mode;
-        assert_eq!("contextual".parse::<Mode>().unwrap(), Mode::Contextual);
-        assert_eq!("single".parse::<Mode>().unwrap(), Mode::Single);
-        assert_eq!(
-            "assistant-only".parse::<Mode>().unwrap(),
-            Mode::AssistantOnly
-        );
+        assert_eq!("contextual".parse::<Mode>()?, Mode::Contextual);
+        assert_eq!("single".parse::<Mode>()?, Mode::Single);
+        assert_eq!("assistant-only".parse::<Mode>()?, Mode::AssistantOnly);
         assert!("invalid".parse::<Mode>().is_err());
+        Ok(())
     }
 }

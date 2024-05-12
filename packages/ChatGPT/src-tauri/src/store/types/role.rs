@@ -40,11 +40,12 @@ impl Display for Role {
 #[cfg(test)]
 mod test {
     #[test]
-    fn test_mode() {
+    fn test_mode() -> anyhow::Result<()> {
         use super::Role;
-        assert_eq!("system".parse::<Role>().unwrap(), Role::System);
-        assert_eq!("user".parse::<Role>().unwrap(), Role::User);
-        assert_eq!("assistant".parse::<Role>().unwrap(), Role::Assistant);
+        assert_eq!("system".parse::<Role>()?, Role::System);
+        assert_eq!("user".parse::<Role>()?, Role::User);
+        assert_eq!("assistant".parse::<Role>()?, Role::Assistant);
         assert!("invalid".parse::<Role>().is_err());
+        Ok(())
     }
 }

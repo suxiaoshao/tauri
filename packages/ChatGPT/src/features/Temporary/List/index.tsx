@@ -1,46 +1,141 @@
 import { useAppSelector } from '@chatgpt/app/hooks';
 import TemplateInfo from '@chatgpt/features/Template/components/TemplateInfo';
 import { selectTemplates } from '@chatgpt/features/Template/templateSlice';
+import { ConversationTemplate } from '@chatgpt/types/conversation_template';
 import { Avatar, Box, Divider, InputBase, List, ListItemAvatar, ListItemButton, ListItemText } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useReducer, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
+import { useNavigate } from 'react-router-dom';
+import { Enum } from 'types';
+
+interface Data {
+  selectedIndex: number | null;
+  searchText: string | null;
+  sourceTemplates: ConversationTemplate[];
+  filteredTemplates: ConversationTemplate[];
+}
+
+type Action =
+  | Enum<'setSearch', string>
+  | Enum<'setSourceTemplates', ConversationTemplate[]>
+  | Enum<'up'>
+  | Enum<'down'>;
+
+function getFilteredTemplates(
+  sourceTemplates: ConversationTemplate[],
+  searchText: string | null,
+): ConversationTemplate[] {
+  if (!searchText) {
+    return sourceTemplates;
+  }
+  const lowerSearchText = searchText.toLowerCase();
+  return sourceTemplates.filter(({ name, description }) => {
+    return name.toLowerCase().includes(lowerSearchText) || description?.toLowerCase().includes(lowerSearchText);
+  });
+}
+
+function reducer(state: Data, action: Action): Data {
+  switch (action.tag) {
+    case 'up':
+      if (state.selectedIndex === null) {
+        return state;
+      }
+      if (state.selectedIndex <= 0) {
+        return { ...state, selectedIndex: state.filteredTemplates.length - 1 };
+      }
+      return { ...state, selectedIndex: state.selectedIndex - 1 };
+    case 'down':
+      if (state.selectedIndex === null) {
+        return { ...state, selectedIndex: 0 };
+      }
+      if (state.selectedIndex >= state.filteredTemplates.length - 1) {
+        return { ...state, selectedIndex: 0 };
+      }
+      return { ...state, selectedIndex: state.selectedIndex + 1 };
+    case 'setSearch':
+      return {
+        ...state,
+        searchText: action.value,
+        filteredTemplates: getFilteredTemplates(state.sourceTemplates, action.value),
+        selectedIndex: null,
+      };
+    case 'setSourceTemplates':
+      return {
+        ...state,
+        sourceTemplates: action.value,
+        filteredTemplates: getFilteredTemplates(action.value, state.searchText),
+        selectedIndex: null,
+      };
+    default:
+      return state;
+  }
+}
+
+const initialState: Data = {
+  selectedIndex: null,
+  searchText: null,
+  filteredTemplates: [],
+  sourceTemplates: [],
+};
+
 export default function TemporaryList() {
+  const navigate = useNavigate();
+  // data & dispatch
   const templates = useAppSelector(selectTemplates);
-  const [seletedIndex, setSeletedIndex] = useState<number | null>(null);
+  const [{ selectedIndex, filteredTemplates }, dispatch] = useReducer(reducer, initialState);
+  useEffect(() => {
+    dispatch({ tag: 'setSourceTemplates', value: templates });
+  }, [templates]);
+
+  // hotkeys
   useHotkeys(
     'up',
     (event) => {
       event.preventDefault();
-      setSeletedIndex((prev) => {
-        if (prev !== null) {
-          return prev - 1 < 0 ? 0 : prev - 1;
-        }
-        return prev;
-      });
+      dispatch({ tag: 'up' });
     },
     { enableOnFormTags: ['INPUT'] },
-    [seletedIndex, templates],
+    [templates],
   );
   useHotkeys(
     'down',
     (event) => {
       event.preventDefault();
-      setSeletedIndex((prev) => {
-        if (prev !== null) {
-          return prev + 1 >= templates.length ? 0 : prev + 1;
-        }
-        return 0;
-      });
+      dispatch({ tag: 'down' });
     },
     { enableOnFormTags: ['INPUT'] },
-    [seletedIndex, templates],
+    [templates],
   );
+  useHotkeys(
+    'enter',
+    (event) => {
+      event.preventDefault();
+      if (selectedIndex !== null) {
+        navigate(`/temporary_conversation/${filteredTemplates[selectedIndex].id}`);
+      }
+    },
+    { enableOnFormTags: ['INPUT'] },
+    [selectedIndex, filteredTemplates, navigate],
+  );
+  const handleClick = useCallback(
+    (index: number) => {
+      navigate(`/temporary_conversation/${filteredTemplates[index].id}`);
+    },
+    [navigate, filteredTemplates],
+  );
+
+  // search & fucused
   const [inputRef, setInputRef] = useState<HTMLInputElement | null>(null);
   useEffect(() => {
     if (inputRef) {
       inputRef.focus();
     }
   }, [inputRef]);
+
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const searchText = event.target.value;
+    dispatch({ tag: 'setSearch', value: searchText });
+  };
   return (
     <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
       <InputBase
@@ -54,11 +149,12 @@ export default function TemporaryList() {
         inputProps={{ 'aria-label': 'search google maps' }}
         inputRef={setInputRef}
         data-tauri-drag-region
+        onChange={handleSearch}
       />
       <Divider />
       <List dense sx={{ flex: '1 1 0' }}>
-        {templates.map(({ id, icon, name, description, mode }, index) => (
-          <ListItemButton dense selected={index === seletedIndex} key={id}>
+        {filteredTemplates.map(({ id, icon, name, description, mode }, index) => (
+          <ListItemButton dense selected={index === selectedIndex} key={id} onClick={() => handleClick(index)}>
             <ListItemAvatar>
               <Avatar sx={{ bgcolor: 'transparent' }}>{icon}</Avatar>
             </ListItemAvatar>

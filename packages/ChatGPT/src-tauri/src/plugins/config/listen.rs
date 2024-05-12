@@ -2,7 +2,7 @@
  * @Author: suxiaoshao suxiaoshao@gmail.com
  * @Date: 2024-05-09 16:25:17
  * @LastEditors: suxiaoshao suxiaoshao@gmail.com
- * @LastEditTime: 2024-05-09 22:38:04
+ * @LastEditTime: 2024-05-12 00:32:18
  * @FilePath: /tauri/packages/ChatGPT/src-tauri/src/plugins/config/listen.rs
  */
 use tauri::Runtime;
