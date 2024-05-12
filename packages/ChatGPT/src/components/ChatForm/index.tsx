@@ -1,31 +1,22 @@
 import { Send } from '@mui/icons-material';
 import { Paper, InputBase, IconButton } from '@mui/material';
 import { useForm } from 'react-hook-form';
-import { Dispatch } from 'react';
 import { Role } from '@chatgpt/types/common';
 import { Message } from '@chatgpt/types/message';
-import { FetchingMessageAction, FetchingMessageType } from '..';
-import { fetchMessage } from '@chatgpt/service/chat/query';
+import { PromiseData, PromiseStatus } from '@chatgpt/hooks/usePromise';
 
 export interface ChatFormProps {
-  fetchingMessageDispatch: Dispatch<FetchingMessageAction>;
-  fetchingMessage: FetchingMessageType;
-  conversationId: number;
+  status: PromiseData<void>;
+  onSendMessage: (content: string) => Promise<void>;
 }
 
-export default function ChatForm({ fetchingMessageDispatch, fetchingMessage, conversationId }: ChatFormProps) {
-  const { register, handleSubmit, setValue } = useForm<Message>({ defaultValues: { role: Role.user } });
+export default function ChatForm({ status, onSendMessage }: ChatFormProps) {
+  const { register, handleSubmit, reset } = useForm<Message>({ defaultValues: { role: Role.user } });
   const onSubmit = handleSubmit(async (data) => {
-    fetchingMessageDispatch(FetchingMessageAction.start);
-    setValue('content', '');
-
-    await fetchMessage({
-      content: data.content,
-      id: conversationId,
-    });
-    fetchingMessageDispatch(FetchingMessageAction.complete);
+    reset();
+    await onSendMessage(data.content);
   });
-  const isLoading = [FetchingMessageType.loading].includes(fetchingMessage);
+  const isLoading = [PromiseStatus.loading].includes(status.tag);
   return (
     <Paper
       onSubmit={onSubmit}

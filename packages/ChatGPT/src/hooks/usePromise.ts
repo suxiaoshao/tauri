@@ -8,15 +8,26 @@
 import { Enum } from 'types';
 import { useCallback, useEffect, useState } from 'react';
 
-export type PromiseData<T> = Enum<'data', T> | Enum<'error', Error> | Enum<'loading'> | Enum<'init'>;
+export enum PromiseStatus {
+  data = 'data',
+  error = 'error',
+  loading = 'loading',
+  init = 'init',
+}
+
+export type PromiseData<T> =
+  | Enum<PromiseStatus.data, T>
+  | Enum<PromiseStatus.error, Error>
+  | Enum<PromiseStatus.loading>
+  | Enum<PromiseStatus.init>;
 
 export default function usePromise<T>(fn: () => Promise<T>, autoRun: boolean = true): [PromiseData<T>, () => void] {
-  const [state, setState] = useState<PromiseData<T>>({ tag: 'init' });
+  const [state, setState] = useState<PromiseData<T>>({ tag: PromiseStatus.init });
   const func = useCallback(() => {
-    setState({ tag: 'loading' });
+    setState({ tag: PromiseStatus.loading });
     fn()
-      .then((data) => setState({ tag: 'data', value: data } as PromiseData<T>))
-      .catch((error) => setState({ tag: 'error', value: error }));
+      .then((data) => setState({ tag: PromiseStatus.data, value: data } as PromiseData<T>))
+      .catch((error) => setState({ tag: PromiseStatus.error, value: error }));
   }, [fn]);
   useEffect(() => {
     if (autoRun) {

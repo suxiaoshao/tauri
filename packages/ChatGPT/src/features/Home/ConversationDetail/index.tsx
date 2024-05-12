@@ -1,40 +1,27 @@
 import { Box } from '@mui/material';
-import ChatForm from './components/ChatForm';
 import Header from './components/ConversationHeader';
-import MessageHistory from './components/MessageHistory';
 import { Conversation } from '@chatgpt/types/conversation';
-import { Reducer, useReducer } from 'react';
+import { useCallback } from 'react';
+import { fetchMessage } from '@chatgpt/service/chat/query';
+import ChatForm from '@chatgpt/components/ChatForm';
+import usePromiseFn from '@chatgpt/hooks/usePromiseFn';
+import MessageHistory from '@chatgpt/components/MessageHistory';
 
 export interface ConversationDetailProps {
   conversation: Conversation;
 }
 
-export enum FetchingMessageAction {
-  complete = 'complete',
-  start = 'start',
-}
-
-export enum FetchingMessageType {
-  loading = 'loading',
-  init = 'init',
-}
-
-type FetchingMessageReducer = Reducer<FetchingMessageType, FetchingMessageAction>;
-
-const reducer: FetchingMessageReducer = (state: FetchingMessageType, action) => {
-  switch (action) {
-    case FetchingMessageAction.complete:
-      return FetchingMessageType.init;
-    case FetchingMessageAction.start:
-      return FetchingMessageType.loading;
-  }
-};
-
 export default function ConversationDetail({ conversation }: ConversationDetailProps) {
-  const [fetchingMessage, fetchingMessageDispatch] = useReducer<FetchingMessageReducer>(
-    reducer,
-    FetchingMessageType.init,
+  const fetchFn = useCallback(
+    async (content: string) => {
+      await fetchMessage({
+        content: content,
+        id: conversation.id,
+      });
+    },
+    [conversation.id],
   );
+  const [status, onSendMessage] = usePromiseFn(fetchFn);
   return (
     <Box
       sx={{
@@ -49,11 +36,7 @@ export default function ConversationDetail({ conversation }: ConversationDetailP
       <Box sx={{ flex: '1 1 0', overflowY: 'auto' }}>
         <MessageHistory messages={conversation.messages} />
       </Box>
-      <ChatForm
-        conversationId={conversation.id}
-        fetchingMessageDispatch={fetchingMessageDispatch}
-        fetchingMessage={fetchingMessage}
-      />
+      <ChatForm status={status} onSendMessage={onSendMessage} />
     </Box>
   );
 }
