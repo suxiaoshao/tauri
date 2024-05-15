@@ -4,7 +4,7 @@ use time::OffsetDateTime;
 
 use crate::{
     errors::ChatGPTResult,
-    fetch::{ChatRequest, ChatResponse, FetchRunner},
+    fetch::{ChatRequest, ChatResponse, FetchRunner, Message as FetchMessage},
     plugins::ChatGPTConfig,
     store::{
         deserialize_offset_date_time, serialize_offset_date_time, ConversationTemplate, DbConn,
@@ -14,7 +14,7 @@ use crate::{
 
 #[derive(Debug, Serialize, Clone, Deserialize, PartialEq, Eq)]
 pub struct TemporaryMessage {
-    pub id: i32,
+    pub id: usize,
     pub role: Role,
     pub content: String,
     pub status: Status,
@@ -51,11 +51,9 @@ pub struct TemporaryHistory {
 
 #[tauri::command]
 pub(super) fn init_temporary_conversation<R: Runtime>(
-    state: tauri::State<'_, DbConn>,
     app: tauri::AppHandle<R>,
     template_id: i32,
 ) -> ChatGPTResult<Vec<TemporaryMessage>> {
-    let conn = &mut state.get()?;
     let messages = vec![];
     let history = TemporaryHistory {
         template_id,
@@ -76,14 +74,27 @@ pub async fn temporary_fetch<R: Runtime>(
         template_id,
         messages,
     } = state.inner();
-    let messages = messages.clone();
+
+    let mut messages = messages.clone();
+    messages.push(TemporaryMessage {
+        id: messages.len() + 1,
+        role: Role::User,
+        content,
+        status: Status::Normal,
+        created_time: OffsetDateTime::now_utc(),
+        updated_time: OffsetDateTime::now_utc(),
+        start_time: OffsetDateTime::now_utc(),
+        end_time: OffsetDateTime::now_utc(),
+    });
+
     let config = ChatGPTConfig::get(&app)?;
+
     let conn = &mut conn.get()?;
     let mut template = ConversationTemplate::find(*template_id, conn)?;
     template.mode = Mode::Contextual;
+
     let mut fetch = TemporaryFetch {
         config,
-        content,
         messages,
         template,
     };
@@ -95,13 +106,32 @@ struct TemporaryFetch {
     config: ChatGPTConfig,
     template: ConversationTemplate,
     messages: Vec<TemporaryMessage>,
-    content: String,
 }
 
 impl FetchRunner for TemporaryFetch {
     fn get_body(&self) -> ChatGPTResult<ChatRequest<'_>> {
-        let request = ChatRequest::new(self.messages.as_slice(), &self.template, &self.content);
-        Ok(request)
+        let mut messages = self
+            .template
+            .prompts
+            .iter()
+            .map(|prompt| FetchMessage::new(prompt.role, prompt.prompt.as_str()))
+            .collect::<Vec<_>>();
+        messages.extend(
+            self.messages
+                .iter()
+                .map(|message| FetchMessage::new(message.role, message.content.as_str())),
+        );
+        Ok(ChatRequest {
+            model: self.template.model.as_str(),
+            messages,
+            stream: true,
+            temperature: self.template.temperature,
+            top_p: self.template.top_p,
+            n: self.template.n,
+            max_tokens: self.template.max_tokens,
+            presence_penalty: self.template.presence_penalty,
+            frequency_penalty: self.template.frequency_penalty,
+        })
     }
 
     fn get_api_key(&self) -> ChatGPTResult<&str> {

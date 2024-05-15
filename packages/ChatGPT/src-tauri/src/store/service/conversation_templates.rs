@@ -2,7 +2,7 @@
  * @Author: suxiaoshao suxiaoshao@gmail.com
  * @Date: 2024-04-28 04:23:22
  * @LastEditors: suxiaoshao suxiaoshao@gmail.com
- * @LastEditTime: 2024-05-01 03:04:57
+ * @LastEditTime: 2024-05-16 04:24:23
  * @FilePath: /tauri/packages/ChatGPT/src-tauri/src/store/service/conversation_templates.rs
  */
 
@@ -13,13 +13,9 @@ use crate::{
     errors::ChatGPTResult,
     store::{
         model::{
-            conversation_template_prompts::{
-                SqlConversationTemplatePrompt, SqlNewConversationTemplatePrompt,
-            },
-            conversation_templates::{
-                SqlConversationTemplate, SqlNewConversationTemplate, SqlUpdateConversationTemplate,
-            },
-            conversations::SqlConversation,
+            SqlConversation, SqlConversationTemplate, SqlConversationTemplatePrompt,
+            SqlNewConversationTemplate, SqlNewConversationTemplatePrompt,
+            SqlUpdateConversationTemplate,
         },
         Mode, NewConversationTemplatePrompt,
     },

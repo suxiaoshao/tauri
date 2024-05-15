@@ -11,7 +11,7 @@ use reqwest_eventsource::{Event, RequestBuilderExt};
 
 use crate::errors::ChatGPTResult;
 
-pub use self::types::{ChatRequest, ChatResponse};
+pub use self::types::{ChatRequest, ChatResponse, Message};
 
 mod types;
 

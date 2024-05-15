@@ -1,7 +1,7 @@
 use crate::{
     errors::{ChatGPTError, ChatGPTResult},
-    fetch::{ChatRequest, ChatResponse, FetchRunner},
-    store::{Conversation, ConversationTemplate, DbConn, NewMessage, Role, Status},
+    fetch::{ChatRequest, ChatResponse, FetchRunner, Message as FetchMessage},
+    store::{Conversation, ConversationTemplate, DbConn, Mode, NewMessage, Role, Status},
 };
 use crate::{plugins::ChatGPTConfig, store::Message};
 use tauri::{AppHandle, Manager, Runtime, Window};
@@ -30,9 +30,9 @@ struct Fetch<R: Runtime> {
     db_conn: DbConn,
     window: Window<R>,
     config: ChatGPTConfig,
-    content: String,
     template: ConversationTemplate,
     messages: Vec<Message>,
+    user_message: Message,
 }
 
 impl<R> FetchRunner for Fetch<R>
@@ -40,13 +40,46 @@ where
     R: Runtime,
 {
     fn get_body(&self) -> ChatGPTResult<ChatRequest<'_>> {
-        // get request
-        let chat_request = ChatRequest::new(
-            self.messages.as_slice(),
-            &self.template,
-            self.content.as_str(),
-        );
-        Ok(chat_request)
+        let mut messages = self
+            .template
+            .prompts
+            .iter()
+            .map(|prompt| FetchMessage::new(prompt.role, prompt.prompt.as_str()))
+            .collect::<Vec<_>>();
+        match self.template.mode {
+            Mode::Contextual => {
+                messages.extend(
+                    self.messages
+                        .iter()
+                        .map(|message| FetchMessage::new(message.role, message.content.as_str())),
+                );
+            }
+            Mode::Single => {}
+            Mode::AssistantOnly => {
+                messages.extend(
+                    self.messages
+                        .iter()
+                        .filter(|message| message.role == Role::Assistant)
+                        .map(|message| FetchMessage::new(message.role, message.content.as_str())),
+                );
+            }
+        }
+        messages.push(FetchMessage::new(
+            self.user_message.role,
+            self.user_message.content.as_str(),
+        ));
+
+        Ok(ChatRequest {
+            messages,
+            model: self.template.model.as_str(),
+            stream: true,
+            temperature: self.template.temperature,
+            top_p: self.template.top_p,
+            n: self.template.n,
+            max_tokens: self.template.max_tokens,
+            presence_penalty: self.template.presence_penalty,
+            frequency_penalty: self.template.frequency_penalty,
+        })
     }
 
     fn get_api_key(&self) -> ChatGPTResult<&str> {
@@ -118,9 +151,9 @@ async fn _fetch<R: Runtime>(
     let template = crate::store::ConversationTemplate::find(conversation.template_id, conn)?;
 
     // insert user message
-    let user_new_message = NewMessage::new(id, Role::User, content.clone(), Status::Normal);
+    let user_new_message = NewMessage::new(id, Role::User, content, Status::Normal);
     let user_message = Message::insert(user_new_message, conn)?;
-    window.emit("message", user_message)?;
+    window.emit("message", &user_message)?;
 
     // init bot message
     let bot_new_message = NewMessage::new(id, Role::Assistant, "".to_string(), Status::Loading);
@@ -135,9 +168,9 @@ async fn _fetch<R: Runtime>(
         db_conn: state,
         window,
         config,
-        content,
         messages: conversation.messages,
         template,
+        user_message,
     };
     fetch.fetch().await?;
 

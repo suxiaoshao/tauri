@@ -14,7 +14,6 @@ use super::ChatGPTConfig;
 mod history;
 mod listen;
 
-pub use history::TemporaryMessage;
 pub use listen::TemporaryHotkeyListener;
 
 pub struct TemporaryConversationPlugin;

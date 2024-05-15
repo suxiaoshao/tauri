@@ -5,11 +5,7 @@ use time::OffsetDateTime;
 use crate::{
     errors::{ChatGPTError, ChatGPTResult},
     store::{
-        model::{
-            conversations::SqlConversation,
-            folders::{SqlFolder, SqlNewFolder, SqlUpdateFolder},
-            messages::SqlMessage,
-        },
+        model::{SqlConversation, SqlFolder, SqlMessage, SqlNewFolder, SqlUpdateFolder},
         Conversation, Message,
     },
 };

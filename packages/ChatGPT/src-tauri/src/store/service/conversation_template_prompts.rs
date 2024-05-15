@@ -9,7 +9,7 @@ use time::OffsetDateTime;
 
 use crate::{
     errors::ChatGPTError,
-    store::{model::conversation_template_prompts::SqlConversationTemplatePrompt, Role},
+    store::{model::SqlConversationTemplatePrompt, Role},
 };
 
 use super::utils::serialize_offset_date_time;

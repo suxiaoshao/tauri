@@ -9,7 +9,7 @@ use crate::{
     errors::ChatGPTResult,
     store::{
         migrations::v1::AllDataV1,
-        model::{folders::SqlFolder, messages::SqlMessage},
+        model::{SqlFolder, SqlMessage},
     },
 };
 
@@ -19,11 +19,8 @@ use self::{v1::SqlConversationV1, v2::AllDataV2};
 
 use super::{
     model::{
-        conversation_template_prompts::{
-            SqlConversationTemplatePrompt, SqlNewConversationTemplatePrompt,
-        },
-        conversation_templates::SqlConversationTemplate,
-        conversations::SqlConversation,
+        SqlConversation, SqlConversationTemplate, SqlConversationTemplatePrompt,
+        SqlNewConversationTemplatePrompt,
     },
     Role, CREATE_TABLE_SQL,
 };

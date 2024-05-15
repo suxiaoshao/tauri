@@ -20,19 +20,15 @@ use diesel::{
     Connection, SqliteConnection,
 };
 
-pub use service::conversation_template_prompts::*;
-pub use service::conversation_templates::*;
-pub use service::conversations::*;
-pub use service::folders::*;
-pub use service::messages::*;
-pub use service::{deserialize_offset_date_time, serialize_offset_date_time};
-use time::OffsetDateTime;
-pub use types::*;
-
-use self::model::{
-    conversation_templates::{SqlConversationTemplate, SqlNewConversationTemplate},
-    conversations::SqlNewConversation,
+pub use service::{
+    deserialize_offset_date_time, serialize_offset_date_time, Conversation, ConversationTemplate,
+    Folder, Message, NewConversation, NewConversationTemplate, NewConversationTemplatePrompt,
+    NewFolder, NewMessage,
 };
+use time::OffsetDateTime;
+pub use types::{Mode, Role, Status};
+
+use self::model::{SqlConversationTemplate, SqlNewConversation, SqlNewConversationTemplate};
 
 const DB_FILE: &str = "history.sqlite3";
 const DB_FILE_V2: &str = "history_v2.sqlite3";
