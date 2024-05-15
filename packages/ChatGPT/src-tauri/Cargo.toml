@@ -28,7 +28,7 @@ tauri = { version = "1.6.5", features = [
     "window-show",
     "global-shortcut",
 ] }
-serde = { version = "1.0.201", features = ["derive"] }
+serde = { version = "1.0.202", features = ["derive"] }
 serde_json = "1.0.117"
 
 # database
@@ -63,7 +63,7 @@ futures = "0.3.30"
 
 # config
 notify = { version = "6.1.1" }
-toml = "0.8.12"
+toml = "0.8.13"
 async-trait = "0.1.80"
 csv = "1.3.0"
 

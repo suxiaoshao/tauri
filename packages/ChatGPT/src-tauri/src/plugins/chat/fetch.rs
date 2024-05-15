@@ -1,7 +1,7 @@
 use crate::{
     errors::{ChatGPTError, ChatGPTResult},
     fetch::{ChatRequest, ChatResponse, FetchRunner},
-    store::{Conversation, DbConn, NewMessage, Role, Status},
+    store::{Conversation, ConversationTemplate, DbConn, NewMessage, Role, Status},
 };
 use crate::{plugins::ChatGPTConfig, store::Message};
 use tauri::{AppHandle, Manager, Runtime, Window};
@@ -26,28 +26,34 @@ pub async fn fetch<R: Runtime>(
 }
 
 struct Fetch<R: Runtime> {
-    api_key: String,
-    chat_request: ChatRequest,
     message_id: i32,
     db_conn: DbConn,
     window: Window<R>,
-    url: String,
-    http_proxy: Option<String>,
+    config: ChatGPTConfig,
+    content: String,
+    template: ConversationTemplate,
+    messages: Vec<Message>,
 }
 
 impl<R> FetchRunner for Fetch<R>
 where
     R: Runtime,
 {
-    fn get_body(&self) -> ChatGPTResult<&ChatRequest> {
-        Ok(&self.chat_request)
+    fn get_body(&self) -> ChatGPTResult<ChatRequest<'_>> {
+        // get request
+        let chat_request = ChatRequest::new(
+            self.messages.as_slice(),
+            &self.template,
+            self.content.as_str(),
+        );
+        Ok(chat_request)
     }
 
     fn get_api_key(&self) -> ChatGPTResult<&str> {
-        Ok(&self.api_key)
+        self.config.get_api_key()
     }
     fn get_http_proxy(&self) -> ChatGPTResult<&Option<String>> {
-        Ok(&self.http_proxy)
+        Ok(&self.config.http_proxy)
     }
 
     fn on_open(&mut self) -> ChatGPTResult<()> {
@@ -55,7 +61,7 @@ where
         Ok(())
     }
     fn url(&self) -> &str {
-        self.url.as_str()
+        self.config.url.as_str()
     }
 
     fn on_message(&mut self, message: ChatResponse) -> ChatGPTResult<()> {
@@ -101,10 +107,6 @@ async fn _fetch<R: Runtime>(
         .ok_or(ChatGPTError::WindowNotFound)?;
     // get api key
     let config = ChatGPTConfig::get(&app_handle)?;
-    let api_key = config.get_api_key()?.to_owned();
-    let ChatGPTConfig {
-        url, http_proxy, ..
-    } = config;
 
     // get conn
     let conn = &mut state.get()?;
@@ -115,11 +117,8 @@ async fn _fetch<R: Runtime>(
     // get conversation template
     let template = crate::store::ConversationTemplate::find(conversation.template_id, conn)?;
 
-    // get request
-    let chat_request = ChatRequest::new(conversation, template, content.clone());
-
     // insert user message
-    let user_new_message = NewMessage::new(id, Role::User, content, Status::Normal);
+    let user_new_message = NewMessage::new(id, Role::User, content.clone(), Status::Normal);
     let user_message = Message::insert(user_new_message, conn)?;
     window.emit("message", user_message)?;
 
@@ -132,13 +131,13 @@ async fn _fetch<R: Runtime>(
     let state = state.inner().clone();
 
     let mut fetch = Fetch {
-        api_key,
-        chat_request,
         message_id,
         db_conn: state,
         window,
-        url,
-        http_proxy,
+        config,
+        content,
+        messages: conversation.messages,
+        template,
     };
     fetch.fetch().await?;
 

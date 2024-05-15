@@ -5,7 +5,7 @@ use crate::store::Role;
 mod chat_request;
 mod message;
 
-pub use chat_request::ChatRequest;
+pub use chat_request::{BaseMessage, ChatRequest};
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Delta {

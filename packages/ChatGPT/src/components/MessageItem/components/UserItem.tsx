@@ -6,16 +6,16 @@
  * @FilePath: /tauri/packages/ChatGPT/src/features/Home/ConversationDetail/components/MessageItem/components/UserItem.tsx
  */
 import CustomMarkdown from '@chatgpt/components/Markdown';
-import { Message } from '@chatgpt/types/message';
 import { Avatar, Box, Divider } from '@mui/material';
 import user from '@chatgpt/assets/user.jpg';
 import { AvatarSx, MarkdownSx, MessageSx } from '../const';
 import DeleteMessageIcon from './ToolBar/DeleteMessageIcon';
 import ToolBar from './ToolBar';
 import ViewIcon from './ToolBar/ViewIcon';
+import { BaseMessage } from '..';
 
 export interface UserItemProps {
-  message: Message;
+  message: BaseMessage;
 }
 
 export default function UserItem({ message }: UserItemProps) {

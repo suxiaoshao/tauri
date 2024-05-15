@@ -1,13 +1,13 @@
-import { Message } from '@chatgpt/types/message';
 import { Status } from '@chatgpt/types/common';
 import { useMemo } from 'react';
 import NormalItem from './NormalItem';
 import LoadingItem from './LoadingItem';
 import HiddenItem from './HiddenItem';
 import ErrorItem from './ErrorItem';
+import { BaseMessage } from '../..';
 
 export interface AssistantItemProps {
-  message: Message;
+  message: BaseMessage;
 }
 
 export default function AssistantItem({ message }: AssistantItemProps) {

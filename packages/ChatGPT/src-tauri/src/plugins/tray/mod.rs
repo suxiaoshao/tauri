@@ -10,6 +10,7 @@ pub struct TrayPlugin;
 
 const QUIT: &str = "quit";
 const TEMPORARY: &str = "temporary";
+const OPEN: &str = "open";
 
 fn get_app_version() -> &'static str {
     env!("CARGO_PKG_VERSION")
@@ -34,6 +35,7 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for TrayPlugin {
 fn init_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> ChatGPTResult<()> {
     let version = get_app_version();
     let tray_menu = SystemTrayMenu::new()
+        .add_item(CustomMenuItem::new(OPEN, "Open ChatGPT"))
         .add_item(
             CustomMenuItem::new(TEMPORARY, "Open Temporary Conversation").accelerator("Option+F"),
         )
@@ -57,6 +59,9 @@ fn init_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> ChatGPTResult<()> {
                         if let Err(err) = super::temporary_conversation::on_short(&app_handle) {
                             log::warn!("tray click error:{}", err)
                         }
+                    }
+                    OPEN => {
+                        todo!()
                     }
                     _ => {}
                 }

@@ -7,15 +7,15 @@
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
 import CustomMarkdown from '@chatgpt/components/Markdown';
-import { Message } from '@chatgpt/types/message';
 import { Avatar, Box, Divider } from '@mui/material';
 import { AvatarSx, MarkdownSx, MessageSx } from '../const';
 import DeleteMessageIcon from './ToolBar/DeleteMessageIcon';
 import ToolBar from './ToolBar';
 import ViewIcon from './ToolBar/ViewIcon';
+import { BaseMessage } from '..';
 
 export interface SystemItemProps {
-  message: Message;
+  message: BaseMessage;
 }
 
 export default function SystemItem({ message }: SystemItemProps) {

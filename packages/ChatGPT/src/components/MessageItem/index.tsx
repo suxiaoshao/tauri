@@ -1,12 +1,18 @@
-import { Role } from '@chatgpt/types/common';
-import { Message } from '@chatgpt/types/message';
+import { Role, Status } from '@chatgpt/types/common';
 import { useMemo } from 'react';
 import UserItem from './components/UserItem';
 import AssistantItem from './components/AssistantItem';
 import SystemItem from './components/SystemItem';
 
+export interface BaseMessage {
+  id: number;
+  role: Role;
+  content: string;
+  status: Status;
+}
+
 export interface MessageItemProps {
-  message: Message;
+  message: BaseMessage;
 }
 
 export default function MessageItem({ message }: MessageItemProps) {

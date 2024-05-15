@@ -2,7 +2,7 @@ use std::{fmt::Display, str::FromStr};
 
 use crate::errors::ChatGPTError;
 
-#[derive(serde::Serialize, serde::Deserialize, PartialEq, Eq, Debug, Clone)]
+#[derive(serde::Serialize, serde::Deserialize, PartialEq, Eq, Debug, Clone, Copy)]
 pub enum Status {
     #[serde(rename = "normal")]
     Normal,

@@ -8,11 +8,11 @@
 import { Avatar, Box, CircularProgress, Divider } from '@mui/material';
 import assistant from '@chatgpt/assets/assistant.jpg';
 import CustomMarkdown from '@chatgpt/components/Markdown';
-import { Message } from '@chatgpt/types/message';
 import { AvatarSx, MarkdownSx, MessageSx } from '../../const';
+import { BaseMessage } from '../..';
 
 export interface LoadingItemProps {
-  message: Message;
+  message: BaseMessage;
 }
 
 export default function LoadingItem({ message }: LoadingItemProps) {

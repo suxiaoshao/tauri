@@ -25,6 +25,7 @@ pub use service::conversation_templates::*;
 pub use service::conversations::*;
 pub use service::folders::*;
 pub use service::messages::*;
+pub use service::{deserialize_offset_date_time, serialize_offset_date_time};
 use time::OffsetDateTime;
 pub use types::*;
 

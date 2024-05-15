@@ -7,14 +7,17 @@
  */
 use serde::{Deserialize, Serialize};
 
-use crate::store::{Conversation, ConversationTemplate, Role};
+use crate::{
+    plugins::TemporaryMessage,
+    store::{ConversationTemplate, Message as StoreMessage, Role, Status},
+};
 
 use super::message::Message;
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct ChatRequest {
-    pub model: String,
-    pub messages: Vec<Message>,
+pub struct ChatRequest<'a> {
+    pub model: &'a str,
+    pub messages: Vec<Message<'a>>,
     pub stream: bool,
     temperature: f64,
     top_p: f64,
@@ -24,9 +27,9 @@ pub struct ChatRequest {
     frequency_penalty: f64,
 }
 
-impl ChatRequest {
-    pub fn new(
-        Conversation { messages, .. }: Conversation,
+impl ChatRequest<'_> {
+    pub fn new<'a, T: BaseMessage>(
+        messages: &'a [T],
         ConversationTemplate {
             mode,
             model,
@@ -38,21 +41,54 @@ impl ChatRequest {
             frequency_penalty,
             prompts,
             ..
-        }: ConversationTemplate,
-        content: String,
-    ) -> Self {
-        let mut messages = Message::from_conversations(prompts, messages, mode);
+        }: &'a ConversationTemplate,
+        content: &'a str,
+    ) -> ChatRequest<'a> {
+        let mut messages = Message::from_conversations(prompts, messages, *mode);
         messages.push(Message::new(Role::User, content));
-        Self {
+        ChatRequest {
             model,
             messages,
             stream: true,
-            temperature,
-            top_p,
-            n,
-            max_tokens,
-            presence_penalty,
-            frequency_penalty,
+            temperature: *temperature,
+            top_p: *top_p,
+            n: *n,
+            max_tokens: *max_tokens,
+            presence_penalty: *presence_penalty,
+            frequency_penalty: *frequency_penalty,
         }
+    }
+}
+pub trait BaseMessage {
+    fn role(&self) -> Role;
+    fn content(&self) -> &str;
+    fn status(&self) -> Status;
+}
+
+impl BaseMessage for StoreMessage {
+    fn role(&self) -> Role {
+        self.role
+    }
+
+    fn content(&self) -> &str {
+        &self.content
+    }
+
+    fn status(&self) -> Status {
+        self.status
+    }
+}
+
+impl BaseMessage for TemporaryMessage {
+    fn role(&self) -> Role {
+        self.role
+    }
+
+    fn content(&self) -> &str {
+        &self.content
+    }
+
+    fn status(&self) -> Status {
+        self.status
     }
 }
