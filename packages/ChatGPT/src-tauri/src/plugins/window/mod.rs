@@ -5,6 +5,7 @@ use self::created::on_created;
 
 mod created;
 
+#[cfg(target_os = "macos")]
 pub(in crate::plugins) use created::WindowExt;
 
 pub struct WindowPlugin;

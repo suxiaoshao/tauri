@@ -95,6 +95,8 @@ fn create_window<R: Runtime>(app: &AppHandle<R>) -> ChatGPTResult<()> {
     #[cfg(target_os = "windows")]
     let window = window.decorations(false);
     let window = window.build()?;
+    #[cfg(target_os = "windows")]
+    window.set_decorations(false)?;
     #[cfg(target_os = "macos")]
     {
         use super::window::WindowExt;

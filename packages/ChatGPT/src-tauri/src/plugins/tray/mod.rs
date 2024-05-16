@@ -1,3 +1,11 @@
+/*
+ * @Author: suxiaoshao suxiaoshao@gamil.com
+ * @Date: 2024-05-08 21:58:29
+ * @LastEditors: suxiaoshao suxiaoshao@gamil.com
+ * @LastEditTime: 2024-05-16 08:47:28
+ * @FilePath: \tauri\packages\ChatGPT\src-tauri\src\plugins\tray\mod.rs
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 use tauri::CustomMenuItem;
 use tauri::Runtime;
 use tauri::SystemTray;
@@ -67,7 +75,6 @@ fn init_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> ChatGPTResult<()> {
                 }
             }
         })
-        .with_title("ChatGPT")
         .with_tooltip("ChatGPT");
     tray.build(app)?;
     Ok(())
