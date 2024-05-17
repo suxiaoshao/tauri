@@ -1,3 +1,5 @@
+use std::sync::PoisonError;
+
 use serde::{ser::SerializeStruct, Serialize, Serializer};
 use thiserror::Error;
 
@@ -63,6 +65,8 @@ pub enum ChatGPTError {
     CsvParse(#[from] csv::Error),
     #[error("这个 template 的 conversation 还存在,不能删除")]
     TemplateHasConversation,
+    #[error("智能指针错误")]
+    Rc,
 }
 
 impl Serialize for ChatGPTError {
@@ -169,6 +173,9 @@ impl Serialize for ChatGPTError {
             ChatGPTError::TemplateHasConversation => {
                 state.serialize_field("code", "TemplateHasConversation")?;
             }
+            ChatGPTError::Rc => {
+                state.serialize_field("code", "Rc")?;
+            }
         }
         state.end()
     }
@@ -206,6 +213,12 @@ impl From<window_shadows::Error> for ChatGPTError {
 impl From<window_vibrancy::Error> for ChatGPTError {
     fn from(_: window_vibrancy::Error) -> Self {
         Self::Vibrancy
+    }
+}
+
+impl<Guard> From<PoisonError<Guard>> for ChatGPTError {
+    fn from(_: PoisonError<Guard>) -> Self {
+        Self::Rc
     }
 }
 

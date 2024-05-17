@@ -1,6 +1,7 @@
 import { useAppSelector } from '@chatgpt/app/hooks';
 import TemplateInfo from '@chatgpt/features/Template/components/TemplateInfo';
 import { selectTemplates } from '@chatgpt/features/Template/templateSlice';
+import { initTemporaryConversation } from '@chatgpt/service/temporary_conversation';
 import { ConversationTemplate } from '@chatgpt/types/conversation_template';
 import { Avatar, Box, Divider, InputBase, List, ListItemAvatar, ListItemButton, ListItemText } from '@mui/material';
 import { useCallback, useEffect, useReducer, useState } from 'react';
@@ -87,6 +88,14 @@ export default function TemporaryList() {
     dispatch({ tag: 'setSourceTemplates', value: templates });
   }, [templates]);
 
+  const handleNavigate = useCallback(
+    async (id: number) => {
+      await initTemporaryConversation({ templateId: id });
+      navigate(`/temporary_conversation/${id}`);
+    },
+    [navigate],
+  );
+
   // hotkeys
   useHotkeys(
     'up',
@@ -111,17 +120,17 @@ export default function TemporaryList() {
     (event) => {
       event.preventDefault();
       if (selectedIndex !== null) {
-        navigate(`/temporary_conversation/${filteredTemplates[selectedIndex].id}`);
+        handleNavigate(filteredTemplates[selectedIndex].id);
       }
     },
     { enableOnFormTags: ['INPUT'] },
-    [selectedIndex, filteredTemplates, navigate],
+    [selectedIndex, filteredTemplates, handleNavigate],
   );
   const handleClick = useCallback(
     (index: number) => {
-      navigate(`/temporary_conversation/${filteredTemplates[index].id}`);
+      handleNavigate(filteredTemplates[index].id);
     },
-    [navigate, filteredTemplates],
+    [handleNavigate, filteredTemplates],
   );
 
   // search & fucused

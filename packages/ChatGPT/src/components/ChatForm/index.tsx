@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { Role } from '@chatgpt/types/common';
 import { Message } from '@chatgpt/types/message';
 import { PromiseData, PromiseStatus } from '@chatgpt/hooks/usePromise';
+import React, { useCallback, useEffect, useState } from 'react';
 
 export interface ChatFormProps {
   status: PromiseData<void>;
@@ -17,6 +18,24 @@ export default function ChatForm({ status, onSendMessage }: ChatFormProps) {
     await onSendMessage(data.content);
   });
   const isLoading = [PromiseStatus.loading].includes(status.tag);
+  // search & fucused
+  const [inputRef, setInputRef] = useState<HTMLInputElement | null>(null);
+  useEffect(() => {
+    if (inputRef) {
+      inputRef.focus();
+    }
+  }, [inputRef]);
+
+  // shift + enter
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent) => {
+      if (event.key === 'Enter' && event.shiftKey) {
+        event.preventDefault();
+        onSubmit();
+      }
+    },
+    [onSubmit],
+  );
   return (
     <Paper
       onSubmit={onSubmit}
@@ -39,6 +58,8 @@ export default function ChatForm({ status, onSendMessage }: ChatFormProps) {
         placeholder="Send a message"
         multiline
         maxRows={4}
+        inputRef={setInputRef}
+        onKeyDown={handleKeyDown}
         {...register('content')}
       />
 

@@ -4,15 +4,16 @@
  * @LastEditors: suxiaoshao suxiaoshao@gamil.com
  * @LastEditTime: 2024-05-16 08:47:28
  * @FilePath: \tauri\packages\ChatGPT\src-tauri\src\plugins\tray\mod.rs
- * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
 use tauri::CustomMenuItem;
+use tauri::Manager;
 use tauri::Runtime;
 use tauri::SystemTray;
 use tauri::SystemTrayMenu;
 use tauri::SystemTrayMenuItem;
 
 use crate::errors::ChatGPTResult;
+use crate::setup;
 
 pub struct TrayPlugin;
 
@@ -69,7 +70,9 @@ fn init_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> ChatGPTResult<()> {
                         }
                     }
                     OPEN => {
-                        todo!()
+                        if let Err(err) = create_main(&app_handle) {
+                            log::warn!("tray click error:{}", err)
+                        }
                     }
                     _ => {}
                 }
@@ -77,5 +80,18 @@ fn init_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> ChatGPTResult<()> {
         })
         .with_tooltip("ChatGPT");
     tray.build(app)?;
+    Ok(())
+}
+
+fn create_main<R: Runtime>(app: &tauri::AppHandle<R>) -> ChatGPTResult<()> {
+    match app.get_window("main") {
+        Some(window) => {
+            window.show()?;
+            window.set_focus()?;
+        }
+        None => {
+            setup(app)?;
+        }
+    };
     Ok(())
 }

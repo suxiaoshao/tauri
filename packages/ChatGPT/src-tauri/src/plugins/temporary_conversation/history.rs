@@ -1,3 +1,5 @@
+use std::sync::{Arc, Mutex};
+
 use serde::{Deserialize, Serialize};
 use tauri::{Manager, Runtime};
 use time::OffsetDateTime;
@@ -44,6 +46,21 @@ pub struct TemporaryMessage {
     pub end_time: OffsetDateTime,
 }
 
+impl TemporaryMessage {
+    fn add_content(&mut self, content: String) {
+        let now = OffsetDateTime::now_utc();
+        self.content += &content;
+        self.updated_time = now;
+        self.end_time = now;
+    }
+    fn update_status(&mut self, status: Status) {
+        let now = OffsetDateTime::now_utc();
+        self.status = status;
+        self.updated_time = now;
+        self.end_time = now;
+    }
+}
+
 pub struct TemporaryHistory {
     pub template_id: i32,
     pub messages: Vec<TemporaryMessage>,
@@ -59,56 +76,93 @@ pub(super) fn init_temporary_conversation<R: Runtime>(
         template_id,
         messages,
     };
-    app.manage(history);
+    match app.try_state::<Arc<Mutex<TemporaryHistory>>>() {
+        Some(old_history) => {
+            let mut old_history = old_history.lock()?;
+            *old_history = history;
+        }
+        None => {
+            app.manage(Arc::new(Mutex::new(history)));
+        }
+    };
     Ok(vec![])
 }
 
 #[tauri::command(async)]
 pub async fn temporary_fetch<R: Runtime>(
     app: tauri::AppHandle<R>,
-    state: tauri::State<'_, TemporaryHistory>,
+    window: tauri::Window<R>,
+    state: tauri::State<'_, Arc<Mutex<TemporaryHistory>>>,
     conn: tauri::State<'_, DbConn>,
     content: String,
 ) -> ChatGPTResult<()> {
-    let TemporaryHistory {
-        template_id,
-        messages,
-    } = state.inner();
+    let template_id = state.lock()?.template_id;
+    let mut messages = state.lock()?.messages.clone();
 
-    let mut messages = messages.clone();
-    messages.push(TemporaryMessage {
+    let now = OffsetDateTime::now_utc();
+    let user_message = TemporaryMessage {
         id: messages.len() + 1,
         role: Role::User,
         content,
         status: Status::Normal,
-        created_time: OffsetDateTime::now_utc(),
-        updated_time: OffsetDateTime::now_utc(),
-        start_time: OffsetDateTime::now_utc(),
-        end_time: OffsetDateTime::now_utc(),
-    });
+        created_time: now,
+        updated_time: now,
+        start_time: now,
+        end_time: now,
+    };
+    window.emit("message", &user_message)?;
+    messages.push(user_message);
 
     let config = ChatGPTConfig::get(&app)?;
 
     let conn = &mut conn.get()?;
-    let mut template = ConversationTemplate::find(*template_id, conn)?;
+    let mut template = ConversationTemplate::find(template_id, conn)?;
     template.mode = Mode::Contextual;
+
+    let assistant_message = TemporaryMessage {
+        id: messages.len() + 1,
+        role: Role::Assistant,
+        content: "".to_string(),
+        status: Status::Loading,
+        created_time: now,
+        updated_time: now,
+        start_time: now,
+        end_time: now,
+    };
+    window.emit("message", &assistant_message)?;
 
     let mut fetch = TemporaryFetch {
         config,
         messages,
         template,
+        assistant_message,
+        window,
     };
     fetch.fetch().await?;
+
+    let TemporaryFetch {
+        mut messages,
+        assistant_message,
+        ..
+    } = fetch;
+    messages.push(assistant_message);
+    let new_history = TemporaryHistory {
+        template_id,
+        messages,
+    };
+    *state.lock()? = new_history;
     Ok(())
 }
 
-struct TemporaryFetch {
+struct TemporaryFetch<R: Runtime> {
     config: ChatGPTConfig,
     template: ConversationTemplate,
     messages: Vec<TemporaryMessage>,
+    assistant_message: TemporaryMessage,
+    window: tauri::Window<R>,
 }
 
-impl FetchRunner for TemporaryFetch {
+impl<R: Runtime> FetchRunner for TemporaryFetch<R> {
     fn get_body(&self) -> ChatGPTResult<ChatRequest<'_>> {
         let mut messages = self
             .template
@@ -148,15 +202,28 @@ impl FetchRunner for TemporaryFetch {
     }
 
     fn on_message(&mut self, message: ChatResponse) -> ChatGPTResult<()> {
-        todo!()
+        let content = message
+            .choices
+            .into_iter()
+            .filter_map(|choice| choice.delta.content)
+            .collect::<String>();
+        self.assistant_message.add_content(content);
+        self.window.emit("message", &self.assistant_message)?;
+        Ok(())
     }
 
     fn on_error(&mut self, err: reqwest_eventsource::Error) -> ChatGPTResult<()> {
-        todo!()
+        log::error!("Connection Error: {:?}", err);
+        self.assistant_message.update_status(Status::Error);
+        self.window.emit("message", &self.assistant_message)?;
+        Ok(())
     }
 
     fn on_close(&mut self) -> ChatGPTResult<()> {
-        todo!()
+        log::info!("Connection Closed!");
+        self.assistant_message.update_status(Status::Normal);
+        self.window.emit("message", &self.assistant_message)?;
+        Ok(())
     }
 
     fn url(&self) -> &str {
