@@ -14,6 +14,8 @@ use crate::{
     },
 };
 
+const TEMPORARY_MESSAGE_EVENT: &str = "temporary_message";
+
 #[derive(Debug, Serialize, Clone, Deserialize, PartialEq, Eq)]
 pub struct TemporaryMessage {
     pub id: usize,
@@ -110,7 +112,7 @@ pub async fn temporary_fetch<R: Runtime>(
         start_time: now,
         end_time: now,
     };
-    window.emit("message", &user_message)?;
+    window.emit(TEMPORARY_MESSAGE_EVENT, &user_message)?;
     messages.push(user_message);
 
     let config = ChatGPTConfig::get(&app)?;
@@ -129,7 +131,7 @@ pub async fn temporary_fetch<R: Runtime>(
         start_time: now,
         end_time: now,
     };
-    window.emit("message", &assistant_message)?;
+    window.emit(TEMPORARY_MESSAGE_EVENT, &assistant_message)?;
 
     let mut fetch = TemporaryFetch {
         config,
@@ -208,21 +210,24 @@ impl<R: Runtime> FetchRunner for TemporaryFetch<R> {
             .filter_map(|choice| choice.delta.content)
             .collect::<String>();
         self.assistant_message.add_content(content);
-        self.window.emit("message", &self.assistant_message)?;
+        self.window
+            .emit(TEMPORARY_MESSAGE_EVENT, &self.assistant_message)?;
         Ok(())
     }
 
     fn on_error(&mut self, err: reqwest_eventsource::Error) -> ChatGPTResult<()> {
         log::error!("Connection Error: {:?}", err);
         self.assistant_message.update_status(Status::Error);
-        self.window.emit("message", &self.assistant_message)?;
+        self.window
+            .emit(TEMPORARY_MESSAGE_EVENT, &self.assistant_message)?;
         Ok(())
     }
 
     fn on_close(&mut self) -> ChatGPTResult<()> {
         log::info!("Connection Closed!");
         self.assistant_message.update_status(Status::Normal);
-        self.window.emit("message", &self.assistant_message)?;
+        self.window
+            .emit(TEMPORARY_MESSAGE_EVENT, &self.assistant_message)?;
         Ok(())
     }
 

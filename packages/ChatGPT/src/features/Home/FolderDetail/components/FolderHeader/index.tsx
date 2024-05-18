@@ -1,7 +1,6 @@
 import { Box, IconButton, Typography } from '@mui/material';
 import { useCallback } from 'react';
 import { useAppDispatch } from '@chatgpt/app/hooks';
-import { fetchConversations } from '@chatgpt/features/Conversations/conversationSlice';
 import { Folder } from '@chatgpt/types/folder';
 import { Delete } from '@mui/icons-material';
 import { deleteFolder } from '@chatgpt/service/chat/mutation';
@@ -15,7 +14,6 @@ export default function FolderHeader({ folder }: FolderHeaderProps) {
   const dispatch = useAppDispatch();
   const handleDelete = useCallback(async () => {
     await deleteFolder({ id: folder.id });
-    dispatch(fetchConversations());
   }, [dispatch, folder.id]);
 
   return (

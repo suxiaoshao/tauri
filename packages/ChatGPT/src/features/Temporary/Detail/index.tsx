@@ -36,7 +36,7 @@ export default function TemporaryDetail() {
   // message history
   const [messages, dispatch] = useReducer(reducer, []);
   useEffect(() => {
-    const fn = appWindow.listen<TemporaryMessage>('message', (response) => {
+    const fn = appWindow.listen<TemporaryMessage>('temporary_message', (response) => {
       dispatch({ tag: ActionType.UpdateMessage, value: response.payload });
     });
     return () => {

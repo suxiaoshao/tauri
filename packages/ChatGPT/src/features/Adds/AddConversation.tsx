@@ -9,7 +9,7 @@ import { Box, Typography, Toolbar, IconButton, ListItemButton, ListItemIcon, Lis
 import PublishIcon from '@mui/icons-material/Publish';
 import ConversationEdit, { ConversationForm } from '../../components/ConversationEdit';
 import { useAppDispatch, useAppSelector } from '@chatgpt/app/hooks';
-import { fetchConversations, selectSelectedFolderId } from '@chatgpt/features/Conversations/conversationSlice';
+import { selectSelectedFolderId } from '@chatgpt/features/Conversations/conversationSlice';
 import { useCallback } from 'react';
 import { useMatch, useNavigate, useLocation } from 'react-router-dom';
 import { Add } from '@mui/icons-material';
@@ -30,7 +30,6 @@ function AddConversation() {
           folderId: folderId ?? undefined,
         } satisfies NewConversation,
       });
-      dispatch(fetchConversations());
       navigate('/');
     },
     [dispatch, folderId, navigate],
