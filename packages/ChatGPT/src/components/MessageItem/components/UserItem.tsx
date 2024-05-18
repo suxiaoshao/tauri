@@ -13,6 +13,7 @@ import DeleteMessageIcon from './ToolBar/DeleteMessageIcon';
 import ToolBar from './ToolBar';
 import ViewIcon from './ToolBar/ViewIcon';
 import { BaseMessage } from '..';
+import CopyIcon from './ToolBar/CopyIcon';
 
 export interface UserItemProps {
   message: BaseMessage;
@@ -27,6 +28,7 @@ export default function UserItem({ message }: UserItemProps) {
         <ToolBar>
           <DeleteMessageIcon id={message.id} />
           <ViewIcon id={message.id} />
+          <CopyIcon content={message.content} />
         </ToolBar>
       </Box>
       <Divider />

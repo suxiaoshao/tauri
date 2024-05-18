@@ -1,25 +1,26 @@
 import { Preview } from '@mui/icons-material';
-import { useCallback } from 'react';
+import { useCallback, useContext } from 'react';
 import { ToolSx } from '../../const';
-import { WebviewWindow } from '@tauri-apps/api/window';
-import { IconButton } from '@mui/material';
+import { IconButton, Tooltip } from '@mui/material';
+import { MessageActionContext } from '@chatgpt/components/MessageHistory';
 
 export interface ViewIconProp {
   id: number;
 }
 
 export default function ViewIcon({ id }: ViewIconProp) {
+  const { onMessageViewed } = useContext(MessageActionContext);
   const handleClick = useCallback(() => {
-    new WebviewWindow(`message-${id}`, {
-      url: `/message/${id}`,
-      title: `message-${id}`,
-      transparent: true,
-      decorations: false,
-    });
+    onMessageViewed?.(id);
   }, [id]);
+  if (!onMessageViewed) {
+    return null;
+  }
   return (
-    <IconButton size="small" onClick={handleClick}>
-      <Preview fontSize={'small'} sx={ToolSx} />
-    </IconButton>
+    <Tooltip title="View">
+      <IconButton size="small" onClick={handleClick}>
+        <Preview fontSize={'small'} sx={ToolSx} />
+      </IconButton>
+    </Tooltip>
   );
 }

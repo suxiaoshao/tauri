@@ -5,7 +5,7 @@ use tauri::{Manager, Runtime};
 use time::OffsetDateTime;
 
 use crate::{
-    errors::ChatGPTResult,
+    errors::{ChatGPTError, ChatGPTResult},
     fetch::{ChatRequest, ChatResponse, FetchRunner, Message as FetchMessage},
     plugins::ChatGPTConfig,
     store::{
@@ -68,6 +68,25 @@ pub struct TemporaryHistory {
     pub messages: Vec<TemporaryMessage>,
 }
 
+trait TemporaryHistoryTrait {
+    fn get_max_id(&self) -> usize;
+    fn new_id(&self) -> usize {
+        self.get_max_id() + 1
+    }
+}
+
+impl TemporaryHistoryTrait for Vec<TemporaryMessage> {
+    fn get_max_id(&self) -> usize {
+        self.iter().map(|m| m.id).max().unwrap_or(0)
+    }
+}
+
+impl TemporaryHistoryTrait for TemporaryHistory {
+    fn get_max_id(&self) -> usize {
+        self.messages.get_max_id()
+    }
+}
+
 #[tauri::command]
 pub(super) fn init_temporary_conversation<R: Runtime>(
     app: tauri::AppHandle<R>,
@@ -90,6 +109,33 @@ pub(super) fn init_temporary_conversation<R: Runtime>(
     Ok(vec![])
 }
 
+#[tauri::command]
+pub(super) fn find_temporary_message(
+    state: tauri::State<'_, Arc<Mutex<TemporaryHistory>>>,
+    id: usize,
+) -> ChatGPTResult<TemporaryMessage> {
+    let message = state.lock()?.messages.iter().find(|m| m.id == id).cloned();
+    match message {
+        Some(message) => Ok(message),
+        None => Err(ChatGPTError::TemporaryMessageNotFound(id)),
+    }
+}
+
+#[tauri::command]
+pub(super) fn delete_temporary_message(
+    state: tauri::State<'_, Arc<Mutex<TemporaryHistory>>>,
+    id: usize,
+) -> ChatGPTResult<Vec<TemporaryMessage>> {
+    let position = state.lock()?.messages.iter().position(|m| m.id == id);
+    match position {
+        Some(position) => {
+            state.lock()?.messages.remove(position);
+            Ok(state.lock()?.messages.clone())
+        }
+        None => Err(ChatGPTError::TemporaryMessageNotFound(id)),
+    }
+}
+
 #[tauri::command(async)]
 pub async fn temporary_fetch<R: Runtime>(
     app: tauri::AppHandle<R>,
@@ -103,7 +149,7 @@ pub async fn temporary_fetch<R: Runtime>(
 
     let now = OffsetDateTime::now_utc();
     let user_message = TemporaryMessage {
-        id: messages.len() + 1,
+        id: messages.new_id(),
         role: Role::User,
         content,
         status: Status::Normal,
@@ -122,7 +168,7 @@ pub async fn temporary_fetch<R: Runtime>(
     template.mode = Mode::Contextual;
 
     let assistant_message = TemporaryMessage {
-        id: messages.len() + 1,
+        id: messages.new_id(),
         role: Role::Assistant,
         content: "".to_string(),
         status: Status::Loading,

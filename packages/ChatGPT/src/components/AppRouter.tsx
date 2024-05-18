@@ -18,6 +18,7 @@ import ConversationTemplateDetail from '@chatgpt/features/Template/Detail';
 import ConversationTemplateCreate from '@chatgpt/features/Template/Create';
 import TemporaryList from '@chatgpt/features/Temporary/List';
 import TemporaryDetail from '@chatgpt/features/Temporary/Detail';
+import Temporary from '@chatgpt/features/Temporary';
 
 export default function AppRouter() {
   return (
@@ -37,7 +38,7 @@ export default function AppRouter() {
       </Route>
       <Route path="/setting" element={<Setting />} />
       <Route path="/message/:id" element={<MessagePreview />} />
-      <Route path="/temporary_conversation">
+      <Route path="/temporary_conversation" element={<Temporary />}>
         <Route index element={<TemporaryList />} />
         <Route path=":temporaryId" element={<TemporaryDetail />} />
       </Route>

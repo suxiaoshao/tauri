@@ -8,16 +8,17 @@ import { appWindow } from '@tauri-apps/api/window';
 import ChatForm from '@chatgpt/components/ChatForm';
 import usePromiseFn from '@chatgpt/hooks/usePromiseFn';
 import MessageHistory from '@chatgpt/components/MessageHistory';
-import { temporaryFetch } from '@chatgpt/service/temporary_conversation';
+import { deleteTemporaryMessage, temporaryFetch } from '@chatgpt/service/temporary_conversation';
 import { TemporaryMessage } from '@chatgpt/types/temporary_conversation';
 import { Enum } from 'types';
 import { useHotkeys } from 'react-hotkeys-hook';
 
 enum ActionType {
   UpdateMessage,
+  SetMessages,
 }
 
-type Action = Enum<ActionType.UpdateMessage, TemporaryMessage>;
+type Action = Enum<ActionType.UpdateMessage, TemporaryMessage> | Enum<ActionType.SetMessages, TemporaryMessage[]>;
 
 function reducer(state: TemporaryMessage[], action: Action): TemporaryMessage[] {
   switch (action.tag) {
@@ -27,6 +28,8 @@ function reducer(state: TemporaryMessage[], action: Action): TemporaryMessage[] 
         return [...state, action.value];
       }
       return state.with(index, action.value);
+    case ActionType.SetMessages:
+      return action.value;
     default:
       return state;
   }
@@ -44,6 +47,11 @@ export default function TemporaryDetail() {
     };
   }, []);
 
+  const handleDeteteMessage = useCallback(async (id: number) => {
+    const newMessages = await deleteTemporaryMessage({ id });
+    dispatch({ tag: ActionType.SetMessages, value: newMessages });
+  }, []);
+
   // fetch template detail
   const { temporaryId } = useParams<{ temporaryId: string }>();
   const templates = useAppSelector(selectTemplates);
@@ -58,6 +66,7 @@ export default function TemporaryDetail() {
   );
   const [status, onSendContent] = usePromiseFn(fetchFn);
 
+  // hotkey
   const navigate = useNavigate();
   useHotkeys(
     'esc',
@@ -86,7 +95,7 @@ export default function TemporaryDetail() {
     >
       <TemporaryHeader template={template} />
       <Box sx={{ flex: '1 1 0', overflowY: 'auto' }}>
-        <MessageHistory messages={messages} />
+        <MessageHistory onMessageDeleted={handleDeteteMessage} messages={messages} />
       </Box>
       <ChatForm status={status} onSendMessage={onSendContent} />
     </Box>

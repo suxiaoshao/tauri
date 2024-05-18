@@ -1,21 +1,25 @@
 import { Delete } from '@mui/icons-material';
 import { ToolSx } from '../../const';
-import { deleteMessage } from '@chatgpt/service/chat/mutation';
-import { useCallback } from 'react';
-import { useAppDispatch } from '@chatgpt/app/hooks';
-import { IconButton } from '@mui/material';
+import { useCallback, useContext } from 'react';
+import { IconButton, Tooltip } from '@mui/material';
+import { MessageActionContext } from '@chatgpt/components/MessageHistory';
 
 export interface DeleteMessageIconProps {
   id: number;
 }
 export default function DeleteMessageIcon({ id }: DeleteMessageIconProps) {
-  const dispatch = useAppDispatch();
+  const { onMessageDeleted } = useContext(MessageActionContext);
   const handleClick = useCallback(async () => {
-    await deleteMessage({ id });
-  }, [dispatch, id]);
+    onMessageDeleted?.(id);
+  }, [onMessageDeleted, id]);
+  if (!onMessageDeleted) {
+    return null;
+  }
   return (
-    <IconButton size="small" onClick={handleClick}>
-      <Delete fontSize={'small'} sx={ToolSx} />
-    </IconButton>
+    <Tooltip title="Delete message">
+      <IconButton size="small" onClick={handleClick}>
+        <Delete fontSize={'small'} sx={ToolSx} />
+      </IconButton>
+    </Tooltip>
   );
 }

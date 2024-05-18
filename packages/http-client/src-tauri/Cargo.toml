@@ -25,7 +25,7 @@ diesel = { version = "2.1.6", features = ["sqlite"] }
 reqwest = "0.12.4"
 
 # 错误处理
-anyhow = "1.0.83"
+anyhow = "1.0.85"
 
 # 搜索应用
 lnk = "0.5.1"

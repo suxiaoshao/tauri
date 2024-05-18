@@ -67,6 +67,8 @@ pub enum ChatGPTError {
     TemplateHasConversation,
     #[error("智能指针错误")]
     Rc,
+    #[error("Temporary message not found:{}",.0)]
+    TemporaryMessageNotFound(usize),
 }
 
 impl Serialize for ChatGPTError {
@@ -175,6 +177,10 @@ impl Serialize for ChatGPTError {
             }
             ChatGPTError::Rc => {
                 state.serialize_field("code", "Rc")?;
+            }
+            ChatGPTError::TemporaryMessageNotFound(id) => {
+                state.serialize_field("code", "TemporaryMessageNotFound")?;
+                state.serialize_field("data", id)?;
             }
         }
         state.end()

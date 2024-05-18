@@ -10,7 +10,7 @@
     "tauri": "tauri"
   },
   "dependencies": {
-    "@mui/x-tree-view": "^7.4.0",
+    "@mui/x-tree-view": "^7.5.0",
     "details": "workspace:^",
     "markdown-to-jsx": "^7.4.7",
     "monaco-editor": "^0.48.0",

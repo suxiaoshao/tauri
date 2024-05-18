@@ -37,7 +37,7 @@ libsqlite3-sys = { version = "0.28.0", features = ["bundled-windows"] }
 time = { version = "0.3.36", features = ["serde"] }
 
 # 错误处理
-thiserror = "1.0.60"
+thiserror = "1.0.61"
 
 # log
 tauri-plugin-log = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v1" }
@@ -77,4 +77,4 @@ custom-protocol = ["tauri/custom-protocol"]
 
 [dev-dependencies]
 dotenv = "0.15.0"
-anyhow = "1.0.83"
+anyhow = "1.0.85"

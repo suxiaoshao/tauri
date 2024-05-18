@@ -31,7 +31,9 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for TemporaryConversationPlugin {
     fn extend_api(&mut self, invoke: Invoke<R>) {
         let handle: Box<dyn Fn(Invoke<R>) + Send + Sync> = Box::new(tauri::generate_handler![
             history::init_temporary_conversation,
-            history::temporary_fetch
+            history::temporary_fetch,
+            history::find_temporary_message,
+            history::delete_temporary_message,
         ]);
         (handle)(invoke);
     }

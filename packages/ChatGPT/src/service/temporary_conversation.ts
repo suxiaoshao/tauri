@@ -1,3 +1,4 @@
+import { TemporaryMessage } from '@chatgpt/types/temporary_conversation';
 import { appInvoke } from './base';
 
 export interface InitTemporaryConversationParams {
@@ -17,4 +18,26 @@ export interface TemporaryFetchParams {
 
 export async function temporaryFetch(params: TemporaryFetchParams) {
   return await appInvoke<TemporaryFetchParams, unknown>('plugin:temporary_conversation|temporary_fetch', params);
+}
+
+export interface DeleteTemporaryMessageParams {
+  id: number;
+}
+
+export async function deleteTemporaryMessage(params: DeleteTemporaryMessageParams) {
+  return await appInvoke<DeleteTemporaryMessageParams, TemporaryMessage[]>(
+    'plugin:temporary_conversation|delete_temporary_message',
+    params,
+  );
+}
+
+export interface FindTemporaryMessageParams {
+  id: number;
+}
+
+export async function findTemporaryMessage(params: FindTemporaryMessageParams) {
+  return await appInvoke<FindTemporaryMessageParams, TemporaryMessage>(
+    'plugin:temporary_conversation|find_temporary_message',
+    params,
+  );
 }

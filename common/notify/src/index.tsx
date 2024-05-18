@@ -6,7 +6,7 @@
  * @FilePath: /tauri/common/notify/src/index.tsx
  */
 import { IconButton } from '@mui/material';
-import { OptionsObject, SnackbarMessage, useSnackbar, SnackbarProvider as SourceSnackbarProvider } from 'notistack';
+import { OptionsObject, useSnackbar, SnackbarProvider as SourceSnackbarProvider } from 'notistack';
 import { ReactNode, useEffect, useRef } from 'react';
 import { Subject } from 'rxjs';
 import { Close } from '@mui/icons-material';
