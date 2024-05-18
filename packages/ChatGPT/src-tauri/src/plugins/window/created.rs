@@ -18,10 +18,6 @@ use crate::errors::ChatGPTResult;
 
 pub fn on_created<R: Runtime>(window: tauri::Window<R>) -> ChatGPTResult<()> {
     window_beatify(&window)?;
-    #[cfg(debug_assertions)]
-    {
-        window.open_devtools()
-    }
     Ok(())
 }
 

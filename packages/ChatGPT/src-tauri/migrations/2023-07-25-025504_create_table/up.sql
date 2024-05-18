@@ -57,16 +57,6 @@ create table conversations
     unique (path)
 );
 
-create table temporary_conversations
-(
-    id           INTEGER primary key autoincrement not null,
-    created_time DateTime                          not null,
-    updated_time DateTime                          not null,
-    template_id  INTEGER                           not null,
-    hotkeys      TEXT                              not null,
-    FOREIGN KEY (template_id) REFERENCES conversation_templates (id)
-);
-
 
 create table messages
 (
@@ -90,4 +80,3 @@ CREATE INDEX idx_messages_start_time ON messages (start_time);
 CREATE INDEX idx_messages_status ON messages (status);
 
 CREATE INDEX idx_messages_content ON messages (content);
-

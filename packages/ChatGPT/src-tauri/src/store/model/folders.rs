@@ -1,7 +1,4 @@
-use crate::{
-    errors::ChatGPTResult,
-    store::migrations::{v1::SqlFolderV1, v2::SqlFolderV2},
-};
+use crate::{errors::ChatGPTResult, store::migrations::v1::SqlFolderV1};
 
 use super::super::schema::folders;
 use diesel::prelude::*;
@@ -28,28 +25,6 @@ impl From<SqlFolderV1> for SqlFolder {
             created_time,
             updated_time,
         }: SqlFolderV1,
-    ) -> Self {
-        Self {
-            id,
-            name,
-            path,
-            parent_id,
-            created_time,
-            updated_time,
-        }
-    }
-}
-
-impl From<SqlFolderV2> for SqlFolder {
-    fn from(
-        SqlFolderV2 {
-            id,
-            name,
-            path,
-            parent_id,
-            created_time,
-            updated_time,
-        }: SqlFolderV2,
     ) -> Self {
         Self {
             id,

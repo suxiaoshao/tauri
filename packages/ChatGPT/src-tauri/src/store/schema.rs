@@ -70,21 +70,10 @@ diesel::table! {
     }
 }
 
-diesel::table! {
-    temporary_conversations (id) {
-        id -> Integer,
-        created_time -> TimestamptzSqlite,
-        updated_time -> TimestamptzSqlite,
-        template_id -> Integer,
-        hotkeys -> Text,
-    }
-}
-
 diesel::joinable!(conversation_template_prompts -> conversation_templates (template_id));
 diesel::joinable!(conversations -> conversation_templates (template_id));
 diesel::joinable!(conversations -> folders (folder_id));
 diesel::joinable!(messages -> conversations (conversation_id));
-diesel::joinable!(temporary_conversations -> conversation_templates (template_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
     conversation_template_prompts,
@@ -92,5 +81,4 @@ diesel::allow_tables_to_appear_in_same_query!(
     conversations,
     folders,
     messages,
-    temporary_conversations,
 );

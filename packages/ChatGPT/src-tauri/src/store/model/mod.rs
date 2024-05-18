@@ -10,7 +10,6 @@ mod conversation_templates;
 mod conversations;
 mod folders;
 mod messages;
-mod temporary_conversations;
 
 pub use conversation_template_prompts::{
     SqlConversationTemplatePrompt, SqlNewConversationTemplatePrompt,

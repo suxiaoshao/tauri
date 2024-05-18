@@ -5,7 +5,7 @@
  * @LastEditTime: 2024-04-30 04:27:21
  * @FilePath: /tauri/packages/ChatGPT/src-tauri/src/store/model/conversation_template_prompts.rs
  */
-use crate::{errors::ChatGPTResult, store::migrations::v2::SqlConversationTemplatePromptV2};
+use crate::errors::ChatGPTResult;
 
 use super::super::schema::conversation_template_prompts;
 use diesel::prelude::*;
@@ -41,28 +41,6 @@ pub struct SqlConversationTemplatePrompt {
     pub(in super::super) role: String,
     pub(in super::super) created_time: OffsetDateTime,
     pub(in super::super) updated_time: OffsetDateTime,
-}
-
-impl From<SqlConversationTemplatePromptV2> for SqlConversationTemplatePrompt {
-    fn from(
-        SqlConversationTemplatePromptV2 {
-            id,
-            template_id,
-            prompt,
-            role,
-            created_time,
-            updated_time,
-        }: SqlConversationTemplatePromptV2,
-    ) -> Self {
-        Self {
-            id,
-            template_id,
-            prompt,
-            role,
-            created_time,
-            updated_time,
-        }
-    }
 }
 
 impl SqlConversationTemplatePrompt {

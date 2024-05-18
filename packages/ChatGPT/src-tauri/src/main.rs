@@ -33,7 +33,7 @@ fn main() -> ChatGPTResult<()> {
                 .add_listen(TemporaryHotkeyListener),
         )
         .plugin(plugins::ChatPlugin)
-        .plugin(plugins::TemporaryConversationPlugin)
+        .plugin(plugins::TemporaryConversationPlugin::default())
         .plugin(plugins::TrayPlugin)
         .run(tauri::generate_context!())?;
     Ok(())

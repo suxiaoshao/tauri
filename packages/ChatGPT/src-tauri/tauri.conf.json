@@ -22,7 +22,9 @@
         "create": true,
         "setFocus": true,
         "show": true,
-        "startDragging": true
+        "startDragging": true,
+        "maximize": true,
+        "unmaximize": true
       },
       "os": {
         "all": true
