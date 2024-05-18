@@ -32,7 +32,7 @@ impl SqlNewConversationTemplatePrompt {
     }
 }
 
-#[derive(Queryable, AsChangeset, Debug, Clone)]
+#[derive(Queryable, AsChangeset, Debug, Clone, Insertable)]
 #[diesel(table_name = conversation_template_prompts)]
 pub struct SqlConversationTemplatePrompt {
     pub(in super::super) id: i32,
@@ -67,6 +67,12 @@ impl SqlConversationTemplatePrompt {
                 .filter(conversation_template_prompts::template_id.eq(template_id)),
         )
         .execute(conn)?;
+        Ok(())
+    }
+    pub fn migration_save(prompts: Vec<Self>, conn: &mut SqliteConnection) -> ChatGPTResult<()> {
+        diesel::insert_into(conversation_template_prompts::table)
+            .values(prompts)
+            .execute(conn)?;
         Ok(())
     }
 }

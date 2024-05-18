@@ -2,7 +2,7 @@
  * @Author: suxiaoshao suxiaoshao@gmail.com
  * @Date: 2024-01-06 01:08:42
  * @LastEditors: suxiaoshao suxiaoshao@gmail.com
- * @LastEditTime: 2024-01-07 20:32:46
+ * @LastEditTime: 2024-05-15 20:42:50
  * @FilePath: /tauri/packages/ChatGPT/src-tauri/src/fetch/mod.rs
  */
 use async_trait::async_trait;
@@ -11,13 +11,13 @@ use reqwest_eventsource::{Event, RequestBuilderExt};
 
 use crate::errors::ChatGPTResult;
 
-pub use self::types::{ChatRequest, ChatResponse};
+pub use self::types::{ChatRequest, ChatResponse, Message};
 
 mod types;
 
 #[async_trait]
 pub trait FetchRunner {
-    fn get_body(&self) -> ChatGPTResult<&ChatRequest>;
+    fn get_body(&self) -> ChatGPTResult<ChatRequest<'_>>;
     fn get_api_key(&self) -> ChatGPTResult<&str>;
     fn get_http_proxy(&self) -> ChatGPTResult<&Option<String>>;
     fn on_open(&mut self) -> ChatGPTResult<()>;

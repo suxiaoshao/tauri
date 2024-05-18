@@ -7,7 +7,7 @@ edition = "2021"
 
 [dependencies]
 # 错误处理
-thiserror = "1.0.59"
+thiserror = "1.0.61"
 
 # 网络请求
 reqwest = "0.12.4"
@@ -23,8 +23,8 @@ tokio = { version = "1.37.0", features = [
 ] }
 
 # 存储
-serde = { version = "1.0.199", features = ["derive"] }
-serde_json = "1.0.116"
+serde = { version = "1.0.202", features = ["derive"] }
+serde_json = "1.0.117"
 
 # 参数
 clap = { version = "4.5.4", features = ["derive"] }

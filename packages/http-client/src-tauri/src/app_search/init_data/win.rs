@@ -1,3 +1,10 @@
+/*
+ * @Author: suxiaoshao suxiaoshao@gamil.com
+ * @Date: 2022-09-11 02:49:00
+ * @LastEditors: suxiaoshao suxiaoshao@gamil.com
+ * @LastEditTime: 2024-05-08 23:48:49
+ * @FilePath: \tauri\packages\http-client\src-tauri\src\app_search\init_data\win.rs
+ */
 use std::{
     collections::HashMap,
     path::{Path, PathBuf},
@@ -45,7 +52,6 @@ fn map_lnk(dir: DirEntry) -> Option<AppPath> {
         .iter()
         .last()?
         .to_str()?
-        .to_string()
         .split('.')
         .next()?
         .to_string();

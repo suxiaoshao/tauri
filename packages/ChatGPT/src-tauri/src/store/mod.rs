@@ -11,7 +11,7 @@ mod schema;
 mod service;
 mod types;
 
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 use crate::errors::{ChatGPTError, ChatGPTResult};
 use diesel::{
@@ -20,18 +20,15 @@ use diesel::{
     Connection, SqliteConnection,
 };
 
-pub use service::conversation_template_prompts::*;
-pub use service::conversation_templates::*;
-pub use service::conversations::*;
-pub use service::folders::*;
-pub use service::messages::*;
-use time::OffsetDateTime;
-pub use types::*;
-
-use self::model::{
-    conversation_templates::{SqlConversationTemplate, SqlNewConversationTemplate},
-    conversations::SqlNewConversation,
+pub use service::{
+    deserialize_offset_date_time, serialize_offset_date_time, Conversation, ConversationTemplate,
+    Folder, Message, NewConversation, NewConversationTemplate, NewConversationTemplatePrompt,
+    NewFolder, NewMessage,
 };
+use time::OffsetDateTime;
+pub use types::{Mode, Role, Status};
+
+use self::model::{SqlConversationTemplate, SqlNewConversation, SqlNewConversationTemplate};
 
 const DB_FILE: &str = "history.sqlite3";
 const DB_FILE_V2: &str = "history_v2.sqlite3";
@@ -39,29 +36,47 @@ const CREATE_TABLE_SQL: &str =
     include_str!("../../migrations/2023-07-25-025504_create_table/up.sql");
 
 pub enum StoreVersion {
-    None,
-    V1,
-    V2,
+    None(DbConn),
+    V1 {
+        conn: DbConn,
+        v1_db: SqliteConnection,
+    },
+    V2(DbConn),
 }
 
 impl StoreVersion {
-    pub fn migration(&self, conn: &DbConn, v1_db_path: &Path) -> ChatGPTResult<()> {
-        let mut conn = conn.get()?;
+    pub fn migration(self) -> ChatGPTResult<DbConn> {
         match self {
-            StoreVersion::None => {
-                create_tables(&mut conn)?;
+            StoreVersion::None(conn) => {
+                log::info!("Migrating from None to V2");
+                let c = &mut conn.get()?;
+                init_tables(c)?;
+                Ok(conn)
             }
-            StoreVersion::V1 => {
+            StoreVersion::V1 { conn, mut v1_db } => {
                 log::info!("Migrating from V1 to V2");
-                let mut v1_conn =
-                    SqliteConnection::establish(v1_db_path.to_str().ok_or(ChatGPTError::DbPath)?)?;
-                if migrations::v1_to_v2(&mut v1_conn, &mut conn).is_err() {
-                    create_tables(&mut conn)?;
+                let v2_db = &mut conn.get()?;
+                if migrations::v1_to_v2(&mut v1_db, v2_db).is_err() {
+                    init_tables(v2_db)?;
                 };
+                Ok(conn)
             }
-            StoreVersion::V2 => {}
+            StoreVersion::V2(conn) => Ok(conn),
         }
-        Ok(())
+    }
+    pub fn new(config_dir: &Path) -> ChatGPTResult<Self> {
+        let v1_filepath = config_dir.join(DB_FILE);
+        let v2_filepath = config_dir.join(DB_FILE_V2);
+        match (v1_filepath.exists(), v2_filepath.exists()) {
+            (true, false) => Ok(StoreVersion::V1 {
+                conn: get_dbconn(&v2_filepath)?,
+                v1_db: SqliteConnection::establish(
+                    v1_filepath.to_str().ok_or(ChatGPTError::DbPath)?,
+                )?,
+            }),
+            (_, true) => Ok(StoreVersion::V2(get_dbconn(&v2_filepath)?)),
+            _ => Ok(StoreVersion::None(get_dbconn(&v2_filepath)?)),
+        }
     }
 }
 
@@ -69,12 +84,8 @@ pub type DbConn = Pool<ConnectionManager<SqliteConnection>>;
 
 pub fn establish_connection(config_dir: &Path) -> ChatGPTResult<DbConn> {
     create_config_dir(config_dir)?;
-    let (version, db_path, v1_db_path) = check_store_version(config_dir)?;
-    let manager =
-        ConnectionManager::<SqliteConnection>::new(db_path.to_str().ok_or(ChatGPTError::DbPath)?);
-    let pool = Pool::builder().test_on_check_out(true).build(manager)?;
-    version.migration(&pool, &v1_db_path)?;
-    Ok(pool)
+    let store_version = StoreVersion::new(config_dir)?;
+    store_version.migration()
 }
 
 fn create_config_dir(config_dir: &Path) -> ChatGPTResult<()> {
@@ -84,17 +95,14 @@ fn create_config_dir(config_dir: &Path) -> ChatGPTResult<()> {
     Ok(())
 }
 
-fn check_store_version(config_dir: &Path) -> ChatGPTResult<(StoreVersion, PathBuf, PathBuf)> {
-    let v1_filepath = config_dir.join(DB_FILE);
-    let v2_filepath = config_dir.join(DB_FILE_V2);
-    match (v1_filepath.exists(), v2_filepath.exists()) {
-        (true, false) => Ok((StoreVersion::V1, v2_filepath, v1_filepath)),
-        (_, true) => Ok((StoreVersion::V2, v2_filepath, v1_filepath)),
-        _ => Ok((StoreVersion::None, v2_filepath, v1_filepath)),
-    }
+fn get_dbconn(db_path: &Path) -> ChatGPTResult<DbConn> {
+    let manager =
+        ConnectionManager::<SqliteConnection>::new(db_path.to_str().ok_or(ChatGPTError::DbPath)?);
+    let pool = Pool::builder().test_on_check_out(true).build(manager)?;
+    Ok(pool)
 }
 
-pub fn create_tables(conn: &mut SqliteConnection) -> ChatGPTResult<()> {
+pub fn init_tables(conn: &mut SqliteConnection) -> ChatGPTResult<()> {
     conn.immediate_transaction(|conn| {
         // Create tables
         conn.batch_execute(CREATE_TABLE_SQL)?;

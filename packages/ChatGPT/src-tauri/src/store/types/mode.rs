@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use std::{fmt::Display, str::FromStr};
 
 use crate::errors::ChatGPTError;
 
@@ -25,12 +25,12 @@ impl FromStr for Mode {
     }
 }
 
-impl ToString for Mode {
-    fn to_string(&self) -> String {
+impl Display for Mode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Mode::Contextual => "contextual".to_owned(),
-            Mode::Single => "single".to_owned(),
-            Mode::AssistantOnly => "assistant-only".to_owned(),
+            Mode::AssistantOnly => f.write_str("assistant-only"),
+            Mode::Contextual => f.write_str("contextual"),
+            Mode::Single => f.write_str("single"),
         }
     }
 }
@@ -38,14 +38,12 @@ impl ToString for Mode {
 #[cfg(test)]
 mod test {
     #[test]
-    fn test_mode() {
+    fn test_mode() -> anyhow::Result<()> {
         use super::Mode;
-        assert_eq!("contextual".parse::<Mode>().unwrap(), Mode::Contextual);
-        assert_eq!("single".parse::<Mode>().unwrap(), Mode::Single);
-        assert_eq!(
-            "assistant-only".parse::<Mode>().unwrap(),
-            Mode::AssistantOnly
-        );
+        assert_eq!("contextual".parse::<Mode>()?, Mode::Contextual);
+        assert_eq!("single".parse::<Mode>()?, Mode::Single);
+        assert_eq!("assistant-only".parse::<Mode>()?, Mode::AssistantOnly);
         assert!("invalid".parse::<Mode>().is_err());
+        Ok(())
     }
 }

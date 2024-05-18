@@ -4,6 +4,7 @@ import { NewFolder } from '@chatgpt/types/folder';
 import { NewConversationTemplate } from '@chatgpt/types/conversation_template';
 import store from '@chatgpt/app/store';
 import { fetchTemplates } from '@chatgpt/features/Template/templateSlice';
+import { fetchConversations } from '@chatgpt/features/Conversations/conversationSlice';
 
 export interface AddConversationParams {
   data: NewConversation;
@@ -11,6 +12,7 @@ export interface AddConversationParams {
 
 export async function addConversation(params: AddConversationParams) {
   await appInvoke<AddConversationParams, unknown>('plugin:chat|add_conversation', params);
+  store.dispatch(fetchConversations());
 }
 
 export interface AddFolderParams {
@@ -19,6 +21,7 @@ export interface AddFolderParams {
 
 export async function addFolder(params: AddFolderParams) {
   await appInvoke<AddFolderParams, unknown>('plugin:chat|add_folder', params);
+  store.dispatch(fetchConversations());
 }
 
 export interface UpdateConversationParams {
@@ -28,6 +31,7 @@ export interface UpdateConversationParams {
 
 export async function updateConversation(params: UpdateConversationParams) {
   await appInvoke<UpdateConversationParams, unknown>('plugin:chat|update_conversation', params);
+  store.dispatch(fetchConversations());
 }
 
 export interface DeleteConversationParams {
@@ -36,6 +40,7 @@ export interface DeleteConversationParams {
 
 export async function deleteConversation(params: DeleteConversationParams) {
   await appInvoke<DeleteConversationParams, unknown>('plugin:chat|delete_conversation', params);
+  store.dispatch(fetchConversations());
 }
 
 export interface DeleteFolderParams {
@@ -44,6 +49,7 @@ export interface DeleteFolderParams {
 
 export async function deleteFolder(params: DeleteFolderParams) {
   await appInvoke<DeleteFolderParams, unknown>('plugin:chat|delete_folder', params);
+  store.dispatch(fetchConversations());
 }
 
 export interface UpdateFolderParams {
@@ -53,6 +59,7 @@ export interface UpdateFolderParams {
 
 export async function updateFolder(params: UpdateFolderParams) {
   await appInvoke<UpdateFolderParams, unknown>('plugin:chat|update_folder', params);
+  store.dispatch(fetchConversations());
 }
 
 export interface MoveConversationParams {
@@ -62,6 +69,7 @@ export interface MoveConversationParams {
 
 export async function moveConversation(params: MoveConversationParams) {
   await appInvoke<MoveConversationParams, unknown>('plugin:chat|move_conversation', params);
+  store.dispatch(fetchConversations());
 }
 
 export interface MoveFolderParams {
@@ -71,6 +79,7 @@ export interface MoveFolderParams {
 
 export async function moveFolder(params: MoveFolderParams) {
   await appInvoke<MoveFolderParams, unknown>('plugin:chat|move_folder', params);
+  store.dispatch(fetchConversations());
 }
 
 export interface DeleteMessageParams {
@@ -79,6 +88,7 @@ export interface DeleteMessageParams {
 
 export async function deleteMessage(params: DeleteMessageParams) {
   await appInvoke<DeleteMessageParams, unknown>('plugin:chat|delete_message', params);
+  store.dispatch(fetchConversations());
 }
 
 export interface UpdateMessageContentParams {
@@ -96,6 +106,7 @@ export interface ClearConversationParams {
 
 export async function clearConversation(params: ClearConversationParams) {
   await appInvoke<ClearConversationParams, unknown>('plugin:chat|clear_conversation', params);
+  store.dispatch(fetchConversations());
 }
 
 export enum ExportType {

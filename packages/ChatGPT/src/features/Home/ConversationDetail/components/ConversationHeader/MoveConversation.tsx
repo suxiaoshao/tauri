@@ -15,7 +15,6 @@ import FolderSelect from '@chatgpt/components/FolderSelect';
 import { Controller, useForm } from 'react-hook-form';
 import { MoveConversationParams, moveConversation } from '@chatgpt/service/chat/mutation';
 import { useAppDispatch } from '@chatgpt/app/hooks';
-import { fetchConversations } from '@chatgpt/features/Conversations/conversationSlice';
 
 export interface MoveConversationProps {
   conversation: Conversation;
@@ -34,7 +33,6 @@ export default function MoveConversation({ conversation }: MoveConversationProps
   const onSubmit = useCallback(
     async ({ folderId }: Pick<MoveConversationParams, 'folderId'>) => {
       await moveConversation({ folderId, conversationId: conversation.id });
-      dispatch(fetchConversations());
       handleClose();
     },
     [conversation.id, dispatch, handleClose],

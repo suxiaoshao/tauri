@@ -5,16 +5,16 @@
  * @LastEditTime: 2024-01-07 20:53:10
  * @FilePath: /tauri/packages/ChatGPT/src/features/Home/ConversationDetail/components/MessageItem/components/AssistantItem/ErrorItem.tsx
  */
-import { Avatar, Box, Divider } from '@mui/material';
 import assistant from '@chatgpt/assets/assistant.jpg';
 import CustomMarkdown from '@chatgpt/components/Markdown';
-import { Message } from '@chatgpt/types/message';
+import { Avatar, Box, Divider } from '@mui/material';
+import { BaseMessage } from '../..';
 import { AvatarSx, MarkdownSx, MessageSx } from '../../const';
-import DeleteMessageIcon from '../ToolBar/DeleteMessageIcon';
 import ToolBar from '../ToolBar';
+import DeleteMessageIcon from '../ToolBar/DeleteMessageIcon';
 
 export interface ErrorItemProps {
-  message: Message;
+  message: BaseMessage;
 }
 
 export default function ErrorItem({ message }: ErrorItemProps) {

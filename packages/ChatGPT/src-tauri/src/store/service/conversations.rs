@@ -5,9 +5,7 @@ use crate::{
     errors::{ChatGPTError, ChatGPTResult},
     store::{
         model::{
-            conversations::{SqlConversation, SqlNewConversation, SqlUpdateConversation},
-            folders::SqlFolder,
-            messages::SqlMessage,
+            SqlConversation, SqlFolder, SqlMessage, SqlNewConversation, SqlUpdateConversation,
         },
         Message,
     },

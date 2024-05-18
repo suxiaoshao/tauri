@@ -37,13 +37,17 @@ fn window_beatify<R: Runtime>(window: &tauri::Window<R>) -> FeiwenResult<()> {
     Ok(())
 }
 
+#[cfg(target_os = "macos")]
 use tauri::Window;
 
+#[cfg(target_os = "macos")]
 pub trait WindowExt {
+    #[allow(dead_code)]
     #[cfg(target_os = "macos")]
     fn set_transparent_titlebar(&self, thickness: ToolbarThickness);
 }
 
+#[cfg(target_os = "macos")]
 impl<R: Runtime> WindowExt for Window<R> {
     #[cfg(target_os = "macos")]
     fn set_transparent_titlebar(&self, thickness: ToolbarThickness) {

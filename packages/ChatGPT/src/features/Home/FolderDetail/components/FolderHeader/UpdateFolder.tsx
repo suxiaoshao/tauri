@@ -22,7 +22,6 @@ export default function UpdateFolder({ folder }: FolderHeaderProps) {
         folder: { name: name.trim(), parentId: folder.parentId } satisfies NewFolder,
         id: folder.id,
       });
-      dispatch(fetchConversations());
       handleClose();
     },
     [folder.parentId, folder.id, dispatch, handleClose],

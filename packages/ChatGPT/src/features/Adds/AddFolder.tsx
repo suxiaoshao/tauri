@@ -11,7 +11,7 @@ import { useMatch, useNavigate } from 'react-router-dom';
 import { Add } from '@mui/icons-material';
 import FolderEdit, { FolderForm } from '@chatgpt/components/FolderEdit';
 import { useAppDispatch, useAppSelector } from '@chatgpt/app/hooks';
-import { fetchConversations, selectSelectedFolderId } from '../Conversations/conversationSlice';
+import { selectSelectedFolderId } from '../Conversations/conversationSlice';
 import { useCallback } from 'react';
 import { NewFolder } from '@chatgpt/types/folder';
 import { addFolder } from '@chatgpt/service/chat/mutation';
@@ -29,7 +29,6 @@ function AddFolder() {
           parentId: folderId,
         } satisfies NewFolder,
       });
-      dispatch(fetchConversations());
       navigate('/');
     },
     [dispatch, folderId, navigate],

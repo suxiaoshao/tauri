@@ -5,9 +5,18 @@
  * @LastEditTime: 2024-04-28 07:06:19
  * @FilePath: /tauri/packages/ChatGPT/src-tauri/src/store/service/mod.rs
  */
-pub mod conversation_template_prompts;
-pub mod conversation_templates;
-pub mod conversations;
-pub mod folders;
-pub mod messages;
+mod conversation_template_prompts;
+mod conversation_templates;
+mod conversations;
+mod folders;
+mod messages;
 mod utils;
+
+pub use conversation_template_prompts::NewConversationTemplatePrompt;
+pub use utils::{deserialize_offset_date_time, serialize_offset_date_time};
+
+pub use conversation_templates::{ConversationTemplate, NewConversationTemplate};
+
+pub use conversations::{Conversation, NewConversation};
+pub use folders::{Folder, NewFolder};
+pub use messages::{Message, NewMessage};

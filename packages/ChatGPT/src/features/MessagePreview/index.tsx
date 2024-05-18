@@ -8,7 +8,6 @@
 import usePromise from '@chatgpt/hooks/usePromise';
 import { findMessage } from '@chatgpt/service/chat/query';
 import notification from '@chatgpt/utils/notification';
-import { CircularProgress } from '@mui/material';
 import { appWindow } from '@tauri-apps/api/window';
 import { useCallback, useMemo } from 'react';
 import { useParams } from 'react-router-dom';

@@ -1,8 +1,8 @@
-use std::str::FromStr;
+use std::{fmt::Display, str::FromStr};
 
 use crate::errors::ChatGPTError;
 
-#[derive(serde::Serialize, serde::Deserialize, PartialEq, Eq, Debug, Clone)]
+#[derive(serde::Serialize, serde::Deserialize, PartialEq, Eq, Debug, Clone, Copy)]
 pub enum Status {
     #[serde(rename = "normal")]
     Normal,
@@ -28,13 +28,13 @@ impl FromStr for Status {
     }
 }
 
-impl ToString for Status {
-    fn to_string(&self) -> String {
+impl Display for Status {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Status::Normal => "normal".to_owned(),
-            Status::Hidden => "hidden".to_owned(),
-            Status::Loading => "loading".to_owned(),
-            Status::Error => "error".to_owned(),
+            Status::Normal => f.write_str("normal"),
+            Status::Hidden => f.write_str("hidden"),
+            Status::Loading => f.write_str("loading"),
+            Status::Error => f.write_str("error"),
         }
     }
 }
@@ -42,12 +42,13 @@ impl ToString for Status {
 #[cfg(test)]
 mod test {
     #[test]
-    fn test_mode() {
+    fn test_mode() -> anyhow::Result<()> {
         use super::Status;
-        assert_eq!("normal".parse::<Status>().unwrap(), Status::Normal);
-        assert_eq!("hidden".parse::<Status>().unwrap(), Status::Hidden);
-        assert_eq!("loading".parse::<Status>().unwrap(), Status::Loading);
-        assert_eq!("error".parse::<Status>().unwrap(), Status::Error);
+        assert_eq!("normal".parse::<Status>()?, Status::Normal);
+        assert_eq!("hidden".parse::<Status>()?, Status::Hidden);
+        assert_eq!("loading".parse::<Status>()?, Status::Loading);
+        assert_eq!("error".parse::<Status>()?, Status::Error);
         assert!("invalid".parse::<Status>().is_err());
+        Ok(())
     }
 }

@@ -1,3 +1,10 @@
+/*
+ * @Author: suxiaoshao suxiaoshao@gmail.com
+ * @Date: 2024-01-06 01:08:42
+ * @LastEditors: suxiaoshao suxiaoshao@gmail.com
+ * @LastEditTime: 2024-05-01 10:32:36
+ * @FilePath: /tauri/packages/ChatGPT/src-tauri/src/plugins/window/created.rs
+ */
 use tauri::Runtime;
 use window_shadows::set_shadow;
 #[cfg(target_os = "windows")]
@@ -11,10 +18,6 @@ use crate::errors::ChatGPTResult;
 
 pub fn on_created<R: Runtime>(window: tauri::Window<R>) -> ChatGPTResult<()> {
     window_beatify(&window)?;
-    #[cfg(debug_assertions)]
-    {
-        window.open_devtools()
-    }
     Ok(())
 }
 
@@ -26,7 +29,7 @@ fn window_beatify<R: Runtime>(window: &tauri::Window<R>) -> ChatGPTResult<()> {
     #[cfg(target_os = "macos")]
     apply_vibrancy(
         window,
-        NSVisualEffectMaterial::HudWindow,
+        NSVisualEffectMaterial::UnderWindowBackground,
         Some(NSVisualEffectState::Active),
         None,
     )?;
@@ -37,16 +40,22 @@ fn window_beatify<R: Runtime>(window: &tauri::Window<R>) -> ChatGPTResult<()> {
     Ok(())
 }
 
+#[cfg(target_os = "macos")]
 use tauri::Window;
 
+#[cfg(target_os = "macos")]
 pub trait WindowExt {
+    #[allow(dead_code)]
     #[cfg(target_os = "macos")]
-    fn set_transparent_titlebar(&self, thickness: ToolbarThickness);
+    fn set_titlebar_thick(&self, thickness: ToolbarThickness);
+    #[cfg(target_os = "macos")]
+    fn set_transparent_titlebar(&self) -> ChatGPTResult<()>;
 }
 
+#[cfg(target_os = "macos")]
 impl<R: Runtime> WindowExt for Window<R> {
     #[cfg(target_os = "macos")]
-    fn set_transparent_titlebar(&self, thickness: ToolbarThickness) {
+    fn set_titlebar_thick(&self, thickness: ToolbarThickness) {
         use cocoa::appkit::{NSWindow, NSWindowTitleVisibility};
 
         unsafe {
@@ -68,6 +77,25 @@ impl<R: Runtime> WindowExt for Window<R> {
                 }
             }
         }
+    }
+    #[cfg(target_os = "macos")]
+    fn set_transparent_titlebar(&self) -> ChatGPTResult<()> {
+        use cocoa::appkit::{NSWindow, NSWindowStyleMask, NSWindowTitleVisibility};
+        unsafe {
+            let id = self.ns_window()? as cocoa::base::id;
+            NSWindow::setTitlebarAppearsTransparent_(id, cocoa::base::YES);
+            let mut style_mask = id.styleMask();
+            style_mask.set(NSWindowStyleMask::NSFullSizeContentViewWindowMask, true);
+            style_mask.remove(
+                NSWindowStyleMask::NSClosableWindowMask
+                    | NSWindowStyleMask::NSMiniaturizableWindowMask
+                    | NSWindowStyleMask::NSResizableWindowMask,
+            );
+            id.setStyleMask_(style_mask);
+            id.setTitleVisibility_(NSWindowTitleVisibility::NSWindowTitleHidden);
+            id.setTitlebarAppearsTransparent_(cocoa::base::YES);
+        }
+        Ok(())
     }
 }
 

@@ -11,7 +11,6 @@ import EditIcon from '@mui/icons-material/Edit';
 import ConversationEdit, { ConversationForm } from '@chatgpt/components/ConversationEdit';
 import { Conversation, NewConversation } from '@chatgpt/types/conversation';
 import { updateConversation } from '@chatgpt/service/chat/mutation';
-import { fetchConversations } from '@chatgpt/features/Conversations/conversationSlice';
 import { useAppDispatch } from '@chatgpt/app/hooks';
 
 export interface UpdateConversationProps {
@@ -33,7 +32,6 @@ export default function UpdateConversation({ conversation }: UpdateConversationP
         } satisfies NewConversation,
         id: conversation.id,
       });
-      dispatch(fetchConversations());
       handleClose();
     },
     [conversation.folderId, conversation.id, dispatch, handleClose],

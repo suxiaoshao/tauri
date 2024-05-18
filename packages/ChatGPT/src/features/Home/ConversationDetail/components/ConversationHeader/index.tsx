@@ -17,7 +17,6 @@ export default function ConversationHeader({ conversation }: ConversationHeaderP
   const dispatch = useAppDispatch();
   const handleDelete = useCallback(async () => {
     await deleteConversation({ id: conversation.id });
-    dispatch(fetchConversations());
   }, [conversation.id, dispatch]);
   const navigate = useNavigate();
   const handleCopy = useCallback(async () => {
@@ -25,7 +24,6 @@ export default function ConversationHeader({ conversation }: ConversationHeaderP
   }, [conversation, navigate]);
   const handleClear = useCallback(async () => {
     await clearConversation({ id: conversation.id });
-    dispatch(fetchConversations());
   }, [conversation.id, dispatch]);
 
   return (

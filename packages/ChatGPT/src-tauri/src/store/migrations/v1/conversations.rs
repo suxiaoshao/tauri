@@ -34,51 +34,6 @@ pub struct SqlConversationV1 {
 }
 
 impl SqlConversationV1 {
-    pub fn find(id: i32, conn: &mut SqliteConnection) -> ChatGPTResult<Self> {
-        conversations::table
-            .find(id)
-            .first::<Self>(conn)
-            .map_err(|e| e.into())
-    }
-    pub fn query_without_folder(conn: &mut SqliteConnection) -> ChatGPTResult<Vec<Self>> {
-        conversations::table
-            .filter(conversations::folder_id.is_null())
-            .load::<Self>(conn)
-            .map_err(|e| e.into())
-    }
-    pub fn find_by_folder_id(
-        folder_id: i32,
-        conn: &mut SqliteConnection,
-    ) -> ChatGPTResult<Vec<Self>> {
-        conversations::table
-            .filter(conversations::folder_id.eq(folder_id))
-            .load::<Self>(conn)
-            .map_err(|e| e.into())
-    }
-    pub fn delete_by_id(id: i32, conn: &mut SqliteConnection) -> ChatGPTResult<()> {
-        diesel::delete(conversations::table.find(id)).execute(conn)?;
-        Ok(())
-    }
-    pub fn path_exists(path: &str, conn: &mut SqliteConnection) -> ChatGPTResult<bool> {
-        let count = conversations::table
-            .filter(conversations::path.eq(path))
-            .count()
-            .get_result::<i64>(conn)?;
-        Ok(count > 0)
-    }
-    pub fn delete_by_path(path: &str, conn: &mut SqliteConnection) -> ChatGPTResult<()> {
-        let path = format!("{}/%", path);
-        diesel::delete(conversations::table.filter(conversations::path.like(path)))
-            .execute(conn)?;
-        Ok(())
-    }
-    pub fn find_by_path_pre(path: &str, conn: &mut SqliteConnection) -> ChatGPTResult<Vec<Self>> {
-        let path = format!("{}/%", path);
-        conversations::table
-            .filter(conversations::path.like(path))
-            .load::<Self>(conn)
-            .map_err(|e| e.into())
-    }
     pub fn all(conn: &mut SqliteConnection) -> ChatGPTResult<Vec<Self>> {
         conversations::table
             .load::<Self>(conn)

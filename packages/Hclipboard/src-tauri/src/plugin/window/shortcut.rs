@@ -1,3 +1,10 @@
+/*
+ * @Author: suxiaoshao suxiaoshao@gmail.com
+ * @Date: 2024-01-06 01:08:42
+ * @LastEditors: suxiaoshao suxiaoshao@gmail.com
+ * @LastEditTime: 2024-05-01 10:32:15
+ * @FilePath: /tauri/packages/Hclipboard/src-tauri/src/plugin/window/shortcut.rs
+ */
 use log::warn;
 use tauri::{AppHandle, GlobalShortcutManager, Manager, Runtime};
 

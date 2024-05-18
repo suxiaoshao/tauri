@@ -73,7 +73,7 @@ mod test {
 
     use crate::{
         errors::ChatGPTResult,
-        store::{self, create_tables, NewMessage},
+        store::{self, init_tables, NewMessage},
     };
 
     #[test]
@@ -94,7 +94,7 @@ mod test {
     }
     pub fn establish_connection() -> ChatGPTResult<SqliteConnection> {
         let mut conn = SqliteConnection::establish("file::memory:")?;
-        create_tables(&mut conn)?;
+        init_tables(&mut conn)?;
         Ok(conn)
     }
 }

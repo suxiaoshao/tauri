@@ -1,12 +1,12 @@
 import { Avatar, Box, Divider } from '@mui/material';
 import assistant from '@chatgpt/assets/assistant.jpg';
-import { Message } from '@chatgpt/types/message';
 import DeleteMessageIcon from '../ToolBar/DeleteMessageIcon';
 import ToolBar from '../ToolBar';
 import { AvatarSx, MessageSx } from '../../const';
+import { BaseMessage } from '../..';
 
 export interface HiddenItemProps {
-  message: Message;
+  message: BaseMessage;
 }
 
 export default function HiddenItem({ message }: HiddenItemProps) {

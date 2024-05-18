@@ -80,4 +80,3 @@ CREATE INDEX idx_messages_start_time ON messages (start_time);
 CREATE INDEX idx_messages_status ON messages (status);
 
 CREATE INDEX idx_messages_content ON messages (content);
-

@@ -8,7 +8,9 @@
 use diesel::prelude::*;
 use time::OffsetDateTime;
 
-use crate::{errors::ChatGPTResult, store::schema::messages};
+use crate::errors::ChatGPTResult;
+
+use super::schema::messages;
 #[derive(Debug, Queryable)]
 pub struct SqlMessageV1 {
     pub id: i32,

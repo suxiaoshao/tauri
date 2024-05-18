@@ -34,7 +34,6 @@ export default function MoveFolder({ folder }: MoveFolderProps) {
   const onSubmit = useCallback(
     async ({ parentId }: Pick<MoveFolderParams, 'parentId'>) => {
       await moveFolder({ parentId, id: folder.id });
-      dispatch(fetchConversations());
       handleClose();
     },
     [folder.id, dispatch, handleClose],

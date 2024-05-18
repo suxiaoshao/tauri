@@ -47,8 +47,9 @@ mod test {
     use super::parse_chapter_url;
 
     #[test]
-    fn test() {
+    fn test() -> anyhow::Result<()> {
         let input = "https://xn--pxtr7m.com/posts/8722849";
-        parse_chapter_url(input).unwrap();
+        parse_chapter_url(input)?;
+        Ok(())
     }
 }

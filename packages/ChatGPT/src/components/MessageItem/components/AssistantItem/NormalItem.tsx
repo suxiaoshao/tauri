@@ -9,15 +9,16 @@
 import { Avatar, Box, Divider } from '@mui/material';
 import assistant from '@chatgpt/assets/assistant.jpg';
 import CustomMarkdown from '@chatgpt/components/Markdown';
-import { Message } from '@chatgpt/types/message';
 import { CheckCircleOutlineOutlined } from '@mui/icons-material';
 import { AvatarSx, MarkdownSx, MessageSx, ToolSx } from '../../const';
 import DeleteMessageIcon from '../ToolBar/DeleteMessageIcon';
 import ToolBar from '../ToolBar';
 import ViewIcon from '../ToolBar/ViewIcon';
+import { BaseMessage } from '../..';
+import CopyIcon from '../ToolBar/CopyIcon';
 
 export interface NormalItemProps {
-  message: Message;
+  message: BaseMessage;
 }
 
 export default function NormalItem({ message }: NormalItemProps) {
@@ -30,6 +31,7 @@ export default function NormalItem({ message }: NormalItemProps) {
           <CheckCircleOutlineOutlined fontSize={'small'} sx={ToolSx} />
           <DeleteMessageIcon id={message.id} />
           <ViewIcon id={message.id} />
+          <CopyIcon content={message.content} />
         </ToolBar>
       </Box>
       <Divider />

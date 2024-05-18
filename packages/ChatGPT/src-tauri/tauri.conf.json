@@ -22,7 +22,9 @@
         "create": true,
         "setFocus": true,
         "show": true,
-        "startDragging": true
+        "startDragging": true,
+        "maximize": true,
+        "unmaximize": true
       },
       "os": {
         "all": true
@@ -38,6 +40,10 @@
         "open": true,
         "save": false
       }
+    },
+    "systemTray": {
+      "iconPath": "icons/icon.png",
+      "iconAsTemplate": true
     },
     "bundle": {
       "active": true,

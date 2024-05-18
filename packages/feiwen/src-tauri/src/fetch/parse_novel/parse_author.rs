@@ -63,8 +63,9 @@ mod test {
     use super::parse_author_url;
 
     #[test]
-    fn test() {
+    fn test() -> anyhow::Result<()> {
         let input = "https://xn--pxtr7m.com/users/538220";
-        parse_author_url(input).unwrap();
+        parse_author_url(input)?;
+        Ok(())
     }
 }
