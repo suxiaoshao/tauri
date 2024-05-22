@@ -38,7 +38,7 @@ log = "0.4.21"
 cocoa = "0.25.0"
 
 [dev-dependencies]
-anyhow = "1.0.85"
+anyhow = "1.0.86"
 
 [features]
 # by default Tauri runs in production mode

@@ -16,20 +16,33 @@ import { Add, Delete } from '@mui/icons-material';
 import { Box, Checkbox, FormControlLabel, FormLabel, IconButton, MenuItem, TextField } from '@mui/material';
 import { useState } from 'react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
-import { Input, array, emoji, enum_, integer, maxValue, minValue, nullish, number, object, string } from 'valibot';
+import {
+  InferInput,
+  array,
+  emoji,
+  enum_,
+  integer,
+  maxValue,
+  minValue,
+  nullish,
+  number,
+  object,
+  pipe,
+  string,
+} from 'valibot';
 
 const templateSchema = object({
   name: string(),
-  icon: string([emoji()]),
+  icon: pipe(string(), emoji()),
   description: nullish(string()),
   mode: enum_(Mode),
   model: string(),
-  temperature: number([minValue(0), maxValue(1)]),
-  topP: number([minValue(0), maxValue(1)]),
-  n: number([minValue(1), integer()]),
-  maxTokens: nullish(number([minValue(1), integer()])),
-  presencePenalty: number([minValue(-2), maxValue(2)]),
-  frequencyPenalty: number([minValue(-2), maxValue(2)]),
+  temperature: pipe(number(), minValue(0), maxValue(1)),
+  topP: pipe(number(), minValue(0), maxValue(1)),
+  n: pipe(number(), minValue(1), integer()),
+  maxTokens: nullish(pipe(number(), minValue(1), integer())),
+  presencePenalty: pipe(number(), minValue(-2), maxValue(2)),
+  frequencyPenalty: pipe(number(), minValue(-2), maxValue(2)),
   prompts: array(
     object({
       prompt: string(),
@@ -38,7 +51,7 @@ const templateSchema = object({
   ),
 });
 
-export type TemplateForm = Input<typeof templateSchema>;
+export type TemplateForm = InferInput<typeof templateSchema>;
 
 const getDefaultValues = (): Partial<TemplateForm> => ({
   mode: Mode.Contextual,

@@ -28,13 +28,12 @@ export default function UpdateConversation({ conversation }: UpdateConversationP
         data: {
           ...data,
           info: info?.trim(),
-          folderId: conversation.folderId ?? undefined,
         } satisfies NewConversation,
         id: conversation.id,
       });
       handleClose();
     },
-    [conversation.folderId, conversation.id, dispatch, handleClose],
+    [conversation.id, dispatch, handleClose],
   );
   return (
     <>

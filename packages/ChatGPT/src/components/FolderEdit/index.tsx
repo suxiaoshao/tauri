@@ -7,13 +7,14 @@
  */
 import { NewFolder } from '@chatgpt/types/folder';
 import { valibotResolver } from '@hookform/resolvers/valibot';
-import { Box, TextField, BoxProps } from '@mui/material';
-import { useForm, Resolver } from 'react-hook-form';
-import { object, string, Input } from 'valibot';
+import { Box, TextField, BoxProps, FormLabel } from '@mui/material';
+import { useForm, Resolver, Controller } from 'react-hook-form';
+import { object, string, InferInput, nullish, number, integer, pipe } from 'valibot';
+import FolderSelect from '../FolderSelect';
 
-const folderSchema = object({ name: string() });
+const folderSchema = object({ name: string(), parentId: nullish(pipe(number(), integer())) });
 
-export type FolderForm = Input<typeof folderSchema>;
+export type FolderForm = InferInput<typeof folderSchema>;
 
 const DefaultValues: Partial<NewFolder> = {};
 
@@ -26,6 +27,7 @@ export default function FolderEdit({ initialValues, id, sx, onSubmit: submit, ..
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
   } = useForm<FolderForm>({
     resolver: valibotResolver(folderSchema) as Resolver<FolderForm, unknown>,
@@ -56,6 +58,8 @@ export default function FolderEdit({ initialValues, id, sx, onSubmit: submit, ..
         label="Title"
         fullWidth
       />
+      <FormLabel sx={{ mt: 2 }}>Folder</FormLabel>
+      <Controller control={control} name="parentId" render={({ field }) => <FolderSelect {...field} />} />
     </Box>
   );
 }

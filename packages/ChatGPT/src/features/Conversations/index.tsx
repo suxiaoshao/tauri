@@ -18,19 +18,22 @@ import { SimpleTreeView } from '@mui/x-tree-view';
 import FolderItem from './components/FolderItem';
 import ConversationItem from './components/ConversationItem';
 import { getSelectedFromNodeId } from '@chatgpt/utils/chatData';
+import { useNavigate } from 'react-router-dom';
 
 export default function ConversationTree() {
+  const navigate = useNavigate();
   const { conversations, folders } = useAppSelector(selectChatData);
   const selectedNodeId = useAppSelector(selectSelectedNodeId);
   const dispatch = useAppDispatch();
   const handleSelect = useCallback(
-    (event: React.SyntheticEvent, nodeIds: string | null) => {
+    (_event: React.SyntheticEvent, nodeIds: string | null) => {
       if (!nodeIds) {
         return;
       }
       dispatch(setSelected(getSelectedFromNodeId(nodeIds)));
+      navigate('/');
     },
-    [dispatch],
+    [dispatch, navigate],
   );
   useEffect(() => {
     dispatch(fetchConversations());

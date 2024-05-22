@@ -12,8 +12,8 @@ use tauri::SystemTray;
 use tauri::SystemTrayMenu;
 use tauri::SystemTrayMenuItem;
 
+use crate::create_main_window;
 use crate::errors::ChatGPTResult;
-use crate::setup;
 
 pub struct TrayPlugin;
 
@@ -90,7 +90,7 @@ fn create_main<R: Runtime>(app: &tauri::AppHandle<R>) -> ChatGPTResult<()> {
             window.set_focus()?;
         }
         None => {
-            setup(app)?;
+            create_main_window(app)?;
         }
     };
     Ok(())

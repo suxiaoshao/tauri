@@ -51,6 +51,7 @@ where
                 messages.extend(
                     self.messages
                         .iter()
+                        .filter(|message| message.status == Status::Normal)
                         .map(|message| FetchMessage::new(message.role, message.content.as_str())),
                 );
             }
@@ -59,7 +60,9 @@ where
                 messages.extend(
                     self.messages
                         .iter()
-                        .filter(|message| message.role == Role::Assistant)
+                        .filter(|message| {
+                            message.role == Role::Assistant && message.status == Status::Normal
+                        })
                         .map(|message| FetchMessage::new(message.role, message.content.as_str())),
                 );
             }

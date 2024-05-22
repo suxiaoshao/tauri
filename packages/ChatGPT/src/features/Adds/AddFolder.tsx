@@ -10,8 +10,7 @@ import PublishIcon from '@mui/icons-material/Publish';
 import { useMatch, useNavigate } from 'react-router-dom';
 import { Add } from '@mui/icons-material';
 import FolderEdit, { FolderForm } from '@chatgpt/components/FolderEdit';
-import { useAppDispatch, useAppSelector } from '@chatgpt/app/hooks';
-import { selectSelectedFolderId } from '../Conversations/conversationSlice';
+import { useAppDispatch } from '@chatgpt/app/hooks';
 import { useCallback } from 'react';
 import { NewFolder } from '@chatgpt/types/folder';
 import { addFolder } from '@chatgpt/service/chat/mutation';
@@ -19,19 +18,18 @@ import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 
 function AddFolder() {
   const dispatch = useAppDispatch();
-  const folderId = useAppSelector(selectSelectedFolderId);
   const navigate = useNavigate();
   const handleSubmit = useCallback(
-    async ({ name }: FolderForm) => {
+    async ({ name, ...data }: FolderForm) => {
       await addFolder({
         folder: {
+          ...data,
           name: name.trim(),
-          parentId: folderId,
         } satisfies NewFolder,
       });
       navigate('/');
     },
-    [dispatch, folderId, navigate],
+    [dispatch, navigate],
   );
   return (
     <Box

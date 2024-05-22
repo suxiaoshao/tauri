@@ -13,5 +13,5 @@ export interface Folder {
 
 export interface NewFolder {
   name: string;
-  parentId: number | null;
+  parentId?: number | null;
 }

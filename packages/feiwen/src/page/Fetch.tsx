@@ -8,25 +8,23 @@
 import { Box, Button, TextField } from '@mui/material';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
-import { Input, object, string, url, number, integer, minValue, forward, custom } from 'valibot';
+import { InferInput, object, string, url, number, integer, minValue, forward, custom, pipe, check } from 'valibot';
 import { fetchData } from '../service/store';
 
-const fetchInputSchema = object(
-  {
-    url: string([url()]),
-    startPage: number([integer(), minValue(1)]),
-    endPage: number([integer(), minValue(1)]),
+const fetchInputSchema = pipe(
+  object({
+    url: pipe(string(), url()),
+    startPage: pipe(number(), integer(), minValue(1)),
+    endPage: pipe(number(), integer(), minValue(1)),
     cookies: string(),
-  },
-  [
-    forward(
-      custom((input) => input.startPage < input.endPage, 'endPage must be greater than or equal to startPage'),
-      ['endPage'],
-    ),
-  ],
+  }),
+  forward(
+    check((input) => input.startPage < input.endPage, 'endPage must be greater than or equal to startPage'),
+    ['endPage'],
+  ),
 );
 
-export type FetchParams = Input<typeof fetchInputSchema>;
+export type FetchParams = InferInput<typeof fetchInputSchema>;
 
 export default function Fetch() {
   const navigate = useNavigate();

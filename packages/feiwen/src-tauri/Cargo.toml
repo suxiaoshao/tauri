@@ -59,4 +59,4 @@ default = ["custom-protocol"]
 custom-protocol = ["tauri/custom-protocol"]
 
 [dev-dependencies]
-anyhow = "1.0.85"
+anyhow = "1.0.86"

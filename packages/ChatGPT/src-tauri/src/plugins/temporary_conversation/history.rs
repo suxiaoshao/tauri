@@ -221,6 +221,7 @@ impl<R: Runtime> FetchRunner for TemporaryFetch<R> {
         messages.extend(
             self.messages
                 .iter()
+                .filter(|message| message.status == Status::Normal)
                 .map(|message| FetchMessage::new(message.role, message.content.as_str())),
         );
         Ok(ChatRequest {

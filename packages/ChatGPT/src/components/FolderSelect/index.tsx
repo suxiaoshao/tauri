@@ -17,7 +17,7 @@ export const FolderSelectContext = createContext<FolderSelectContextType>({
 });
 
 export interface FolderSelectProps {
-  value: number | null;
+  value?: number | null;
   onChange: (id: number | null) => void;
   disabledFolderIds?: number[];
 }
@@ -29,7 +29,7 @@ function FolderSelect(
   const folders = useAppSelector(SELECT_FOLDERS);
   const contextValue = useMemo<FolderSelectContextType>(() => {
     return {
-      selectedId: value,
+      selectedId: value ?? null,
       onSelect: onChange,
       disabledFolderIds,
     };

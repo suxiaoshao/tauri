@@ -21,7 +21,7 @@ export interface Conversation {
 
 export interface NewConversation {
   title: string;
-  folderId: number | undefined;
+  folderId?: number | null;
   icon: string;
   info?: string | null;
   templateId: number;

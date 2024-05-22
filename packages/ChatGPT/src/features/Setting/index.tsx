@@ -20,7 +20,7 @@ import { useCallback } from 'react';
 import useConfig from '@chatgpt/hooks/useConfig';
 import useSettingKey from '@chatgpt/hooks/useSettingKey';
 import { createSettingWindow, setConfigService } from '@chatgpt/service/config';
-import { string, object, enum_, Input, regex, url, array, nullish } from 'valibot';
+import { string, object, enum_, InferOutput, regex, url, array, nullish, pipe } from 'valibot';
 import { valibotResolver } from '@hookform/resolvers/valibot';
 import HotkeyInput from '@chatgpt/components/HotkeyInput';
 
@@ -34,15 +34,15 @@ const ChatGPTConfigSchema = object({
   apiKey: string(),
   theme: object({
     theme: enum_(Theme),
-    color: string([regex(/^#(?:[0-9a-fA-F]{3}){1,2}$/, 'Invalid color format')]),
+    color: pipe(string(), regex(/^#(?:[0-9a-fA-F]{3}){1,2}$/, 'Invalid color format')),
   }),
-  url: nullish(string([url()])),
-  httpProxy: nullish(string([url()])),
+  url: nullish(pipe(string(), url())),
+  httpProxy: nullish(pipe(string(), url())),
   models: array(string()),
   temporaryHotkey: nullish(string()),
 });
 
-export type Config = Input<typeof ChatGPTConfigSchema>;
+export type Config = InferOutput<typeof ChatGPTConfigSchema>;
 
 function Setting() {
   const initData = useAppSelector(selectConfig);
