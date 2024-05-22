@@ -1,6 +1,5 @@
 import { useAppDispatch } from '@chatgpt/app/hooks';
 import FolderEdit, { FolderForm } from '@chatgpt/components/FolderEdit';
-import { fetchConversations } from '@chatgpt/features/Conversations/conversationSlice';
 import { updateFolder } from '@chatgpt/service/chat/mutation';
 import { Folder, NewFolder } from '@chatgpt/types/folder';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton } from '@mui/material';
@@ -17,14 +16,14 @@ export default function UpdateFolder({ folder }: FolderHeaderProps) {
   const handleOpen = useCallback(() => setOpen(true), []);
   const handleClose = useCallback(() => setOpen(false), []);
   const handleSubmit = useCallback(
-    async ({ name }: FolderForm) => {
+    async ({ name, parentId }: FolderForm) => {
       await updateFolder({
-        folder: { name: name.trim(), parentId: folder.parentId } satisfies NewFolder,
+        folder: { name: name.trim(), parentId: parentId } satisfies NewFolder,
         id: folder.id,
       });
       handleClose();
     },
-    [folder.parentId, folder.id, dispatch, handleClose],
+    [folder.id, dispatch, handleClose],
   );
   return (
     <>

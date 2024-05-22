@@ -20,11 +20,11 @@ import {
 import { useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { ThemeSliceType, updateColor, useAppDispatch, useAppSelector } from '../themeSlice';
-import { string, object, regex, picklist } from 'valibot';
+import { string, object, regex, picklist, pipe } from 'valibot';
 import { valibotResolver } from '@hookform/resolvers/valibot';
 
 const createColorSchema = object({
-  color: string([regex(/^#(?:[0-9a-fA-F]{3}){1,2}$/, 'Invalid color format')]),
+  color: pipe(string(), regex(/^#(?:[0-9a-fA-F]{3}){1,2}$/, 'Invalid color format')),
   colorSetting: picklist(['light', 'dark', 'system']),
 });
 

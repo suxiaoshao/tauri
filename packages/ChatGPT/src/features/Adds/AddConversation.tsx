@@ -8,8 +8,7 @@
 import { Box, Typography, Toolbar, IconButton, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import PublishIcon from '@mui/icons-material/Publish';
 import ConversationEdit, { ConversationForm } from '../../components/ConversationEdit';
-import { useAppDispatch, useAppSelector } from '@chatgpt/app/hooks';
-import { selectSelectedFolderId } from '@chatgpt/features/Conversations/conversationSlice';
+import { useAppDispatch } from '@chatgpt/app/hooks';
 import { useCallback } from 'react';
 import { useMatch, useNavigate, useLocation } from 'react-router-dom';
 import { Add } from '@mui/icons-material';
@@ -19,7 +18,6 @@ import { addConversation } from '@chatgpt/service/chat/mutation';
 
 function AddConversation() {
   const dispatch = useAppDispatch();
-  const folderId = useAppSelector(selectSelectedFolderId);
   const navigate = useNavigate();
   const handleSubmit = useCallback(
     async ({ info, ...data }: ConversationForm) => {
@@ -27,12 +25,11 @@ function AddConversation() {
         data: {
           ...data,
           info: info?.trim(),
-          folderId: folderId ?? undefined,
         } satisfies NewConversation,
       });
       navigate('/');
     },
-    [dispatch, folderId, navigate],
+    [dispatch, navigate],
   );
   const { state } = useLocation();
   return (

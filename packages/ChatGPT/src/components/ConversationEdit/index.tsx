@@ -10,20 +10,34 @@ import TemplateInfo from '@chatgpt/features/Template/components/TemplateInfo';
 import { selectTemplates } from '@chatgpt/features/Template/templateSlice';
 import { NewConversation } from '@chatgpt/types/conversation';
 import { valibotResolver } from '@hookform/resolvers/valibot';
-import { Box, TextField, BoxProps, MenuItem, ListItemAvatar, ListItemText, Avatar, ListItem } from '@mui/material';
+import {
+  Box,
+  TextField,
+  BoxProps,
+  MenuItem,
+  ListItemAvatar,
+  ListItemText,
+  Avatar,
+  ListItem,
+  FormLabel,
+} from '@mui/material';
 import { useForm, Resolver, Controller } from 'react-hook-form';
-import { object, string, number, Input, emoji, integer, nullish } from 'valibot';
+import { object, string, number, InferOutput, emoji, integer, nullish, pipe } from 'valibot';
+import FolderSelect from '../FolderSelect';
 
 const conversationSchema = object({
   title: string(),
-  icon: string([emoji()]),
+  icon: pipe(string(), emoji()),
   info: nullish(string()),
-  templateId: number([integer()]),
+  templateId: pipe(number(), integer()),
+  folderId: nullish(pipe(number(), integer())),
 });
 
-export type ConversationForm = Input<typeof conversationSchema>;
+export type ConversationForm = InferOutput<typeof conversationSchema>;
 
-const getDefaultValues = (): Partial<NewConversation> => ({});
+const getDefaultValues = (): Partial<NewConversation> => ({
+  folderId: null,
+});
 
 export interface ConversationEditProps extends Omit<BoxProps, 'component' | 'id' | 'onSubmit'> {
   initialValues?: NewConversation;
@@ -123,6 +137,8 @@ export default function ConversationEdit({ initialValues, id, sx, onSubmit: subm
           </TextField>
         )}
       />
+      <FormLabel sx={{ mt: 2 }}>Folder</FormLabel>
+      <Controller control={control} name="folderId" render={({ field }) => <FolderSelect {...field} />} />
     </Box>
   );
 }
