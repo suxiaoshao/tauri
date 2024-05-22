@@ -14,7 +14,14 @@ tauri-build = { version = "1.5.2", features = [] }
 
 [dependencies]
 # tauri
-tauri = { version = "1.6.6", features = [ "window-unmaximize", "window-maximize", "window-start-dragging", "window-close", "window-create", "window-show", "window-set-focus",
+tauri = { version = "1.6.6", features = [
+    "window-unmaximize",
+    "window-maximize",
+    "window-start-dragging",
+    "window-close",
+    "window-create",
+    "window-show",
+    "window-set-focus",
     "system-tray",
     "dialog-open",
     "notification-all",
@@ -72,4 +79,4 @@ custom-protocol = ["tauri/custom-protocol"]
 
 [dev-dependencies]
 dotenv = "0.15.0"
-anyhow = "1.0.85"
+anyhow = "1.0.86"

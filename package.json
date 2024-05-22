@@ -40,7 +40,7 @@
     "@rsbuild/core": "^0.6.15",
     "@rsbuild/plugin-lightningcss": "^0.6.15",
     "@rsbuild/plugin-react": "^0.6.15",
-    "@rsdoctor/rspack-plugin": "^0.2.3",
+    "@rsdoctor/rspack-plugin": "^0.2.4",
     "@tauri-apps/cli": "^1.5.14",
     "@testing-library/jest-dom": "^6.4.5",
     "@testing-library/react": "^15.0.7",

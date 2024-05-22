@@ -15,7 +15,7 @@ mod store;
 fn main() -> ChatGPTResult<()> {
     tauri::Builder::default()
         .setup(|app| {
-            setup(app)?;
+            create_main_window(app)?;
             Ok(())
         })
         .plugin(
@@ -39,7 +39,7 @@ fn main() -> ChatGPTResult<()> {
     Ok(())
 }
 
-fn setup<R: Runtime, M: Manager<R>>(app: &M) -> ChatGPTResult<()> {
+fn create_main_window<R: Runtime, M: Manager<R>>(app: &M) -> ChatGPTResult<()> {
     let window = WindowBuilder::new(app, "main", tauri::WindowUrl::App("/".into()))
         .title("ChatGPT")
         .inner_size(800.0, 600.0)
