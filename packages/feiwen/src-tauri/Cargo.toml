@@ -11,24 +11,24 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [build-dependencies]
-tauri-build = { version = "1.5.2", features = [] }
+tauri-build = { version = "1.5.3", features = [] }
 
 [dependencies]
-serde = { version = "1.0.202", features = ["derive"] }
-serde_json = "1.0.117"
-tauri = { version = "1.6.6", features = ["macos-private-api", "api-all"] }
+serde = { version = "1.0.203", features = ["derive"] }
+serde_json = "1.0.120"
+tauri = { version = "1.7.1", features = ["macos-private-api", "api-all"] }
 
 # log
 tauri-plugin-log = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v1" }
-log = "0.4.21"
+log = "0.4.22"
 
 # database
-diesel = { version = "2.1.6", features = ["sqlite", "r2d2"] }
+diesel = { version = "2.2.1", features = ["sqlite", "r2d2"] }
 libsqlite3-sys = { version = "0.28.0", features = ["bundled"] }
 time = { version = "0.3.36", features = ["serde"] }
 
 # http
-reqwest = "0.12.4"
+reqwest = "0.12.5"
 async-trait = "0.1.80"
 
 # html
@@ -39,13 +39,13 @@ futures = "0.3.30"
 thiserror = "1.0.61"
 
 # config
-toml = "0.8.13"
+toml = "0.8.14"
 
 # 窗口管理
 tauri-plugin-window-state = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v1" }
 window-shadows = "0.2.2"
 window-vibrancy = "0.4.3"
-url = "2.5.0"
+url = "2.5.2"
 
 [target.'cfg(target_os="macos")'.dependencies]
 cocoa = "0.25.0"
