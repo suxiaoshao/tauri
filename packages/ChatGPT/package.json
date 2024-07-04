@@ -10,10 +10,10 @@
     "tauri": "tauri"
   },
   "dependencies": {
-    "@mui/x-tree-view": "^7.5.0",
+    "@mui/x-tree-view": "^7.8.0",
     "details": "workspace:^",
     "markdown-to-jsx": "^7.4.7",
-    "monaco-editor": "^0.48.0",
+    "monaco-editor": "^0.50.0",
     "monaco-themes": "^0.4.4",
     "notify": "workspace:^",
     "prism-themes": "^1.9.0",
@@ -26,6 +26,6 @@
   },
   "devDependencies": {
     "@types/prismjs": "^1.26.4",
-    "@types/react-resizable": "^3.0.7"
+    "@types/react-resizable": "^3.0.8"
   }
 }

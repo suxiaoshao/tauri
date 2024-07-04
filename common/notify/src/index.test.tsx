@@ -8,40 +8,40 @@
 import { useSnackbar } from 'notistack';
 import { render, waitFor, screen, cleanup } from '@testing-library/react';
 import { enqueueSnackbar, SnackbarProvider } from '.';
-import { afterEach, expect, describe, it } from 'vitest';
-import { mockIPC } from '@tauri-apps/api/mocks';
+import { afterEach, expect, describe, it, vi } from 'vitest';
+
+vi.mock('@tauri-apps/api/notification', () => ({
+  isPermissionGranted: vi.fn().mockReturnValue(true),
+  sendNotification: vi.fn(),
+}));
 
 describe('notify', () => {
   afterEach(() => {
     cleanup();
   });
   it('use enqueueSnackbar fn', async () => {
-    mockIPC(async () => {
-      render(<SnackbarProvider>111</SnackbarProvider>);
-      expect(screen.getByText('111')).toBeTruthy();
-      await waitFor(async () => await enqueueSnackbar('test'));
-      expect(screen.getByText('test')).toBeTruthy();
-    });
+    render(<SnackbarProvider>111</SnackbarProvider>);
+    expect(screen.getByText('111')).toBeTruthy();
+    await waitFor(async () => await enqueueSnackbar('test'));
+    expect(screen.getByText('test')).toBeTruthy();
   });
   it('use hooks', async () => {
-    mockIPC(async () => {
-      function Test() {
-        const snackbar = useSnackbar();
-        return (
-          <div>
-            <button onClick={() => snackbar.enqueueSnackbar('test click')}>test</button>
-          </div>
-        );
-      }
-      render(
-        <SnackbarProvider>
-          <Test />
-        </SnackbarProvider>,
+    function Test() {
+      const snackbar = useSnackbar();
+      return (
+        <div>
+          <button onClick={() => snackbar.enqueueSnackbar('test click')}>test</button>
+        </div>
       );
-      expect(screen.getByText('test')).toBeTruthy();
-      await waitFor(() => screen.getByText('test').click());
-      expect(screen.getByText('test click')).toBeTruthy();
-      expect(screen.getByText('test click')).toBeTruthy();
-    });
+    }
+    render(
+      <SnackbarProvider>
+        <Test />
+      </SnackbarProvider>,
+    );
+    expect(screen.getByText('test')).toBeTruthy();
+    await waitFor(() => screen.getByText('test').click());
+    expect(screen.getByText('test click')).toBeTruthy();
+    expect(screen.getByText('test click')).toBeTruthy();
   });
 });

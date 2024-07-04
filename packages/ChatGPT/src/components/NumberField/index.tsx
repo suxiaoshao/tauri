@@ -104,13 +104,9 @@ function NumberField({ onChange, ...props }: NumberFieldProps, ref: React.Ref<HT
       onChange({ target: { value } });
     }
   };
-  useImperativeHandle(
-    ref,
-    () => {
-      return proxy(sourceRef);
-    },
-    [sourceRef],
-  );
+  useImperativeHandle(ref, () => {
+    return proxy(sourceRef);
+  }, [sourceRef]);
   return <TextField type="number" onChange={handleChange} {...props} inputRef={setSourceRef} />;
 }
 
