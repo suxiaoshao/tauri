@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "dayjs": "^1.11.11",
-    "entities": "^4.5.0",
+    "entities": "^5.0.0",
     "notify": "workspace:^",
     "theme": "workspace:^"
   }

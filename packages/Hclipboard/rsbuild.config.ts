@@ -15,6 +15,9 @@ export default defineConfig({
   server: {
     port: 1420,
   },
+  dev: {
+    lazyCompilation: true,
+  },
   source: {
     entry: {
       index: './src/main.tsx',
