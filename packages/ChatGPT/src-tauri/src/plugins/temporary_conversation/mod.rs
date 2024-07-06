@@ -31,9 +31,6 @@ impl TemporaryConversationPlugin {
             Some(window) => window,
             None => return,
         };
-        if let Err(err) = window.hide() {
-            log::error!("hide temporary window error:{}", err);
-        };
         self.delayed_task.update(Self::DURATION, {
             async move {
                 if let Err(err) = window.close() {

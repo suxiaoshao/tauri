@@ -16,5 +16,16 @@ export default function Temporary() {
     },
     [platform],
   );
+  useHotkeys(
+    platform === 'Darwin' ? ['Meta+h'] : ['Control+h'],
+    (event) => {
+      event.preventDefault();
+      appWindow.hide();
+    },
+    {
+      enableOnFormTags: ['INPUT', 'TEXTAREA'],
+    },
+    [platform],
+  );
   return <Outlet />;
 }
