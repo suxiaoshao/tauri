@@ -51,6 +51,7 @@ impl FetchRunner for Fetch {
 
     fn resolve_novel(&self, novels: Vec<crate::store::service::Novel>) -> FeiwenResult<i64> {
         let conn = &mut self.db_conn.get()?;
+        // todo
         for novel in novels {
             novel.save(conn)?;
         }

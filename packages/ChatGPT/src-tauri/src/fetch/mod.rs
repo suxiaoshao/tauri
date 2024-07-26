@@ -5,7 +5,6 @@
  * @LastEditTime: 2024-05-15 20:42:50
  * @FilePath: /tauri/packages/ChatGPT/src-tauri/src/fetch/mod.rs
  */
-use async_trait::async_trait;
 use futures::StreamExt;
 use reqwest_eventsource::{Event, RequestBuilderExt};
 
@@ -15,7 +14,6 @@ pub use self::types::{ChatRequest, ChatResponse, Message};
 
 mod types;
 
-#[async_trait]
 pub trait FetchRunner {
     fn get_body(&self) -> ChatGPTResult<ChatRequest<'_>>;
     fn get_api_key(&self) -> ChatGPTResult<&str>;

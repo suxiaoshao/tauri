@@ -5,6 +5,8 @@
  * @LastEditTime: 2024-01-07 19:26:07
  * @FilePath: /tauri/packages/feiwen/src-tauri/src/fetch/parse_novel/parse_title.rs
  */
+use std::sync::LazyLock;
+
 use nom::{
     bytes::complete::{tag, take_till},
     number::streaming::float,
@@ -19,10 +21,9 @@ use crate::{
 };
 
 use super::{parse_url::parse_url, Title};
-use once_cell::sync::Lazy;
 
-static SELECTOR_NOVEL: Lazy<Selector> =
-    Lazy::new(|| Selector::parse("div:nth-child(1) > span:nth-child(1) > a").unwrap());
+static SELECTOR_NOVEL: LazyLock<Selector> =
+    LazyLock::new(|| Selector::parse("div:nth-child(1) > span:nth-child(1) > a").unwrap());
 
 pub fn parse_title(doc: &Html) -> FeiwenResult<Title> {
     let UrlWithName { name, href } = parse_url(doc, &SELECTOR_NOVEL)?;

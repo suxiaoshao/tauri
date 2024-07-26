@@ -14,7 +14,7 @@ edition = "2021"
 tauri-build = { version = "1.5.3", features = [] }
 
 [dependencies]
-serde = { version = "1.0.203", features = ["derive"] }
+serde = { version = "1.0.204", features = ["derive"] }
 serde_json = "1.0.120"
 tauri = { version = "1.7.1", features = ["macos-private-api", "api-all"] }
 
@@ -23,23 +23,21 @@ tauri-plugin-log = { git = "https://github.com/tauri-apps/plugins-workspace", br
 log = "0.4.22"
 
 # database
-diesel = { version = "2.2.1", features = ["sqlite", "r2d2"] }
-libsqlite3-sys = { version = "0.28.0", features = ["bundled"] }
+diesel = { version = "2.2.2", features = ["sqlite", "r2d2"] }
+libsqlite3-sys = { version = "0.29.0", features = ["bundled"] }
 time = { version = "0.3.36", features = ["serde"] }
 
 # http
 reqwest = "0.12.5"
-async-trait = "0.1.80"
 
 # html
-scraper = "0.19.0"
+scraper = "0.19.1"
 nom = "7.1.3"
-once_cell = "1.19.0"
 futures = "0.3.30"
-thiserror = "1.0.61"
+thiserror = "1.0.63"
 
 # config
-toml = "0.8.14"
+toml = "0.8.16"
 
 # 窗口管理
 tauri-plugin-window-state = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v1" }

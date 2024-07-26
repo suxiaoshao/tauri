@@ -5,6 +5,8 @@
  * @LastEditTime: 2024-01-07 19:24:15
  * @FilePath: /tauri/packages/feiwen/src-tauri/src/fetch/parse_novel/parse_author.rs
  */
+use std::sync::LazyLock;
+
 use nom::{
     bytes::complete::{tag, take_till},
     combinator::complete,
@@ -12,7 +14,6 @@ use nom::{
     sequence::tuple,
     IResult,
 };
-use once_cell::sync::Lazy;
 use scraper::{Html, Selector};
 
 use crate::{
@@ -21,10 +22,11 @@ use crate::{
 };
 
 use super::{parse_url::parse_url, Author, Title};
-static SELECTOR_AUTHOR: Lazy<Selector> =
-    Lazy::new(|| Selector::parse("div:nth-child(1) > span.pull-right.smaller-5 > a").unwrap());
-static SELECTOR_AUTHOR_NNONYMOUS: Lazy<Selector> =
-    Lazy::new(|| Selector::parse("div:nth-child(1) > span.pull-right.smaller-5 > span").unwrap());
+static SELECTOR_AUTHOR: LazyLock<Selector> =
+    LazyLock::new(|| Selector::parse("div:nth-child(1) > span.pull-right.smaller-5 > a").unwrap());
+static SELECTOR_AUTHOR_NNONYMOUS: LazyLock<Selector> = LazyLock::new(|| {
+    Selector::parse("div:nth-child(1) > span.pull-right.smaller-5 > span").unwrap()
+});
 
 pub fn parse_author(doc: &Html) -> FeiwenResult<Author> {
     let value = match parse_url(doc, &SELECTOR_AUTHOR) {
