@@ -7,15 +7,14 @@ edition = "2021"
 
 [dependencies]
 # 错误处理
-thiserror = "1.0.61"
+thiserror = "1.0.63"
 
 # 网络请求
 reqwest = "0.12.5"
-scraper = "0.19.0"
-once_cell = "1.19.0"
+scraper = "0.19.1"
 
 # 运行时
-tokio = { version = "1.38.0", features = [
+tokio = { version = "1.39.1", features = [
   "rt",
   "rt-multi-thread",
   "macros",
@@ -23,8 +22,8 @@ tokio = { version = "1.38.0", features = [
 ] }
 
 # 存储
-serde = { version = "1.0.203", features = ["derive"] }
+serde = { version = "1.0.204", features = ["derive"] }
 serde_json = "1.0.120"
 
 # 参数
-clap = { version = "4.5.8", features = ["derive"] }
+clap = { version = "4.5.11", features = ["derive"] }

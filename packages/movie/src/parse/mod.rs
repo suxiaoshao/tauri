@@ -1,18 +1,18 @@
 use crate::errors::MovieErrors;
 use crate::MovieResult;
-use once_cell::sync::Lazy;
 use scraper::{ElementRef, Html, Selector};
 use serde::{Deserialize, Serialize};
-use std::{collections::HashSet, fmt::Debug};
+use std::{collections::HashSet, fmt::Debug, sync::LazyLock};
 
-static SELECTOR_ITEM: Lazy<Selector> =
-    Lazy::new(|| Selector::parse("#content > div > div.article > ol > li > div").unwrap());
-static SELECTOR_IMAGE: Lazy<Selector> = Lazy::new(|| Selector::parse("div.pic > a > img").unwrap());
-static SELECTOR_TITLE: Lazy<Selector> =
-    Lazy::new(|| Selector::parse("div.info > div.hd > a").unwrap());
-static SELECTOR_TITLE_NAME: Lazy<Selector> = Lazy::new(|| Selector::parse("span").unwrap());
-static SELECTOR_INFO: Lazy<Selector> =
-    Lazy::new(|| Selector::parse("div.info > div.bd > p:nth-child(1)").unwrap());
+static SELECTOR_ITEM: LazyLock<Selector> =
+    LazyLock::new(|| Selector::parse("#content > div > div.article > ol > li > div").unwrap());
+static SELECTOR_IMAGE: LazyLock<Selector> =
+    LazyLock::new(|| Selector::parse("div.pic > a > img").unwrap());
+static SELECTOR_TITLE: LazyLock<Selector> =
+    LazyLock::new(|| Selector::parse("div.info > div.hd > a").unwrap());
+static SELECTOR_TITLE_NAME: LazyLock<Selector> = LazyLock::new(|| Selector::parse("span").unwrap());
+static SELECTOR_INFO: LazyLock<Selector> =
+    LazyLock::new(|| Selector::parse("div.info > div.bd > p:nth-child(1)").unwrap());
 
 pub(crate) fn parse_page(body: String) -> MovieResult<Vec<Movie>> {
     let document = Html::parse_document(&body);

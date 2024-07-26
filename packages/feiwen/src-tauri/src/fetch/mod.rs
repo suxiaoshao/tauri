@@ -7,7 +7,6 @@ use self::parse_novel::parse_page;
 mod get_content;
 pub mod parse_novel;
 
-#[async_trait::async_trait]
 pub trait FetchRunner {
     fn get_url(&self) -> &str;
     fn get_cookies(&self) -> &str;

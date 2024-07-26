@@ -1,7 +1,6 @@
-use once_cell::sync::Lazy;
 use pinyin::ToPinyin;
 use serde::Serialize;
-use std::sync::Mutex;
+use std::sync::{LazyLock, Mutex};
 use std::{collections::HashMap, path::PathBuf};
 
 #[derive(Debug, Serialize, Clone)]
@@ -30,7 +29,7 @@ impl PartialEq<&str> for &AppPath {
 
 pub type AppDataType = HashMap<PathBuf, AppPath>;
 
-pub static APP_DATA: Lazy<Mutex<AppDataType>> = Lazy::new(|| {
+pub static APP_DATA: LazyLock<Mutex<AppDataType>> = LazyLock::new(|| {
     let m = HashMap::new();
     Mutex::new(m)
 });
