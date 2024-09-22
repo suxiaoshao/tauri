@@ -10,7 +10,7 @@ import TemplateCreateHeader from './Header';
 import TemplateEdit, { TemplateForm } from '../components/TemplateEdit';
 import { useCallback } from 'react';
 import { addConversationTemplate } from '@chatgpt/service/chat/mutation';
-import { NewConversationTemplate } from '@chatgpt/types/conversation_template';
+import { NewConversationTemplate } from '@chatgpt/types/conversationTemplate';
 import { useNavigate } from 'react-router-dom';
 
 const formId = 'template-form';

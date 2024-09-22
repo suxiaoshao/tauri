@@ -6,7 +6,8 @@
  * @FilePath: /tauri/common/details/src/Item.tsx
  */
 import { Box, Typography } from '@mui/material';
-import { DetailsItem } from './Details';
+import { match, P } from 'ts-pattern';
+import { DetailsItem } from './types';
 
 export default function Item({ label, value, span }: Omit<DetailsItem, 'key'>) {
   return (
@@ -14,11 +15,11 @@ export default function Item({ label, value, span }: Omit<DetailsItem, 'key'>) {
       sx={{
         display: 'flex',
         flexDirection: 'column',
-        ...(span
-          ? {
-              gridColumn: `span ${span}`,
-            }
-          : {}),
+        ...match(span)
+          .with(P.number, (span) => ({
+            gridColumn: `span ${span}`,
+          }))
+          .otherwise(() => ({})),
       }}
     >
       <Typography variant="subtitle1">{label}</Typography>

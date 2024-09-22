@@ -1,9 +1,10 @@
 import { Box, List, ListItemButton, ListItemText, TextField } from '@mui/material';
 import { invoke } from '@tauri-apps/api';
-import { appWindow, LogicalSize } from '@tauri-apps/api/window';
 import { open } from '@tauri-apps/api/shell';
+import { appWindow, LogicalSize } from '@tauri-apps/api/window';
 import { useEffect, useState } from 'react';
 import { useKey } from 'react-use';
+import { match } from 'ts-pattern';
 
 interface AppPath {
   desc: string | null;
@@ -45,21 +46,21 @@ export default function Home() {
     }
   }, [ref]);
   useEffect(() => {
-    (async () => {
-      if (appPath.length !== 0) {
-        appWindow.setSize(new LogicalSize(800, 580));
-        setSelectIndex(0);
-      } else {
-        appWindow.setSize(new LogicalSize(800, 56));
-      }
-    })();
+    if (appPath.length > 0) {
+      appWindow.setSize(new LogicalSize(800, 580));
+      setSelectIndex(0);
+    } else {
+      appWindow.setSize(new LogicalSize(800, 56));
+    }
   }, [appPath]);
   return (
     <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', backgroundColor: '#ffffff00' }}>
       <TextField
         placeholder="搜索"
         fullWidth
-        inputProps={{ spellcheck: 'false' }}
+        slotProps={{
+          htmlInput: { spellcheck: 'false' },
+        }}
         onChange={async (e) => {
           const data: AppPath[] = await invoke('app_search', { path: e.target.value });
           setAppPath(data);
@@ -73,7 +74,14 @@ export default function Home() {
       />
       <List sx={{ flex: '1 1 0', padding: 0, overflowY: 'auto' }}>
         {appPath.map(({ name, desc, path }, index) => (
-          <ListItemButton ref={index === selectIndex ? setRef : undefined} key={path} selected={index === selectIndex}>
+          <ListItemButton
+            ref={match(index)
+              .with(selectIndex, () => setRef)
+              // eslint-disable-next-line no-useless-undefined
+              .otherwise(() => undefined)}
+            key={path}
+            selected={index === selectIndex}
+          >
             <ListItemText primary={name} secondary={desc ?? path} />
           </ListItemButton>
         ))}

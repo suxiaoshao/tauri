@@ -23,11 +23,20 @@ export type PromiseData<T> =
 
 export default function usePromise<T>(fn: () => Promise<T>, autoRun: boolean = true): [PromiseData<T>, () => void] {
   const [state, setState] = useState<PromiseData<T>>({ tag: PromiseStatus.init });
-  const func = useCallback(() => {
+  const func = useCallback(async () => {
     setState({ tag: PromiseStatus.loading });
-    fn()
-      .then((data) => setState({ tag: PromiseStatus.data, value: data } as PromiseData<T>))
-      .catch((error) => setState({ tag: PromiseStatus.error, value: error }));
+    try {
+      const data = await fn();
+      setState({ tag: PromiseStatus.data, value: data } as PromiseData<T>);
+    } catch (error) {
+      if (error instanceof Error) {
+        setState({ tag: PromiseStatus.error, value: error });
+        throw error;
+      }
+      const err = new Error(`unknow error: ${error}`);
+      setState({ tag: PromiseStatus.error, value: err });
+      throw err;
+    }
   }, [fn]);
   useEffect(() => {
     if (autoRun) {

@@ -5,7 +5,7 @@
  * @LastEditTime: 2024-05-01 02:26:45
  * @FilePath: /tauri/packages/ChatGPT/src/features/Template/Detail/index.tsx
  */
-import usePromise from '@chatgpt/hooks/usePromise';
+import usePromise, { PromiseStatus } from '@chatgpt/hooks/usePromise';
 import { findConversationTemplate } from '@chatgpt/service/chat/query';
 import { Box } from '@mui/material';
 import { useCallback, useMemo, useState } from 'react';
@@ -18,21 +18,15 @@ import { Alignment } from '@chatgpt/features/MessagePreview/Success';
 import TemplateDetailView from './components/View';
 import { updateConversationTemplate } from '@chatgpt/service/chat/mutation';
 import { enqueueSnackbar } from 'notify';
+import { match } from 'ts-pattern';
 
 export default function ConversationTemplateDetail() {
   const [alignment, setAlignment] = useState(Alignment.preview);
   const handleAlignment = useCallback((event: React.MouseEvent<HTMLElement>, newAlignment: string | null) => {
-    switch (newAlignment) {
-      case Alignment.preview:
-        setAlignment(Alignment.preview);
-        break;
-      case Alignment.edit:
-        setAlignment(Alignment.edit);
-        break;
-      default:
-        setAlignment(Alignment.preview);
-        break;
-    }
+    match(newAlignment)
+      .with(Alignment.preview, () => setAlignment(Alignment.preview))
+      .with(Alignment.edit, () => setAlignment(Alignment.edit))
+      .otherwise(() => setAlignment(Alignment.preview));
   }, []);
 
   // fetch template detail
@@ -41,7 +35,7 @@ export default function ConversationTemplateDetail() {
     if (!id) {
       throw new Error('id is empty');
     }
-    const templateId = parseInt(id);
+    const templateId = Number.parseInt(id, 10);
     // Fetch template detail
     const template = await findConversationTemplate({ id: templateId });
     return template;
@@ -58,27 +52,26 @@ export default function ConversationTemplateDetail() {
 
   // render content
   const content: JSX.Element = useMemo(() => {
-    switch (data.tag) {
-      case 'loading':
-        return <Loading sx={{ width: '100%', height: '100%' }} />;
-      case 'error':
-        return <ErrorInfo sx={{ flex: '1 1 0' }} error={data.value} refetch={refresh} />;
-      case 'data':
-        switch (alignment) {
-          case Alignment.preview:
-            return <TemplateDetailView data={data.value} />;
-          case Alignment.edit:
+    return match(data)
+      .with({ tag: PromiseStatus.loading }, () => <Loading sx={{ width: '100%', height: '100%' }} />)
+      .with({ tag: PromiseStatus.error }, ({ value }) => (
+        <ErrorInfo sx={{ flex: '1 1 0' }} error={value} refetch={refresh} />
+      ))
+      .with({ tag: PromiseStatus.data }, ({ value }) =>
+        match(alignment)
+          .with(Alignment.preview, () => <TemplateDetailView data={value} />)
+          .with(Alignment.edit, () => {
             const onSubmit = async (formData: TemplateForm) => {
-              await updateConversationTemplate({ data: formData, id: data.value.id });
+              await updateConversationTemplate({ data: formData, id: value.id });
               enqueueSnackbar('Template updated successfully', { variant: 'success' });
               refresh();
               setAlignment(Alignment.preview);
             };
-            return <TemplateEdit onSubmit={onSubmit} id={formId} initialValues={data.value} />;
-        }
-      default:
-        return <Loading sx={{ width: '100%', height: '100%' }} />;
-    }
+            return <TemplateEdit onSubmit={onSubmit} id={formId} initialValues={value} />;
+          })
+          .otherwise(() => <Loading sx={{ width: '100%', height: '100%' }} />),
+      )
+      .otherwise(() => <Loading sx={{ width: '100%', height: '100%' }} />);
   }, [data, refresh, alignment]);
   return (
     <Box

@@ -39,7 +39,7 @@ const getDefaultValues = (): Partial<NewConversation> => ({
   folderId: null,
 });
 
-export interface ConversationEditProps extends Omit<BoxProps, 'component' | 'id' | 'onSubmit'> {
+export interface ConversationEditProps extends Omit<BoxProps<'form'>, 'component' | 'id' | 'onSubmit'> {
   initialValues?: NewConversation;
   id: string;
   onSubmit: (newConversation: ConversationForm) => Promise<void>;

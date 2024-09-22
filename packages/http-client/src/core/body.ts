@@ -15,12 +15,12 @@ export type RawBody =
   | Enum<'svg', string>
   | Enum<'plain', string>;
 
-export type FormDataItem = {
+export interface FormDataItem {
   key: string;
   value: Enum<'text', string> | Enum<'file', File>;
-};
+}
 
-export type XFormItem = {
+export interface XFormItem {
   key: string;
   value: string;
-};
+}

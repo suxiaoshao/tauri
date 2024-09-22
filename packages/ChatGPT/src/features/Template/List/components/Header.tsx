@@ -6,7 +6,7 @@
  * @FilePath: /tauri/packages/ChatGPT/src/features/Template/List/header.tsx
  */
 import { Box, IconButton, Typography } from '@mui/material';
-import { Add, Create, Refresh } from '@mui/icons-material';
+import { Add, Refresh } from '@mui/icons-material';
 import { useCallback } from 'react';
 import { useAppDispatch, useAppSelector } from '@chatgpt/app/hooks';
 import { fetchTemplates, selectTemplateCount } from '../../templateSlice';

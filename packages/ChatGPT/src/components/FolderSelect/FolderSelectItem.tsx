@@ -2,7 +2,8 @@ import { Folder } from '@chatgpt/types/folder';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import { Collapse, ListItemText, MenuItem } from '@mui/material';
 import { useCallback, useContext, useMemo, useState } from 'react';
-import { FolderSelectContext } from '.';
+import { FolderSelectContext } from './FolderSelectContext';
+import { match } from 'ts-pattern';
 
 export interface FolderSelectItemProps {
   folder: Folder;
@@ -24,7 +25,10 @@ export default function FolderSelectItem({ folder, disabled: parentDisabled }: F
     <>
       <MenuItem disabled={disabled} selected={selectedId === folder.id} onClick={handleClick}>
         <ListItemText primary={folder.name} secondary={folder.path} />
-        {open ? <ExpandLess /> : <ExpandMore />}
+        {match(open)
+          .with(true, () => <ExpandLess />)
+          .with(false, () => <ExpandMore />)
+          .exhaustive()}
       </MenuItem>
       {folder.folders.length > 0 && (
         <Collapse in={open} timeout="auto" unmountOnExit sx={{ pl: 2 }}>

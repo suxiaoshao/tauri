@@ -1,17 +1,18 @@
 import { useAppSelector } from '@chatgpt/app/hooks';
-import { selectTemplates } from '@chatgpt/features/Template/templateSlice';
-import { Box } from '@mui/material';
-import { useCallback, useEffect, useMemo, useReducer } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import TemporaryHeader from './components/Header';
-import { appWindow } from '@tauri-apps/api/window';
 import ChatForm from '@chatgpt/components/ChatForm';
-import usePromiseFn from '@chatgpt/hooks/usePromiseFn';
 import MessageHistory from '@chatgpt/components/MessageHistory';
-import { deleteTemporaryMessage, temporaryFetch } from '@chatgpt/service/temporary_conversation';
-import { TemporaryMessage } from '@chatgpt/types/temporary_conversation';
-import { Enum } from 'types';
+import { selectTemplates } from '@chatgpt/features/Template/templateSlice';
+import usePromiseFn from '@chatgpt/hooks/usePromiseFn';
+import { deleteTemporaryMessage, temporaryFetch } from '@chatgpt/service/temporaryConversation';
+import { TemporaryMessage } from '@chatgpt/types/temporaryConversation';
+import { Box } from '@mui/material';
+import { appWindow } from '@tauri-apps/api/window';
+import { useCallback, useEffect, useMemo, useReducer } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
+import { useNavigate, useParams } from 'react-router-dom';
+import { match } from 'ts-pattern';
+import { Enum } from 'types';
+import TemporaryHeader from './components/Header';
 
 enum ActionType {
   UpdateMessage,
@@ -21,18 +22,16 @@ enum ActionType {
 type Action = Enum<ActionType.UpdateMessage, TemporaryMessage> | Enum<ActionType.SetMessages, TemporaryMessage[]>;
 
 function reducer(state: TemporaryMessage[], action: Action): TemporaryMessage[] {
-  switch (action.tag) {
-    case ActionType.UpdateMessage:
+  return match(action)
+    .with({ tag: ActionType.UpdateMessage }, (action) => {
       const index = state.findIndex((m) => m.id === action.value.id);
       if (index === -1) {
         return [...state, action.value];
       }
       return state.with(index, action.value);
-    case ActionType.SetMessages:
-      return action.value;
-    default:
-      return state;
-  }
+    })
+    .with({ tag: ActionType.SetMessages }, (action) => action.value)
+    .otherwise(() => state);
 }
 
 export default function TemporaryDetail() {
@@ -43,7 +42,10 @@ export default function TemporaryDetail() {
       dispatch({ tag: ActionType.UpdateMessage, value: response.payload });
     });
     return () => {
-      fn.then((f) => f());
+      (async () => {
+        const f = await fn;
+        f();
+      })();
     };
   }, []);
 

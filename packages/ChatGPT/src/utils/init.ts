@@ -11,7 +11,7 @@ import { fetchConfig, setConfig } from '@chatgpt/features/Setting/configSlice';
 import { Message } from '@chatgpt/types/message';
 import { appWindow } from '@tauri-apps/api/window';
 import { listen } from '@tauri-apps/api/event';
-import { Config } from '@chatgpt/features/Setting';
+import { Config } from '@chatgpt/features/Setting/types';
 import { fetchTemplates } from '@chatgpt/features/Template/templateSlice';
 
 export default async function init() {

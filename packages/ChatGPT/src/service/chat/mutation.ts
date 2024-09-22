@@ -1,7 +1,7 @@
 import { NewConversation } from '@chatgpt/types/conversation';
 import { appInvoke } from '../base';
 import { NewFolder } from '@chatgpt/types/folder';
-import { NewConversationTemplate } from '@chatgpt/types/conversation_template';
+import { NewConversationTemplate } from '@chatgpt/types/conversationTemplate';
 import store from '@chatgpt/app/store';
 import { fetchTemplates } from '@chatgpt/features/Template/templateSlice';
 import { fetchConversations } from '@chatgpt/features/Conversations/conversationSlice';

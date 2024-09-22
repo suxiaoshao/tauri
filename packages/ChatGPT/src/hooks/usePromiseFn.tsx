@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 import { PromiseData, PromiseStatus } from './usePromise';
 
+// eslint-disable-next-line no-explicit-any
 export default function usePromiseFn<T, Args extends any[]>(
   fn: (...args: Args) => Promise<T>,
 ): [PromiseData<T>, (...args: Args) => Promise<T>] {
@@ -8,15 +9,19 @@ export default function usePromiseFn<T, Args extends any[]>(
   const func = useCallback(
     async (...args: Args) => {
       setState({ tag: PromiseStatus.loading });
-      return fn(...args)
-        .then((data) => {
-          setState({ tag: PromiseStatus.data, value: data } as PromiseData<T>);
-          return data;
-        })
-        .catch((error) => {
+      try {
+        const data = await fn(...args);
+        setState({ tag: PromiseStatus.data, value: data } as PromiseData<T>);
+        return data;
+      } catch (error) {
+        if (error instanceof Error) {
           setState({ tag: PromiseStatus.error, value: error });
           throw error;
-        });
+        }
+        const err = new Error(`unknow error: ${error}`);
+        setState({ tag: PromiseStatus.error, value: err });
+        throw err;
+      }
     },
     [fn],
   );

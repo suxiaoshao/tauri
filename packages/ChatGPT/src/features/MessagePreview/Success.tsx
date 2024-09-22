@@ -13,6 +13,7 @@ import { Box, IconButton, ToggleButton, ToggleButtonGroup, Tooltip } from '@mui/
 import { appWindow } from '@tauri-apps/api/window';
 import { useCallback, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { match } from 'ts-pattern';
 
 export interface SuccessProps {
   message: Message;
@@ -33,18 +34,14 @@ export default function Success({ message }: SuccessProps) {
     [setSearchParams],
   );
   const toggleValue = useMemo<Alignment>(() => {
-    switch (searchParams.get('action')) {
-      case Alignment.preview:
-        return Alignment.preview;
-      case Alignment.edit:
-        return Alignment.edit;
-      default:
-        return Alignment.preview;
-    }
+    return match(searchParams.get('action'))
+      .with(Alignment.preview, () => Alignment.preview)
+      .with(Alignment.edit, () => Alignment.edit)
+      .otherwise(() => Alignment.preview);
   }, [searchParams]);
   const [submitLoading, setSubmitLoading] = useState(false);
   const [code, setCode] = useState<string>(message.content);
-  const handleSubmit = useCallback(async () => {
+  const handleSubmit = useCallback(() => {
     try {
       setSubmitLoading(true);
       updateMessageContent({ id: message.id, content: code });
@@ -75,7 +72,10 @@ export default function Success({ message }: SuccessProps) {
       </Box>
       <CustomEdit
         sx={{ width: '100%', height: '100%', borderRadius: (theme) => theme.spacing(1), overflow: 'hidden' }}
-        value={toggleValue === Alignment.preview ? message.content : code}
+        value={match(toggleValue)
+          .with(Alignment.preview, () => message.content)
+          .with(Alignment.edit, () => code)
+          .exhaustive()}
         readonly={toggleValue === Alignment.preview}
         language="markdown"
         onChange={(newValue) => {

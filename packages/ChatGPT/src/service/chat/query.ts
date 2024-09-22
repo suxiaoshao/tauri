@@ -1,7 +1,7 @@
 import { ChatData } from '@chatgpt/types/chatData';
 import { appInvoke } from '../base';
 import { Message } from '@chatgpt/types/message';
-import { ConversationTemplate } from '@chatgpt/types/conversation_template';
+import { ConversationTemplate } from '@chatgpt/types/conversationTemplate';
 
 export interface FetchMessageParams {
   id: number;
@@ -13,7 +13,7 @@ export async function fetchMessage(params: FetchMessageParams) {
 }
 
 export async function getChatData(): Promise<ChatData> {
-  return await appInvoke<unknown, ChatData>('plugin:chat|get_chat_data', undefined);
+  return await appInvoke<unknown, ChatData>('plugin:chat|get_chat_data', null);
 }
 export interface FindMessageParams {
   id: number;
@@ -23,7 +23,7 @@ export async function findMessage(params: FindMessageParams) {
   return await appInvoke<FindMessageParams, Message>('plugin:chat|find_message', params);
 }
 export async function allConversationTemplates(): Promise<ConversationTemplate[]> {
-  return await appInvoke<unknown, ConversationTemplate[]>('plugin:chat|all_conversation_templates', undefined);
+  return await appInvoke<unknown, ConversationTemplate[]>('plugin:chat|all_conversation_templates', null);
 }
 
 export interface FindConversationTemplateParams {

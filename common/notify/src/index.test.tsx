@@ -10,10 +10,14 @@ import { render, waitFor, screen, cleanup } from '@testing-library/react';
 import { enqueueSnackbar, SnackbarProvider } from '.';
 import { afterEach, expect, describe, it, vi } from 'vitest';
 
-vi.mock('@tauri-apps/api/notification', () => ({
-  isPermissionGranted: vi.fn().mockReturnValue(true),
-  sendNotification: vi.fn(),
-}));
+vi.mock(import('@tauri-apps/api/notification'), async (importOriginal) => {
+  const mod = await importOriginal();
+  return {
+    ...mod,
+    isPermissionGranted: vi.fn().mockReturnValue(true),
+    sendNotification: vi.fn(),
+  };
+});
 
 describe('notify', () => {
   afterEach(() => {
@@ -30,7 +34,9 @@ describe('notify', () => {
       const snackbar = useSnackbar();
       return (
         <div>
-          <button onClick={() => snackbar.enqueueSnackbar('test click')}>test</button>
+          <button type="button" onClick={() => snackbar.enqueueSnackbar('test click')}>
+            test
+          </button>
         </div>
       );
     }

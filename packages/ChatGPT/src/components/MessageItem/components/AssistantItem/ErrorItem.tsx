@@ -8,8 +8,8 @@
 import assistant from '@chatgpt/assets/assistant.jpg';
 import CustomMarkdown from '@chatgpt/components/Markdown';
 import { Avatar, Box, Divider } from '@mui/material';
-import { BaseMessage } from '../..';
 import { AvatarSx, MarkdownSx, MessageSx } from '../../const';
+import { BaseMessage } from '../../types';
 import ToolBar from '../ToolBar';
 import DeleteMessageIcon from '../ToolBar/DeleteMessageIcon';
 

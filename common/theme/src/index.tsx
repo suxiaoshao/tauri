@@ -5,14 +5,14 @@
  * @LastEditTime: 2024-01-29 20:58:40
  * @FilePath: /tauri/common/theme/src/index.tsx
  */
-import React, { useEffect } from 'react';
-import { createTheme, CssBaseline, ThemeProvider } from '@mui/material';
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
+import { createTheme, CssBaseline, ThemeProvider } from '@mui/material';
+import React, { useEffect } from 'react';
+import { match } from 'ts-pattern';
 import './index.css';
-import setYouThemeToCssVars from './utils/cssVar';
 import {
   colorSchemaMatch,
   selectActiveYouTheme,
@@ -21,6 +21,7 @@ import {
   useAppDispatch,
   useAppSelector,
 } from './themeSlice';
+import setYouThemeToCssVars from './utils/cssVar';
 
 export interface CustomThemeProps {
   children?: React.ReactNode;
@@ -36,7 +37,10 @@ export function CustomTheme({ children }: CustomThemeProps): JSX.Element {
   }, [youTheme]);
   useEffect(() => {
     colorSchemaMatch.addEventListener('change', (e) => {
-      const colorScheme = e.matches ? 'dark' : 'light';
+      const colorScheme = match(e.matches)
+        .with(true, () => 'dark' as const)
+        .with(false, () => 'light' as const)
+        .exhaustive();
       dispatch(setSystemColorScheme(colorScheme));
     });
   }, [dispatch]);
@@ -48,9 +52,9 @@ export function CustomTheme({ children }: CustomThemeProps): JSX.Element {
   );
 }
 
-export { hexFromArgb, argbFromHex, themeFromSourceColor } from '@material/material-color-utilities';
+export { argbFromHex, hexFromArgb, themeFromSourceColor } from '@material/material-color-utilities';
 
-export { default as themeReducer, selectActiveYouTheme } from './themeSlice';
+export { selectActiveYouTheme, default as themeReducer } from './themeSlice';
 
 export { default as ThemeDrawerItem } from './components/ThemeDrawerItem';
 

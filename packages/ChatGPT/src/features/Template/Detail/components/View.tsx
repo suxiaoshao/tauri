@@ -6,7 +6,7 @@
  * @FilePath: /tauri/packages/ChatGPT/src/features/Template/Detail/components/View.tsx
  */
 import CustomMarkdown from '@chatgpt/components/Markdown';
-import { ConversationTemplate } from '@chatgpt/types/conversation_template';
+import { ConversationTemplate } from '@chatgpt/types/conversationTemplate';
 import { Avatar, Box, Divider, List, ListItem, ListItemAvatar, ListItemText, Typography } from '@mui/material';
 import { Details, DetailsItem } from 'details';
 import React, { useMemo } from 'react';
@@ -15,6 +15,7 @@ import assistant from '@chatgpt/assets/assistant.jpg';
 import user from '@chatgpt/assets/user.jpg';
 import { Role } from '@chatgpt/types/common';
 import { format } from 'time';
+import { match } from 'ts-pattern';
 
 export interface TemplateDetailViewProps {
   data: ConversationTemplate;
@@ -50,19 +51,13 @@ export default function TemplateDetailView({ data }: TemplateDetailViewProps) {
       </Typography>
       <List>
         {data.prompts.map((prompt) => {
-          let avatar = user;
-          switch (prompt.role) {
-            case Role.user:
-              avatar = user;
-              break;
-            case Role.assistant:
-              avatar = assistant;
-              break;
-            case Role.system:
-              avatar = system;
-              break;
-          }
+          const avatar = match(prompt.role)
+            .with(Role.user, () => user)
+            .with(Role.assistant, () => assistant)
+            .with(Role.system, () => system)
+            .otherwise(() => user);
           return (
+            // eslint-disable-next-line label-has-associated-control
             <React.Fragment key={prompt.id}>
               <ListItem alignItems="flex-start" key={prompt.id}>
                 <ListItemAvatar>

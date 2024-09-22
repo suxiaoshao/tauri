@@ -10,7 +10,7 @@ import store from '@chatgpt/app/store';
 import NumberField from '@chatgpt/components/NumberField';
 import { selectModels } from '@chatgpt/features/Setting/configSlice';
 import { Mode, Role } from '@chatgpt/types/common';
-import { ConversationTemplate } from '@chatgpt/types/conversation_template';
+import { ConversationTemplate } from '@chatgpt/types/conversationTemplate';
 import { valibotResolver } from '@hookform/resolvers/valibot';
 import { Add, Delete } from '@mui/icons-material';
 import { Box, Checkbox, FormControlLabel, FormLabel, IconButton, MenuItem, TextField } from '@mui/material';

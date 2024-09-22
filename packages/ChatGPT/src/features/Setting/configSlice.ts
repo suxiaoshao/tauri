@@ -6,10 +6,9 @@
  * @FilePath: /tauri/packages/ChatGPT/src/features/Setting/configSlice.ts
  */
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { AppThunkAction } from '../../app/store';
+import { AppThunkAction } from '../../app/types';
 import { getConfig } from '@chatgpt/service/config';
-import { Config } from '.';
-import { ArrayPath } from 'react-hook-form';
+import { Config } from './types';
 
 export const configSlice = createSlice({
   name: 'config',

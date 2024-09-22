@@ -1,8 +1,9 @@
 import { Folder } from '@chatgpt/types/folder';
-import { List, Box } from '@mui/material';
-import FolderHeader from './components/FolderHeader';
-import ContentList from './components/ContentList';
+import { Box, List } from '@mui/material';
+import { match, P } from 'ts-pattern';
 import ContentEmpty from './components/ContentEmpty';
+import ContentList from './components/ContentList';
+import FolderHeader from './components/FolderHeader';
 
 export interface FolderDetailProps {
   folder: Folder;
@@ -21,11 +22,11 @@ export default function FolderDetail({ folder }: FolderDetailProps) {
     >
       <FolderHeader folder={folder} />
       <List>
-        {folder.conversations.length + folder.folders.length > 0 ? (
-          <ContentList folders={folder.folders} conversations={folder.conversations} />
-        ) : (
-          <ContentEmpty />
-        )}
+        {match(folder.conversations.length + folder.folders.length)
+          .with(P.number.gt(0), () => <ContentList folders={folder.folders} conversations={folder.conversations} />)
+          .otherwise(() => (
+            <ContentEmpty />
+          ))}
       </List>
     </Box>
   );

@@ -52,7 +52,10 @@ export default function Home() {
       setValue('searchData', '');
     });
     return () => {
-      fn.then((fn) => fn());
+      (async () => {
+        const f = await fn;
+        f();
+      })();
     };
   }, [setValue]);
   return (

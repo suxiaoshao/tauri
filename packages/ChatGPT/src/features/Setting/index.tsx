@@ -1,3 +1,9 @@
+import HotkeyInput from '@chatgpt/components/HotkeyInput';
+import useConfig from '@chatgpt/hooks/useConfig';
+import useSettingKey from '@chatgpt/hooks/useSettingKey';
+import { createSettingWindow, setConfigService } from '@chatgpt/service/config';
+import { valibotResolver } from '@hookform/resolvers/valibot';
+import { Add, Delete, Settings } from '@mui/icons-material';
 import {
   Box,
   Button,
@@ -11,38 +17,13 @@ import {
   MenuItem,
   TextField,
 } from '@mui/material';
-import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import { appWindow } from '@tauri-apps/api/window';
+import { useCallback } from 'react';
+import { Controller, useFieldArray, useForm } from 'react-hook-form';
+import { match } from 'ts-pattern';
 import { useAppSelector } from '../../app/hooks';
 import { selectConfig } from './configSlice';
-import { Add, Delete, Settings } from '@mui/icons-material';
-import { useCallback } from 'react';
-import useConfig from '@chatgpt/hooks/useConfig';
-import useSettingKey from '@chatgpt/hooks/useSettingKey';
-import { createSettingWindow, setConfigService } from '@chatgpt/service/config';
-import { string, object, enum_, InferOutput, regex, url, array, nullish, pipe } from 'valibot';
-import { valibotResolver } from '@hookform/resolvers/valibot';
-import HotkeyInput from '@chatgpt/components/HotkeyInput';
-
-export enum Theme {
-  Dark = 'dark',
-  Light = 'light',
-  System = 'system',
-}
-
-const ChatGPTConfigSchema = object({
-  apiKey: string(),
-  theme: object({
-    theme: enum_(Theme),
-    color: pipe(string(), regex(/^#(?:[0-9a-fA-F]{3}){1,2}$/, 'Invalid color format')),
-  }),
-  url: nullish(pipe(string(), url())),
-  httpProxy: nullish(pipe(string(), url())),
-  models: array(string()),
-  temporaryHotkey: nullish(string()),
-});
-
-export type Config = InferOutput<typeof ChatGPTConfigSchema>;
+import { ChatGPTConfigSchema, Config, Theme } from './types';
 
 function Setting() {
   const initData = useAppSelector(selectConfig);
@@ -57,7 +38,8 @@ function Setting() {
   });
   const { fields, append, remove } = useFieldArray({
     control,
-    // @ts-ignore
+    // eslint-disable-next-line ban-ts-comment
+    // @ts-expect-error
     name: 'models',
   });
 
@@ -131,7 +113,16 @@ function Setting() {
           helperText={errors.url?.message}
         />
         <TextField
-          {...register('httpProxy', { setValueAs: (value) => (value?.trim()?.length > 0 ? value : undefined) })}
+          {...register('httpProxy', {
+            setValueAs: (value) => {
+              return (
+                match(value?.trim())
+                  // eslint-disable-next-line no-useless-undefined
+                  .with('', () => undefined)
+                  .otherwise(() => value)
+              );
+            },
+          })}
           label="Http Proxy"
           fullWidth
           sx={{ mt: 2 }}

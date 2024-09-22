@@ -6,8 +6,8 @@
  * @FilePath: /tauri/packages/ChatGPT/src/features/Template/templateSlice.ts
  */
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { AppThunkAction } from '../../app/store';
-import { ConversationTemplate } from '@chatgpt/types/conversation_template';
+import { AppThunkAction } from '../../app/types';
+import { ConversationTemplate } from '@chatgpt/types/conversationTemplate';
 import { allConversationTemplates } from '@chatgpt/service/chat/query';
 
 export const templateSlice = createSlice({

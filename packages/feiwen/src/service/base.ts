@@ -13,15 +13,16 @@ export async function appInvoke<P, R>(cmd: string, params: P): Promise<R> {
   try {
     const response = await invoke<R>(cmd, params as InvokeArgs);
     return response;
-  } catch (e) {
-    if (e instanceof Error) {
-      await enqueueSnackbar(e.message, { variant: 'error' });
-    } else if (typeof e === 'string') {
-      await enqueueSnackbar(e, { variant: 'error' });
+  } catch (error) {
+    if (error instanceof Error) {
+      await enqueueSnackbar(error.message, { variant: 'error' });
+    } else if (typeof error === 'string') {
+      await enqueueSnackbar(error, { variant: 'error' });
     } else {
       await enqueueSnackbar('unknown error', { variant: 'error' });
     }
-    console.error(e);
-    throw e;
+    // eslint-disable-next-line no-console
+    console.error(error);
+    throw error;
   }
 }

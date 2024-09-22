@@ -12,8 +12,8 @@ import { AvatarSx, MarkdownSx, MessageSx } from '../const';
 import DeleteMessageIcon from './ToolBar/DeleteMessageIcon';
 import ToolBar from './ToolBar';
 import ViewIcon from './ToolBar/ViewIcon';
-import { BaseMessage } from '..';
 import CopyIcon from './ToolBar/CopyIcon';
+import { BaseMessage } from '../types';
 
 export interface SystemItemProps {
   message: BaseMessage;

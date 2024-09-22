@@ -1,4 +1,4 @@
-import { TemporaryMessage } from '@chatgpt/types/temporary_conversation';
+import { TemporaryMessage } from '@chatgpt/types/temporaryConversation';
 import { appInvoke } from './base';
 
 export interface InitTemporaryConversationParams {

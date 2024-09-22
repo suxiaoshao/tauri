@@ -2,7 +2,7 @@ import { Preview } from '@mui/icons-material';
 import { useCallback, useContext } from 'react';
 import { ToolSx } from '../../const';
 import { IconButton, Tooltip } from '@mui/material';
-import { MessageActionContext } from '@chatgpt/components/MessageHistory';
+import { MessageActionContext } from '@chatgpt/components/MessageHistory/MessageActionContext';
 
 export interface ViewIconProp {
   id: number;
@@ -19,7 +19,7 @@ export default function ViewIcon({ id }: ViewIconProp) {
   return (
     <Tooltip title="View">
       <IconButton size="small" onClick={handleClick}>
-        <Preview fontSize={'small'} sx={ToolSx} />
+        <Preview fontSize="small" sx={ToolSx} />
       </IconButton>
     </Tooltip>
   );

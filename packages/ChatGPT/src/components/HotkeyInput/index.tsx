@@ -2,6 +2,7 @@ import { Close } from '@mui/icons-material';
 import { IconButton, InputAdornment, TextField, TextFieldProps } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
 import { useRecordHotkeys } from 'react-hotkeys-hook';
+import { match } from 'ts-pattern';
 
 export interface HotkeyInputProps extends Omit<TextFieldProps, 'value' | 'onChange' | 'onBlur' | 'onFucos'> {
   value?: string | null;
@@ -19,6 +20,7 @@ function HotkeyInput({ value, onChange, onBlur, ...props }: HotkeyInputProps) {
   const [keys, { start, stop, isRecording }] = useRecordHotkeys();
   useEffect(() => {
     if (isRecording && keys.size > 0) {
+      // eslint-disable-next-line prefer-spread
       const value = Array.from(keys).join('+');
       onChange({ target: { value } });
       setInnerValue(value);
@@ -48,16 +50,22 @@ function HotkeyInput({ value, onChange, onBlur, ...props }: HotkeyInputProps) {
     <TextField
       {...props}
       value={innerValue ?? ''}
-      onFocus={isRecording ? stop : start}
+      onFocus={() => {
+        match(isRecording)
+          .with(true, () => stop())
+          .otherwise(() => start());
+      }}
       onBlur={handleBlur}
-      InputProps={{
-        endAdornment: (
-          <InputAdornment position="end">
-            <IconButton onClick={handleClear} edge="end">
-              <Close />
-            </IconButton>
-          </InputAdornment>
-        ),
+      slotProps={{
+        input: {
+          endAdornment: (
+            <InputAdornment position="end">
+              <IconButton onClick={handleClear} edge="end">
+                <Close />
+              </IconButton>
+            </InputAdornment>
+          ),
+        },
       }}
     />
   );

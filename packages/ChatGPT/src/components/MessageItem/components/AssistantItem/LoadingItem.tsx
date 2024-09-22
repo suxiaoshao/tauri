@@ -5,11 +5,11 @@
  * @LastEditTime: 2024-01-07 20:53:25
  * @FilePath: /tauri/packages/ChatGPT/src/features/Home/ConversationDetail/components/MessageItem/components/AssistantItem/LoadingItem.tsx
  */
-import { Avatar, Box, CircularProgress, Divider } from '@mui/material';
 import assistant from '@chatgpt/assets/assistant.jpg';
 import CustomMarkdown from '@chatgpt/components/Markdown';
+import { Avatar, Box, CircularProgress, Divider } from '@mui/material';
 import { AvatarSx, MarkdownSx, MessageSx } from '../../const';
-import { BaseMessage } from '../..';
+import { BaseMessage } from '../../types';
 
 export interface LoadingItemProps {
   message: BaseMessage;

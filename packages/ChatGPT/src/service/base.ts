@@ -10,11 +10,11 @@ import { InvokeArgs } from '@tauri-apps/api/tauri';
 import { enqueueSnackbar } from 'notify';
 import { object, string, enum_, parseAsync, nullish } from 'valibot';
 
-export type ChatGPTError = {
+export interface ChatGPTError {
   code: ChatGPTErrorCodes;
   message: string;
   data?: string; // Optional, only used for some error types
-};
+}
 
 export enum ChatGPTErrorCodes {
   ConfigPath = 'ConfigPath',
@@ -61,21 +61,23 @@ export async function appInvoke<P, R>(cmd: string, params: P): Promise<R> {
   try {
     const response = await invoke<R>(cmd, params as InvokeArgs);
     return response;
-  } catch (e) {
-    if (e instanceof Error) {
-      await enqueueSnackbar(e.message, { variant: 'error' });
-    } else if (typeof e === 'string') {
-      await enqueueSnackbar(e, { variant: 'error' });
+  } catch (error) {
+    if (error instanceof Error) {
+      await enqueueSnackbar(error.message, { variant: 'error' });
+    } else if (typeof error === 'string') {
+      await enqueueSnackbar(error, { variant: 'error' });
     } else {
       try {
-        const err = await parseAsync(ChatGPTErrorSchema, e);
+        const err = await parseAsync(ChatGPTErrorSchema, error);
         await enqueueSnackbar(err.message, { variant: 'error' });
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error('Validation failed:', error);
         await enqueueSnackbar('An unknown error occurred', { variant: 'error' });
       }
     }
-    console.error('source error:', e);
-    throw e;
+    // eslint-disable-next-line no-console
+    console.error('source error:', error);
+    throw error;
   }
 }

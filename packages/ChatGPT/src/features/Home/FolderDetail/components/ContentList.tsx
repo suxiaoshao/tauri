@@ -6,12 +6,13 @@
  * @FilePath: /tauri/packages/ChatGPT/src/features/Home/FolderDetail/components/ContentList.tsx
  */
 import { useAppDispatch } from '@chatgpt/app/hooks';
-import { SelectedType, setSelected } from '@chatgpt/features/Conversations/conversationSlice';
+import { setSelected } from '@chatgpt/features/Conversations/conversationSlice';
+import { SelectedType } from '@chatgpt/features/Conversations/types';
 import { Conversation } from '@chatgpt/types/conversation';
 import { Folder } from '@chatgpt/types/folder';
+import FolderIcon from '@mui/icons-material/Folder';
 import { Avatar, Divider, List, ListItemAvatar, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { useCallback } from 'react';
-import FolderIcon from '@mui/icons-material/Folder';
 
 export interface ContentListProps {
   folders: Folder[];

@@ -7,11 +7,14 @@
  */
 import { TextField, TextFieldProps } from '@mui/material';
 import React, { useImperativeHandle } from 'react';
+import { match, P } from 'ts-pattern';
 
+// eslint-disable-next-line ban-types
 export function fixedForwardRef<T, P = {}>(
   render: (props: P, ref: React.Ref<T>) => React.ReactNode,
 ): (props: P & React.RefAttributes<T>) => React.ReactNode {
-  return React.forwardRef(render) as any;
+  // eslint-disable-next-line no-explicit-any
+  return React.forwardRef(render as any) as any;
 }
 
 export interface NumberFieldProps extends Omit<TextFieldProps, 'type' | 'onChange'> {
@@ -19,29 +22,28 @@ export interface NumberFieldProps extends Omit<TextFieldProps, 'type' | 'onChang
 }
 
 export function customParseFloat(value: unknown): number {
-  switch (typeof value) {
-    case 'number':
-      return value;
-    case 'string':
-      const newValue = parseFloat(value);
-      if (!isNaN(newValue)) {
-        return newValue;
-      }
-      return 0;
-    default:
-      return 0;
-  }
+  return match(value)
+    .with(P.number, (v) => v)
+    .with(P.string, (v) => {
+      const newValue = Number.parseFloat(v);
+      return match(newValue)
+        .with(Number.NaN, () => 0)
+        .with(P.number, (num) => num)
+        .otherwise(() => 0);
+    })
+    .otherwise(() => 0);
 }
 
 export function proxy<T>(source: T): T {
   switch (typeof source) {
     case 'object':
-    case 'function':
+    case 'function': {
       if (source !== null) {
         return new Proxy(source, {
           get(target, p) {
             if (p === 'focus') {
               return () => {
+                // eslint-disable-next-line no-explicit-any
                 (target as any).focus();
               };
             }
@@ -57,7 +59,7 @@ export function proxy<T>(source: T): T {
           construct(target, argArray, newTarget) {
             return Reflect.construct(target as () => void, argArray, newTarget);
           },
-          set(target, p, newValue, receiver) {
+          set(target, p, newValue) {
             target[p as keyof T] = newValue;
             return true;
             // return Reflect.set(target, p, newValue, receiver);
@@ -91,8 +93,11 @@ export function proxy<T>(source: T): T {
           },
         });
       }
-    default:
+    }
+    // eslint-disable-next-line no-fallthrough
+    default: {
       return source;
+    }
   }
 }
 

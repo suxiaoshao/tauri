@@ -5,21 +5,26 @@
  * @LastEditTime: 2024-04-28 21:15:54
  * @FilePath: /tauri/packages/ChatGPT/src/components/AppDrawer/index.tsx
  */
-import { Box, Divider, List, Toolbar } from '@mui/material';
-import { Outlet } from 'react-router-dom';
 import AddConversation from '@chatgpt/features/Adds/AddConversation';
 import AddFolder from '@chatgpt/features/Adds/AddFolder';
-import { useMemo, useState } from 'react';
-import { Resizable } from 'react-resizable';
-import usePlatform from '@chatgpt/hooks/usePlatform';
 import ConversationTree from '@chatgpt/features/Conversations';
 import Setting from '@chatgpt/features/Setting';
-import 'react-resizable/css/styles.css';
 import ConversationTemplateList from '@chatgpt/features/Template/List';
+import usePlatform from '@chatgpt/hooks/usePlatform';
+import { Box, Divider, List, Toolbar } from '@mui/material';
+import { useMemo, useState } from 'react';
+import { Resizable } from 'react-resizable';
+import 'react-resizable/css/styles.css';
+import { Outlet } from 'react-router-dom';
+import { match } from 'ts-pattern';
 export default function AppDrawer() {
   const [drawerWidth, setDrawerWidth] = useState(250);
   const platform = usePlatform();
-  const headersHeight = useMemo(() => (platform === 'Darwin' ? 28 : 0), [platform]);
+  const headersHeight = useMemo(() => {
+    return match(platform)
+      .with('Darwin', () => 28)
+      .otherwise(() => 0);
+  }, [platform]);
   return (
     <Box sx={{ width: '100%', height: '100%', backgroundColor: 'transparent', display: 'flex', flexDirection: 'row' }}>
       <Resizable
@@ -63,9 +68,13 @@ export default function AppDrawer() {
             <ConversationTree />
             <Divider />
             <List>
+              {/* eslint-disable-next-line label-has-associated-control */}
               <AddConversation.Item />
+              {/* eslint-disable-next-line label-has-associated-control */}
               <AddFolder.Item />
+              {/* eslint-disable-next-line label-has-associated-control */}
               <ConversationTemplateList.Item />
+              {/* eslint-disable-next-line label-has-associated-control */}
               <Setting.Item />
             </List>
           </Box>

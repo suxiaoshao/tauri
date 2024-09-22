@@ -1,8 +1,7 @@
-import { startTransition, useCallback, useEffect, useImperativeHandle, useState } from 'react';
-import './init';
-import * as monaco from 'monaco-editor';
 import { Box, BoxProps } from '@mui/material';
-import React from 'react';
+import * as monaco from 'monaco-editor';
+import React, { startTransition, useCallback, useEffect, useImperativeHandle, useState } from 'react';
+import './init';
 
 /**
  * @author sushao
@@ -43,38 +42,37 @@ function CustomEdit(
   /**
    * 编辑器绑定的 dom 的引用
    * */
-  const [editRef, setEditRef] = useState<HTMLDivElement | undefined>(undefined);
+  const [editRef, setEditRef] = useState<HTMLDivElement | undefined>();
   /**
    * 编辑器实体
    * */
-  const [edit, setEdit] = useState<monaco.editor.IStandaloneCodeEditor | undefined>(undefined);
+  const [edit, setEdit] = useState<monaco.editor.IStandaloneCodeEditor | undefined>();
   /**
    * 编辑器要绑定的 dom 生成时,再这个 dom 上新建一个编辑器,并赋值给 edit
    * */
   useEffect(() => {
-    if (editRef !== undefined) {
-      if (
-        (edit === undefined && editRef.firstChild === null) ||
-        (edit !== undefined && edit?.getModel()?.getLanguageId() && edit?.getModel()?.getLanguageId() !== language)
-      ) {
-        edit?.dispose();
-        while (editRef.firstChild) {
-          editRef.removeChild(editRef.firstChild);
-        }
-        const newEditor = monaco.editor.create(editRef, {
-          value: code,
-          theme: 'dracula',
-          automaticLayout: true,
-          language: language,
-          fontSize: 16,
-          minimap: {
-            enabled: false,
-          },
-          readOnly: readonly,
-          wordWrap: 'on',
-        });
-        return setEdit(newEditor);
+    if (
+      editRef !== undefined &&
+      ((edit === undefined && editRef.firstChild === null) ||
+        (edit !== undefined && edit?.getModel()?.getLanguageId() && edit?.getModel()?.getLanguageId() !== language))
+    ) {
+      edit?.dispose();
+      while (editRef.firstChild) {
+        editRef.firstChild.remove();
       }
+      const newEditor = monaco.editor.create(editRef, {
+        value: code,
+        theme: 'dracula',
+        automaticLayout: true,
+        language: language,
+        fontSize: 16,
+        minimap: {
+          enabled: false,
+        },
+        readOnly: readonly,
+        wordWrap: 'on',
+      });
+      return setEdit(newEditor);
     }
   }, [code, edit, editRef, language, readonly]);
 

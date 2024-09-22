@@ -2,14 +2,14 @@ import { Delete } from '@mui/icons-material';
 import { ToolSx } from '../../const';
 import { useCallback, useContext } from 'react';
 import { IconButton, Tooltip } from '@mui/material';
-import { MessageActionContext } from '@chatgpt/components/MessageHistory';
+import { MessageActionContext } from '@chatgpt/components/MessageHistory/MessageActionContext';
 
 export interface DeleteMessageIconProps {
   id: number;
 }
 export default function DeleteMessageIcon({ id }: DeleteMessageIconProps) {
   const { onMessageDeleted } = useContext(MessageActionContext);
-  const handleClick = useCallback(async () => {
+  const handleClick = useCallback(() => {
     onMessageDeleted?.(id);
   }, [onMessageDeleted, id]);
   if (!onMessageDeleted) {
@@ -18,7 +18,7 @@ export default function DeleteMessageIcon({ id }: DeleteMessageIconProps) {
   return (
     <Tooltip title="Delete message">
       <IconButton size="small" onClick={handleClick}>
-        <Delete fontSize={'small'} sx={ToolSx} />
+        <Delete fontSize="small" sx={ToolSx} />
       </IconButton>
     </Tooltip>
   );

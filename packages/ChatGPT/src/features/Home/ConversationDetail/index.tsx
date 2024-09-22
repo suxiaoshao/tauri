@@ -16,7 +16,7 @@ export interface ConversationDetailProps {
 const handleMessageDelete = async (id: number) => {
   await deleteMessage({ id });
 };
-const handleMessageView = async (id: number) => {
+const handleMessageView = (id: number) => {
   new WebviewWindow(`message-${id}`, {
     url: `/message/${id}`,
     title: `message-${id}`,

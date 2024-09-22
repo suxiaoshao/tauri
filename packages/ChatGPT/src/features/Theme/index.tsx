@@ -5,17 +5,18 @@
  * @LastEditTime: 2024-05-08 21:07:53
  * @FilePath: /tauri/packages/ChatGPT/src/features/Theme/index.tsx
  */
-import React, { useEffect } from 'react';
-import { createTheme, CssBaseline, ThemeProvider } from '@mui/material';
+import { useAppDispatch, useAppSelector } from '@chatgpt/app/hooks';
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
-import 'theme/src/index.css';
-import { colorSchemaMatch, selectActiveYouTheme, selectMuiTheme, setSystemColorScheme } from './themeSlice';
+import { createTheme, CssBaseline, ThemeProvider } from '@mui/material';
+import React, { useEffect } from 'react';
 import { setYouThemeToCssVars } from 'theme';
-import { useAppDispatch, useAppSelector } from '@chatgpt/app/hooks';
-import { Theme } from '../Setting';
+import 'theme/src/index.css';
+import { match } from 'ts-pattern';
+import { Theme } from '../Setting/types';
+import { colorSchemaMatch, selectActiveYouTheme, selectMuiTheme, setSystemColorScheme } from './themeSlice';
 
 export interface CustomThemeProps {
   children?: React.ReactNode;
@@ -31,7 +32,10 @@ export function CustomTheme({ children }: CustomThemeProps): JSX.Element {
   }, [youTheme]);
   useEffect(() => {
     colorSchemaMatch.addEventListener('change', (e) => {
-      const colorScheme = e.matches ? Theme.Dark : Theme.Light;
+      const colorScheme = match(e.matches)
+        .with(true, () => Theme.Dark as const)
+        .with(false, () => Theme.Light as const)
+        .exhaustive();
       dispatch(setSystemColorScheme(colorScheme));
     });
   }, [dispatch]);

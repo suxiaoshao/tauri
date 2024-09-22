@@ -6,14 +6,15 @@
  * @FilePath: /tauri/packages/ChatGPT/src/features/Theme/themeSlice.ts
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
+import { RootState } from '@chatgpt/app/types';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Theme } from '../Setting';
-import { RootState } from '@chatgpt/app/store';
 import { argbFromHex, themeFromSourceColor, youThemeToMuiTheme } from 'theme';
+import { match } from 'ts-pattern';
+import { Theme } from '../Setting/types';
 
-export type ThemeSliceType = {
+export interface ThemeSliceType {
   systemColorScheme: Theme.Dark | Theme.Light;
-};
+}
 const getColorScheme = (colorSetting: Theme, systemColorScheme: ThemeSliceType['systemColorScheme']) => {
   if (colorSetting === Theme.System) {
     return systemColorScheme;
@@ -24,7 +25,10 @@ const getColorScheme = (colorSetting: Theme, systemColorScheme: ThemeSliceType['
 export const colorSchemaMatch = window.matchMedia('(prefers-color-scheme: dark)');
 
 function getInitDate(): ThemeSliceType {
-  const systemColorScheme = colorSchemaMatch.matches ? Theme.Dark : Theme.Light;
+  const systemColorScheme = match(colorSchemaMatch.matches)
+    .with(true, () => Theme.Dark as const)
+    .with(false, () => Theme.Light as const)
+    .exhaustive();
   return {
     systemColorScheme,
   };
