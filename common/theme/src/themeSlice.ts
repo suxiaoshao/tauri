@@ -6,8 +6,7 @@
  * @FilePath: /tauri/common/theme/src/themeSlice.ts
  */
 import { argbFromHex, themeFromSourceColor } from '@material/material-color-utilities';
-import { createSlice, EnhancedStore, PayloadAction } from '@reduxjs/toolkit';
-import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
+import { create } from 'zustand';
 import { match } from 'ts-pattern';
 import { youThemeToMuiTheme } from './utils/youTheme';
 
@@ -16,6 +15,7 @@ export interface ThemeSliceType {
   colorSetting: 'dark' | 'light' | 'system';
   systemColorScheme: 'light' | 'dark';
 }
+
 const getColorScheme = (
   colorSetting: ThemeSliceType['colorSetting'],
   systemColorScheme: ThemeSliceType['systemColorScheme'],
@@ -44,42 +44,37 @@ function getInitDate(): ThemeSliceType {
   };
 }
 
-export const themeSlice = createSlice({
-  name: 'theme',
-  initialState: getInitDate(),
-  reducers: {
-    setSystemColorScheme: (state, action: PayloadAction<ThemeSliceType['systemColorScheme']>) => {
-      state.systemColorScheme = action.payload;
-    },
-    updateColor(state, action: PayloadAction<Pick<ThemeSliceType, 'color' | 'colorSetting'>>) {
-      const { color, colorSetting } = action.payload;
-      state.color = color;
+export const useThemeStore = create<
+  ThemeSliceType & {
+    setSystemColorScheme: (scheme: ThemeSliceType['systemColorScheme']) => void;
+    updateColor: (color: string, colorSetting: ThemeSliceType['colorSetting']) => void;
+  }
+>((set) => ({
+  ...getInitDate(),
+  setSystemColorScheme: (scheme) =>
+    set(() => ({
+      systemColorScheme: scheme,
+    })),
+  updateColor: (color, colorSetting) =>
+    set(() => {
       window.localStorage.setItem('color', color);
-      state.colorSetting = colorSetting;
       window.localStorage.setItem('colorSetting', colorSetting);
-    },
-  },
-});
-export const { setSystemColorScheme, updateColor } = themeSlice.actions;
+      return {
+        color,
+        colorSetting,
+      };
+    }),
+}));
 
-export const selectColorMode = (state: RootState) =>
-  getColorScheme(state.theme.colorSetting, state.theme.systemColorScheme);
+export const selectColorMode = (state: ThemeSliceType) => getColorScheme(state.colorSetting, state.systemColorScheme);
 
-export const selectActiveYouTheme = (state: RootState) => {
+export const selectActiveYouTheme = (state: ThemeSliceType) => {
   const colorScheme = selectColorMode(state);
-  return themeFromSourceColor(argbFromHex(state.theme.color)).schemes[colorScheme];
+  return themeFromSourceColor(argbFromHex(state.color)).schemes[colorScheme];
 };
 
-export const selectMuiTheme = (state: RootState) => {
+export const selectMuiTheme = (state: ThemeSliceType) => {
   const colorScheme = selectColorMode(state);
   const youTheme = selectActiveYouTheme(state);
   return youThemeToMuiTheme(youTheme, colorScheme);
 };
-
-type StoreType = EnhancedStore<{ theme: ThemeSliceType }>;
-
-export default themeSlice.reducer;
-export type RootState = ReturnType<StoreType['getState']>;
-export type AppDispatch = StoreType['dispatch'];
-export const useAppDispatch = () => useDispatch<AppDispatch>();
-export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
