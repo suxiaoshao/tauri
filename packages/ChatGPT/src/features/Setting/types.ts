@@ -7,7 +7,7 @@ export enum Theme {
 }
 
 export const ChatGPTConfigSchema = object({
-  apiKey: string(),
+  apiKey: nullish(string()),
   theme: object({
     theme: enum_(Theme),
     color: pipe(string(), regex(/^#(?:[0-9a-fA-F]{3}){1,2}$/, 'Invalid color format')),

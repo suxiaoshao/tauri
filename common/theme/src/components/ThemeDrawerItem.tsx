@@ -53,7 +53,7 @@ export default function ThemeDrawerItem() {
     defaultValues: theme,
     resolver: valibotResolver(createColorSchema),
   });
-  const onSubmit: SubmitHandler<FormData> = async ({ color, colorSetting }) => {
+  const onSubmit: SubmitHandler<FormData> = ({ color, colorSetting }) => {
     updateColor(color, colorSetting);
     handleClose();
   };

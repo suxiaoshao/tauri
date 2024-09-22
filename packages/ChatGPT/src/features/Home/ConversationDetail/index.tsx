@@ -17,6 +17,7 @@ const handleMessageDelete = async (id: number) => {
   await deleteMessage({ id });
 };
 const handleMessageView = (id: number) => {
+  // eslint-disable-next-line no-new
   new WebviewWindow(`message-${id}`, {
     url: `/message/${id}`,
     title: `message-${id}`,

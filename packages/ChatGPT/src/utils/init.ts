@@ -7,7 +7,7 @@
  */
 import store from '@chatgpt/app/store';
 import { useConversationStore } from '@chatgpt/features/Conversations/conversationSlice';
-import { fetchConfig, setConfig } from '@chatgpt/features/Setting/configSlice';
+import { useConfigStore } from '@chatgpt/features/Setting/configSlice';
 import { Message } from '@chatgpt/types/message';
 import { appWindow } from '@tauri-apps/api/window';
 import { listen } from '@tauri-apps/api/event';
@@ -24,11 +24,11 @@ export default async function init() {
   });
 
   // fetch config data
-  store.dispatch(fetchConfig());
+  useConfigStore.getState().fetchConfig();
 
   // listen for config changes
   await listen<Config>('config', (event) => {
-    store.dispatch(setConfig(event.payload));
+    useConfigStore.getState().setConfig(event.payload);
   });
 
   // fetch templates data

@@ -134,6 +134,7 @@
     "prefer-modern-math-apis": "warn",
     "prefer-node-protocol": "warn",
     "prefer-number-properties": "warn",
+    "no-new": "warn",
     "no-useless-concat": "warn",
     "no-useless-constructor": "warn",
     "no-duplicates": "warn",

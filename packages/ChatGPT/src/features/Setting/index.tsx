@@ -21,12 +21,12 @@ import { appWindow } from '@tauri-apps/api/window';
 import { useCallback } from 'react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
-import { useAppSelector } from '../../app/hooks';
-import { selectConfig } from './configSlice';
+import { useShallow } from 'zustand/react/shallow';
+import { selectConfig, useConfigStore } from './configSlice';
 import { ChatGPTConfigSchema, Config, Theme } from './types';
 
 function Setting() {
-  const initData = useAppSelector(selectConfig);
+  const initData = useConfigStore(useShallow(selectConfig));
   const {
     register,
     handleSubmit,
