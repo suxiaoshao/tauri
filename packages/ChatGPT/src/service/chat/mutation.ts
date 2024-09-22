@@ -1,10 +1,9 @@
-import { NewConversation } from '@chatgpt/types/conversation';
-import { appInvoke } from '../base';
-import { NewFolder } from '@chatgpt/types/folder';
-import { NewConversationTemplate } from '@chatgpt/types/conversationTemplate';
-import store from '@chatgpt/app/store';
-import { fetchTemplates } from '@chatgpt/features/Template/templateSlice';
 import { useConversationStore } from '@chatgpt/features/Conversations/conversationSlice';
+import { useTemplateStore } from '@chatgpt/features/Template/templateSlice';
+import { NewConversation } from '@chatgpt/types/conversation';
+import { NewConversationTemplate } from '@chatgpt/types/conversationTemplate';
+import { NewFolder } from '@chatgpt/types/folder';
+import { appInvoke } from '../base';
 
 export interface AddConversationParams {
   data: NewConversation;
@@ -131,7 +130,7 @@ export interface DeleteConversationParams {
 
 export async function deleteConversationTemplate(params: DeleteConversationParams) {
   await appInvoke<DeleteConversationParams, unknown>('plugin:chat|delete_conversation_template', params);
-  store.dispatch(fetchTemplates());
+  useTemplateStore.getState().fetchTemplates();
 }
 
 export interface AddConversationTemplateParams {
@@ -140,7 +139,7 @@ export interface AddConversationTemplateParams {
 
 export async function addConversationTemplate(params: AddConversationTemplateParams) {
   const id = await appInvoke<AddConversationTemplateParams, number>('plugin:chat|add_conversation_template', params);
-  store.dispatch(fetchTemplates());
+  useTemplateStore.getState().fetchTemplates();
   return id;
 }
 
@@ -151,5 +150,5 @@ export interface UpdateConversationTemplateParams {
 
 export async function updateConversationTemplate(params: UpdateConversationTemplateParams) {
   await appInvoke<UpdateConversationTemplateParams, unknown>('plugin:chat|update_conversation_template', params);
-  store.dispatch(fetchTemplates());
+  useTemplateStore.getState().fetchTemplates();
 }

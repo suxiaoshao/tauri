@@ -1,7 +1,6 @@
-import { useAppSelector } from '@chatgpt/app/hooks';
 import ChatForm from '@chatgpt/components/ChatForm';
 import MessageHistory from '@chatgpt/components/MessageHistory';
-import { selectTemplates } from '@chatgpt/features/Template/templateSlice';
+import { selectTemplates, useTemplateStore } from '@chatgpt/features/Template/templateSlice';
 import usePromiseFn from '@chatgpt/hooks/usePromiseFn';
 import { deleteTemporaryMessage, temporaryFetch } from '@chatgpt/service/temporaryConversation';
 import { TemporaryMessage } from '@chatgpt/types/temporaryConversation';
@@ -13,6 +12,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { match } from 'ts-pattern';
 import { Enum } from 'types';
 import TemporaryHeader from './components/Header';
+import { useShallow } from 'zustand/react/shallow';
 
 enum ActionType {
   UpdateMessage,
@@ -56,7 +56,7 @@ export default function TemporaryDetail() {
 
   // fetch template detail
   const { temporaryId } = useParams<{ temporaryId: string }>();
-  const templates = useAppSelector(selectTemplates);
+  const templates = useTemplateStore(useShallow(selectTemplates));
   const template = useMemo(() => templates.find(({ id }) => id === Number(temporaryId)), [templates, temporaryId]);
 
   // send form status

@@ -7,14 +7,15 @@
  */
 import { Apps } from '@mui/icons-material';
 import { Avatar, Box, List, ListItemAvatar, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { useLocation, useMatch, useNavigate } from 'react-router-dom';
-import TemplateListHeader from './components/Header';
 import { useCallback, useMemo } from 'react';
-import { useAppSelector } from '@chatgpt/app/hooks';
-import { selectTemplates } from '../templateSlice';
+import { useLocation, useMatch, useNavigate } from 'react-router-dom';
+import { useShallow } from 'zustand/react/shallow';
 import TemplateInfo from '../components/TemplateInfo';
+import { selectTemplates, useTemplateStore } from '../templateSlice';
+import TemplateListHeader from './components/Header';
+
 function ConversationTemplateList() {
-  const templates = useAppSelector(selectTemplates);
+  const templates = useTemplateStore(useShallow(selectTemplates));
   const navigate = useNavigate();
   const handleClick = useCallback(
     (templateId: number) => {

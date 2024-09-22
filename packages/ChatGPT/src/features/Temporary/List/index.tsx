@@ -1,6 +1,5 @@
-import { useAppSelector } from '@chatgpt/app/hooks';
 import TemplateInfo from '@chatgpt/features/Template/components/TemplateInfo';
-import { selectTemplates } from '@chatgpt/features/Template/templateSlice';
+import { selectTemplates, useTemplateStore } from '@chatgpt/features/Template/templateSlice';
 import { initTemporaryConversation } from '@chatgpt/service/temporaryConversation';
 import { ConversationTemplate } from '@chatgpt/types/conversationTemplate';
 import { Avatar, Box, Divider, InputBase, List, ListItemAvatar, ListItemButton, ListItemText } from '@mui/material';
@@ -9,6 +8,7 @@ import { useHotkeys } from 'react-hotkeys-hook';
 import { useNavigate } from 'react-router-dom';
 import { match } from 'ts-pattern';
 import { Enum } from 'types';
+import { useShallow } from 'zustand/react/shallow';
 
 interface Data {
   selectedIndex: number | null;
@@ -85,7 +85,7 @@ const initialState: Data = {
 export default function TemporaryList() {
   const navigate = useNavigate();
   // data & dispatch
-  const templates = useAppSelector(selectTemplates);
+  const templates = useTemplateStore(useShallow(selectTemplates));
   const [{ selectedIndex, filteredTemplates }, dispatch] = useReducer(reducer, initialState);
   useEffect(() => {
     dispatch({ tag: 'setSourceTemplates', value: templates });

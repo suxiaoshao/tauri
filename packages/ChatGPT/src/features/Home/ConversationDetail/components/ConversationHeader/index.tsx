@@ -1,7 +1,6 @@
 import { Conversation } from '@chatgpt/types/conversation';
 import { Avatar, Box, IconButton, Tooltip, Typography } from '@mui/material';
 import { useCallback } from 'react';
-import { useAppDispatch } from '@chatgpt/app/hooks';
 import { CleaningServices, CopyAll, Delete } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { clearConversation, deleteConversation } from '@chatgpt/service/chat/mutation';
@@ -13,17 +12,16 @@ export interface ConversationHeaderProps {
 }
 
 export default function ConversationHeader({ conversation }: ConversationHeaderProps) {
-  const dispatch = useAppDispatch();
   const handleDelete = useCallback(async () => {
     await deleteConversation({ id: conversation.id });
-  }, [conversation.id, dispatch]);
+  }, [conversation.id]);
   const navigate = useNavigate();
   const handleCopy = useCallback(() => {
     navigate('/add/conversation', { state: { ...conversation, id: undefined } });
   }, [conversation, navigate]);
   const handleClear = useCallback(async () => {
     await clearConversation({ id: conversation.id });
-  }, [conversation.id, dispatch]);
+  }, [conversation.id]);
 
   return (
     <Box

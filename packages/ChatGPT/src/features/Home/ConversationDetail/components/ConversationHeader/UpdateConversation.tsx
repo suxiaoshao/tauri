@@ -5,20 +5,18 @@
  * @LastEditTime: 2024-04-28 20:49:43
  * @FilePath: /tauri/packages/ChatGPT/src/features/Home/ConversationDetail/components/ConversationHeader/UpdateConversation.tsx
  */
+import ConversationEdit, { ConversationForm } from '@chatgpt/components/ConversationEdit';
+import { updateConversation } from '@chatgpt/service/chat/mutation';
+import { Conversation, NewConversation } from '@chatgpt/types/conversation';
+import EditIcon from '@mui/icons-material/Edit';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Tooltip } from '@mui/material';
 import { useCallback, useState } from 'react';
-import EditIcon from '@mui/icons-material/Edit';
-import ConversationEdit, { ConversationForm } from '@chatgpt/components/ConversationEdit';
-import { Conversation, NewConversation } from '@chatgpt/types/conversation';
-import { updateConversation } from '@chatgpt/service/chat/mutation';
-import { useAppDispatch } from '@chatgpt/app/hooks';
 
 export interface UpdateConversationProps {
   conversation: Conversation;
 }
 
 export default function UpdateConversation({ conversation }: UpdateConversationProps) {
-  const dispatch = useAppDispatch();
   const [open, setOpen] = useState(false);
   const handleOpen = useCallback(() => setOpen(true), []);
   const handleClose = useCallback(() => setOpen(false), []);
@@ -33,7 +31,7 @@ export default function UpdateConversation({ conversation }: UpdateConversationP
       });
       handleClose();
     },
-    [conversation.id, dispatch, handleClose],
+    [conversation.id, handleClose],
   );
   return (
     <>

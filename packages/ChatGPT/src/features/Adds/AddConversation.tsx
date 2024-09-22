@@ -5,19 +5,17 @@
  * @LastEditTime: 2024-04-28 20:49:26
  * @FilePath: /tauri/packages/ChatGPT/src/features/Adds/AddConversation.tsx
  */
-import { Box, Typography, Toolbar, IconButton, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import PublishIcon from '@mui/icons-material/Publish';
-import ConversationEdit, { ConversationForm } from '../../components/ConversationEdit';
-import { useAppDispatch } from '@chatgpt/app/hooks';
-import { useCallback } from 'react';
-import { useMatch, useNavigate, useLocation } from 'react-router-dom';
-import { Add } from '@mui/icons-material';
-import { NewConversation } from '@chatgpt/types/conversation';
-import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import { addConversation } from '@chatgpt/service/chat/mutation';
+import { NewConversation } from '@chatgpt/types/conversation';
+import { Add } from '@mui/icons-material';
+import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
+import PublishIcon from '@mui/icons-material/Publish';
+import { Box, IconButton, ListItemButton, ListItemIcon, ListItemText, Toolbar, Typography } from '@mui/material';
+import { useCallback } from 'react';
+import { useLocation, useMatch, useNavigate } from 'react-router-dom';
+import ConversationEdit, { ConversationForm } from '../../components/ConversationEdit';
 
 function AddConversation() {
-  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const handleSubmit = useCallback(
     async ({ info, ...data }: ConversationForm) => {
@@ -29,7 +27,7 @@ function AddConversation() {
       });
       navigate('/');
     },
-    [dispatch, navigate],
+    [navigate],
   );
   const { state } = useLocation();
   return (

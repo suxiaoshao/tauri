@@ -13,7 +13,6 @@ import { useCallback, useState } from 'react';
 import FolderSelect from '@chatgpt/components/FolderSelect';
 import { Controller, useForm } from 'react-hook-form';
 import { MoveFolderParams, moveFolder } from '@chatgpt/service/chat/mutation';
-import { useAppDispatch } from '@chatgpt/app/hooks';
 import { Folder } from '@chatgpt/types/folder';
 
 export interface MoveFolderProps {
@@ -21,7 +20,6 @@ export interface MoveFolderProps {
 }
 
 export default function MoveFolder({ folder }: MoveFolderProps) {
-  const dispatch = useAppDispatch();
   const [open, setOpen] = useState(false);
   const handleOpen = useCallback(() => setOpen(true), []);
   const handleClose = useCallback(() => setOpen(false), []);
@@ -35,7 +33,7 @@ export default function MoveFolder({ folder }: MoveFolderProps) {
       await moveFolder({ parentId, id: folder.id });
       handleClose();
     },
-    [folder.id, dispatch, handleClose],
+    [folder.id, handleClose],
   );
   return (
     <>

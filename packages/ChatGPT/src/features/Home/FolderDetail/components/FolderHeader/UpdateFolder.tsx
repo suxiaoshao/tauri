@@ -1,4 +1,3 @@
-import { useAppDispatch } from '@chatgpt/app/hooks';
 import FolderEdit, { FolderForm } from '@chatgpt/components/FolderEdit';
 import { updateFolder } from '@chatgpt/service/chat/mutation';
 import { Folder, NewFolder } from '@chatgpt/types/folder';
@@ -11,7 +10,6 @@ export interface FolderHeaderProps {
 }
 
 export default function UpdateFolder({ folder }: FolderHeaderProps) {
-  const dispatch = useAppDispatch();
   const [open, setOpen] = useState(false);
   const handleOpen = useCallback(() => setOpen(true), []);
   const handleClose = useCallback(() => setOpen(false), []);
@@ -23,7 +21,7 @@ export default function UpdateFolder({ folder }: FolderHeaderProps) {
       });
       handleClose();
     },
-    [folder.id, dispatch, handleClose],
+    [folder.id, handleClose],
   );
   return (
     <>
