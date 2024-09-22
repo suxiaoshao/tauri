@@ -7,37 +7,41 @@
  */
 import { ChevronRight, ExpandMore } from '@mui/icons-material';
 import {
-  fetchConversations,
   selectChatData,
   selectSelectedNodeId,
-  setSelected,
+  useConversationStore,
 } from '@chatgpt/features/Conversations/conversationSlice';
-import { useAppDispatch, useAppSelector } from '@chatgpt/app/hooks';
 import { useCallback, useEffect } from 'react';
 import { SimpleTreeView } from '@mui/x-tree-view';
 import FolderItem from './components/FolderItem';
 import ConversationItem from './components/ConversationItem';
 import { getSelectedFromNodeId } from '@chatgpt/utils/chatData';
 import { useNavigate } from 'react-router-dom';
+import { useShallow } from 'zustand/react/shallow';
 
 export default function ConversationTree() {
   const navigate = useNavigate();
-  const { conversations, folders } = useAppSelector(selectChatData);
-  const selectedNodeId = useAppSelector(selectSelectedNodeId);
-  const dispatch = useAppDispatch();
+  const { conversations, folders, selectedNodeId, setSelected, fetchConversations } = useConversationStore(
+    useShallow((state) => ({
+      ...selectChatData(state),
+      selectedNodeId: selectSelectedNodeId(state),
+      setSelected: state.setSelected,
+      fetchConversations: state.fetchConversations,
+    })),
+  );
   const handleSelect = useCallback(
     (_event: React.SyntheticEvent, nodeIds: string | null) => {
       if (!nodeIds) {
         return;
       }
-      dispatch(setSelected(getSelectedFromNodeId(nodeIds)));
+      setSelected(getSelectedFromNodeId(nodeIds));
       navigate('/');
     },
-    [dispatch, navigate],
+    [setSelected, navigate],
   );
   useEffect(() => {
-    dispatch(fetchConversations());
-  }, [dispatch]);
+    fetchConversations();
+  }, [fetchConversations]);
   return (
     <SimpleTreeView
       aria-label="file system navigator"

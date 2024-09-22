@@ -5,14 +5,14 @@
  * @LastEditTime: 2024-04-29 02:46:17
  * @FilePath: /tauri/packages/ChatGPT/src/features/Home/FolderDetail/components/ContentList.tsx
  */
-import { useAppDispatch } from '@chatgpt/app/hooks';
-import { setSelected } from '@chatgpt/features/Conversations/conversationSlice';
+import { useConversationStore } from '@chatgpt/features/Conversations/conversationSlice';
 import { SelectedType } from '@chatgpt/features/Conversations/types';
 import { Conversation } from '@chatgpt/types/conversation';
 import { Folder } from '@chatgpt/types/folder';
 import FolderIcon from '@mui/icons-material/Folder';
 import { Avatar, Divider, List, ListItemAvatar, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { useCallback } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 
 export interface ContentListProps {
   folders: Folder[];
@@ -20,18 +20,18 @@ export interface ContentListProps {
 }
 
 export default function ContentList({ folders, conversations }: ContentListProps) {
-  const dispatch = useAppDispatch();
+  const setSelected = useConversationStore(useShallow(({ setSelected }) => setSelected));
   const handleFolderClick = useCallback(
     (folderId: number) => {
-      dispatch(setSelected({ tag: SelectedType.Folder, value: folderId }));
+      setSelected({ tag: SelectedType.Folder, value: folderId });
     },
-    [dispatch],
+    [setSelected],
   );
   const handleConversationClick = useCallback(
     (conversationId: number) => {
-      dispatch(setSelected({ tag: SelectedType.Conversation, value: conversationId }));
+      setSelected({ tag: SelectedType.Conversation, value: conversationId });
     },
-    [dispatch],
+    [setSelected],
   );
   return (
     <List>

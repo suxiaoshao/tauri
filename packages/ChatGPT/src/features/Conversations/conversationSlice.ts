@@ -4,97 +4,93 @@ import { Conversation } from '@chatgpt/types/conversation';
 import { Folder } from '@chatgpt/types/folder';
 import { Message } from '@chatgpt/types/message';
 import { findConversation, findFolder, getFirstConversation, getNodeId } from '@chatgpt/utils/chatData';
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { match } from 'ts-pattern';
 import { Enum } from 'types';
-import { AppThunkAction, RootState } from '../../app/types';
-import { ConversationSliceType, Selected, SelectedType } from './types';
+import { create } from 'zustand';
+import { Selected, SelectedType } from './types';
 
-export const conversationSlice = createSlice({
-  name: 'menu',
-  initialState: {
-    value: { conversations: [], folders: [] },
-    selected: { tag: SelectedType.None },
-  } as ConversationSliceType,
-  reducers: {
-    setChatData: (state, action: PayloadAction<ChatData>) => {
-      state.value = action.payload;
-    },
-    setSelected: (state, action: PayloadAction<Selected>) => {
-      state.selected = action.payload;
-    },
-    updateMessage: (state, { payload }: PayloadAction<Message>) => {
-      const conversation = findConversation(state.value, payload.conversationId);
+interface ConversationState {
+  value: { conversations: Conversation[]; folders: Folder[] };
+  selected: Selected;
+  setChatData: (chatData: ChatData) => void;
+  setSelected: (selected: Selected) => void;
+  updateMessage: (message: Message) => void;
+  fetchConversations: () => Promise<void>;
+}
+
+export const useConversationStore = create<ConversationState>((set) => ({
+  value: { conversations: [], folders: [] },
+  selected: { tag: SelectedType.None },
+  setChatData: (chatData) => set((state) => ({ ...state, value: chatData })),
+  setSelected: (selected) => set((state) => ({ ...state, selected })),
+  updateMessage: (message) =>
+    set((state) => {
+      const conversation = findConversation(state.value, message.conversationId);
       if (conversation) {
-        const message = conversation.messages.findIndex((m) => m.id === payload.id);
-        if (message >= 0) {
-          conversation.messages[message] = payload;
+        const messageIndex = conversation.messages.findIndex((m) => m.id === message.id);
+        if (messageIndex >= 0) {
+          conversation.messages[messageIndex] = message;
         } else {
-          conversation.messages.push(payload);
+          conversation.messages.push(message);
         }
       }
-    },
+      return { ...state };
+    }),
+  fetchConversations: async () => {
+    const data = await getChatData();
+    set((state) => ({ ...state, value: data }));
+    const oldState = useConversationStore.getState().selected;
+    let noneSelected: Selected = { tag: SelectedType.None };
+    const firstConversation = getFirstConversation(data);
+    if (firstConversation) {
+      noneSelected = { value: firstConversation.id, tag: SelectedType.Conversation };
+    }
+
+    match(oldState)
+      .with({ tag: SelectedType.Folder }, ({ value }) => {
+        const folder = findFolder(data, value);
+        if (!folder) {
+          useConversationStore.getState().setSelected(noneSelected);
+        }
+      })
+      .with({ tag: SelectedType.Conversation }, ({ value }) => {
+        const conversation = findConversation(data, value);
+        if (!conversation) {
+          useConversationStore.getState().setSelected(noneSelected);
+        }
+      })
+      .with({ tag: SelectedType.None }, () => {
+        useConversationStore.getState().setSelected(noneSelected);
+      })
+      .exhaustive();
   },
-});
+}));
 
-export const { setChatData, setSelected, updateMessage } = conversationSlice.actions;
-
-export const selectChatData = (state: RootState) => state.conversation.value;
-export const SELECT_FOLDERS = (state: RootState) => state.conversation.value.folders;
+export const selectChatData = (state: ConversationState) => state.value;
+export const SELECT_FOLDERS = (state: ConversationState) => state.value.folders;
 export const selectSelected = (
-  state: RootState,
+  state: ConversationState,
 ): Enum<SelectedType.Conversation, Conversation> | Enum<SelectedType.Folder, Folder> | Enum<SelectedType.None> => {
-  return match(state.conversation.selected)
+  return match(state.selected)
     .with({ tag: SelectedType.Folder }, (selected) => {
-      return match(findFolder(state.conversation.value, selected.value))
+      return match(findFolder(state.value, selected.value))
         .with(null, () => ({ tag: SelectedType.None }) as const)
         .otherwise((folder) => ({ tag: SelectedType.Folder, value: folder }) as const);
     })
     .with({ tag: SelectedType.Conversation }, (selected) => {
-      return match(findConversation(state.conversation.value, selected.value))
+      return match(findConversation(state.value, selected.value))
         .with(null, () => ({ tag: SelectedType.None }) as const)
         .otherwise((conversation) => ({ tag: SelectedType.Conversation, value: conversation }) as const);
     })
     .otherwise(() => ({ tag: SelectedType.None }));
 };
-export const selectSelectedNodeId = (state: RootState) => getNodeId(state.conversation.selected);
-export const selectSelectedFolderId = (state: RootState) => {
-  return match(state.conversation.selected)
+export const selectSelectedNodeId = (state: ConversationState) => getNodeId(state.selected);
+export const selectSelectedFolderId = (state: ConversationState) => {
+  return match(state.selected)
     .with({ tag: SelectedType.Folder }, (selected) => selected.value)
     .with(
       { tag: SelectedType.Conversation },
-      (selected) => findConversation(state.conversation.value, selected.value)?.folderId ?? null,
+      (selected) => findConversation(state.value, selected.value)?.folderId ?? null,
     )
     .otherwise(() => null);
-};
-
-export const conversationReducer = conversationSlice.reducer;
-
-export const fetchConversations = (): AppThunkAction => async (dispatch, getState) => {
-  const data = await getChatData();
-  dispatch(setChatData(data));
-  const oldState = getState().conversation.selected;
-  let noneSelected: Selected = { tag: SelectedType.None };
-  const firstConversation = getFirstConversation(data);
-  if (firstConversation) {
-    noneSelected = { value: firstConversation.id, tag: SelectedType.Conversation };
-  }
-
-  match(oldState)
-    .with({ tag: SelectedType.Folder }, ({ value }) => {
-      const folder = findFolder(data, value);
-      if (!folder) {
-        dispatch(setSelected(noneSelected));
-      }
-    })
-    .with({ tag: SelectedType.Conversation }, ({ value }) => {
-      const conversation = findConversation(data, value);
-      if (!conversation) {
-        dispatch(setSelected(noneSelected));
-      }
-    })
-    .with({ tag: SelectedType.None }, () => {
-      dispatch(setSelected(noneSelected));
-    })
-    .exhaustive();
 };

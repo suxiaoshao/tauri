@@ -1,9 +1,9 @@
-import { useAppSelector } from '@chatgpt/app/hooks';
-import { SELECT_FOLDERS } from '@chatgpt/features/Conversations/conversationSlice';
+import { useConversationStore, SELECT_FOLDERS } from '@chatgpt/features/Conversations/conversationSlice';
 import { MenuList, MenuItem, ListItemText } from '@mui/material';
 import FolderSelectItem from './FolderSelectItem';
 import React, { ForwardedRef, useMemo } from 'react';
 import { FolderSelectContextType, FolderSelectContext } from './FolderSelectContext';
+import { useShallow } from 'zustand/react/shallow';
 
 export interface FolderSelectProps {
   value?: number | null;
@@ -15,7 +15,7 @@ function FolderSelect(
   { value, onChange, disabledFolderIds = [] }: FolderSelectProps,
   ref: ForwardedRef<HTMLUListElement>,
 ) {
-  const folders = useAppSelector(SELECT_FOLDERS);
+  const folders = useConversationStore(useShallow(SELECT_FOLDERS));
   const contextValue = useMemo<FolderSelectContextType>(() => {
     return {
       selectedId: value ?? null,

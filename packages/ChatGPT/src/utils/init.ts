@@ -6,7 +6,7 @@
  * @FilePath: /tauri/packages/ChatGPT/src/utils/init.ts
  */
 import store from '@chatgpt/app/store';
-import { fetchConversations, updateMessage } from '@chatgpt/features/Conversations/conversationSlice';
+import { useConversationStore } from '@chatgpt/features/Conversations/conversationSlice';
 import { fetchConfig, setConfig } from '@chatgpt/features/Setting/configSlice';
 import { Message } from '@chatgpt/types/message';
 import { appWindow } from '@tauri-apps/api/window';
@@ -16,11 +16,11 @@ import { fetchTemplates } from '@chatgpt/features/Template/templateSlice';
 
 export default async function init() {
   // fetch conversations data
-  store.dispatch(fetchConversations());
+  useConversationStore.getState().fetchConversations();
 
   // listen for messages
   await appWindow.listen<Message>('message', (response) => {
-    store.dispatch(updateMessage(response.payload));
+    useConversationStore.getState().updateMessage(response.payload);
   });
 
   // fetch config data
