@@ -5,7 +5,10 @@
  * @LastEditTime: 2023-11-07 12:29:49
  * @FilePath: /tauri/packages/ChatGPT/src/features/Home/ConversationDetail/components/ConversationHeader/ExportConversation.tsx
  */
+import { useConversationStore } from '@chatgpt/features/Conversations/conversationSlice';
+import { ExportConversationParams, ExportType, exportConversation } from '@chatgpt/service/chat/mutation';
 import { Conversation } from '@chatgpt/types/conversation';
+import IosShareIcon from '@mui/icons-material/IosShare';
 import {
   Button,
   Dialog,
@@ -17,14 +20,11 @@ import {
   TextField,
   Tooltip,
 } from '@mui/material';
-import IosShareIcon from '@mui/icons-material/IosShare';
-import { useCallback, useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
-import { ExportConversationParams, ExportType, exportConversation } from '@chatgpt/service/chat/mutation';
-import { useAppDispatch } from '@chatgpt/app/hooks';
-import { fetchConversations } from '@chatgpt/features/Conversations/conversationSlice';
 import { dialog } from '@tauri-apps/api';
 import { enqueueSnackbar } from 'notify';
+import { useCallback, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { useShallow } from 'zustand/react/shallow';
 
 export interface ExportConversationProps {
   conversation: Conversation;
@@ -38,7 +38,7 @@ async function selectFolder() {
 }
 
 export default function ExportConversation({ conversation }: ExportConversationProps) {
-  const dispatch = useAppDispatch();
+  const fetchConversations = useConversationStore(useShallow(({ fetchConversations }) => fetchConversations));
   const [open, setOpen] = useState(false);
   const handleOpen = useCallback(() => setOpen(true), []);
   const handleClose = useCallback(() => setOpen(false), []);
@@ -47,11 +47,11 @@ export default function ExportConversation({ conversation }: ExportConversationP
     async ({ exportType }: Pick<ExportConversationParams, 'exportType'>) => {
       const path = await selectFolder();
       await exportConversation({ path, exportType, id: conversation.id });
-      dispatch(fetchConversations());
+      fetchConversations();
       handleClose();
       await enqueueSnackbar('Exported successfully', { variant: 'success' });
     },
-    [conversation.id, dispatch, handleClose],
+    [conversation.id, fetchConversations, handleClose],
   );
   return (
     <>

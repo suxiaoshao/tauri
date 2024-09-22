@@ -5,31 +5,24 @@
  * @LastEditTime: 2024-04-30 23:45:58
  * @FilePath: /tauri/packages/ChatGPT/src/features/Template/templateSlice.ts
  */
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { AppThunkAction } from '../../app/store';
-import { ConversationTemplate } from '@chatgpt/types/conversation_template';
 import { allConversationTemplates } from '@chatgpt/service/chat/query';
+import { ConversationTemplate } from '@chatgpt/types/conversationTemplate';
+import { create } from 'zustand';
 
-export const templateSlice = createSlice({
-  name: 'template',
-  initialState: { value: [] as ConversationTemplate[] },
-  reducers: {
-    setTemplates: (state, action: PayloadAction<ConversationTemplate[]>) => {
-      state.value = action.payload;
-    },
+interface TemplateState {
+  templates: ConversationTemplate[];
+  setTemplates: (templates: ConversationTemplate[]) => void;
+  fetchTemplates: () => Promise<void>;
+}
+
+export const useTemplateStore = create<TemplateState>((set) => ({
+  templates: [],
+  setTemplates: (templates) => set({ templates }),
+  fetchTemplates: async () => {
+    const data = await allConversationTemplates();
+    set({ templates: data });
   },
-  selectors: {
-    selectTemplates: (state) => state.value,
-    selectTemplateCount: (state) => state.value.length,
-  },
-});
-export const { setTemplates } = templateSlice.actions;
+}));
 
-export const { selectTemplates, selectTemplateCount } = templateSlice.selectors;
-
-export default templateSlice.reducer;
-
-export const fetchTemplates = (): AppThunkAction => async (dispatch) => {
-  const data = await allConversationTemplates();
-  dispatch(setTemplates(data));
-};
+export const selectTemplates = (state: TemplateState) => state.templates;
+export const selectTemplateCount = (state: TemplateState) => state.templates.length;

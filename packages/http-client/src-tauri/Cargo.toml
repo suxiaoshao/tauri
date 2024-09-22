@@ -11,21 +11,21 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [build-dependencies]
-tauri-build = { version = "1.5.3", features = [] }
+tauri-build = { version = "1.5.5", features = [] }
 
 [dependencies]
-serde_json = "1.0.120"
-serde = { version = "1.0.204", features = ["derive"] }
-tauri = { version = "1.7.1", features = ["api-all", "system-tray"] }
+serde_json = "1.0.128"
+serde = { version = "1.0.210", features = ["derive"] }
+tauri = { version = "1.8.0", features = ["api-all", "system-tray"] }
 
 # 数据库
-diesel = { version = "2.2.2", features = ["sqlite"] }
+diesel = { version = "2.2.4", features = ["sqlite"] }
 
 # http
-reqwest = "0.12.5"
+reqwest = "0.12.7"
 
 # 错误处理
-anyhow = "1.0.86"
+anyhow = "1.0.89"
 
 # 搜索应用
 lnk = "0.5.1"

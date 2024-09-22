@@ -1,13 +1,14 @@
-import { useAppSelector } from '@chatgpt/app/hooks';
 import TemplateInfo from '@chatgpt/features/Template/components/TemplateInfo';
-import { selectTemplates } from '@chatgpt/features/Template/templateSlice';
-import { initTemporaryConversation } from '@chatgpt/service/temporary_conversation';
-import { ConversationTemplate } from '@chatgpt/types/conversation_template';
+import { selectTemplates, useTemplateStore } from '@chatgpt/features/Template/templateSlice';
+import { initTemporaryConversation } from '@chatgpt/service/temporaryConversation';
+import { ConversationTemplate } from '@chatgpt/types/conversationTemplate';
 import { Avatar, Box, Divider, InputBase, List, ListItemAvatar, ListItemButton, ListItemText } from '@mui/material';
 import { useCallback, useEffect, useReducer, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useNavigate } from 'react-router-dom';
+import { match } from 'ts-pattern';
 import { Enum } from 'types';
+import { useShallow } from 'zustand/react/shallow';
 
 interface Data {
   selectedIndex: number | null;
@@ -36,8 +37,8 @@ function getFilteredTemplates(
 }
 
 function reducer(state: Data, action: Action): Data {
-  switch (action.tag) {
-    case 'up':
+  return match(action)
+    .with({ tag: 'up' }, () => {
       if (state.selectedIndex === null) {
         return state;
       }
@@ -45,7 +46,8 @@ function reducer(state: Data, action: Action): Data {
         return { ...state, selectedIndex: state.filteredTemplates.length - 1 };
       }
       return { ...state, selectedIndex: state.selectedIndex - 1 };
-    case 'down':
+    })
+    .with({ tag: 'down' }, () => {
       if (state.selectedIndex === null) {
         return { ...state, selectedIndex: 0 };
       }
@@ -53,23 +55,24 @@ function reducer(state: Data, action: Action): Data {
         return { ...state, selectedIndex: 0 };
       }
       return { ...state, selectedIndex: state.selectedIndex + 1 };
-    case 'setSearch':
+    })
+    .with({ tag: 'setSearch' }, (action) => {
       return {
         ...state,
         searchText: action.value,
         filteredTemplates: getFilteredTemplates(state.sourceTemplates, action.value),
         selectedIndex: null,
       };
-    case 'setSourceTemplates':
+    })
+    .with({ tag: 'setSourceTemplates' }, (action) => {
       return {
         ...state,
         sourceTemplates: action.value,
         filteredTemplates: getFilteredTemplates(action.value, state.searchText),
         selectedIndex: null,
       };
-    default:
-      return state;
-  }
+    })
+    .otherwise(() => state);
 }
 
 const initialState: Data = {
@@ -82,7 +85,7 @@ const initialState: Data = {
 export default function TemporaryList() {
   const navigate = useNavigate();
   // data & dispatch
-  const templates = useAppSelector(selectTemplates);
+  const templates = useTemplateStore(useShallow(selectTemplates));
   const [{ selectedIndex, filteredTemplates }, dispatch] = useReducer(reducer, initialState);
   useEffect(() => {
     dispatch({ tag: 'setSourceTemplates', value: templates });

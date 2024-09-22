@@ -19,13 +19,14 @@ import {
   SxProps,
   Theme,
 } from '@mui/material';
+import { match, P } from 'ts-pattern';
 
 export interface MarkdownProps extends BoxProps {
   value: string;
 }
 
 function CustomImage(props: React.ImgHTMLAttributes<HTMLImageElement>) {
-  return <Box component={'img'} {...props} />;
+  return <Box component="img" {...props} />;
 }
 
 function CustomLink(props: { title: string; href: string; children: string }) {
@@ -41,7 +42,9 @@ function CustomHead(props: TypographyProps) {
     <>
       <Typography
         sx={{
-          margin: `${props.variant !== 'h2' ? '30px' : '10px'} 0 0 10px`,
+          margin: match(props.variant)
+            .with('h2', () => '10px 0 0 10px')
+            .otherwise(() => '30px 0 0 10px'),
         }}
         id={String(props.children)}
         variant={props.variant}
@@ -58,12 +61,12 @@ function CustomHead(props: TypographyProps) {
 }
 
 function MyCode(props: { children: string; className?: string }) {
-  if (props.className !== undefined) {
+  if (props.className) {
     return <code className={props.className}>{props.children}</code>;
   } else {
     return (
       <Box
-        component={'span'}
+        component="span"
         sx={({
           palette: {
             secondary: { main, contrastText },
@@ -105,21 +108,21 @@ function MyListItem(props: { children: JSX.Element[] }) {
   return (
     <li>
       {props.children.map((value) => {
-        return typeof value === 'string' ? (
-          <Typography
-            variant="body1"
-            component="span"
-            sx={{
-              margin: '6px 0 6px 0',
-              display: 'inline-block',
-            }}
-            key={value}
-          >
-            {value}
-          </Typography>
-        ) : (
-          value
-        );
+        return match(value)
+          .with(P.string, (str) => (
+            <Typography
+              variant="body1"
+              component="span"
+              sx={{
+                margin: '6px 0 6px 0',
+                display: 'inline-block',
+              }}
+              key={str.toString()}
+            >
+              {str}
+            </Typography>
+          ))
+          .otherwise(() => value);
       })}
     </li>
   );

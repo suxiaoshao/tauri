@@ -1,7 +1,8 @@
-import { Selected, SelectedType } from '@chatgpt/features/Conversations/conversationSlice';
+import { Selected, SelectedType } from '@chatgpt/features/Conversations/types';
 import { ChatData } from '@chatgpt/types/chatData';
 import { Conversation } from '@chatgpt/types/conversation';
 import { Folder } from '@chatgpt/types/folder';
+import { match } from 'ts-pattern';
 
 export function findConversation(chatData: ChatData, conversationId: number | null): Conversation | null {
   const conversation = _findConversation(chatData.conversations, conversationId);
@@ -67,12 +68,14 @@ export function getNodeIdByFolder(folder: Folder): string {
 
 export function getSelectedFromNodeId(nodeId: string): Selected {
   const [tag, value] = nodeId.split('-');
-  switch (tag) {
-    case SelectedType.Conversation:
-      return { tag: SelectedType.Conversation, value: parseInt(value) };
-    case SelectedType.Folder:
-      return { tag: SelectedType.Folder, value: parseInt(value) };
-    default:
-      return { tag: SelectedType.None };
-  }
+  return match(tag)
+    .with(
+      SelectedType.Conversation,
+      () => ({ tag: SelectedType.Conversation, value: Number.parseInt(value, 10) }) satisfies Selected,
+    )
+    .with(
+      SelectedType.Folder,
+      () => ({ tag: SelectedType.Folder, value: Number.parseInt(value, 10) }) satisfies Selected,
+    )
+    .otherwise(() => ({ tag: SelectedType.None }) satisfies Selected);
 }

@@ -1,8 +1,8 @@
-import { Config } from '@chatgpt/features/Setting';
+import { Config } from '@chatgpt/features/Setting/types';
 import { appInvoke } from './base';
 
 export async function getConfig() {
-  return await appInvoke<unknown, Config>('plugin:config|get_config', undefined);
+  return await appInvoke<unknown, Config>('plugin:config|get_config', null);
 }
 
 export interface SetConfigParams {
@@ -14,5 +14,5 @@ export async function setConfigService(params: SetConfigParams) {
 }
 
 export async function createSettingWindow() {
-  await appInvoke<unknown, unknown>('plugin:config|create_setting_window', undefined);
+  await appInvoke<unknown, unknown>('plugin:config|create_setting_window', null);
 }

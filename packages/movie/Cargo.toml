@@ -10,11 +10,11 @@ edition = "2021"
 thiserror = "1.0.63"
 
 # 网络请求
-reqwest = "0.12.5"
-scraper = "0.19.1"
+reqwest = "0.12.7"
+scraper = "0.20.0"
 
 # 运行时
-tokio = { version = "1.39.1", features = [
+tokio = { version = "1.40.0", features = [
   "rt",
   "rt-multi-thread",
   "macros",
@@ -22,8 +22,8 @@ tokio = { version = "1.39.1", features = [
 ] }
 
 # 存储
-serde = { version = "1.0.204", features = ["derive"] }
-serde_json = "1.0.120"
+serde = { version = "1.0.210", features = ["derive"] }
+serde_json = "1.0.128"
 
 # 参数
-clap = { version = "4.5.11", features = ["derive"] }
+clap = { version = "4.5.18", features = ["derive"] }

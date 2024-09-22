@@ -6,18 +6,19 @@
  * @FilePath: /tauri/packages/ChatGPT/src/features/Template/List/header.tsx
  */
 import { Box, IconButton, Typography } from '@mui/material';
-import { Add, Create, Refresh } from '@mui/icons-material';
+import { Add, Refresh } from '@mui/icons-material';
 import { useCallback } from 'react';
-import { useAppDispatch, useAppSelector } from '@chatgpt/app/hooks';
-import { fetchTemplates, selectTemplateCount } from '../../templateSlice';
+import { useTemplateStore, selectTemplateCount } from '../../templateSlice';
 import { useNavigate } from 'react-router-dom';
+import { useShallow } from 'zustand/react/shallow';
 
 export default function TemplateListHeader() {
-  const count = useAppSelector(selectTemplateCount);
-  const dispatch = useAppDispatch();
+  const { count, fetchTemplates } = useTemplateStore(
+    useShallow((state) => ({ count: selectTemplateCount(state), fetchTemplates: state.fetchTemplates })),
+  );
   const refresh = useCallback(() => {
-    dispatch(fetchTemplates());
-  }, [dispatch]);
+    fetchTemplates();
+  }, [fetchTemplates]);
   const navigate = useNavigate();
   const goToCreate = useCallback(() => {
     navigate('/template/create');

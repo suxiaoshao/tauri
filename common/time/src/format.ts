@@ -6,11 +6,11 @@
  * @FilePath: /tauri/common/time/src/format.ts
  */
 import { ConfigType } from 'dayjs';
-import { dayjs } from './index';
+import { dayjs } from './init';
 
 /** 格式化时间 */
 export function format(timestamp?: ConfigType): string {
-  if (timestamp == null || timestamp == undefined) {
+  if (timestamp === null || timestamp === undefined) {
     return '~';
   }
   const time = dayjs(timestamp);

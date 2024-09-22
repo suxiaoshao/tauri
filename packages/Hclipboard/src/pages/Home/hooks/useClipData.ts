@@ -19,7 +19,10 @@ export default function useClipData(searchName: string | undefined) {
       }
     });
     return () => {
-      unlisten.then((e) => e());
+      (async () => {
+        const f = await unlisten;
+        f();
+      })();
     };
   }, [fetchData]);
   return data;

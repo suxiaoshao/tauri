@@ -5,52 +5,62 @@
  * @LastEditTime: 2024-01-29 20:58:40
  * @FilePath: /tauri/common/theme/src/index.tsx
  */
-import React, { useEffect } from 'react';
-import { createTheme, CssBaseline, ThemeProvider } from '@mui/material';
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
+import { createTheme, CssBaseline, ThemeProvider } from '@mui/material';
+import React, { useEffect } from 'react';
+import { match } from 'ts-pattern';
+import { useShallow } from 'zustand/react/shallow';
 import './index.css';
+import { colorSchemaMatch, useThemeStore, selectActiveYouTheme, selectMuiTheme } from './themeSlice';
 import setYouThemeToCssVars from './utils/cssVar';
-import {
-  colorSchemaMatch,
-  selectActiveYouTheme,
-  selectMuiTheme,
-  setSystemColorScheme,
-  useAppDispatch,
-  useAppSelector,
-} from './themeSlice';
 
 export interface CustomThemeProps {
   children?: React.ReactNode;
 }
 
 export function CustomTheme({ children }: CustomThemeProps): JSX.Element {
-  const youTheme = useAppSelector(selectActiveYouTheme);
-  const muiTheme = useAppSelector(selectMuiTheme);
-  const dispatch = useAppDispatch();
+  const { setSystemColorScheme, ...state } = useThemeStore(
+    useShallow(({ setSystemColorScheme, color, colorSetting, systemColorScheme }) => ({
+      color,
+      colorSetting,
+      systemColorScheme,
+      setSystemColorScheme,
+    })),
+  );
 
   useEffect(() => {
-    setYouThemeToCssVars(youTheme);
-  }, [youTheme]);
+    setYouThemeToCssVars(selectActiveYouTheme(state));
+  }, [state]);
   useEffect(() => {
-    colorSchemaMatch.addEventListener('change', (e) => {
-      const colorScheme = e.matches ? 'dark' : 'light';
-      dispatch(setSystemColorScheme(colorScheme));
-    });
-  }, [dispatch]);
+    const sign = new AbortController();
+    colorSchemaMatch.addEventListener(
+      'change',
+      (e) => {
+        const colorScheme = match(e.matches)
+          .with(true, () => 'dark' as const)
+          .otherwise(() => 'light' as const);
+        setSystemColorScheme(colorScheme);
+      },
+      { signal: sign.signal },
+    );
+    return () => {
+      sign.abort();
+    };
+  }, [setSystemColorScheme]);
   return (
-    <ThemeProvider theme={createTheme(muiTheme)}>
+    <ThemeProvider theme={createTheme(selectMuiTheme(state))}>
       <CssBaseline />
       {children}
     </ThemeProvider>
   );
 }
 
-export { hexFromArgb, argbFromHex, themeFromSourceColor } from '@material/material-color-utilities';
+export { argbFromHex, hexFromArgb, themeFromSourceColor } from '@material/material-color-utilities';
 
-export { default as themeReducer, selectActiveYouTheme } from './themeSlice';
+export { selectActiveYouTheme } from './themeSlice';
 
 export { default as ThemeDrawerItem } from './components/ThemeDrawerItem';
 

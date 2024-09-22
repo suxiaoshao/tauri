@@ -16,7 +16,7 @@ export default function CopyIcon({ content }: CopyIconProps) {
   return (
     <Tooltip title="Copy">
       <IconButton size="small" onClick={handleCopy}>
-        <ContentCopy fontSize={'small'} sx={ToolSx} />
+        <ContentCopy fontSize="small" sx={ToolSx} />
       </IconButton>
     </Tooltip>
   );

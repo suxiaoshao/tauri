@@ -5,15 +5,15 @@
  * @LastEditTime: 2024-01-07 20:53:49
  * @FilePath: /tauri/packages/ChatGPT/src/features/Home/ConversationDetail/components/MessageItem/components/UserItem.tsx
  */
+import user from '@chatgpt/assets/user.jpg';
 import CustomMarkdown from '@chatgpt/components/Markdown';
 import { Avatar, Box, Divider } from '@mui/material';
-import user from '@chatgpt/assets/user.jpg';
 import { AvatarSx, MarkdownSx, MessageSx } from '../const';
-import DeleteMessageIcon from './ToolBar/DeleteMessageIcon';
+import { BaseMessage } from '../types';
 import ToolBar from './ToolBar';
-import ViewIcon from './ToolBar/ViewIcon';
-import { BaseMessage } from '..';
 import CopyIcon from './ToolBar/CopyIcon';
+import DeleteMessageIcon from './ToolBar/DeleteMessageIcon';
+import ViewIcon from './ToolBar/ViewIcon';
 
 export interface UserItemProps {
   message: BaseMessage;

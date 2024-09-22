@@ -5,32 +5,31 @@
  * @LastEditTime: 2024-04-30 23:38:23
  * @FilePath: /tauri/packages/ChatGPT/src/utils/init.ts
  */
-import store from '@chatgpt/app/store';
-import { fetchConversations, updateMessage } from '@chatgpt/features/Conversations/conversationSlice';
-import { fetchConfig, setConfig } from '@chatgpt/features/Setting/configSlice';
+import { useConversationStore } from '@chatgpt/features/Conversations/conversationSlice';
+import { useConfigStore } from '@chatgpt/features/Setting/configSlice';
+import { Config } from '@chatgpt/features/Setting/types';
+import { useTemplateStore } from '@chatgpt/features/Template/templateSlice';
 import { Message } from '@chatgpt/types/message';
-import { appWindow } from '@tauri-apps/api/window';
 import { listen } from '@tauri-apps/api/event';
-import { Config } from '@chatgpt/features/Setting';
-import { fetchTemplates } from '@chatgpt/features/Template/templateSlice';
+import { appWindow } from '@tauri-apps/api/window';
 
 export default async function init() {
   // fetch conversations data
-  store.dispatch(fetchConversations());
+  useConversationStore.getState().fetchConversations();
 
   // listen for messages
   await appWindow.listen<Message>('message', (response) => {
-    store.dispatch(updateMessage(response.payload));
+    useConversationStore.getState().updateMessage(response.payload);
   });
 
   // fetch config data
-  store.dispatch(fetchConfig());
+  useConfigStore.getState().fetchConfig();
 
   // listen for config changes
   await listen<Config>('config', (event) => {
-    store.dispatch(setConfig(event.payload));
+    useConfigStore.getState().setConfig(event.payload);
   });
 
   // fetch templates data
-  store.dispatch(fetchTemplates());
+  useTemplateStore.getState().fetchTemplates();
 }

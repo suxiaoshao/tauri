@@ -5,38 +5,32 @@
  * @LastEditTime: 2024-05-08 21:11:32
  * @FilePath: /tauri/packages/ChatGPT/src/features/Setting/configSlice.ts
  */
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { AppThunkAction } from '../../app/store';
+import { create } from 'zustand';
 import { getConfig } from '@chatgpt/service/config';
-import { Config } from '.';
-import { ArrayPath } from 'react-hook-form';
+import { Config, Theme } from './types';
 
-export const configSlice = createSlice({
-  name: 'config',
-  initialState: {} as Config,
-  reducers: {
-    setConfig: (state, action: PayloadAction<Config>) => {
-      state.apiKey = action.payload.apiKey;
-      state.theme = action.payload.theme;
-      state.url = action.payload.url;
-      state.httpProxy = action.payload.httpProxy;
-      state.models = action.payload.models;
-      state.temporaryHotkey = action.payload.temporaryHotkey;
-    },
+interface ConfigState extends Config {
+  setConfig: (config: Config) => void;
+  fetchConfig: () => Promise<void>;
+}
+
+export const useConfigStore = create<ConfigState>((set) => ({
+  apiKey: null,
+  theme: {
+    color: '#3271ae',
+    theme: Theme.System,
   },
-  selectors: {
-    selectApiKey: (state) => state.apiKey,
-    selectModels: (state) => state.models,
-    selectConfig: (state) => state,
+  url: null,
+  httpProxy: '',
+  models: [],
+  temporaryHotkey: '',
+  setConfig: (config: Config) => set(config),
+  fetchConfig: async () => {
+    const data = await getConfig();
+    set(data);
   },
-});
-export const { setConfig } = configSlice.actions;
+}));
 
-export const { selectApiKey, selectModels, selectConfig } = configSlice.selectors;
-
-export default configSlice.reducer;
-
-export const fetchConfig = (): AppThunkAction => async (dispatch) => {
-  const data = await getConfig();
-  dispatch(setConfig(data));
-};
+export const selectApiKey = (state: ConfigState) => state.apiKey;
+export const selectModels = (state: ConfigState) => state.models;
+export const selectConfig = (state: ConfigState) => state;

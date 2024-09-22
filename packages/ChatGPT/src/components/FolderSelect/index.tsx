@@ -1,20 +1,9 @@
-import { useAppSelector } from '@chatgpt/app/hooks';
-import { SELECT_FOLDERS } from '@chatgpt/features/Conversations/conversationSlice';
+import { useConversationStore, SELECT_FOLDERS } from '@chatgpt/features/Conversations/conversationSlice';
 import { MenuList, MenuItem, ListItemText } from '@mui/material';
 import FolderSelectItem from './FolderSelectItem';
-import React, { ForwardedRef, createContext, useMemo } from 'react';
-
-export type FolderSelectContextType = {
-  selectedId: number | null;
-  onSelect: (id: number | null) => void;
-  disabledFolderIds: number[];
-};
-
-export const FolderSelectContext = createContext<FolderSelectContextType>({
-  selectedId: null,
-  onSelect: () => {},
-  disabledFolderIds: [],
-});
+import React, { ForwardedRef, useMemo } from 'react';
+import { FolderSelectContextType, FolderSelectContext } from './FolderSelectContext';
+import { useShallow } from 'zustand/react/shallow';
 
 export interface FolderSelectProps {
   value?: number | null;
@@ -26,7 +15,7 @@ function FolderSelect(
   { value, onChange, disabledFolderIds = [] }: FolderSelectProps,
   ref: ForwardedRef<HTMLUListElement>,
 ) {
-  const folders = useAppSelector(SELECT_FOLDERS);
+  const folders = useConversationStore(useShallow(SELECT_FOLDERS));
   const contextValue = useMemo<FolderSelectContextType>(() => {
     return {
       selectedId: value ?? null,
@@ -38,7 +27,7 @@ function FolderSelect(
     <FolderSelectContext.Provider value={contextValue}>
       <MenuList ref={ref}>
         <MenuItem selected={value === null} onClick={() => onChange(null)}>
-          <ListItemText primary={'root'} secondary={'/'} />
+          <ListItemText primary="root" secondary="/" />
         </MenuItem>
 
         {folders.map((folder) => (

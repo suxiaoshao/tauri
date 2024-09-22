@@ -10,11 +10,11 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [build-dependencies]
-tauri-build = { version = "1.5.3", features = [] }
+tauri-build = { version = "1.5.5", features = [] }
 
 [dependencies]
 # tauri
-tauri = { version = "1.7.1", features = [
+tauri = { version = "1.8.0", features = [
     "window-unmaximize",
     "window-maximize",
     "window-start-dragging",
@@ -30,12 +30,12 @@ tauri = { version = "1.7.1", features = [
     "shell-open",
     "global-shortcut",
 ] }
-serde = { version = "1.0.204", features = ["derive"] }
-serde_json = "1.0.120"
+serde = { version = "1.0.210", features = ["derive"] }
+serde_json = "1.0.128"
 
 # database
-diesel = { version = "2.2.2", features = ["sqlite", "r2d2", "numeric", "time"] }
-libsqlite3-sys = { version = "0.29.0", features = ["bundled-windows"] }
+diesel = { version = "2.2.4", features = ["sqlite", "r2d2", "numeric", "time"] }
+libsqlite3-sys = { version = "0.30.1", features = ["bundled-windows"] }
 time = { version = "0.3.36", features = ["serde"] }
 
 # 错误处理
@@ -51,8 +51,8 @@ window-shadows = "0.2.2"
 window-vibrancy = "0.4.3"
 
 # http request
-reqwest = { version = "0.12.5", features = ["json"] }
-tokio = { version = "1.39.1", features = [
+reqwest = { version = "0.12.7", features = ["json"] }
+tokio = { version = "1.40.0", features = [
     "rt",
     "rt-multi-thread",
     "sync",
@@ -65,11 +65,11 @@ futures = "0.3.30"
 
 # config
 notify = { version = "6.1.1" }
-toml = "0.8.16"
+toml = "0.8.19"
 csv = "1.3.0"
 
 [target.'cfg(target_os="macos")'.dependencies]
-cocoa = "0.25.0"
+cocoa = "0.26.0"
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem
@@ -78,4 +78,4 @@ custom-protocol = ["tauri/custom-protocol"]
 
 [dev-dependencies]
 dotenv = "0.15.0"
-anyhow = "1.0.86"
+anyhow = "1.0.89"

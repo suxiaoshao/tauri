@@ -1,17 +1,14 @@
 import { Box } from '@mui/material';
-import MessageItem, { BaseMessage } from '../MessageItem';
-import { createContext, useMemo } from 'react';
+import { useMemo } from 'react';
+import MessageItem from '../MessageItem';
+import { BaseMessage } from '../MessageItem/types';
+import { MessageActionContext } from './MessageActionContext';
 
 export interface MessageHistoryProps {
   messages: BaseMessage[];
   onMessageViewed?: (id: number) => void;
   onMessageDeleted?: (id: number) => void;
 }
-
-export const MessageActionContext = createContext<{
-  onMessageDeleted?: (id: number) => void;
-  onMessageViewed?: (id: number) => void;
-}>({});
 
 export default function MessageHistory({ messages, onMessageDeleted, onMessageViewed }: MessageHistoryProps) {
   const contextValue = useMemo(() => ({ onMessageDeleted, onMessageViewed }), [onMessageDeleted, onMessageViewed]);

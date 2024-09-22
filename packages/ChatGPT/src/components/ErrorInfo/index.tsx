@@ -5,7 +5,7 @@
  * @LastEditTime: 2024-04-29 02:08:04
  * @FilePath: /tauri/packages/ChatGPT/src/components/ErrorInfo/index.tsx
  */
-import { Alert, Box, BoxProps, Button, Link, Typography } from '@mui/material';
+import { Alert, Box, BoxProps, Link, Typography } from '@mui/material';
 
 export interface ErrorInfoProps extends BoxProps {
   error: Error;

@@ -5,12 +5,10 @@
  * @LastEditTime: 2024-05-01 02:43:52
  * @FilePath: /tauri/packages/ChatGPT/src/features/Template/Detail/components/Edit.tsx
  */
-import { useAppSelector } from '@chatgpt/app/hooks';
-import store from '@chatgpt/app/store';
 import NumberField from '@chatgpt/components/NumberField';
-import { selectModels } from '@chatgpt/features/Setting/configSlice';
+import { selectModels, useConfigStore } from '@chatgpt/features/Setting/configSlice';
 import { Mode, Role } from '@chatgpt/types/common';
-import { ConversationTemplate } from '@chatgpt/types/conversation_template';
+import { ConversationTemplate } from '@chatgpt/types/conversationTemplate';
 import { valibotResolver } from '@hookform/resolvers/valibot';
 import { Add, Delete } from '@mui/icons-material';
 import { Box, Checkbox, FormControlLabel, FormLabel, IconButton, MenuItem, TextField } from '@mui/material';
@@ -30,6 +28,7 @@ import {
   pipe,
   string,
 } from 'valibot';
+import { useShallow } from 'zustand/react/shallow';
 
 const templateSchema = object({
   name: string(),
@@ -55,7 +54,7 @@ export type TemplateForm = InferInput<typeof templateSchema>;
 
 const getDefaultValues = (): Partial<TemplateForm> => ({
   mode: Mode.Contextual,
-  model: store.getState().config.models.at(0),
+  model: useConfigStore.getState().models.at(0),
   temperature: 1,
   topP: 1,
   n: 1,
@@ -80,7 +79,7 @@ export default function TemplateEdit({ initialValues, id, onSubmit }: TemplateEd
     defaultValues: initialValues ?? getDefaultValues(),
   });
   const [openMaxTokens, setOpenMaxTokens] = useState(false);
-  const models = useAppSelector(selectModels);
+  const models = useConfigStore(useShallow(selectModels));
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'prompts',

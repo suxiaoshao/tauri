@@ -1,8 +1,8 @@
 import { Box, Divider, Drawer, Link, ListItemButton, Typography } from '@mui/material';
+import { encodeNonAsciiHTML } from 'entities';
+import { useEffect, useMemo, useState } from 'react';
 import { ClipHistory } from '../../../rpc/query';
 import formatTime from '../../../utils/formatTime';
-import { useEffect, useMemo, useState } from 'react';
-import { encodeNonAsciiHTML } from 'entities';
 import useElementSize from '../hooks/useElementSize';
 
 export interface HistoryItemProps {
@@ -16,7 +16,7 @@ export interface HistoryItemProps {
 export default function HistoryItem({ item: { data, updateTime }, selected, isLast, index }: HistoryItemProps) {
   // 设置空格
   const dataList = useMemo(
-    () => data.split('\n').map((value) => encodeNonAsciiHTML(value).replace(/ /g, '&nbsp;')),
+    () => data.split('\n').map((value) => encodeNonAsciiHTML(value).replaceAll(' ', '&nbsp;')),
     [data],
   );
   const [{ height } = { height: 0 }, ref] = useElementSize();
@@ -30,7 +30,7 @@ export default function HistoryItem({ item: { data, updateTime }, selected, isLa
     <>
       <ListItemButton sx={{ display: 'flex', overflowX: 'hidden' }} selected={selected}>
         <Box sx={{ flex: '0 0 80px' }}>
-          <Typography color="text.secondary" variant={'body2'}>
+          <Typography color="text.secondary" variant="body2">
             {formatTime(updateTime)}
           </Typography>
         </Box>
@@ -40,10 +40,11 @@ export default function HistoryItem({ item: { data, updateTime }, selected, isLa
               {dataList.map((value) => (
                 <Typography
                   sx={{ width: '100%', wordBreak: 'break-all' }}
-                  variant={'body1'}
+                  variant="body1"
+                  // eslint-disable-next-line no-danger
                   dangerouslySetInnerHTML={{ __html: value }}
                   key={value}
-                ></Typography>
+                />
               ))}
             </Box>
           </Box>
@@ -53,32 +54,31 @@ export default function HistoryItem({ item: { data, updateTime }, selected, isLa
                 event.stopPropagation();
                 setOpen(true);
               }}
-              variant={'body2'}
+              variant="body2"
             >
               查看全部 {'>>'}
             </Link>
           )}
         </Box>
         <Box sx={{ flex: '0 0 30px' }}>
-          <Typography align={'right'} color="text.secondary" variant={'body2'}>
+          <Typography align="right" color="text.secondary" variant="body2">
             {index + 1}
           </Typography>
         </Box>
       </ListItemButton>
       {!isLast && <Divider />}
-      <Drawer anchor={'right'} open={open} onClose={() => setOpen(false)}>
-        {
-          <Box sx={{ padding: 1, width: '60vw' }}>
-            {dataList.map((value) => (
-              <Typography
-                sx={{ width: '100%', wordBreak: 'break-all' }}
-                variant={'body1'}
-                dangerouslySetInnerHTML={{ __html: value }}
-                key={value}
-              ></Typography>
-            ))}
-          </Box>
-        }
+      <Drawer anchor="right" open={open} onClose={() => setOpen(false)}>
+        <Box sx={{ padding: 1, width: '60vw' }}>
+          {dataList.map((value) => (
+            <Typography
+              sx={{ width: '100%', wordBreak: 'break-all' }}
+              variant="body1"
+              // eslint-disable-next-line no-danger
+              dangerouslySetInnerHTML={{ __html: value }}
+              key={value}
+            />
+          ))}
+        </Box>
       </Drawer>
     </>
   );

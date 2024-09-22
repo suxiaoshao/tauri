@@ -5,8 +5,8 @@
  * @LastEditTime: 2024-05-01 03:14:09
  * @FilePath: /tauri/packages/ChatGPT/src/features/Template/Detail/components/header.tsx
  */
-import { PromiseData } from '@chatgpt/hooks/usePromise';
-import { ConversationTemplate } from '@chatgpt/types/conversation_template';
+import { PromiseData, PromiseStatus } from '@chatgpt/hooks/usePromise';
+import { ConversationTemplate } from '@chatgpt/types/conversationTemplate';
 import { Delete, Edit, Preview, Refresh, Save } from '@mui/icons-material';
 import { Avatar, Box, IconButton, Skeleton, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
@@ -15,6 +15,7 @@ import { useMemo } from 'react';
 import { Alignment } from '@chatgpt/features/MessagePreview/Success';
 import { deleteConversationTemplate } from '@chatgpt/service/chat/mutation';
 import { enqueueSnackbar } from 'notify';
+import { match } from 'ts-pattern';
 
 export interface TemplateDetailHeaderProps {
   refresh: () => void;
@@ -25,7 +26,7 @@ export interface TemplateDetailHeaderProps {
 }
 
 export default function TemplateDetailHeader({
-  data: { tag, value },
+  data,
   refresh,
   alignment,
   handleAlignment,
@@ -33,52 +34,40 @@ export default function TemplateDetailHeader({
 }: TemplateDetailHeaderProps) {
   const navigate = useNavigate();
   const content = useMemo(() => {
-    switch (tag) {
-      case 'loading':
-        return (
-          <>
-            <Skeleton variant="circular" width={40} height={40} />
-            <Skeleton variant="text" sx={{ fontSize: '1rem' }} />
-          </>
-        );
-      case 'error':
-        return (
-          <Typography data-tauri-drag-region variant="h6" component="span" paragraph={false}>
+    return match(data)
+      .with({ tag: PromiseStatus.loading }, () => (
+        <>
+          <Skeleton variant="circular" width={40} height={40} />
+          <Skeleton variant="text" sx={{ fontSize: '1rem' }} />
+        </>
+      ))
+      .with({ tag: PromiseStatus.error }, () => (
+        <Typography data-tauri-drag-region variant="h6" component="span">
+          Conversation Templates
+        </Typography>
+      ))
+      .with({ tag: PromiseStatus.data }, ({ value }) => (
+        <>
+          <Typography data-tauri-drag-region variant="h6" component="span">
             Conversation Templates
           </Typography>
-        );
-      case 'data':
-        return (
-          <>
-            <Typography data-tauri-drag-region variant="h6" component="span" paragraph={false}>
-              Conversation Templates
-            </Typography>
-            <Avatar data-tauri-drag-region sx={{ backgroundColor: 'transparent' }}>
-              {value.icon}
-            </Avatar>
-            <Typography
-              sx={{ ml: 1 }}
-              data-tauri-drag-region
-              variant="body2"
-              color="inherit"
-              component="span"
-              paragraph={false}
-            >
-              {value.name}
-            </Typography>
-          </>
-        );
-      default:
-        return (
-          <Typography data-tauri-drag-region variant="h6" component="span" paragraph={false}>
-            Conversation Templates
+          <Avatar data-tauri-drag-region sx={{ backgroundColor: 'transparent' }}>
+            {value.icon}
+          </Avatar>
+          <Typography sx={{ ml: 1 }} data-tauri-drag-region variant="body2" color="inherit" component="span">
+            {value.name}
           </Typography>
-        );
-    }
-  }, [tag, value]);
+        </>
+      ))
+      .otherwise(() => (
+        <Typography data-tauri-drag-region variant="h6" component="span">
+          Conversation Templates
+        </Typography>
+      ));
+  }, [data]);
   const deleteButton = useMemo(() => {
-    switch (tag) {
-      case 'data':
+    return match(data)
+      .with({ tag: PromiseStatus.data }, ({ value }) => {
         const handleDelete = async () => {
           await deleteConversationTemplate({ id: value.id });
           navigate(-1);
@@ -91,29 +80,24 @@ export default function TemplateDetailHeader({
             </IconButton>
           </Tooltip>
         );
-      default:
-        return null;
-    }
-  }, [tag, value]);
+      })
+      .otherwise(() => null);
+  }, [data]);
   const submitButton = useMemo(() => {
-    switch (tag) {
-      case 'data':
-        switch (alignment) {
-          case Alignment.edit:
-            return (
-              <Tooltip title="Save">
-                <IconButton type="submit" form={formId}>
-                  <Save />
-                </IconButton>
-              </Tooltip>
-            );
-          default:
-            return null;
-        }
-      default:
-        return null;
-    }
-  }, [tag, value, formId, alignment]);
+    return match(data)
+      .with({ tag: PromiseStatus.data }, () => {
+        return match(alignment)
+          .with(Alignment.edit, () => (
+            <Tooltip title="Save">
+              <IconButton type="submit" form={formId}>
+                <Save />
+              </IconButton>
+            </Tooltip>
+          ))
+          .otherwise(() => null);
+      })
+      .otherwise(() => null);
+  }, [data, formId, alignment]);
   return (
     <Box
       data-tauri-drag-region
@@ -142,7 +126,7 @@ export default function TemplateDetailHeader({
         </ToggleButton>
       </ToggleButtonGroup>
       <Box>
-        <IconButton disabled={tag === 'loading'} onClick={refresh}>
+        <IconButton disabled={data.tag === 'loading'} onClick={refresh}>
           <Refresh />
         </IconButton>
         {deleteButton}

@@ -6,15 +6,8 @@
  * @FilePath: /tauri/common/details/src/Details.tsx
  */
 import { Box, BoxProps } from '@mui/material';
-import React, { Key } from 'react';
 import Item from './Item';
-
-export interface DetailsItem {
-  key?: Key;
-  label: string;
-  value: React.ReactNode;
-  span?: 1 | 2 | 3;
-}
+import { DetailsItem } from './types';
 
 export interface DetailsProps extends BoxProps {
   items: DetailsItem[];

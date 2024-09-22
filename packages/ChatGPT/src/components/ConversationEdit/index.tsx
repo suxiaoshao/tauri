@@ -5,24 +5,24 @@
  * @LastEditTime: 2024-05-01 03:52:35
  * @FilePath: /tauri/packages/ChatGPT/src/components/ConversationEdit/index.tsx
  */
-import { useAppSelector } from '@chatgpt/app/hooks';
 import TemplateInfo from '@chatgpt/features/Template/components/TemplateInfo';
-import { selectTemplates } from '@chatgpt/features/Template/templateSlice';
+import { selectTemplates, useTemplateStore } from '@chatgpt/features/Template/templateSlice';
 import { NewConversation } from '@chatgpt/types/conversation';
 import { valibotResolver } from '@hookform/resolvers/valibot';
 import {
+  Avatar,
   Box,
-  TextField,
   BoxProps,
-  MenuItem,
+  FormLabel,
+  ListItem,
   ListItemAvatar,
   ListItemText,
-  Avatar,
-  ListItem,
-  FormLabel,
+  MenuItem,
+  TextField,
 } from '@mui/material';
-import { useForm, Resolver, Controller } from 'react-hook-form';
-import { object, string, number, InferOutput, emoji, integer, nullish, pipe } from 'valibot';
+import { Controller, Resolver, useForm } from 'react-hook-form';
+import { InferOutput, emoji, integer, nullish, number, object, pipe, string } from 'valibot';
+import { useShallow } from 'zustand/react/shallow';
 import FolderSelect from '../FolderSelect';
 
 const conversationSchema = object({
@@ -39,7 +39,7 @@ const getDefaultValues = (): Partial<NewConversation> => ({
   folderId: null,
 });
 
-export interface ConversationEditProps extends Omit<BoxProps, 'component' | 'id' | 'onSubmit'> {
+export interface ConversationEditProps extends Omit<BoxProps<'form'>, 'component' | 'id' | 'onSubmit'> {
   initialValues?: NewConversation;
   id: string;
   onSubmit: (newConversation: ConversationForm) => Promise<void>;
@@ -55,7 +55,7 @@ export default function ConversationEdit({ initialValues, id, sx, onSubmit: subm
     defaultValues: initialValues ?? getDefaultValues(),
   });
   const onSubmit = handleSubmit(submit);
-  const templates = useAppSelector(selectTemplates);
+  const templates = useTemplateStore(useShallow(selectTemplates));
   return (
     <Box
       {...props}

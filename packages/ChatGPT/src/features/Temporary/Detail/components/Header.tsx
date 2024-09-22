@@ -1,4 +1,4 @@
-import { ConversationTemplate } from '@chatgpt/types/conversation_template';
+import { ConversationTemplate } from '@chatgpt/types/conversationTemplate';
 import { Avatar, Box, Typography } from '@mui/material';
 
 export interface TemporaryHeaderProps {

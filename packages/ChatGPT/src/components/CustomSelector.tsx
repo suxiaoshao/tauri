@@ -1,6 +1,5 @@
 import { Menu, MenuItem } from '@mui/material';
-import React from 'react';
-import { useState, MouseEvent, ReactNode, Key, FocusEventHandler, FocusEvent, ForwardedRef } from 'react';
+import React, { FocusEvent, FocusEventHandler, ForwardedRef, Key, MouseEvent, ReactNode, useState } from 'react';
 
 export interface CustomSelectorProps<T> {
   children?: { value: T; label: ReactNode; key: Key }[];
