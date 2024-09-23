@@ -1,9 +1,17 @@
+/*
+ * @Author: suxiaoshao suxiaoshao@gmail.com
+ * @Date: 2024-09-23 06:56:59
+ * @LastEditors: suxiaoshao suxiaoshao@gmail.com
+ * @LastEditTime: 2024-09-23 07:26:27
+ * @FilePath: /tauri/packages/ChatGPT/src/features/Conversations/conversationSlice.ts
+ */
 import { getChatData } from '@chatgpt/service/chat/query';
 import { ChatData } from '@chatgpt/types/chatData';
 import { Conversation } from '@chatgpt/types/conversation';
 import { Folder } from '@chatgpt/types/folder';
 import { Message } from '@chatgpt/types/message';
 import { findConversation, findFolder, getFirstConversation, getNodeId } from '@chatgpt/utils/chatData';
+import { produce } from 'immer';
 import { match } from 'ts-pattern';
 import { Enum } from 'types';
 import { create } from 'zustand';
@@ -18,28 +26,29 @@ interface ConversationState {
   fetchConversations: () => Promise<void>;
 }
 
-export const useConversationStore = create<ConversationState>((set) => ({
+export const useConversationStore = create<ConversationState>((set, get) => ({
   value: { conversations: [], folders: [] },
-  selected: { tag: SelectedType.None },
+  selected: { tag: SelectedType.None } as const,
   setChatData: (chatData) => set((state) => ({ ...state, value: chatData })),
   setSelected: (selected) => set((state) => ({ ...state, selected })),
   updateMessage: (message) =>
-    set((state) => {
-      const conversation = findConversation(state.value, message.conversationId);
-      if (conversation) {
-        const messageIndex = conversation.messages.findIndex((m) => m.id === message.id);
-        if (messageIndex >= 0) {
-          conversation.messages[messageIndex] = message;
-        } else {
-          conversation.messages.push(message);
+    set(
+      produce((state: ConversationState) => {
+        const conversation = findConversation(state.value, message.conversationId);
+        if (conversation) {
+          const messageIndex = conversation.messages.findIndex((m) => m.id === message.id);
+          if (messageIndex >= 0) {
+            conversation.messages[messageIndex] = message;
+          } else {
+            conversation.messages.push(message);
+          }
         }
-      }
-      return { ...state };
-    }),
+      }),
+    ),
   fetchConversations: async () => {
     const data = await getChatData();
     set((state) => ({ ...state, value: data }));
-    const oldState = useConversationStore.getState().selected;
+    const oldState = get().selected;
     let noneSelected: Selected = { tag: SelectedType.None };
     const firstConversation = getFirstConversation(data);
     if (firstConversation) {
@@ -50,17 +59,17 @@ export const useConversationStore = create<ConversationState>((set) => ({
       .with({ tag: SelectedType.Folder }, ({ value }) => {
         const folder = findFolder(data, value);
         if (!folder) {
-          useConversationStore.getState().setSelected(noneSelected);
+          get().setSelected(noneSelected);
         }
       })
       .with({ tag: SelectedType.Conversation }, ({ value }) => {
         const conversation = findConversation(data, value);
         if (!conversation) {
-          useConversationStore.getState().setSelected(noneSelected);
+          get().setSelected(noneSelected);
         }
       })
       .with({ tag: SelectedType.None }, () => {
-        useConversationStore.getState().setSelected(noneSelected);
+        get().setSelected(noneSelected);
       })
       .exhaustive();
   },

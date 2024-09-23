@@ -20,6 +20,7 @@ export default async function init() {
   // listen for messages
   await appWindow.listen<Message>('message', (response) => {
     useConversationStore.getState().updateMessage(response.payload);
+    console.log(response.payload);
   });
 
   // fetch config data

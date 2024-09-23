@@ -12,6 +12,7 @@
   "dependencies": {
     "@mui/x-tree-view": "^7.18.0",
     "details": "workspace:^",
+    "immer": "^10.1.1",
     "markdown-to-jsx": "^7.5.0",
     "monaco-editor": "^0.52.0",
     "monaco-themes": "^0.4.4",
