@@ -5,7 +5,7 @@
  * @LastEditTime: 2024-04-29 02:16:42
  * @FilePath: /tauri/packages/ChatGPT/src/components/Loading/index.tsx
  */
-import { Box, BoxProps, CircularProgress } from '@mui/material';
+import { Box, type BoxProps, CircularProgress } from '@mui/material';
 
 export default function Loading({ sx, ...props }: BoxProps) {
   return (

@@ -5,10 +5,10 @@
  * @LastEditTime: 2023-11-07 12:51:35
  * @FilePath: /tauri/common/notify/src/index.test.tsx
  */
+import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import { useSnackbar } from 'notistack';
-import { render, waitFor, screen, cleanup } from '@testing-library/react';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { enqueueSnackbar, SnackbarProvider } from '.';
-import { afterEach, expect, describe, it, vi } from 'vitest';
 
 vi.mock(import('@tauri-apps/api/notification'), async (importOriginal) => {
   const mod = await importOriginal();

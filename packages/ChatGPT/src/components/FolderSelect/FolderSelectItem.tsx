@@ -1,9 +1,9 @@
-import { Folder } from '@chatgpt/types/folder';
+import { type Folder } from '@chatgpt/types/folder';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import { Collapse, ListItemText, MenuItem } from '@mui/material';
 import { useCallback, useContext, useMemo, useState } from 'react';
-import { FolderSelectContext } from './FolderSelectContext';
 import { match } from 'ts-pattern';
+import { FolderSelectContext } from './FolderSelectContext';
 
 export interface FolderSelectItemProps {
   folder: Folder;

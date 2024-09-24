@@ -4,7 +4,7 @@ import { match } from 'ts-pattern';
 import AssistantItem from './components/AssistantItem';
 import SystemItem from './components/SystemItem';
 import UserItem from './components/UserItem';
-import { BaseMessage } from './types';
+import { type BaseMessage } from './types';
 
 export interface MessageItemProps {
   message: BaseMessage;

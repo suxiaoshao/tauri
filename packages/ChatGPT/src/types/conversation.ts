@@ -5,7 +5,7 @@
  * @LastEditTime: 2024-04-28 20:44:52
  * @FilePath: /tauri/packages/ChatGPT/src/types/conversation.ts
  */
-import { Message } from '@chatgpt/types/message';
+import { type Message } from '@chatgpt/types/message';
 
 export interface Conversation {
   id: number;

@@ -1,3 +1,7 @@
+import FolderSelect from '@chatgpt/components/FolderSelect';
+import { type MoveFolderParams, moveFolder } from '@chatgpt/service/chat/mutation';
+import { type Folder } from '@chatgpt/types/folder';
+import DriveFileMoveIcon from '@mui/icons-material/DriveFileMove';
 import {
   Button,
   Dialog,
@@ -8,12 +12,8 @@ import {
   IconButton,
   Tooltip,
 } from '@mui/material';
-import DriveFileMoveIcon from '@mui/icons-material/DriveFileMove';
 import { useCallback, useState } from 'react';
-import FolderSelect from '@chatgpt/components/FolderSelect';
 import { Controller, useForm } from 'react-hook-form';
-import { MoveFolderParams, moveFolder } from '@chatgpt/service/chat/mutation';
-import { Folder } from '@chatgpt/types/folder';
 
 export interface MoveFolderProps {
   folder: Folder;

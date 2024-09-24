@@ -7,7 +7,7 @@
  */
 import { Box, Typography } from '@mui/material';
 import { match, P } from 'ts-pattern';
-import { DetailsItem } from './types';
+import { type DetailsItem } from './types';
 
 export default function Item({ label, value, span }: Omit<DetailsItem, 'key'>) {
   return (

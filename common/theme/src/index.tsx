@@ -10,11 +10,11 @@ import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import { createTheme, CssBaseline, ThemeProvider } from '@mui/material';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { match } from 'ts-pattern';
 import { useShallow } from 'zustand/react/shallow';
 import './index.css';
-import { colorSchemaMatch, useThemeStore, selectActiveYouTheme, selectMuiTheme } from './themeSlice';
+import { colorSchemaMatch, selectActiveYouTheme, selectMuiTheme, useThemeStore } from './themeSlice';
 import setYouThemeToCssVars from './utils/cssVar';
 
 export interface CustomThemeProps {
@@ -23,7 +23,7 @@ export interface CustomThemeProps {
 
 export function CustomTheme({ children }: CustomThemeProps): JSX.Element {
   const { setSystemColorScheme, ...state } = useThemeStore(
-    useShallow(({ setSystemColorScheme, color, colorSetting, systemColorScheme }) => ({
+    useShallow(({ color, colorSetting, setSystemColorScheme, systemColorScheme }) => ({
       color,
       colorSetting,
       systemColorScheme,

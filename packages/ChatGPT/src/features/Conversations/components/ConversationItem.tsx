@@ -5,10 +5,10 @@
  * @LastEditTime: 2024-04-19 04:07:38
  * @FilePath: /tauri/packages/ChatGPT/src/features/Conversations/components/ConversationItem.tsx
  */
-import { Conversation } from '@chatgpt/types/conversation';
+import { type Conversation } from '@chatgpt/types/conversation';
 import { getNodeIdByConversation } from '@chatgpt/utils/chatData';
-import { TreeItem } from '@mui/x-tree-view';
 import { Avatar, Box, Typography } from '@mui/material';
+import { TreeItem } from '@mui/x-tree-view';
 
 export interface ConversationItemProps {
   conversation: Conversation;

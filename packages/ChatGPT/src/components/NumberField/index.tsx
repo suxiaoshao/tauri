@@ -5,7 +5,7 @@
  * @LastEditTime: 2024-04-19 11:57:40
  * @FilePath: /self-tools/Users/sushao/Documents/code/tauri/packages/ChatGPT/src/components/NumberField/index.tsx
  */
-import { TextField, TextFieldProps } from '@mui/material';
+import { TextField, type TextFieldProps } from '@mui/material';
 import React, { useImperativeHandle } from 'react';
 import { match, P } from 'ts-pattern';
 

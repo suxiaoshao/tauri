@@ -1,10 +1,10 @@
-import { Send } from '@mui/icons-material';
-import { Paper, InputBase, IconButton } from '@mui/material';
-import { useForm } from 'react-hook-form';
+import { type PromiseData, PromiseStatus } from '@chatgpt/hooks/usePromise';
 import { Role } from '@chatgpt/types/common';
-import { Message } from '@chatgpt/types/message';
-import { PromiseData, PromiseStatus } from '@chatgpt/hooks/usePromise';
-import React, { useCallback, useEffect, useState } from 'react';
+import { type Message } from '@chatgpt/types/message';
+import { Send } from '@mui/icons-material';
+import { IconButton, InputBase, Paper } from '@mui/material';
+import { useCallback, useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
 
 export interface ChatFormProps {
   status: PromiseData<void>;

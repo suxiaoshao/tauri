@@ -3,16 +3,16 @@ import MessageHistory from '@chatgpt/components/MessageHistory';
 import { selectTemplates, useTemplateStore } from '@chatgpt/features/Template/templateSlice';
 import usePromiseFn from '@chatgpt/hooks/usePromiseFn';
 import { deleteTemporaryMessage, temporaryFetch } from '@chatgpt/service/temporaryConversation';
-import { TemporaryMessage } from '@chatgpt/types/temporaryConversation';
+import { type TemporaryMessage } from '@chatgpt/types/temporaryConversation';
 import { Box } from '@mui/material';
 import { appWindow } from '@tauri-apps/api/window';
 import { useCallback, useEffect, useMemo, useReducer } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useNavigate, useParams } from 'react-router-dom';
 import { match } from 'ts-pattern';
-import { Enum } from 'types';
-import TemporaryHeader from './components/Header';
+import { type Enum } from 'types';
 import { useShallow } from 'zustand/react/shallow';
+import TemporaryHeader from './components/Header';
 
 enum ActionType {
   UpdateMessage,

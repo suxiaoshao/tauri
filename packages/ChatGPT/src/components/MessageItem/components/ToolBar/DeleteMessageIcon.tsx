@@ -1,8 +1,8 @@
-import { Delete } from '@mui/icons-material';
-import { ToolSx } from '../../const';
-import { useCallback, useContext } from 'react';
-import { IconButton, Tooltip } from '@mui/material';
 import { MessageActionContext } from '@chatgpt/components/MessageHistory/MessageActionContext';
+import { Delete } from '@mui/icons-material';
+import { IconButton, Tooltip } from '@mui/material';
+import { useCallback, useContext } from 'react';
+import { ToolSx } from '../../const';
 
 export interface DeleteMessageIconProps {
   id: number;

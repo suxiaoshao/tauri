@@ -1,7 +1,7 @@
 import { Box } from '@mui/material';
 import { useMemo } from 'react';
 import MessageItem from '../MessageItem';
-import { BaseMessage } from '../MessageItem/types';
+import { type BaseMessage } from '../MessageItem/types';
 import { MessageActionContext } from './MessageActionContext';
 
 export interface MessageHistoryProps {

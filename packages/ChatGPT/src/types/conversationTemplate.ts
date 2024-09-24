@@ -5,7 +5,7 @@
  * @LastEditTime: 2024-05-01 02:41:51
  * @FilePath: /tauri/packages/ChatGPT/src/types/conversation_template.ts
  */
-import { Mode, Role } from './common';
+import { type Mode, type Role } from './common';
 
 export interface ConversationTemplate {
   id: number;

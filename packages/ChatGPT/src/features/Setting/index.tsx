@@ -23,7 +23,7 @@ import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
 import { useShallow } from 'zustand/react/shallow';
 import { selectConfig, useConfigStore } from './configSlice';
-import { ChatGPTConfigSchema, Config, Theme } from './types';
+import { ChatGPTConfigSchema, type Config, Theme } from './types';
 
 function Setting() {
   const initData = useConfigStore(useShallow(selectConfig));

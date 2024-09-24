@@ -1,4 +1,4 @@
-import { Role, Status } from '@chatgpt/types/common';
+import { type Role, type Status } from '@chatgpt/types/common';
 
 export interface BaseMessage {
   id: number;

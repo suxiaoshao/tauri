@@ -1,4 +1,4 @@
-import { RequestBody } from './body';
+import { type RequestBody } from './body';
 
 export default interface Request {
   method: HttpMethod;

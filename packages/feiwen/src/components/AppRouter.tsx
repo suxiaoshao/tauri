@@ -1,6 +1,6 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
-import Query from '../page/Query';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import Fetch from '../page/Fetch';
+import Query from '../page/Query';
 
 export default function AppRouter(): JSX.Element {
   return (

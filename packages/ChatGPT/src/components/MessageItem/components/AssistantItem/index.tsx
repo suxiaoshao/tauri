@@ -1,11 +1,11 @@
 import { Status } from '@chatgpt/types/common';
 import { useMemo } from 'react';
 import { match } from 'ts-pattern';
+import { type BaseMessage } from '../../types';
 import ErrorItem from './ErrorItem';
 import HiddenItem from './HiddenItem';
 import LoadingItem from './LoadingItem';
 import NormalItem from './NormalItem';
-import { BaseMessage } from '../../types';
 
 export interface AssistantItemProps {
   message: BaseMessage;

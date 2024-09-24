@@ -5,20 +5,20 @@
  * @LastEditTime: 2024-05-01 01:23:05
  * @FilePath: /tauri/packages/ChatGPT/src/components/AppRouter.tsx
  */
-import { Routes, Route } from 'react-router-dom';
+import AddConversation from '@chatgpt/features/Adds/AddConversation';
+import AddFolder from '@chatgpt/features/Adds/AddFolder';
+import MessagePreview from '@chatgpt/features/MessagePreview';
+import ConversationTemplateCreate from '@chatgpt/features/Template/Create';
+import ConversationTemplateDetail from '@chatgpt/features/Template/Detail';
+import ConversationTemplateList from '@chatgpt/features/Template/List';
+import Temporary from '@chatgpt/features/Temporary';
+import TemporaryDetail from '@chatgpt/features/Temporary/Detail';
+import TemporaryList from '@chatgpt/features/Temporary/List';
+import { Route, Routes } from 'react-router-dom';
 import Errors from '../features/Errors';
 import Home from '../features/Home';
 import Setting from '../features/Setting';
 import AppDrawer from './AppDrawer';
-import AddConversation from '@chatgpt/features/Adds/AddConversation';
-import AddFolder from '@chatgpt/features/Adds/AddFolder';
-import MessagePreview from '@chatgpt/features/MessagePreview';
-import ConversationTemplateList from '@chatgpt/features/Template/List';
-import ConversationTemplateDetail from '@chatgpt/features/Template/Detail';
-import ConversationTemplateCreate from '@chatgpt/features/Template/Create';
-import TemporaryList from '@chatgpt/features/Temporary/List';
-import TemporaryDetail from '@chatgpt/features/Temporary/Detail';
-import Temporary from '@chatgpt/features/Temporary';
 
 export default function AppRouter() {
   return (

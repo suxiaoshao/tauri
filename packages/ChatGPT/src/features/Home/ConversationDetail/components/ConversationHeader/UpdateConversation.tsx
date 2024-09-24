@@ -5,9 +5,9 @@
  * @LastEditTime: 2024-04-28 20:49:43
  * @FilePath: /tauri/packages/ChatGPT/src/features/Home/ConversationDetail/components/ConversationHeader/UpdateConversation.tsx
  */
-import ConversationEdit, { ConversationForm } from '@chatgpt/components/ConversationEdit';
+import ConversationEdit, { type ConversationForm } from '@chatgpt/components/ConversationEdit';
 import { updateConversation } from '@chatgpt/service/chat/mutation';
-import { Conversation, NewConversation } from '@chatgpt/types/conversation';
+import { type Conversation, type NewConversation } from '@chatgpt/types/conversation';
 import EditIcon from '@mui/icons-material/Edit';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Tooltip } from '@mui/material';
 import { useCallback, useState } from 'react';

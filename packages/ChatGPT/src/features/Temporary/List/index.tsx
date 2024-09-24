@@ -1,13 +1,13 @@
 import TemplateInfo from '@chatgpt/features/Template/components/TemplateInfo';
 import { selectTemplates, useTemplateStore } from '@chatgpt/features/Template/templateSlice';
 import { initTemporaryConversation } from '@chatgpt/service/temporaryConversation';
-import { ConversationTemplate } from '@chatgpt/types/conversationTemplate';
+import { type ConversationTemplate } from '@chatgpt/types/conversationTemplate';
 import { Avatar, Box, Divider, InputBase, List, ListItemAvatar, ListItemButton, ListItemText } from '@mui/material';
 import { useCallback, useEffect, useReducer, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useNavigate } from 'react-router-dom';
 import { match } from 'ts-pattern';
-import { Enum } from 'types';
+import { type Enum } from 'types';
 import { useShallow } from 'zustand/react/shallow';
 
 interface Data {

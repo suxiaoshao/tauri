@@ -6,7 +6,7 @@
   "scripts": {
     "lint": "pnpm run format && pnpm run oxlint && pnpm run tslint",
     "format": "prettier --config ./.prettierrc.js --write .",
-    "oxlint": "oxlint --ignore-path ./.eslintignore --tsconfig=./tsconfig.json -c ./oxlintrc.json --import-plugin --jest-plugin --jsx-a11y-plugin --jsdoc-plugin --nextjs-plugin --vitest-plugin --promise-plugin",
+    "oxlint": "oxlint --ignore-path ./.eslintignore --tsconfig=./tsconfig.json -c ./oxlintrc.json --import-plugin --jsdoc-plugin --jest-plugin --vitest-plugin --jsx-a11y-plugin --nextjs-plugin --promise-plugin --node-plugin --security-plugin",
     "tslint": "tsc --build tsconfig.json",
     "build:tauri": "pnpm --filter './packages/*' run tauri build",
     "build:web": "pnpm --filter './packages/*' run build",

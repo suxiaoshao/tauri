@@ -9,11 +9,11 @@
 import CustomMarkdown from '@chatgpt/components/Markdown';
 import { Avatar, Box, Divider } from '@mui/material';
 import { AvatarSx, MarkdownSx, MessageSx } from '../const';
-import DeleteMessageIcon from './ToolBar/DeleteMessageIcon';
+import { type BaseMessage } from '../types';
 import ToolBar from './ToolBar';
-import ViewIcon from './ToolBar/ViewIcon';
 import CopyIcon from './ToolBar/CopyIcon';
-import { BaseMessage } from '../types';
+import DeleteMessageIcon from './ToolBar/DeleteMessageIcon';
+import ViewIcon from './ToolBar/ViewIcon';
 
 export interface SystemItemProps {
   message: BaseMessage;
@@ -24,7 +24,7 @@ export default function SystemItem({ message }: SystemItemProps) {
     <>
       <Box sx={MessageSx}>
         <Avatar sx={{ ...AvatarSx, backgroundColor: 'transparent' }}>🤖</Avatar>
-        <CustomMarkdown sx={{ ...MarkdownSx }} value={message.content} />
+        <CustomMarkdown sx={MarkdownSx} value={message.content} />
         <ToolBar>
           <DeleteMessageIcon id={message.id} />
           <ViewIcon id={message.id} />

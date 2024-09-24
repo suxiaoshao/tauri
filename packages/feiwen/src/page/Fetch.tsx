@@ -6,10 +6,10 @@
  * @FilePath: /tauri/packages/feiwen/src/page/Fetch.tsx
  */
 import { Box, Button, TextField } from '@mui/material';
-import { SubmitHandler, useForm } from 'react-hook-form';
+import { type SubmitHandler, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { fetchData } from '../service/store';
-import { FetchParams } from './types';
+import { type FetchParams } from './types';
 
 export default function Fetch() {
   const navigate = useNavigate();

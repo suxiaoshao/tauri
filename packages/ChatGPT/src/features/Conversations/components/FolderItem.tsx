@@ -5,12 +5,12 @@
  * @LastEditTime: 2024-04-19 08:02:13
  * @FilePath: /tauri/packages/ChatGPT/src/features/Conversations/components/FolderItem.tsx
  */
-import { Folder } from '@chatgpt/types/folder';
+import { type Folder } from '@chatgpt/types/folder';
+import { getNodeIdByFolder } from '@chatgpt/utils/chatData';
+import { Folder as FolderIcon } from '@mui/icons-material';
+import { Box, Typography } from '@mui/material';
 import { TreeItem } from '@mui/x-tree-view';
 import ConversationItem from './ConversationItem';
-import { getNodeIdByFolder } from '@chatgpt/utils/chatData';
-import { Box, Typography } from '@mui/material';
-import { Folder as FolderIcon } from '@mui/icons-material';
 
 export interface FolderItemProps {
   folder: Folder;

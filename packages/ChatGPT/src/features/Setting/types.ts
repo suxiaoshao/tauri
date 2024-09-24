@@ -1,4 +1,4 @@
-import { array, enum_, InferOutput, nullish, object, pipe, regex, string, url } from 'valibot';
+import { array, enum_, type InferOutput, nullish, object, pipe, regex, string, url } from 'valibot';
 
 export enum Theme {
   Dark = 'dark',

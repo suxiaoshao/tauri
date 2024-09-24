@@ -1,3 +1,4 @@
+import { valibotResolver } from '@hookform/resolvers/valibot';
 import { Palette } from '@mui/icons-material';
 import {
   Box,
@@ -18,11 +19,10 @@ import {
   TextField,
 } from '@mui/material';
 import { useState } from 'react';
-import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { ThemeSliceType, useThemeStore } from '../themeSlice';
-import { string, object, regex, picklist, pipe } from 'valibot';
-import { valibotResolver } from '@hookform/resolvers/valibot';
+import { Controller, type SubmitHandler, useForm } from 'react-hook-form';
+import { object, picklist, pipe, regex, string } from 'valibot';
 import { useShallow } from 'zustand/react/shallow';
+import { type ThemeSliceType, useThemeStore } from '../themeSlice';
 
 const createColorSchema = object({
   color: pipe(string(), regex(/^#(?:[0-9a-fA-F]{3}){1,2}$/, 'Invalid color format')),

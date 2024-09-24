@@ -7,12 +7,12 @@
  */
 import TemplateInfo from '@chatgpt/features/Template/components/TemplateInfo';
 import { selectTemplates, useTemplateStore } from '@chatgpt/features/Template/templateSlice';
-import { NewConversation } from '@chatgpt/types/conversation';
+import { type NewConversation } from '@chatgpt/types/conversation';
 import { valibotResolver } from '@hookform/resolvers/valibot';
 import {
   Avatar,
   Box,
-  BoxProps,
+  type BoxProps,
   FormLabel,
   ListItem,
   ListItemAvatar,
@@ -20,8 +20,8 @@ import {
   MenuItem,
   TextField,
 } from '@mui/material';
-import { Controller, Resolver, useForm } from 'react-hook-form';
-import { InferOutput, emoji, integer, nullish, number, object, pipe, string } from 'valibot';
+import { Controller, type Resolver, useForm } from 'react-hook-form';
+import { type InferOutput, emoji, integer, nullish, number, object, pipe, string } from 'valibot';
 import { useShallow } from 'zustand/react/shallow';
 import FolderSelect from '../FolderSelect';
 

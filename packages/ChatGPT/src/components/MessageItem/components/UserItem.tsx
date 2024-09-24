@@ -9,7 +9,7 @@ import user from '@chatgpt/assets/user.jpg';
 import CustomMarkdown from '@chatgpt/components/Markdown';
 import { Avatar, Box, Divider } from '@mui/material';
 import { AvatarSx, MarkdownSx, MessageSx } from '../const';
-import { BaseMessage } from '../types';
+import { type BaseMessage } from '../types';
 import ToolBar from './ToolBar';
 import CopyIcon from './ToolBar/CopyIcon';
 import DeleteMessageIcon from './ToolBar/DeleteMessageIcon';

@@ -1,8 +1,8 @@
 import { useConversationStore } from '@chatgpt/features/Conversations/conversationSlice';
 import { useTemplateStore } from '@chatgpt/features/Template/templateSlice';
-import { NewConversation } from '@chatgpt/types/conversation';
-import { NewConversationTemplate } from '@chatgpt/types/conversationTemplate';
-import { NewFolder } from '@chatgpt/types/folder';
+import { type NewConversation } from '@chatgpt/types/conversation';
+import { type NewConversationTemplate } from '@chatgpt/types/conversationTemplate';
+import { type NewFolder } from '@chatgpt/types/folder';
 import { appInvoke } from '../base';
 
 export interface AddConversationParams {

@@ -6,8 +6,8 @@
  * @FilePath: /tauri/common/theme/src/themeSlice.ts
  */
 import { argbFromHex, themeFromSourceColor } from '@material/material-color-utilities';
-import { create } from 'zustand';
 import { match } from 'ts-pattern';
+import { create } from 'zustand';
 import { youThemeToMuiTheme } from './utils/youTheme';
 
 export interface ThemeSliceType {
@@ -46,6 +46,7 @@ function getInitDate(): ThemeSliceType {
 
 export const useThemeStore = create<
   ThemeSliceType & {
+    // eslint-disable-next-line no-unexpected-multiline
     setSystemColorScheme: (scheme: ThemeSliceType['systemColorScheme']) => void;
     updateColor: (color: string, colorSetting: ThemeSliceType['colorSetting']) => void;
   }

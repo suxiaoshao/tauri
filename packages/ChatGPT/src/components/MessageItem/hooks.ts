@@ -1,7 +1,7 @@
 import assistant from '@chatgpt/assets/assistant.jpg';
 import user from '@chatgpt/assets/user.jpg';
 import { Role } from '@chatgpt/types/common';
-import { Theme } from '@mui/material';
+import { type Theme } from '@mui/material';
 import { useMemo } from 'react';
 import { match } from 'ts-pattern';
 

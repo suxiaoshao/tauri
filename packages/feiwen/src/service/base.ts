@@ -6,7 +6,7 @@
  * @FilePath: /tauri/packages/feiwen/src/service/base.ts
  */
 import { invoke } from '@tauri-apps/api';
-import { InvokeArgs } from '@tauri-apps/api/tauri';
+import { type InvokeArgs } from '@tauri-apps/api/tauri';
 import { enqueueSnackbar } from 'notify';
 
 export async function appInvoke<P, R>(cmd: string, params: P): Promise<R> {

@@ -1,12 +1,12 @@
-import { Conversation } from '@chatgpt/types/conversation';
+import { clearConversation, deleteConversation } from '@chatgpt/service/chat/mutation';
+import { type Conversation } from '@chatgpt/types/conversation';
+import { CleaningServices, CopyAll, Delete } from '@mui/icons-material';
 import { Avatar, Box, IconButton, Tooltip, Typography } from '@mui/material';
 import { useCallback } from 'react';
-import { CleaningServices, CopyAll, Delete } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import { clearConversation, deleteConversation } from '@chatgpt/service/chat/mutation';
-import UpdateConversation from './UpdateConversation';
-import MoveConversation from './MoveConversation';
 import ExportConversation from './ExportConversation';
+import MoveConversation from './MoveConversation';
+import UpdateConversation from './UpdateConversation';
 export interface ConversationHeaderProps {
   conversation: Conversation;
 }

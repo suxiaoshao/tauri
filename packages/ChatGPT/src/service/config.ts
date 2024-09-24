@@ -1,4 +1,4 @@
-import { Config } from '@chatgpt/features/Setting/types';
+import { type Config } from '@chatgpt/features/Setting/types';
 import { appInvoke } from './base';
 
 export async function getConfig() {

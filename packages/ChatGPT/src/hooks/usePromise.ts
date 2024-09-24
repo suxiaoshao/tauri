@@ -5,8 +5,8 @@
  * @LastEditTime: 2024-04-28 22:41:58
  * @FilePath: /tauri/packages/ChatGPT/src/hooks/usePromise.ts
  */
-import { Enum } from 'types';
 import { useCallback, useEffect, useState } from 'react';
+import { type Enum } from 'types';
 
 export enum PromiseStatus {
   data = 'data',

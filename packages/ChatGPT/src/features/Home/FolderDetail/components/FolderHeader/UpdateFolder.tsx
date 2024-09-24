@@ -1,9 +1,9 @@
-import FolderEdit, { FolderForm } from '@chatgpt/components/FolderEdit';
+import FolderEdit, { type FolderForm } from '@chatgpt/components/FolderEdit';
 import { updateFolder } from '@chatgpt/service/chat/mutation';
-import { Folder, NewFolder } from '@chatgpt/types/folder';
+import { type Folder, type NewFolder } from '@chatgpt/types/folder';
+import EditIcon from '@mui/icons-material/Edit';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton } from '@mui/material';
 import { useCallback, useState } from 'react';
-import EditIcon from '@mui/icons-material/Edit';
 
 export interface FolderHeaderProps {
   folder: Folder;

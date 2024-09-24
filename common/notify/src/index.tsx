@@ -5,12 +5,12 @@
  * @LastEditTime: 2024-05-01 10:38:37
  * @FilePath: /tauri/common/notify/src/index.tsx
  */
-import { IconButton } from '@mui/material';
-import { OptionsObject, useSnackbar, SnackbarProvider as SourceSnackbarProvider } from 'notistack';
-import { ReactNode, useEffect, useRef } from 'react';
-import { Subject } from 'rxjs';
 import { Close } from '@mui/icons-material';
+import { IconButton } from '@mui/material';
 import { isPermissionGranted, requestPermission, sendNotification } from '@tauri-apps/api/notification';
+import { type OptionsObject, SnackbarProvider as SourceSnackbarProvider, useSnackbar } from 'notistack';
+import { type ReactNode, useEffect, useRef } from 'react';
+import { Subject } from 'rxjs';
 
 export type SnackbarData = [string, OptionsObject?];
 const snackbarSubject = new Subject<SnackbarData>();

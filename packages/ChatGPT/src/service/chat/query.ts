@@ -1,7 +1,7 @@
-import { ChatData } from '@chatgpt/types/chatData';
+import { type ChatData } from '@chatgpt/types/chatData';
+import { type ConversationTemplate } from '@chatgpt/types/conversationTemplate';
+import { type Message } from '@chatgpt/types/message';
 import { appInvoke } from '../base';
-import { Message } from '@chatgpt/types/message';
-import { ConversationTemplate } from '@chatgpt/types/conversationTemplate';
 
 export interface FetchMessageParams {
   id: number;

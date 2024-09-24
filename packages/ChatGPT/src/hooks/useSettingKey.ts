@@ -1,6 +1,6 @@
+import { createSettingWindow } from '@chatgpt/service/config';
 import { useEffect } from 'react';
 import usePlatform from './usePlatform';
-import { createSettingWindow } from '@chatgpt/service/config';
 
 export default function useSettingKey() {
   const platform = usePlatform();

@@ -6,9 +6,10 @@
  */
 import { defineConfig } from '@rsbuild/core';
 import { pluginReact } from '@rsbuild/plugin-react';
-import { resolve } from 'node:path';
 import { RsdoctorRspackPlugin } from '@rsdoctor/rspack-plugin';
 import { codeInspectorPlugin } from 'code-inspector-plugin';
+import { resolve } from 'node:path';
+
 export default defineConfig({
   plugins: [pluginReact()],
   server: {

@@ -6,16 +6,16 @@
  * @FilePath: /tauri/packages/ChatGPT/src/features/Conversations/conversationSlice.ts
  */
 import { getChatData } from '@chatgpt/service/chat/query';
-import { ChatData } from '@chatgpt/types/chatData';
-import { Conversation } from '@chatgpt/types/conversation';
-import { Folder } from '@chatgpt/types/folder';
-import { Message } from '@chatgpt/types/message';
+import { type ChatData } from '@chatgpt/types/chatData';
+import { type Conversation } from '@chatgpt/types/conversation';
+import { type Folder } from '@chatgpt/types/folder';
+import { type Message } from '@chatgpt/types/message';
 import { findConversation, findFolder, getFirstConversation, getNodeId } from '@chatgpt/utils/chatData';
 import { produce } from 'immer';
 import { match } from 'ts-pattern';
-import { Enum } from 'types';
+import { type Enum } from 'types';
 import { create } from 'zustand';
-import { Selected, SelectedType } from './types';
+import { type Selected, SelectedType } from './types';
 
 interface ConversationState {
   value: { conversations: Conversation[]; folders: Folder[] };

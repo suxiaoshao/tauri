@@ -1,4 +1,4 @@
-import { Conversation } from './conversation';
+import { type Conversation } from './conversation';
 
 export interface Folder {
   id: number;

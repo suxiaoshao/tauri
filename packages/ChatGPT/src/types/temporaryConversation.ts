@@ -1,4 +1,4 @@
-import { Role, Status } from './common';
+import { type Role, type Status } from './common';
 
 export interface TemporaryMessage {
   id: number;

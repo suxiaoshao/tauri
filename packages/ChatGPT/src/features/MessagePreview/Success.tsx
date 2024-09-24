@@ -7,7 +7,7 @@
  */
 import CustomEdit from '@chatgpt/components/CustomEdit';
 import { updateMessageContent } from '@chatgpt/service/chat/mutation';
-import { Message } from '@chatgpt/types/message';
+import { type Message } from '@chatgpt/types/message';
 import { Edit, Preview, Upload } from '@mui/icons-material';
 import { Box, IconButton, ToggleButton, ToggleButtonGroup, Tooltip } from '@mui/material';
 import { appWindow } from '@tauri-apps/api/window';
