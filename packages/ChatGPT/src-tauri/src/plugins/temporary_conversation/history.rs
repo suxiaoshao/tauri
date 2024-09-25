@@ -1,7 +1,10 @@
-use std::sync::{Arc, Mutex};
+use std::{
+    collections::HashMap,
+    sync::{Arc, Mutex},
+};
 
 use serde::{Deserialize, Serialize};
-use tauri::{Manager, Runtime};
+use tauri::{AppHandle, Runtime, WindowBuilder};
 use time::OffsetDateTime;
 
 use crate::{
@@ -14,7 +17,59 @@ use crate::{
     },
 };
 
+use super::TEMPORARY_WINDOW;
+
 const TEMPORARY_MESSAGE_EVENT: &str = "temporary_message";
+
+#[derive(Default)]
+pub struct TemporaryStore {
+    persistent_conversations: HashMap<usize, TemporaryConversation>,
+    autoincrement_id: usize,
+    temp_conversation: Option<TemporaryConversation>,
+}
+
+impl TemporaryStore {
+    fn update_temp_conversation(&mut self, conversation: TemporaryConversation) {
+        self.temp_conversation = Some(conversation)
+    }
+    fn update_temp_conversation_by_template_id(&mut self, template_id: i32) {
+        self.temp_conversation = Some(TemporaryConversation {
+            template_id,
+            messages: vec![],
+            autoincrement_id: 0,
+        })
+    }
+    fn get_temp_conversation(&mut self) -> ChatGPTResult<TemporaryConversation> {
+        match &self.temp_conversation {
+            Some(data) => Ok(data.clone()),
+            None => Err(ChatGPTError::TemporaryConversationUninitialized),
+        }
+    }
+    fn delete_temp_conversation(&mut self, id: usize) -> ChatGPTResult<Vec<TemporaryMessage>> {
+        let temp_conversation = match &mut self.temp_conversation {
+            Some(data) => data,
+            None => return Err(ChatGPTError::TemporaryConversationUninitialized),
+        };
+        let position = temp_conversation.messages.iter().position(|m| m.id == id);
+        match position {
+            Some(position) => {
+                temp_conversation.messages.remove(position);
+                Ok(temp_conversation.messages.clone())
+            }
+            None => Err(ChatGPTError::TemporaryMessageNotFound(id)),
+        }
+    }
+    fn separate_window(&mut self) -> ChatGPTResult<usize> {
+        let temp_conversation = match self.temp_conversation.take() {
+            Some(data) => data,
+            None => return Err(ChatGPTError::TemporaryConversationUninitialized),
+        };
+        self.autoincrement_id += 1;
+        self.persistent_conversations
+            .insert(self.autoincrement_id, temp_conversation);
+        Ok(self.autoincrement_id)
+    }
+}
 
 #[derive(Debug, Serialize, Clone, Deserialize, PartialEq, Eq)]
 pub struct TemporaryMessage {
@@ -63,103 +118,101 @@ impl TemporaryMessage {
     }
 }
 
-pub struct TemporaryHistory {
+#[derive(Clone)]
+pub struct TemporaryConversation {
     pub template_id: i32,
     pub messages: Vec<TemporaryMessage>,
+    autoincrement_id: usize,
 }
 
-trait TemporaryHistoryTrait {
-    fn get_max_id(&self) -> usize;
-    fn new_id(&self) -> usize {
-        self.get_max_id() + 1
+impl TemporaryConversation {
+    fn new_id(&mut self) -> usize {
+        self.autoincrement_id += 1;
+        self.autoincrement_id
     }
-}
 
-impl TemporaryHistoryTrait for Vec<TemporaryMessage> {
-    fn get_max_id(&self) -> usize {
-        self.iter().map(|m| m.id).max().unwrap_or(0)
-    }
-}
-
-impl TemporaryHistoryTrait for TemporaryHistory {
-    fn get_max_id(&self) -> usize {
-        self.messages.get_max_id()
+    fn add_message(
+        &mut self,
+        now: OffsetDateTime,
+        role: Role,
+        content: String,
+        status: Status,
+    ) -> &TemporaryMessage {
+        let id = self.new_id();
+        let message = TemporaryMessage {
+            id,
+            role,
+            content,
+            status,
+            created_time: now,
+            updated_time: now,
+            start_time: now,
+            end_time: now,
+        };
+        self.messages.push(message);
+        self.messages.last().unwrap()
     }
 }
 
 #[tauri::command]
-pub(super) fn init_temporary_conversation<R: Runtime>(
-    app: tauri::AppHandle<R>,
+pub(super) fn init_temporary_conversation(
+    state: tauri::State<'_, Arc<Mutex<TemporaryStore>>>,
     template_id: i32,
 ) -> ChatGPTResult<Vec<TemporaryMessage>> {
-    let messages = vec![];
-    let history = TemporaryHistory {
-        template_id,
-        messages,
-    };
-    match app.try_state::<Arc<Mutex<TemporaryHistory>>>() {
-        Some(old_history) => {
-            let mut old_history = old_history.lock()?;
-            *old_history = history;
-        }
-        None => {
-            app.manage(Arc::new(Mutex::new(history)));
-        }
-    };
+    state
+        .lock()?
+        .update_temp_conversation_by_template_id(template_id);
     Ok(vec![])
 }
 
 #[tauri::command]
-pub(super) fn find_temporary_message(
-    state: tauri::State<'_, Arc<Mutex<TemporaryHistory>>>,
-    id: usize,
-) -> ChatGPTResult<TemporaryMessage> {
-    let message = state.lock()?.messages.iter().find(|m| m.id == id).cloned();
-    match message {
-        Some(message) => Ok(message),
-        None => Err(ChatGPTError::TemporaryMessageNotFound(id)),
-    }
-}
-
-#[tauri::command]
 pub(super) fn delete_temporary_message(
-    state: tauri::State<'_, Arc<Mutex<TemporaryHistory>>>,
+    state: tauri::State<'_, Arc<Mutex<TemporaryStore>>>,
     id: usize,
 ) -> ChatGPTResult<Vec<TemporaryMessage>> {
-    let position = state.lock()?.messages.iter().position(|m| m.id == id);
-    match position {
-        Some(position) => {
-            state.lock()?.messages.remove(position);
-            Ok(state.lock()?.messages.clone())
-        }
-        None => Err(ChatGPTError::TemporaryMessageNotFound(id)),
-    }
+    let data = state.lock()?.delete_temp_conversation(id)?;
+    Ok(data)
+}
+#[tauri::command(async)]
+pub(super) fn separate_window<R: Runtime>(
+    state: tauri::State<'_, Arc<Mutex<TemporaryStore>>>,
+    app_handle: AppHandle<R>,
+    window: tauri::Window<R>,
+) -> ChatGPTResult<()> {
+    window.close()?;
+    let id = state.lock()?.separate_window()?;
+    create_window(&app_handle, id)?;
+    Ok(())
+}
+
+fn create_window<R: Runtime>(app: &AppHandle<R>, id: usize) -> ChatGPTResult<()> {
+    let window = WindowBuilder::new(
+        app,
+        format!("{}-{}", TEMPORARY_WINDOW, id),
+        tauri::WindowUrl::App("/temporary_conversation".into()),
+    )
+    .title("Temporary Conversation")
+    .inner_size(800.0, 600.0)
+    .transparent(true)
+    .center();
+    window.build()?;
+    Ok(())
 }
 
 #[tauri::command(async)]
 pub async fn temporary_fetch<R: Runtime>(
     app: tauri::AppHandle<R>,
     window: tauri::Window<R>,
-    state: tauri::State<'_, Arc<Mutex<TemporaryHistory>>>,
+    state: tauri::State<'_, Arc<Mutex<TemporaryStore>>>,
     conn: tauri::State<'_, DbConn>,
     content: String,
 ) -> ChatGPTResult<()> {
-    let template_id = state.lock()?.template_id;
-    let mut messages = state.lock()?.messages.clone();
+    let mut conversation = state.lock()?.get_temp_conversation()?;
+    let template_id = conversation.template_id;
 
     let now = OffsetDateTime::now_utc();
-    let user_message = TemporaryMessage {
-        id: messages.new_id(),
-        role: Role::User,
-        content,
-        status: Status::Normal,
-        created_time: now,
-        updated_time: now,
-        start_time: now,
-        end_time: now,
-    };
+    let user_message = conversation.add_message(now, Role::User, content, Status::Normal);
     window.emit(TEMPORARY_MESSAGE_EVENT, &user_message)?;
-    messages.push(user_message);
 
     let config = ChatGPTConfig::get(&app)?;
 
@@ -167,8 +220,10 @@ pub async fn temporary_fetch<R: Runtime>(
     let mut template = ConversationTemplate::find(template_id, conn)?;
     template.mode = Mode::Contextual;
 
+    let new_id = conversation.new_id();
+
     let assistant_message = TemporaryMessage {
-        id: messages.new_id(),
+        id: new_id,
         role: Role::Assistant,
         content: "".to_string(),
         status: Status::Loading,
@@ -181,33 +236,30 @@ pub async fn temporary_fetch<R: Runtime>(
 
     let mut fetch = TemporaryFetch {
         config,
-        messages,
         template,
         assistant_message,
         window,
+        conversation,
     };
     fetch.fetch().await?;
 
     let TemporaryFetch {
-        mut messages,
+        mut conversation,
         assistant_message,
         ..
     } = fetch;
-    messages.push(assistant_message);
-    let new_history = TemporaryHistory {
-        template_id,
-        messages,
-    };
-    *state.lock()? = new_history;
+    conversation.messages.push(assistant_message);
+    state.lock()?.update_temp_conversation(conversation);
+
     Ok(())
 }
 
 struct TemporaryFetch<R: Runtime> {
     config: ChatGPTConfig,
     template: ConversationTemplate,
-    messages: Vec<TemporaryMessage>,
     assistant_message: TemporaryMessage,
     window: tauri::Window<R>,
+    conversation: TemporaryConversation,
 }
 
 impl<R: Runtime> FetchRunner for TemporaryFetch<R> {
@@ -218,12 +270,15 @@ impl<R: Runtime> FetchRunner for TemporaryFetch<R> {
             .iter()
             .map(|prompt| FetchMessage::new(prompt.role, prompt.prompt.as_str()))
             .collect::<Vec<_>>();
+
         messages.extend(
-            self.messages
+            self.conversation
+                .messages
                 .iter()
                 .filter(|message| message.status == Status::Normal)
                 .map(|message| FetchMessage::new(message.role, message.content.as_str())),
         );
+
         Ok(ChatRequest {
             model: self.template.model.as_str(),
             messages,

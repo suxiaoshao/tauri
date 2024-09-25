@@ -35,9 +35,6 @@ export interface FindTemporaryMessageParams {
   id: number;
 }
 
-export async function findTemporaryMessage(params: FindTemporaryMessageParams) {
-  return await appInvoke<FindTemporaryMessageParams, TemporaryMessage>(
-    'plugin:temporary_conversation|find_temporary_message',
-    params,
-  );
+export async function separateWindow() {
+  return await appInvoke<undefined, unknown>('plugin:temporary_conversation|separate_window', undefined);
 }

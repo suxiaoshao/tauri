@@ -2,7 +2,7 @@ import ChatForm from '@chatgpt/components/ChatForm';
 import MessageHistory from '@chatgpt/components/MessageHistory';
 import { selectTemplates, useTemplateStore } from '@chatgpt/features/Template/templateSlice';
 import usePromiseFn from '@chatgpt/hooks/usePromiseFn';
-import { deleteTemporaryMessage, temporaryFetch } from '@chatgpt/service/temporaryConversation';
+import { deleteTemporaryMessage, separateWindow, temporaryFetch } from '@chatgpt/service/temporaryConversation';
 import { type TemporaryMessage } from '@chatgpt/types/temporaryConversation';
 import { Box } from '@mui/material';
 import { appWindow } from '@tauri-apps/api/window';
@@ -13,6 +13,7 @@ import { match } from 'ts-pattern';
 import { type Enum } from 'types';
 import { useShallow } from 'zustand/react/shallow';
 import TemporaryHeader from './components/Header';
+import usePlatform from '@chatgpt/hooks/usePlatform';
 
 enum ActionType {
   UpdateMessage,
@@ -35,6 +36,20 @@ function reducer(state: TemporaryMessage[], action: Action): TemporaryMessage[] 
 }
 
 export default function TemporaryDetail() {
+  const platform = usePlatform();
+  useHotkeys(
+    match(platform)
+      .with('Darwin', () => ['Meta+d'])
+      .otherwise(() => ['Control+d']),
+    (event) => {
+      event.preventDefault();
+      separateWindow();
+    },
+    {
+      enableOnFormTags: ['INPUT', 'TEXTAREA'],
+    },
+    [platform],
+  );
   // message history
   const [messages, dispatch] = useReducer(reducer, []);
   useEffect(() => {

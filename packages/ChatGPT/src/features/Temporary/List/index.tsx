@@ -144,6 +144,13 @@ export default function TemporaryList() {
     }
   }, [inputRef]);
 
+  const [ref, setRef] = useState<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (ref) {
+      ref?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    }
+  }, [ref]);
+
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     const searchText = event.target.value;
     dispatch({ tag: 'setSearch', value: searchText });
@@ -164,9 +171,18 @@ export default function TemporaryList() {
         onChange={handleSearch}
       />
       <Divider />
-      <List dense sx={{ flex: '1 1 0' }}>
+      <List dense sx={{ flex: '1 1 0', overflowY: 'auto' }}>
         {filteredTemplates.map(({ id, icon, name, description, mode }, index) => (
-          <ListItemButton dense selected={index === selectedIndex} key={id} onClick={() => handleClick(index)}>
+          <ListItemButton
+            ref={match(selectedIndex)
+              .with(index, () => setRef)
+              // eslint-disable-next-line no-useless-undefined
+              .otherwise(() => undefined)}
+            dense
+            selected={index === selectedIndex}
+            key={id}
+            onClick={() => handleClick(index)}
+          >
             <ListItemAvatar>
               <Avatar sx={{ bgcolor: 'transparent' }}>{icon}</Avatar>
             </ListItemAvatar>

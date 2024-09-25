@@ -2,10 +2,12 @@
  * @Author: suxiaoshao suxiaoshao@gmail.com
  * @Date: 2024-05-02 10:09:55
  * @LastEditors: suxiaoshao suxiaoshao@gmail.com
- * @LastEditTime: 2024-05-19 03:42:01
+ * @LastEditTime: 2024-09-25 02:21:13
  * @FilePath: /tauri/packages/ChatGPT/src-tauri/src/plugins/temporary_conversation/mod.rs
  */
+use history::TemporaryStore;
 use serde_json::Value;
+use std::sync::{Arc, Mutex};
 use tauri::{
     AppHandle, GlobalShortcutManager, Invoke, Manager, Runtime, WindowBuilder, WindowEvent,
 };
@@ -31,6 +33,9 @@ impl TemporaryConversationPlugin {
             Some(window) => window,
             None => return,
         };
+        if let Err(err) = window.hide() {
+            log::error!("hide temporary window error:{}", err);
+        }
         self.delayed_task.update(Self::DURATION, {
             async move {
                 if let Err(err) = window.close() {
@@ -51,6 +56,7 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for TemporaryConversationPlugin {
         "temporary_conversation"
     }
     fn initialize(&mut self, app: &AppHandle<R>, _: Value) -> tauri::plugin::Result<()> {
+        app.manage(Arc::new(Mutex::new(TemporaryStore::default())));
         manager_global_shortcut(app)?;
         Ok(())
     }
@@ -74,8 +80,8 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for TemporaryConversationPlugin {
         let handle: Box<dyn Fn(Invoke<R>) + Send + Sync> = Box::new(tauri::generate_handler![
             history::init_temporary_conversation,
             history::temporary_fetch,
-            history::find_temporary_message,
             history::delete_temporary_message,
+            history::separate_window
         ]);
         (handle)(invoke);
     }
