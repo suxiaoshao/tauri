@@ -40,7 +40,7 @@ export default function AppRouter() {
       <Route path="/message/:id" element={<MessagePreview />} />
       <Route path="/temporary_conversation" element={<Temporary />}>
         <Route index element={<TemporaryList />} />
-        <Route path=":temporaryId" element={<TemporaryDetail />} />
+        <Route path="detail" element={<TemporaryDetail />} />
       </Route>
     </Routes>
   );

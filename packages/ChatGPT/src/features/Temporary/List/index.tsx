@@ -94,7 +94,7 @@ export default function TemporaryList() {
   const handleNavigate = useCallback(
     async (id: number) => {
       await initTemporaryConversation({ templateId: id });
-      navigate(`/temporary_conversation/${id}`);
+      navigate(`/temporary_conversation/detail`);
     },
     [navigate],
   );

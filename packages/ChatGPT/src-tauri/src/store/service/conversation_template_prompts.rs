@@ -14,7 +14,7 @@ use crate::{
 
 use super::utils::serialize_offset_date_time;
 
-#[derive(serde::Serialize)]
+#[derive(serde::Serialize, Clone)]
 pub struct ConversationTemplatePrompt {
     pub id: i32,
     #[serde(rename = "templateId")]
