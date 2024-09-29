@@ -1,5 +1,5 @@
 import usePlatform from '@chatgpt/hooks/usePlatform';
-import { deleteTemporaryConversation } from '@chatgpt/service/temporaryConversation';
+import { deleteTemporaryConversation } from '@chatgpt/service/temporaryConversation/mutation';
 import { appWindow } from '@tauri-apps/api/window';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { Outlet, useSearchParams } from 'react-router-dom';

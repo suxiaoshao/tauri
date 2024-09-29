@@ -26,17 +26,10 @@ export default function FolderHeader({ folder }: FolderHeaderProps) {
       }}
     >
       <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', ml: 1 }} data-tauri-drag-region>
-        <Typography data-tauri-drag-region variant="h6" component="span" paragraph={false}>
+        <Typography data-tauri-drag-region variant="h6" component="span">
           {folder.name}
         </Typography>
-        <Typography
-          sx={{ ml: 1 }}
-          data-tauri-drag-region
-          variant="body2"
-          color="inherit"
-          component="span"
-          paragraph={false}
-        >
+        <Typography sx={{ ml: 1 }} data-tauri-drag-region variant="body2" color="inherit" component="span">
           {folder.path}
         </Typography>
       </Box>

@@ -1,8 +1,8 @@
 import { type TemporaryMessageEvent, type TemporaryConversation } from '@chatgpt/types/temporaryConversation';
 import { create } from 'zustand';
-import { deleteTemporaryMessage, getTemporaryConversation } from '@chatgpt/service/temporaryConversation';
 import { match } from 'ts-pattern';
 import { type PromiseData, PromiseStatus } from '@chatgpt/hooks/usePromise';
+import { getTemporaryConversation } from '@chatgpt/service/temporaryConversation/query';
 
 export type TemporaryConversationState = PromiseData<TemporaryConversation>;
 
@@ -10,7 +10,6 @@ export interface TemporaryConversationStore {
   state: TemporaryConversationState;
   updateMessage: (message: TemporaryMessageEvent) => void;
   fetchData: (persistentId: number | null) => Promise<void>;
-  deleteMessage: (messageId: number) => Promise<void>;
 }
 
 export const useTemporaryConversationStore = create<TemporaryConversationStore>((set, get) => ({
@@ -52,14 +51,5 @@ export const useTemporaryConversationStore = create<TemporaryConversationStore>(
         state: { tag: PromiseStatus.error, value: new Error(`Unknown Error:${error}`) },
       });
     }
-  },
-  deleteMessage: async (messageId: number) => {
-    const { state } = get();
-    await match(state)
-      .with({ tag: PromiseStatus.data }, async ({ value }) => {
-        const newConversation = await deleteTemporaryMessage({ messageId, persistentId: value.persistentId ?? null });
-        set({ state: { tag: PromiseStatus.data, value: newConversation } });
-      })
-      .otherwise(() => null);
   },
 }));

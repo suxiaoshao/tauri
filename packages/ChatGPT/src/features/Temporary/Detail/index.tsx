@@ -5,7 +5,6 @@ import MessageHistory from '@chatgpt/components/MessageHistory';
 import usePlatform from '@chatgpt/hooks/usePlatform';
 import { PromiseStatus } from '@chatgpt/hooks/usePromise';
 import usePromiseFn from '@chatgpt/hooks/usePromiseFn';
-import { separateWindow, temporaryFetch } from '@chatgpt/service/temporaryConversation';
 import { type TemporaryMessageEvent } from '@chatgpt/types/temporaryConversation';
 import { Box } from '@mui/material';
 import { appWindow } from '@tauri-apps/api/window';
@@ -16,6 +15,11 @@ import { match, P } from 'ts-pattern';
 import { useShallow } from 'zustand/react/shallow';
 import TemporaryHeader from './components/Header';
 import { useTemporaryConversationStore } from './temporaryDetailSlice';
+import {
+  deleteTemporaryMessage,
+  temporaryFetch,
+  separateWindow,
+} from '@chatgpt/service/temporaryConversation/mutation';
 
 export default function TemporaryDetail() {
   const platform = usePlatform();
@@ -27,12 +31,11 @@ export default function TemporaryDetail() {
         .otherwise((id) => id),
     )
     .otherwise(() => null);
-  const { deleteMessage, fetchData, state, updateMessage } = useTemporaryConversationStore(
-    useShallow(({ state, fetchData, updateMessage, deleteMessage }) => ({
+  const { fetchData, state, updateMessage } = useTemporaryConversationStore(
+    useShallow(({ state, fetchData, updateMessage }) => ({
       state,
       fetchData,
       updateMessage,
-      deleteMessage,
     })),
   );
   useEffect(() => {
@@ -53,9 +56,9 @@ export default function TemporaryDetail() {
 
   const handleDeteteMessage = useCallback(
     async (messageId: number) => {
-      await deleteMessage(messageId);
+      await deleteTemporaryMessage({ messageId, persistentId });
     },
-    [deleteMessage],
+    [persistentId],
   );
 
   // send form status
@@ -97,7 +100,7 @@ export default function TemporaryDetail() {
   const content = match(state)
     .with({ tag: PromiseStatus.data }, ({ value }) => (
       <>
-        <TemporaryHeader template={value.template} />
+        <TemporaryHeader persistentId={persistentId} template={value.template} />
         <Box sx={{ flex: '1 1 0', overflowY: 'auto' }}>
           <MessageHistory onMessageDeleted={handleDeteteMessage} messages={value.messages} />
         </Box>

@@ -31,7 +31,7 @@ export default function TemplateCreateHeader({ formId }: TemplateCreateHeaderPro
         <IconButton sx={{ mr: 1 }} onClick={() => navigate(-1)}>
           <KeyboardArrowLeftIcon />
         </IconButton>
-        <Typography data-tauri-drag-region variant="h6" component="span" paragraph={false}>
+        <Typography data-tauri-drag-region variant="h6" component="span">
           Create Template
         </Typography>
       </Box>

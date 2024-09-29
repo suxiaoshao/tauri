@@ -158,7 +158,7 @@ impl TemporaryStore {
         &mut self,
         persistent_id: Option<usize>,
         message_id: usize,
-    ) -> ChatGPTResult<TemporaryConversation> {
+    ) -> ChatGPTResult<()> {
         let temp_conversation = self.get_temp_conversation_mut(persistent_id)?;
         let position = temp_conversation
             .messages
@@ -167,7 +167,7 @@ impl TemporaryStore {
         match position {
             Some(position) => {
                 temp_conversation.messages.remove(position);
-                Ok(temp_conversation.clone())
+                Ok(())
             }
             None => Err(ChatGPTError::TemporaryMessageNotFound(message_id)),
         }
@@ -183,19 +183,6 @@ impl TemporaryStore {
             .insert(self.autoincrement_id, temp_conversation);
         Ok(self.autoincrement_id)
     }
-    fn get_conversation(&self, id: Option<usize>) -> ChatGPTResult<TemporaryConversation> {
-        match id {
-            Some(id) => self
-                .persistent_conversations
-                .get(&id)
-                .cloned()
-                .ok_or_else(|| ChatGPTError::TemporaryConversationNotFound(id)),
-            None => self
-                .temp_conversation
-                .clone()
-                .ok_or_else(|| ChatGPTError::TemporaryConversationUninitialized),
-        }
-    }
     fn delete_conversation(&mut self, persistent_id: Option<usize>) {
         let id = match persistent_id {
             Some(id) => id,
@@ -205,6 +192,11 @@ impl TemporaryStore {
             }
         };
         self.persistent_conversations.remove(&id);
+    }
+    fn clear_conversation(&mut self, persistent_id: Option<usize>) -> ChatGPTResult<()> {
+        let conversation = self.get_temp_conversation_mut(persistent_id)?;
+        conversation.messages.clear();
+        Ok(())
     }
 }
 
@@ -244,11 +236,11 @@ pub(super) fn delete_temporary_message(
     state: tauri::State<'_, Arc<Mutex<TemporaryStore>>>,
     persistent_id: Option<usize>,
     message_id: usize,
-) -> ChatGPTResult<TemporaryConversation> {
-    let data = state
+) -> ChatGPTResult<()> {
+    state
         .lock()?
         .delete_temp_conversation_message(persistent_id, message_id)?;
-    Ok(data)
+    Ok(())
 }
 #[tauri::command(async)]
 pub(super) fn separate_window<R: Runtime>(
@@ -267,7 +259,7 @@ pub(super) fn get_temporary_conversation(
     persistent_id: Option<usize>,
     state: tauri::State<'_, Arc<Mutex<TemporaryStore>>>,
 ) -> ChatGPTResult<TemporaryConversation> {
-    state.lock()?.get_conversation(persistent_id)
+    state.lock()?.get_temp_conversation(persistent_id)
 }
 
 fn create_persistent_window<R: Runtime>(app: &AppHandle<R>, id: usize) -> ChatGPTResult<()> {
@@ -290,6 +282,15 @@ pub fn delete_temporary_conversation(
     state: tauri::State<'_, Arc<Mutex<TemporaryStore>>>,
 ) -> ChatGPTResult<()> {
     state.lock()?.delete_conversation(persistent_id);
+    Ok(())
+}
+
+#[tauri::command]
+pub fn clear_temporary_conversation(
+    persistent_id: Option<usize>,
+    state: tauri::State<'_, Arc<Mutex<TemporaryStore>>>,
+) -> ChatGPTResult<()> {
+    state.lock()?.clear_conversation(persistent_id)?;
     Ok(())
 }
 

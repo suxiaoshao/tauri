@@ -1,5 +1,5 @@
-import { type TemporaryConversation } from '@chatgpt/types/temporaryConversation';
-import { appInvoke } from './base';
+import { useTemporaryConversationStore } from '@chatgpt/features/Temporary/Detail/temporaryDetailSlice';
+import { appInvoke } from '@feiwen/service/base';
 
 export interface InitTemporaryConversationParams {
   templateId: number;
@@ -27,29 +27,15 @@ export interface DeleteTemporaryMessageParams {
 }
 
 export async function deleteTemporaryMessage(params: DeleteTemporaryMessageParams) {
-  return await appInvoke<DeleteTemporaryMessageParams, TemporaryConversation>(
+  await appInvoke<DeleteTemporaryMessageParams, unknown>(
     'plugin:temporary_conversation|delete_temporary_message',
     params,
   );
-}
-
-export interface FindTemporaryMessageParams {
-  id: number;
+  useTemporaryConversationStore.getState().fetchData(params.persistentId);
 }
 
 export async function separateWindow() {
   return await appInvoke<null, unknown>('plugin:temporary_conversation|separate_window', null);
-}
-
-export interface GetTemporaryConversationsParams {
-  persistentId: number | null;
-}
-
-export async function getTemporaryConversation(params: GetTemporaryConversationsParams) {
-  return await appInvoke<GetTemporaryConversationsParams, TemporaryConversation>(
-    'plugin:temporary_conversation|get_temporary_conversation',
-    params,
-  );
 }
 
 export interface DeleteTemporaryConversationParams {
@@ -61,4 +47,16 @@ export async function deleteTemporaryConversation(params: DeleteTemporaryConvers
     'plugin:temporary_conversation|delete_temporary_conversation',
     params,
   );
+}
+
+export interface ClearTemporaryConversationParams {
+  persistentId: number | null;
+}
+
+export async function clearTemporaryConversation(params: ClearTemporaryConversationParams) {
+  await appInvoke<ClearTemporaryConversationParams, unknown>(
+    'plugin:temporary_conversation|clear_temporary_conversation',
+    params,
+  );
+  useTemporaryConversationStore.getState().fetchData(params.persistentId);
 }

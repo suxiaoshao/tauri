@@ -35,7 +35,7 @@ export default function TemplateListHeader() {
       }}
     >
       <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', ml: 1 }} data-tauri-drag-region>
-        <Typography data-tauri-drag-region variant="h6" component="span" paragraph={false}>
+        <Typography data-tauri-drag-region variant="h6" component="span">
           Conversation Templates
         </Typography>
         <Typography

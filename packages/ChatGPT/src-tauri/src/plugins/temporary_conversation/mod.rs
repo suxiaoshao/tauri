@@ -83,7 +83,8 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for TemporaryConversationPlugin {
             history::delete_temporary_message,
             history::separate_window,
             history::get_temporary_conversation,
-            history::delete_temporary_conversation
+            history::delete_temporary_conversation,
+            history::clear_temporary_conversation
         ]);
         (handle)(invoke);
     }

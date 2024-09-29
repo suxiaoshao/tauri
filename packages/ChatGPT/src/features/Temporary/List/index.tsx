@@ -1,6 +1,6 @@
 import TemplateInfo from '@chatgpt/features/Template/components/TemplateInfo';
 import { selectTemplates, useTemplateStore } from '@chatgpt/features/Template/templateSlice';
-import { initTemporaryConversation } from '@chatgpt/service/temporaryConversation';
+import { initTemporaryConversation } from '@chatgpt/service/temporaryConversation/mutation';
 import { type ConversationTemplate } from '@chatgpt/types/conversationTemplate';
 import { Avatar, Box, Divider, InputBase, List, ListItemAvatar, ListItemButton, ListItemText } from '@mui/material';
 import { useCallback, useEffect, useReducer, useState } from 'react';
