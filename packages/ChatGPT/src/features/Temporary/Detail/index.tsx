@@ -7,7 +7,7 @@ import { PromiseStatus } from '@chatgpt/hooks/usePromise';
 import usePromiseFn from '@chatgpt/hooks/usePromiseFn';
 import { type TemporaryMessageEvent } from '@chatgpt/types/temporaryConversation';
 import { Box } from '@mui/material';
-import { appWindow } from '@tauri-apps/api/window';
+import { appWindow, WebviewWindow } from '@tauri-apps/api/window';
 import { useCallback, useEffect } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -96,13 +96,26 @@ export default function TemporaryDetail() {
     },
     [platform, persistentId],
   );
+  const handleMessageView = (id: number) => {
+    // eslint-disable-next-line no-new
+    new WebviewWindow(`temporary-${persistentId}-message-${id}`, {
+      url: `/temporary_conversation/message?persistentId=${persistentId}&messageId=${id}`,
+      title: `temporary-${persistentId}-message-${id}`,
+      transparent: true,
+      decorations: false,
+    });
+  };
 
   const content = match(state)
     .with({ tag: PromiseStatus.data }, ({ value }) => (
       <>
         <TemporaryHeader persistentId={persistentId} template={value.template} />
         <Box sx={{ flex: '1 1 0', overflowY: 'auto' }}>
-          <MessageHistory onMessageDeleted={handleDeteteMessage} messages={value.messages} />
+          <MessageHistory
+            onMessageViewed={handleMessageView}
+            onMessageDeleted={handleDeteteMessage}
+            messages={value.messages}
+          />
         </Box>
         <ChatForm status={status} onSendMessage={onSendContent} />
       </>

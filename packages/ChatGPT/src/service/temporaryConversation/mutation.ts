@@ -72,3 +72,16 @@ export async function saveTemporaryConversation(params: SaveTemporaryConversatio
     params,
   );
 }
+
+export interface UpdateTemporaryMessageParams {
+  persistentId: number | null;
+  messageId: number;
+  content: string;
+}
+
+export async function updateTemporaryMessage(params: UpdateTemporaryMessageParams) {
+  await appInvoke<UpdateTemporaryMessageParams, unknown>(
+    'plugin:temporary_conversation|update_temporary_message',
+    params,
+  );
+}

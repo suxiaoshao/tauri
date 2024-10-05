@@ -14,6 +14,7 @@ import ConversationTemplateList from '@chatgpt/features/Template/List';
 import Temporary from '@chatgpt/features/Temporary';
 import TemporaryDetail from '@chatgpt/features/Temporary/Detail';
 import TemporaryList from '@chatgpt/features/Temporary/List';
+import TemporaryMessagePreview from '@chatgpt/features/Temporary/Message';
 import Errors from '../features/Errors';
 import Home from '../features/Home';
 import Setting from '../features/Setting';
@@ -54,6 +55,10 @@ const AppRouter = createBrowserRouter([
       { index: true, element: <TemporaryList /> },
       { path: 'detail', element: <TemporaryDetail /> },
     ],
+  },
+  {
+    path: '/temporary_conversation/message',
+    element: <TemporaryMessagePreview />,
   },
 ]);
 export default AppRouter;

@@ -47,6 +47,10 @@ export enum ChatGPTErrorCodes {
   FolderPathExists = 'FolderPathExists',
   CsvParse = 'CsvParse',
   TemplateHasConversation = 'TemplateHasConversation',
+  Rc = 'Rc',
+  TemporaryMessageNotFound = 'TemporaryMessageNotFound',
+  TemporaryConversationUninitialized = 'TemporaryConversationUninitialized',
+  TemporaryConversationNotFound = 'TemporaryConversationNotFound',
 }
 
 const ChatGPTErrorCodesSchema = enum_(ChatGPTErrorCodes);

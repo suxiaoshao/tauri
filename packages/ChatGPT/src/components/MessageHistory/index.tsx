@@ -45,12 +45,15 @@ export default function MessageHistory({ messages, onMessageDeleted, onMessageVi
     'delete',
     async () => {
       if (selectedIndex !== null) {
-        await onMessageDeleted?.(messages[selectedIndex].id);
-        setSelectedIndex(null);
+        const message = messages.at(selectedIndex);
+        if (message) {
+          await onMessageDeleted?.(message.id);
+          setSelectedIndex(null);
+        }
       }
     },
     {},
-    [selectedIndex, onMessageDeleted],
+    [selectedIndex, onMessageDeleted, messages],
   );
   useHotkeys(
     'space',
@@ -63,7 +66,7 @@ export default function MessageHistory({ messages, onMessageDeleted, onMessageVi
       }
     },
     {},
-    [onMessageViewed],
+    [onMessageViewed, selectedIndex, messages],
   );
   useHotkeys(
     'enter',
