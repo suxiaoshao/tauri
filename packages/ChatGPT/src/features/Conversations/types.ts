@@ -1,5 +1,5 @@
-import { ChatData } from '@chatgpt/types/chatData';
-import { Enum } from 'types';
+import { type ChatData } from '@chatgpt/types/chatData';
+import { type Enum } from 'types';
 
 export enum SelectedType {
   Conversation = 'Conversation',

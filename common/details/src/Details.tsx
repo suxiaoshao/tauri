@@ -5,9 +5,9 @@
  * @LastEditTime: 2024-05-01 02:48:14
  * @FilePath: /tauri/common/details/src/Details.tsx
  */
-import { Box, BoxProps } from '@mui/material';
+import { Box, type BoxProps } from '@mui/material';
 import Item from './Item';
-import { DetailsItem } from './types';
+import { type DetailsItem } from './types';
 
 export interface DetailsProps extends BoxProps {
   items: DetailsItem[];

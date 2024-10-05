@@ -1,4 +1,7 @@
-import { Conversation } from '@chatgpt/types/conversation';
+import FolderSelect from '@chatgpt/components/FolderSelect';
+import { type MoveConversationParams, moveConversation } from '@chatgpt/service/chat/mutation';
+import { type Conversation } from '@chatgpt/types/conversation';
+import DriveFileMoveIcon from '@mui/icons-material/DriveFileMove';
 import {
   Button,
   Dialog,
@@ -9,11 +12,8 @@ import {
   IconButton,
   Tooltip,
 } from '@mui/material';
-import DriveFileMoveIcon from '@mui/icons-material/DriveFileMove';
 import { useCallback, useState } from 'react';
-import FolderSelect from '@chatgpt/components/FolderSelect';
 import { Controller, useForm } from 'react-hook-form';
-import { MoveConversationParams, moveConversation } from '@chatgpt/service/chat/mutation';
 
 export interface MoveConversationProps {
   conversation: Conversation;

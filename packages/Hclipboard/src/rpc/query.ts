@@ -1,5 +1,5 @@
 import { invoke } from '@tauri-apps/api';
-import { InvokeArgs } from '@tauri-apps/api/tauri';
+import { type InvokeArgs } from '@tauri-apps/api/tauri';
 
 export interface QueryHistoryRequest {
   searchName?: string | null;

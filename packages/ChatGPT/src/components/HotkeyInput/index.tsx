@@ -1,5 +1,5 @@
 import { Close } from '@mui/icons-material';
-import { IconButton, InputAdornment, TextField, TextFieldProps } from '@mui/material';
+import { IconButton, InputAdornment, TextField, type TextFieldProps } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
 import { useRecordHotkeys } from 'react-hotkeys-hook';
 import { match } from 'ts-pattern';

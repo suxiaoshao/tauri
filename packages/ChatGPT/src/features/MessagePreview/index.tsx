@@ -15,6 +15,7 @@ import { useCallback, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { match } from 'ts-pattern';
 import Success from './Success';
+import { updateMessageContent } from '@chatgpt/service/chat/mutation';
 
 export default function MessagePreview() {
   const { id } = useParams<{ id: string }>();
@@ -42,7 +43,9 @@ export default function MessagePreview() {
     return match(data)
       .with({ tag: PromiseStatus.loading }, () => <Loading sx={{ width: '100%', height: '100%' }} />)
       .with({ tag: PromiseStatus.error }, ({ value }) => <ErrorInfo error={value} refetch={fn} />)
-      .with({ tag: PromiseStatus.data }, ({ value }) => <Success message={value} />)
+      .with({ tag: PromiseStatus.data }, ({ value }) => (
+        <Success updateMessageContent={(content) => updateMessageContent({ id: value.id, content })} message={value} />
+      ))
       .otherwise(() => <Loading sx={{ width: '100%', height: '100%' }} />);
   }, [data]);
   return content;

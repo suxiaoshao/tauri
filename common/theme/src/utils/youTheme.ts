@@ -5,8 +5,8 @@
  * @LastEditTime: 2024-05-01 03:50:23
  * @FilePath: /tauri/common/theme/src/utils/youTheme.ts
  */
-import { hexFromArgb, Scheme } from '@material/material-color-utilities';
-import { ThemeOptions } from '@mui/material';
+import { hexFromArgb, type Scheme } from '@material/material-color-utilities';
+import { type ThemeOptions } from '@mui/material';
 
 export function youThemeToMuiTheme(theme: ReturnType<Scheme['toJSON']>, mode: 'dark' | 'light' = 'light') {
   return {

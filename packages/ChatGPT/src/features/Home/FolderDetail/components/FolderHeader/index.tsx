@@ -1,10 +1,10 @@
+import { deleteFolder } from '@chatgpt/service/chat/mutation';
+import { type Folder } from '@chatgpt/types/folder';
+import { Delete } from '@mui/icons-material';
 import { Box, IconButton, Typography } from '@mui/material';
 import { useCallback } from 'react';
-import { Folder } from '@chatgpt/types/folder';
-import { Delete } from '@mui/icons-material';
-import { deleteFolder } from '@chatgpt/service/chat/mutation';
-import UpdateFolder from './UpdateFolder';
 import MoveFolder from './MoveFolder';
+import UpdateFolder from './UpdateFolder';
 export interface FolderHeaderProps {
   folder: Folder;
 }
@@ -26,17 +26,10 @@ export default function FolderHeader({ folder }: FolderHeaderProps) {
       }}
     >
       <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', ml: 1 }} data-tauri-drag-region>
-        <Typography data-tauri-drag-region variant="h6" component="span" paragraph={false}>
+        <Typography data-tauri-drag-region variant="h6" component="span">
           {folder.name}
         </Typography>
-        <Typography
-          sx={{ ml: 1 }}
-          data-tauri-drag-region
-          variant="body2"
-          color="inherit"
-          component="span"
-          paragraph={false}
-        >
+        <Typography sx={{ ml: 1 }} data-tauri-drag-region variant="body2" color="inherit" component="span">
           {folder.path}
         </Typography>
       </Box>

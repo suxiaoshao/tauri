@@ -5,10 +5,10 @@
  * @LastEditTime: 2024-05-01 02:18:50
  * @FilePath: /tauri/packages/ChatGPT/src/features/Template/List/header.tsx
  */
+import { Publish } from '@mui/icons-material';
+import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import { Box, IconButton, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
-import { Publish } from '@mui/icons-material';
 
 export interface TemplateCreateHeaderProps {
   formId: string;
@@ -31,7 +31,7 @@ export default function TemplateCreateHeader({ formId }: TemplateCreateHeaderPro
         <IconButton sx={{ mr: 1 }} onClick={() => navigate(-1)}>
           <KeyboardArrowLeftIcon />
         </IconButton>
-        <Typography data-tauri-drag-region variant="h6" component="span" paragraph={false}>
+        <Typography data-tauri-drag-region variant="h6" component="span">
           Create Template
         </Typography>
       </Box>

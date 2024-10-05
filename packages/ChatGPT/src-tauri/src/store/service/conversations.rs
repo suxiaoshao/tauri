@@ -41,13 +41,13 @@ pub struct Conversation {
 
 #[derive(serde::Deserialize, Debug)]
 pub struct NewConversation {
-    title: String,
+    pub title: String,
     #[serde(rename = "folderId")]
-    folder_id: Option<i32>,
-    icon: String,
-    info: Option<String>,
+    pub folder_id: Option<i32>,
+    pub icon: String,
+    pub info: Option<String>,
     #[serde(rename = "templateId")]
-    template_id: i32,
+    pub template_id: i32,
 }
 
 impl Conversation {
@@ -242,5 +242,9 @@ impl Conversation {
     pub fn clear(id: i32, conn: &mut SqliteConnection) -> ChatGPTResult<()> {
         SqlMessage::delete_by_conversation_id(id, conn)?;
         Ok(())
+    }
+    pub fn find_latest(conn: &mut SqliteConnection) -> ChatGPTResult<SqlConversation> {
+        let sql_conversation = SqlConversation::find_latest(conn)?;
+        Ok(sql_conversation)
     }
 }

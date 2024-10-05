@@ -5,12 +5,12 @@
  * @LastEditTime: 2024-05-01 01:26:12
  * @FilePath: /tauri/packages/ChatGPT/src/features/Template/List/header.tsx
  */
-import { Box, IconButton, Typography } from '@mui/material';
 import { Add, Refresh } from '@mui/icons-material';
+import { Box, IconButton, Typography } from '@mui/material';
 import { useCallback } from 'react';
-import { useTemplateStore, selectTemplateCount } from '../../templateSlice';
 import { useNavigate } from 'react-router-dom';
 import { useShallow } from 'zustand/react/shallow';
+import { selectTemplateCount, useTemplateStore } from '../../templateSlice';
 
 export default function TemplateListHeader() {
   const { count, fetchTemplates } = useTemplateStore(
@@ -35,7 +35,7 @@ export default function TemplateListHeader() {
       }}
     >
       <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', ml: 1 }} data-tauri-drag-region>
-        <Typography data-tauri-drag-region variant="h6" component="span" paragraph={false}>
+        <Typography data-tauri-drag-region variant="h6" component="span">
           Conversation Templates
         </Typography>
         <Typography

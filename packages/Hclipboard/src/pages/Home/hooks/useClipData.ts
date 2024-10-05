@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useState } from 'react';
-import { ClipHistory, query } from '../../../rpc/query';
 import { appWindow } from '@tauri-apps/api/window';
+import { useCallback, useEffect, useState } from 'react';
+import { type ClipHistory, query } from '../../../rpc/query';
 
 export default function useClipData(searchName: string | undefined) {
   // 剪切板历史

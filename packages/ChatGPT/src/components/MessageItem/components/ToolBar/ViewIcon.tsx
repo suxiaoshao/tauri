@@ -1,8 +1,8 @@
+import { MessageActionContext } from '@chatgpt/components/MessageHistory/MessageActionContext';
 import { Preview } from '@mui/icons-material';
+import { IconButton, Tooltip } from '@mui/material';
 import { useCallback, useContext } from 'react';
 import { ToolSx } from '../../const';
-import { IconButton, Tooltip } from '@mui/material';
-import { MessageActionContext } from '@chatgpt/components/MessageHistory/MessageActionContext';
 
 export interface ViewIconProp {
   id: number;

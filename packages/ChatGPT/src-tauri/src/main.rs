@@ -4,7 +4,7 @@
 use errors::ChatGPTResult;
 use log::LevelFilter;
 use plugins::{LogPlugin, MainConfigListener, TemporaryHotkeyListener};
-use tauri::{Manager, Runtime, WindowBuilder};
+use tauri::{Manager, Runtime, Window, WindowBuilder};
 use tauri_plugin_log::LogTarget;
 
 mod errors;
@@ -39,7 +39,7 @@ fn main() -> ChatGPTResult<()> {
     Ok(())
 }
 
-fn create_main_window<R: Runtime, M: Manager<R>>(app: &M) -> ChatGPTResult<()> {
+fn create_main_window<R: Runtime, M: Manager<R>>(app: &M) -> ChatGPTResult<Window<R>> {
     let window = WindowBuilder::new(app, "main", tauri::WindowUrl::App("/".into()))
         .title("ChatGPT")
         .inner_size(800.0, 600.0)
@@ -52,6 +52,6 @@ fn create_main_window<R: Runtime, M: Manager<R>>(app: &M) -> ChatGPTResult<()> {
         .hidden_title(true);
     #[cfg(target_os = "windows")]
     let window = window.decorations(false);
-    window.build()?;
-    Ok(())
+    let window = window.build()?;
+    Ok(window)
 }

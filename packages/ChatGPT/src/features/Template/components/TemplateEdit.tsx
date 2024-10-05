@@ -8,14 +8,14 @@
 import NumberField from '@chatgpt/components/NumberField';
 import { selectModels, useConfigStore } from '@chatgpt/features/Setting/configSlice';
 import { Mode, Role } from '@chatgpt/types/common';
-import { ConversationTemplate } from '@chatgpt/types/conversationTemplate';
+import { type ConversationTemplate } from '@chatgpt/types/conversationTemplate';
 import { valibotResolver } from '@hookform/resolvers/valibot';
 import { Add, Delete } from '@mui/icons-material';
 import { Box, Checkbox, FormControlLabel, FormLabel, IconButton, MenuItem, TextField } from '@mui/material';
 import { useState } from 'react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import {
-  InferInput,
+  type InferInput,
   array,
   emoji,
   enum_,

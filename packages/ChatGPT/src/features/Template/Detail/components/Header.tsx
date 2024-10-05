@@ -5,16 +5,16 @@
  * @LastEditTime: 2024-05-01 03:14:09
  * @FilePath: /tauri/packages/ChatGPT/src/features/Template/Detail/components/header.tsx
  */
-import { PromiseData, PromiseStatus } from '@chatgpt/hooks/usePromise';
-import { ConversationTemplate } from '@chatgpt/types/conversationTemplate';
-import { Delete, Edit, Preview, Refresh, Save } from '@mui/icons-material';
-import { Avatar, Box, IconButton, Skeleton, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
-import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
-import { useMemo } from 'react';
 import { Alignment } from '@chatgpt/features/MessagePreview/Success';
+import { type PromiseData, PromiseStatus } from '@chatgpt/hooks/usePromise';
 import { deleteConversationTemplate } from '@chatgpt/service/chat/mutation';
+import { type ConversationTemplate } from '@chatgpt/types/conversationTemplate';
+import { Delete, Edit, Preview, Refresh, Save } from '@mui/icons-material';
+import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
+import { Avatar, Box, IconButton, Skeleton, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from '@mui/material';
 import { enqueueSnackbar } from 'notify';
+import { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { match } from 'ts-pattern';
 
 export interface TemplateDetailHeaderProps {

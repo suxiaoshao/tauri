@@ -5,15 +5,15 @@
  * @LastEditTime: 2024-05-01 02:45:51
  * @FilePath: /tauri/packages/ChatGPT/src/features/Template/Detail/components/View.tsx
  */
-import CustomMarkdown from '@chatgpt/components/Markdown';
-import { ConversationTemplate } from '@chatgpt/types/conversationTemplate';
-import { Avatar, Box, Divider, List, ListItem, ListItemAvatar, ListItemText, Typography } from '@mui/material';
-import { Details, DetailsItem } from 'details';
-import React, { useMemo } from 'react';
-import system from '@chatgpt/assets/system.png';
 import assistant from '@chatgpt/assets/assistant.jpg';
+import system from '@chatgpt/assets/system.png';
 import user from '@chatgpt/assets/user.jpg';
+import CustomMarkdown from '@chatgpt/components/Markdown';
 import { Role } from '@chatgpt/types/common';
+import { type ConversationTemplate } from '@chatgpt/types/conversationTemplate';
+import { Avatar, Box, Divider, List, ListItem, ListItemAvatar, ListItemText, Typography } from '@mui/material';
+import { Details, type DetailsItem } from 'details';
+import React, { useMemo } from 'react';
 import { format } from 'time';
 import { match } from 'ts-pattern';
 

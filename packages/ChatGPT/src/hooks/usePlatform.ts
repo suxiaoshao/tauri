@@ -1,4 +1,4 @@
-import { OsType, type } from '@tauri-apps/api/os';
+import { type OsType, type } from '@tauri-apps/api/os';
 import { useEffect, useState } from 'react';
 
 export default function usePlatform() {

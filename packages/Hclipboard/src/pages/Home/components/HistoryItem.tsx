@@ -1,7 +1,7 @@
 import { Box, Divider, Drawer, Link, ListItemButton, Typography } from '@mui/material';
 import { encodeNonAsciiHTML } from 'entities';
 import { useEffect, useMemo, useState } from 'react';
-import { ClipHistory } from '../../../rpc/query';
+import { type ClipHistory } from '../../../rpc/query';
 import formatTime from '../../../utils/formatTime';
 import useElementSize from '../hooks/useElementSize';
 

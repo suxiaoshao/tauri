@@ -1,10 +1,11 @@
-import { Send } from '@mui/icons-material';
-import { Paper, InputBase, IconButton } from '@mui/material';
-import { useForm } from 'react-hook-form';
+import { type PromiseData, PromiseStatus } from '@chatgpt/hooks/usePromise';
 import { Role } from '@chatgpt/types/common';
-import { Message } from '@chatgpt/types/message';
-import { PromiseData, PromiseStatus } from '@chatgpt/hooks/usePromise';
-import React, { useCallback, useEffect, useState } from 'react';
+import { type Message } from '@chatgpt/types/message';
+import { Send } from '@mui/icons-material';
+import { IconButton, InputBase, Paper } from '@mui/material';
+import { useCallback, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useHotkeys } from 'react-hotkeys-hook';
 
 export interface ChatFormProps {
   status: PromiseData<void>;
@@ -20,11 +21,6 @@ export default function ChatForm({ status, onSendMessage }: ChatFormProps) {
   const isLoading = [PromiseStatus.loading].includes(status.tag);
   // search & fucused
   const [inputRef, setInputRef] = useState<HTMLInputElement | null>(null);
-  useEffect(() => {
-    if (inputRef) {
-      inputRef.focus();
-    }
-  }, [inputRef]);
 
   // shift + enter
   const handleKeyDown = useCallback(
@@ -35,6 +31,15 @@ export default function ChatForm({ status, onSendMessage }: ChatFormProps) {
       }
     },
     [onSubmit],
+  );
+  useHotkeys(
+    'enter',
+    (event) => {
+      event.preventDefault();
+      inputRef?.focus();
+    },
+    {},
+    [inputRef],
   );
   return (
     <Paper

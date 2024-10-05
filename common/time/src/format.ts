@@ -5,7 +5,7 @@
  * @LastEditTime: 2024-04-30 02:20:58
  * @FilePath: /tauri/common/time/src/format.ts
  */
-import { ConfigType } from 'dayjs';
+import { type ConfigType } from 'dayjs';
 import { dayjs } from './init';
 
 /** 格式化时间 */

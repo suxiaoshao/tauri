@@ -1,4 +1,4 @@
-import { RefObject, useCallback, useEffect, useRef, useState } from 'react';
+import { type RefObject, useCallback, useEffect, useRef, useState } from 'react';
 
 export default function useElementSize(): [DOMRect | undefined, RefObject<HTMLElement>] {
   const ref = useRef<HTMLElement>(null);

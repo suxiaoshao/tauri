@@ -6,8 +6,7 @@
  * @FilePath: /tauri/packages/ChatGPT/src/features/MessagePreview/Success.tsx
  */
 import CustomEdit from '@chatgpt/components/CustomEdit';
-import { updateMessageContent } from '@chatgpt/service/chat/mutation';
-import { Message } from '@chatgpt/types/message';
+import { type Message } from '@chatgpt/types/message';
 import { Edit, Preview, Upload } from '@mui/icons-material';
 import { Box, IconButton, ToggleButton, ToggleButtonGroup, Tooltip } from '@mui/material';
 import { appWindow } from '@tauri-apps/api/window';
@@ -16,19 +15,23 @@ import { useSearchParams } from 'react-router-dom';
 import { match } from 'ts-pattern';
 
 export interface SuccessProps {
-  message: Message;
+  message: Pick<Message, 'content'>;
+  updateMessageContent: (content: string) => Promise<void>;
 }
 export enum Alignment {
   preview = 'preview',
   edit = 'edit',
 }
 
-export default function Success({ message }: SuccessProps) {
+export default function Success({ message, updateMessageContent }: SuccessProps) {
   const [searchParams, setSearchParams] = useSearchParams();
   const handleAlignment = useCallback(
     (event: React.MouseEvent<HTMLElement>, newAlignment: string | null) => {
       if (newAlignment !== null) {
-        setSearchParams({ action: newAlignment });
+        setSearchParams((prev) => {
+          prev.set('action', newAlignment);
+          return prev;
+        });
       }
     },
     [setSearchParams],
@@ -41,15 +44,15 @@ export default function Success({ message }: SuccessProps) {
   }, [searchParams]);
   const [submitLoading, setSubmitLoading] = useState(false);
   const [code, setCode] = useState<string>(message.content);
-  const handleSubmit = useCallback(() => {
+  const handleSubmit = useCallback(async () => {
     try {
       setSubmitLoading(true);
-      updateMessageContent({ id: message.id, content: code });
+      await updateMessageContent(code);
       appWindow.close();
     } finally {
       setSubmitLoading(false);
     }
-  }, [code, message.id]);
+  }, [code]);
 
   return (
     <Box sx={{ width: '100%', height: '100%', p: 2, display: 'flex', flexDirection: 'column' }}>

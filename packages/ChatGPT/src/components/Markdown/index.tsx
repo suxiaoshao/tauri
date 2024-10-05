@@ -1,25 +1,25 @@
-import React, { startTransition, useEffect } from 'react';
-import MarkdownSource, { MarkdownToJSX } from 'markdown-to-jsx';
-import Prism from 'prismjs';
-import './init';
 import {
+  Box,
+  type BoxProps,
   Divider,
-  TypographyProps,
-  Typography,
-  TableContainer,
+  Link,
   Paper,
+  type SxProps,
   Table,
-  TableHead,
-  TableRow,
   TableBody,
   TableCell,
-  Link,
-  Box,
-  BoxProps,
-  SxProps,
-  Theme,
+  TableContainer,
+  TableHead,
+  TableRow,
+  type Theme,
+  Typography,
+  type TypographyProps,
 } from '@mui/material';
+import MarkdownSource, { type MarkdownToJSX } from 'markdown-to-jsx';
+import Prism from 'prismjs';
+import React, { startTransition, useEffect } from 'react';
 import { match, P } from 'ts-pattern';
+import './init';
 
 export interface MarkdownProps extends BoxProps {
   value: string;
@@ -190,8 +190,8 @@ const option: MarkdownToJSX.Options = {
       props: {
         variant: 'body1',
         sx: {
-          lineHeight: '1.5em',
           fontSize: 16,
+          lineHeight: '1.5em',
         } as SxProps<Theme>,
       },
     },

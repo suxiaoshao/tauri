@@ -6,7 +6,7 @@
  * @FilePath: /tauri/packages/ChatGPT/src/features/Template/templateSlice.ts
  */
 import { allConversationTemplates } from '@chatgpt/service/chat/query';
-import { ConversationTemplate } from '@chatgpt/types/conversationTemplate';
+import { type ConversationTemplate } from '@chatgpt/types/conversationTemplate';
 import { create } from 'zustand';
 
 interface TemplateState {

@@ -69,6 +69,10 @@ pub enum ChatGPTError {
     Rc,
     #[error("Temporary message not found:{}",.0)]
     TemporaryMessageNotFound(usize),
+    #[error("Temporary conversation uninitialized")]
+    TemporaryConversationUninitialized,
+    #[error("Temporary conversation not found:{}",.0)]
+    TemporaryConversationNotFound(usize),
 }
 
 impl Serialize for ChatGPTError {
@@ -180,6 +184,13 @@ impl Serialize for ChatGPTError {
             }
             ChatGPTError::TemporaryMessageNotFound(id) => {
                 state.serialize_field("code", "TemporaryMessageNotFound")?;
+                state.serialize_field("data", id)?;
+            }
+            ChatGPTError::TemporaryConversationUninitialized => {
+                state.serialize_field("code", "TemporaryConversationUninitialized")?;
+            }
+            ChatGPTError::TemporaryConversationNotFound(id) => {
+                state.serialize_field("code", "TemporaryConversationNotFound")?;
                 state.serialize_field("data", id)?;
             }
         }

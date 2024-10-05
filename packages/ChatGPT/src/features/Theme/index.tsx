@@ -10,14 +10,14 @@ import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import { createTheme, CssBaseline, ThemeProvider } from '@mui/material';
-import React, { useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { setYouThemeToCssVars } from 'theme';
 import 'theme/src/index.css';
 import { match } from 'ts-pattern';
-import { Theme } from '../Setting/types';
-import { colorSchemaMatch, selectActiveYouTheme, selectMuiTheme, useThemeStore } from './themeSlice';
 import { useShallow } from 'zustand/react/shallow';
 import { useConfigStore } from '../Setting/configSlice';
+import { Theme } from '../Setting/types';
+import { colorSchemaMatch, selectActiveYouTheme, selectMuiTheme, useThemeStore } from './themeSlice';
 
 export interface CustomThemeProps {
   children?: React.ReactNode;

@@ -1,45 +1,50 @@
 import ChatForm from '@chatgpt/components/ChatForm';
+import ErrorInfo from '@chatgpt/components/ErrorInfo';
+import Loading from '@chatgpt/components/Loading';
 import MessageHistory from '@chatgpt/components/MessageHistory';
-import { selectTemplates, useTemplateStore } from '@chatgpt/features/Template/templateSlice';
+import usePlatform from '@chatgpt/hooks/usePlatform';
+import { PromiseStatus } from '@chatgpt/hooks/usePromise';
 import usePromiseFn from '@chatgpt/hooks/usePromiseFn';
-import { deleteTemporaryMessage, temporaryFetch } from '@chatgpt/service/temporaryConversation';
-import { TemporaryMessage } from '@chatgpt/types/temporaryConversation';
+import { type TemporaryMessageEvent } from '@chatgpt/types/temporaryConversation';
 import { Box } from '@mui/material';
-import { appWindow } from '@tauri-apps/api/window';
-import { useCallback, useEffect, useMemo, useReducer } from 'react';
+import { appWindow, WebviewWindow } from '@tauri-apps/api/window';
+import { useCallback, useEffect } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
-import { useNavigate, useParams } from 'react-router-dom';
-import { match } from 'ts-pattern';
-import { Enum } from 'types';
-import TemporaryHeader from './components/Header';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { match, P } from 'ts-pattern';
 import { useShallow } from 'zustand/react/shallow';
-
-enum ActionType {
-  UpdateMessage,
-  SetMessages,
-}
-
-type Action = Enum<ActionType.UpdateMessage, TemporaryMessage> | Enum<ActionType.SetMessages, TemporaryMessage[]>;
-
-function reducer(state: TemporaryMessage[], action: Action): TemporaryMessage[] {
-  return match(action)
-    .with({ tag: ActionType.UpdateMessage }, (action) => {
-      const index = state.findIndex((m) => m.id === action.value.id);
-      if (index === -1) {
-        return [...state, action.value];
-      }
-      return state.with(index, action.value);
-    })
-    .with({ tag: ActionType.SetMessages }, (action) => action.value)
-    .otherwise(() => state);
-}
+import TemporaryHeader from './components/Header';
+import { useTemporaryConversationStore } from './temporaryDetailSlice';
+import {
+  deleteTemporaryMessage,
+  temporaryFetch,
+  separateWindow,
+} from '@chatgpt/service/temporaryConversation/mutation';
 
 export default function TemporaryDetail() {
-  // message history
-  const [messages, dispatch] = useReducer(reducer, []);
+  const platform = usePlatform();
+  const [searchParams] = useSearchParams();
+  const persistentId = match(searchParams.get('persistentId'))
+    .with(P.nonNullable, (id) =>
+      match(Number.parseInt(id, 10))
+        .with(Number.NaN, () => null)
+        .otherwise((id) => id),
+    )
+    .otherwise(() => null);
+  const { fetchData, state, updateMessage } = useTemporaryConversationStore(
+    useShallow(({ state, fetchData, updateMessage }) => ({
+      state,
+      fetchData,
+      updateMessage,
+    })),
+  );
   useEffect(() => {
-    const fn = appWindow.listen<TemporaryMessage>('temporary_message', (response) => {
-      dispatch({ tag: ActionType.UpdateMessage, value: response.payload });
+    fetchData(persistentId);
+  }, [persistentId, fetchData]);
+  // message history
+  useEffect(() => {
+    const fn = appWindow.listen<TemporaryMessageEvent>('temporary_message', (response) => {
+      updateMessage(response.payload);
     });
     return () => {
       (async () => {
@@ -47,24 +52,21 @@ export default function TemporaryDetail() {
         f();
       })();
     };
-  }, []);
+  }, [updateMessage]);
 
-  const handleDeteteMessage = useCallback(async (id: number) => {
-    const newMessages = await deleteTemporaryMessage({ id });
-    dispatch({ tag: ActionType.SetMessages, value: newMessages });
-  }, []);
-
-  // fetch template detail
-  const { temporaryId } = useParams<{ temporaryId: string }>();
-  const templates = useTemplateStore(useShallow(selectTemplates));
-  const template = useMemo(() => templates.find(({ id }) => id === Number(temporaryId)), [templates, temporaryId]);
+  const handleDeteteMessage = useCallback(
+    async (messageId: number) => {
+      await deleteTemporaryMessage({ messageId, persistentId });
+    },
+    [persistentId],
+  );
 
   // send form status
   const fetchFn = useCallback(
     async (content: string) => {
-      await temporaryFetch({ content });
+      await temporaryFetch({ content, persistentId });
     },
-    [temporaryId],
+    [persistentId],
   );
   const [status, onSendContent] = usePromiseFn(fetchFn);
 
@@ -79,12 +81,50 @@ export default function TemporaryDetail() {
     { enableOnFormTags: ['textarea'] },
     [navigate],
   );
+  useHotkeys(
+    match(platform)
+      .with('Darwin', () => ['Meta+d'])
+      .otherwise(() => ['Control+d']),
+    (event) => {
+      if (persistentId === null) {
+        event.preventDefault();
+        separateWindow();
+      }
+    },
+    {
+      enableOnFormTags: ['INPUT', 'TEXTAREA'],
+    },
+    [platform, persistentId],
+  );
+  const handleMessageView = (id: number) => {
+    // eslint-disable-next-line no-new
+    new WebviewWindow(`temporary-${persistentId}-message-${id}`, {
+      url: `/temporary_conversation/message?persistentId=${persistentId}&messageId=${id}`,
+      title: `temporary-${persistentId}-message-${id}`,
+      transparent: true,
+      decorations: false,
+    });
+  };
 
-  // render
-  if (!template) {
-    appWindow.close();
-    return null;
-  }
+  const content = match(state)
+    .with({ tag: PromiseStatus.data }, ({ value }) => (
+      <>
+        <TemporaryHeader persistentId={persistentId} template={value.template} />
+        <Box sx={{ flex: '1 1 0', overflowY: 'auto' }}>
+          <MessageHistory
+            onMessageViewed={handleMessageView}
+            onMessageDeleted={handleDeteteMessage}
+            messages={value.messages}
+          />
+        </Box>
+        <ChatForm status={status} onSendMessage={onSendContent} />
+      </>
+    ))
+    .with({ tag: PromiseStatus.loading }, () => <Loading sx={{ width: '100%', flex: '1 1 0' }} />)
+    .with({ tag: PromiseStatus.error }, ({ value }) => (
+      <ErrorInfo error={value} refetch={() => fetchData(persistentId)} />
+    ))
+    .otherwise(() => null);
   return (
     <Box
       sx={{
@@ -95,11 +135,7 @@ export default function TemporaryDetail() {
         backgroundColor: 'transparent',
       }}
     >
-      <TemporaryHeader template={template} />
-      <Box sx={{ flex: '1 1 0', overflowY: 'auto' }}>
-        <MessageHistory onMessageDeleted={handleDeteteMessage} messages={messages} />
-      </Box>
-      <ChatForm status={status} onSendMessage={onSendContent} />
+      {content}
     </Box>
   );
 }

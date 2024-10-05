@@ -25,7 +25,7 @@ use super::{
     conversation_template_prompts::ConversationTemplatePrompt, utils::serialize_offset_date_time,
 };
 
-#[derive(serde::Serialize)]
+#[derive(serde::Serialize, Clone)]
 pub struct ConversationTemplate {
     pub id: i32,
     pub name: String,

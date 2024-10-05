@@ -7,8 +7,8 @@
  */
 import { useConversationStore } from '@chatgpt/features/Conversations/conversationSlice';
 import { SelectedType } from '@chatgpt/features/Conversations/types';
-import { Conversation } from '@chatgpt/types/conversation';
-import { Folder } from '@chatgpt/types/folder';
+import { type Conversation } from '@chatgpt/types/conversation';
+import { type Folder } from '@chatgpt/types/folder';
 import FolderIcon from '@mui/icons-material/Folder';
 import { Avatar, Divider, List, ListItemAvatar, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { useCallback } from 'react';

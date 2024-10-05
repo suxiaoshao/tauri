@@ -6,14 +6,14 @@
  * @FilePath: /tauri/packages/ChatGPT/src/features/Adds/AddConversation.tsx
  */
 import { addConversation } from '@chatgpt/service/chat/mutation';
-import { NewConversation } from '@chatgpt/types/conversation';
+import { type NewConversation } from '@chatgpt/types/conversation';
 import { Add } from '@mui/icons-material';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import PublishIcon from '@mui/icons-material/Publish';
 import { Box, IconButton, ListItemButton, ListItemIcon, ListItemText, Toolbar, Typography } from '@mui/material';
 import { useCallback } from 'react';
 import { useLocation, useMatch, useNavigate } from 'react-router-dom';
-import ConversationEdit, { ConversationForm } from '../../components/ConversationEdit';
+import ConversationEdit, { type ConversationForm } from '../../components/ConversationEdit';
 
 function AddConversation() {
   const navigate = useNavigate();

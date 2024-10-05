@@ -1,13 +1,13 @@
 import TemplateInfo from '@chatgpt/features/Template/components/TemplateInfo';
 import { selectTemplates, useTemplateStore } from '@chatgpt/features/Template/templateSlice';
-import { initTemporaryConversation } from '@chatgpt/service/temporaryConversation';
-import { ConversationTemplate } from '@chatgpt/types/conversationTemplate';
+import { initTemporaryConversation } from '@chatgpt/service/temporaryConversation/mutation';
+import { type ConversationTemplate } from '@chatgpt/types/conversationTemplate';
 import { Avatar, Box, Divider, InputBase, List, ListItemAvatar, ListItemButton, ListItemText } from '@mui/material';
 import { useCallback, useEffect, useReducer, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useNavigate } from 'react-router-dom';
 import { match } from 'ts-pattern';
-import { Enum } from 'types';
+import { type Enum } from 'types';
 import { useShallow } from 'zustand/react/shallow';
 
 interface Data {
@@ -94,7 +94,7 @@ export default function TemporaryList() {
   const handleNavigate = useCallback(
     async (id: number) => {
       await initTemporaryConversation({ templateId: id });
-      navigate(`/temporary_conversation/${id}`);
+      navigate(`/temporary_conversation/detail`);
     },
     [navigate],
   );
@@ -144,6 +144,13 @@ export default function TemporaryList() {
     }
   }, [inputRef]);
 
+  const [ref, setRef] = useState<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (ref) {
+      ref?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+    }
+  }, [ref]);
+
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     const searchText = event.target.value;
     dispatch({ tag: 'setSearch', value: searchText });
@@ -164,9 +171,18 @@ export default function TemporaryList() {
         onChange={handleSearch}
       />
       <Divider />
-      <List dense sx={{ flex: '1 1 0' }}>
+      <List dense sx={{ flex: '1 1 0', overflowY: 'auto' }}>
         {filteredTemplates.map(({ id, icon, name, description, mode }, index) => (
-          <ListItemButton dense selected={index === selectedIndex} key={id} onClick={() => handleClick(index)}>
+          <ListItemButton
+            ref={match(selectedIndex)
+              .with(index, () => setRef)
+              // eslint-disable-next-line no-useless-undefined
+              .otherwise(() => undefined)}
+            dense
+            selected={index === selectedIndex}
+            key={id}
+            onClick={() => handleClick(index)}
+          >
             <ListItemAvatar>
               <Avatar sx={{ bgcolor: 'transparent' }}>{icon}</Avatar>
             </ListItemAvatar>

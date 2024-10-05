@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { PromiseData, PromiseStatus } from './usePromise';
+import { type PromiseData, PromiseStatus } from './usePromise';
 
 // eslint-disable-next-line no-explicit-any
 export default function usePromiseFn<T, Args extends any[]>(

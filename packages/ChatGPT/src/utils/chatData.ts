@@ -1,7 +1,7 @@
-import { Selected, SelectedType } from '@chatgpt/features/Conversations/types';
-import { ChatData } from '@chatgpt/types/chatData';
-import { Conversation } from '@chatgpt/types/conversation';
-import { Folder } from '@chatgpt/types/folder';
+import { type Selected, SelectedType } from '@chatgpt/features/Conversations/types';
+import { type ChatData } from '@chatgpt/types/chatData';
+import { type Conversation } from '@chatgpt/types/conversation';
+import { type Folder } from '@chatgpt/types/folder';
 import { match } from 'ts-pattern';
 
 export function findConversation(chatData: ChatData, conversationId: number | null): Conversation | null {

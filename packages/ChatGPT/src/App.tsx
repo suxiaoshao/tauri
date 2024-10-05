@@ -1,5 +1,5 @@
 import { SnackbarProvider } from 'notify';
-import { BrowserRouter } from 'react-router-dom';
+import { RouterProvider } from 'react-router-dom';
 import AppRouter from './components/AppRouter';
 import { CustomTheme } from './features/Theme';
 
@@ -7,9 +7,7 @@ function App() {
   return (
     <CustomTheme>
       <SnackbarProvider>
-        <BrowserRouter>
-          <AppRouter />
-        </BrowserRouter>
+        <RouterProvider router={AppRouter} />
       </SnackbarProvider>
     </CustomTheme>
   );

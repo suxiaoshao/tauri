@@ -5,15 +5,15 @@
  * @LastEditTime: 2024-04-29 03:09:23
  * @FilePath: /tauri/packages/ChatGPT/src/features/Adds/AddFolder.tsx
  */
-import { Box, Typography, Toolbar, IconButton, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import PublishIcon from '@mui/icons-material/Publish';
-import { useMatch, useNavigate } from 'react-router-dom';
-import { Add } from '@mui/icons-material';
-import FolderEdit, { FolderForm } from '@chatgpt/components/FolderEdit';
-import { useCallback } from 'react';
-import { NewFolder } from '@chatgpt/types/folder';
+import FolderEdit, { type FolderForm } from '@chatgpt/components/FolderEdit';
 import { addFolder } from '@chatgpt/service/chat/mutation';
+import { type NewFolder } from '@chatgpt/types/folder';
+import { Add } from '@mui/icons-material';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
+import PublishIcon from '@mui/icons-material/Publish';
+import { Box, IconButton, ListItemButton, ListItemIcon, ListItemText, Toolbar, Typography } from '@mui/material';
+import { useCallback } from 'react';
+import { useMatch, useNavigate } from 'react-router-dom';
 
 function AddFolder() {
   const navigate = useNavigate();

@@ -1,4 +1,4 @@
-import { Folder } from '@chatgpt/types/folder';
+import { type Folder } from '@chatgpt/types/folder';
 import { Box, List } from '@mui/material';
 import { match, P } from 'ts-pattern';
 import ContentEmpty from './components/ContentEmpty';

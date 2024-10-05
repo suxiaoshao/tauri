@@ -5,13 +5,13 @@
  * @LastEditTime: 2024-05-01 03:12:40
  * @FilePath: /tauri/packages/ChatGPT/src/features/Template/Create/index.tsx
  */
-import { Box } from '@mui/material';
-import TemplateCreateHeader from './Header';
-import TemplateEdit, { TemplateForm } from '../components/TemplateEdit';
-import { useCallback } from 'react';
 import { addConversationTemplate } from '@chatgpt/service/chat/mutation';
-import { NewConversationTemplate } from '@chatgpt/types/conversationTemplate';
+import { type NewConversationTemplate } from '@chatgpt/types/conversationTemplate';
+import { Box } from '@mui/material';
+import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import TemplateEdit, { type TemplateForm } from '../components/TemplateEdit';
+import TemplateCreateHeader from './Header';
 
 const formId = 'template-form';
 

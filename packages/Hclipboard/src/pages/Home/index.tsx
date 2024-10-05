@@ -6,13 +6,13 @@
  * @FilePath: /self-tools/Users/sushao/Documents/code/tauri/packages/Hclipboard/src/pages/Home/index.tsx
  */
 import { Box, List, TextField } from '@mui/material';
-import { useForm } from 'react-hook-form';
+import { writeText } from '@tauri-apps/api/clipboard';
+import { appWindow } from '@tauri-apps/api/window';
 import { useCallback, useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useKey } from 'react-use';
 import HistoryItem from './components/HistoryItem';
 import useClipData from './hooks/useClipData';
-import { useKey } from 'react-use';
-import { appWindow } from '@tauri-apps/api/window';
-import { writeText } from '@tauri-apps/api/clipboard';
 
 export default function Home() {
   // 表单

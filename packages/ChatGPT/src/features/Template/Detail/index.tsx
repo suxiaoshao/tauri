@@ -5,20 +5,20 @@
  * @LastEditTime: 2024-05-01 02:26:45
  * @FilePath: /tauri/packages/ChatGPT/src/features/Template/Detail/index.tsx
  */
+import ErrorInfo from '@chatgpt/components/ErrorInfo';
+import Loading from '@chatgpt/components/Loading';
+import { Alignment } from '@chatgpt/features/MessagePreview/Success';
 import usePromise, { PromiseStatus } from '@chatgpt/hooks/usePromise';
+import { updateConversationTemplate } from '@chatgpt/service/chat/mutation';
 import { findConversationTemplate } from '@chatgpt/service/chat/query';
 import { Box } from '@mui/material';
+import { enqueueSnackbar } from 'notify';
 import { useCallback, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import TemplateDetailHeader from './components/Header';
-import Loading from '@chatgpt/components/Loading';
-import ErrorInfo from '@chatgpt/components/ErrorInfo';
-import TemplateEdit, { TemplateForm } from '../components/TemplateEdit';
-import { Alignment } from '@chatgpt/features/MessagePreview/Success';
-import TemplateDetailView from './components/View';
-import { updateConversationTemplate } from '@chatgpt/service/chat/mutation';
-import { enqueueSnackbar } from 'notify';
 import { match } from 'ts-pattern';
+import TemplateEdit, { type TemplateForm } from '../components/TemplateEdit';
+import TemplateDetailHeader from './components/Header';
+import TemplateDetailView from './components/View';
 
 export default function ConversationTemplateDetail() {
   const [alignment, setAlignment] = useState(Alignment.preview);

@@ -1,5 +1,5 @@
-import { Tag } from '@feiwen/types/tag';
-import { FetchParams } from '../page/types';
+import { type Tag } from '@feiwen/types/tag';
+import { type FetchParams } from '../page/types';
 import { appInvoke } from './base';
 
 export async function fetchData(params: FetchParams) {

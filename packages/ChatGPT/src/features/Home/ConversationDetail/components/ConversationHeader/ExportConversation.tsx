@@ -6,8 +6,8 @@
  * @FilePath: /tauri/packages/ChatGPT/src/features/Home/ConversationDetail/components/ConversationHeader/ExportConversation.tsx
  */
 import { useConversationStore } from '@chatgpt/features/Conversations/conversationSlice';
-import { ExportConversationParams, ExportType, exportConversation } from '@chatgpt/service/chat/mutation';
-import { Conversation } from '@chatgpt/types/conversation';
+import { type ExportConversationParams, ExportType, exportConversation } from '@chatgpt/service/chat/mutation';
+import { type Conversation } from '@chatgpt/types/conversation';
 import IosShareIcon from '@mui/icons-material/IosShare';
 import {
   Button,

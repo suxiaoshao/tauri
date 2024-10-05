@@ -1,4 +1,4 @@
-import { check, forward, InferInput, integer, minValue, number, object, pipe, string, url } from 'valibot';
+import { check, forward, type InferInput, integer, minValue, number, object, pipe, string, url } from 'valibot';
 
 export const fetchInputSchema = pipe(
   object({

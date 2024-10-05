@@ -1,4 +1,4 @@
-import { Enum } from 'types';
+import { type Enum } from 'types';
 export type RequestBody =
   | Enum<'none', undefined>
   | Enum<'raw', RawBody>

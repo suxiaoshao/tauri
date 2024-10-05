@@ -5,7 +5,7 @@
  * @LastEditTime: 2024-01-07 20:52:58
  * @FilePath: /tauri/packages/ChatGPT/src/features/Home/ConversationDetail/components/MessageItem/const.ts
  */
-import { SxProps, Theme } from '@mui/material';
+import { type SxProps, type Theme } from '@mui/material';
 
 export const MarkdownSx: SxProps<Theme> = {
   m: 2,
@@ -38,4 +38,9 @@ export const MessageSx: SxProps<Theme> = {
 
 export const ToolSx: SxProps<Theme> = {
   ml: 0,
+};
+
+export const MessageSelectedSx: SxProps<Theme> = {
+  border: (theme) => `${theme.spacing(0.5)} solid ${theme.palette.primary.main}`,
+  borderRadius: (theme) => theme.spacing(1),
 };

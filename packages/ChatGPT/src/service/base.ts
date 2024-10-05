@@ -6,9 +6,9 @@
  * @FilePath: /tauri/packages/ChatGPT/src/service/base.ts
  */
 import { invoke } from '@tauri-apps/api';
-import { InvokeArgs } from '@tauri-apps/api/tauri';
+import { type InvokeArgs } from '@tauri-apps/api/tauri';
 import { enqueueSnackbar } from 'notify';
-import { object, string, enum_, parseAsync, nullish } from 'valibot';
+import { enum_, nullish, object, parseAsync, string } from 'valibot';
 
 export interface ChatGPTError {
   code: ChatGPTErrorCodes;
@@ -47,6 +47,10 @@ export enum ChatGPTErrorCodes {
   FolderPathExists = 'FolderPathExists',
   CsvParse = 'CsvParse',
   TemplateHasConversation = 'TemplateHasConversation',
+  Rc = 'Rc',
+  TemporaryMessageNotFound = 'TemporaryMessageNotFound',
+  TemporaryConversationUninitialized = 'TemporaryConversationUninitialized',
+  TemporaryConversationNotFound = 'TemporaryConversationNotFound',
 }
 
 const ChatGPTErrorCodesSchema = enum_(ChatGPTErrorCodes);

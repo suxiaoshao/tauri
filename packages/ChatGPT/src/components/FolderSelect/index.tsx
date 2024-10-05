@@ -1,9 +1,9 @@
-import { useConversationStore, SELECT_FOLDERS } from '@chatgpt/features/Conversations/conversationSlice';
-import { MenuList, MenuItem, ListItemText } from '@mui/material';
-import FolderSelectItem from './FolderSelectItem';
-import React, { ForwardedRef, useMemo } from 'react';
-import { FolderSelectContextType, FolderSelectContext } from './FolderSelectContext';
+import { SELECT_FOLDERS, useConversationStore } from '@chatgpt/features/Conversations/conversationSlice';
+import { ListItemText, MenuItem, MenuList } from '@mui/material';
+import React, { type ForwardedRef, useMemo } from 'react';
 import { useShallow } from 'zustand/react/shallow';
+import { type FolderSelectContextType, FolderSelectContext } from './FolderSelectContext';
+import FolderSelectItem from './FolderSelectItem';
 
 export interface FolderSelectProps {
   value?: number | null;

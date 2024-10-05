@@ -27,6 +27,12 @@ impl SqlNewMessage {
             .execute(conn)?;
         Ok(())
     }
+    pub fn insert_many(data: &[Self], conn: &mut SqliteConnection) -> ChatGPTResult<()> {
+        diesel::insert_into(messages::table)
+            .values(data)
+            .execute(conn)?;
+        Ok(())
+    }
 }
 
 #[derive(Debug, Queryable, Insertable)]

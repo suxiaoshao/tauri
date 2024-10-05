@@ -9,7 +9,7 @@
 import { argbFromHex, themeFromSourceColor, youThemeToMuiTheme } from 'theme';
 import { match } from 'ts-pattern';
 import { create } from 'zustand';
-import { Config, Theme } from '../Setting/types';
+import { type Config, Theme } from '../Setting/types';
 
 export interface ThemeSliceType {
   systemColorScheme: Theme.Dark | Theme.Light;
@@ -35,6 +35,7 @@ function getInitDate(): ThemeSliceType {
 }
 
 export const useThemeStore = create<
+  // eslint-disable-next-line no-unexpected-multiline
   ThemeSliceType & { setSystemColorScheme: (scheme: ThemeSliceType['systemColorScheme']) => void }
 >((set) => ({
   ...getInitDate(),

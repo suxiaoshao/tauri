@@ -5,9 +5,9 @@
  * @LastEditTime: 2024-05-08 21:11:32
  * @FilePath: /tauri/packages/ChatGPT/src/features/Setting/configSlice.ts
  */
-import { create } from 'zustand';
 import { getConfig } from '@chatgpt/service/config';
-import { Config, Theme } from './types';
+import { create } from 'zustand';
+import { type Config, Theme } from './types';
 
 interface ConfigState extends Config {
   setConfig: (config: Config) => void;

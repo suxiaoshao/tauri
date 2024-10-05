@@ -5,19 +5,19 @@
  * @LastEditTime: 2024-04-19 08:05:24
  * @FilePath: /tauri/packages/ChatGPT/src/features/Conversations/index.tsx
  */
-import { ChevronRight, ExpandMore } from '@mui/icons-material';
 import {
   selectChatData,
   selectSelectedNodeId,
   useConversationStore,
 } from '@chatgpt/features/Conversations/conversationSlice';
-import { useCallback, useEffect } from 'react';
-import { SimpleTreeView } from '@mui/x-tree-view';
-import FolderItem from './components/FolderItem';
-import ConversationItem from './components/ConversationItem';
 import { getSelectedFromNodeId } from '@chatgpt/utils/chatData';
+import { ChevronRight, ExpandMore } from '@mui/icons-material';
+import { SimpleTreeView } from '@mui/x-tree-view';
+import { useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useShallow } from 'zustand/react/shallow';
+import ConversationItem from './components/ConversationItem';
+import FolderItem from './components/FolderItem';
 
 export default function ConversationTree() {
   const navigate = useNavigate();
