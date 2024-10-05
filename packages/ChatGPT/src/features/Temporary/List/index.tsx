@@ -147,7 +147,7 @@ export default function TemporaryList() {
   const [ref, setRef] = useState<HTMLDivElement | null>(null);
   useEffect(() => {
     if (ref) {
-      ref?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      ref?.scrollIntoView({ block: 'start', behavior: 'smooth' });
     }
   }, [ref]);
 

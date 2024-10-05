@@ -39,3 +39,8 @@ export const MessageSx: SxProps<Theme> = {
 export const ToolSx: SxProps<Theme> = {
   ml: 0,
 };
+
+export const MessageSelectedSx: SxProps<Theme> = {
+  border: (theme) => `${theme.spacing(0.5)} solid ${theme.palette.primary.main}`,
+  borderRadius: (theme) => theme.spacing(1),
+};

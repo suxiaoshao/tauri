@@ -42,7 +42,7 @@ export default function Home() {
   );
   useEffect(() => {
     if (ref) {
-      ref?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      ref?.scrollIntoView({ block: 'start', behavior: 'smooth' });
     }
   }, [ref]);
   useEffect(() => {

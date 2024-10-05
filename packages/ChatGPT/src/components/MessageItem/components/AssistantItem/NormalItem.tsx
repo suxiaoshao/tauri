@@ -10,21 +10,33 @@ import assistant from '@chatgpt/assets/assistant.jpg';
 import CustomMarkdown from '@chatgpt/components/Markdown';
 import { CheckCircleOutlineOutlined } from '@mui/icons-material';
 import { Avatar, Box, Divider } from '@mui/material';
-import { AvatarSx, MarkdownSx, MessageSx, ToolSx } from '../../const';
+import { AvatarSx, MarkdownSx, MessageSelectedSx, MessageSx, ToolSx } from '../../const';
 import { type BaseMessage } from '../../types';
 import ToolBar from '../ToolBar';
 import CopyIcon from '../ToolBar/CopyIcon';
 import DeleteMessageIcon from '../ToolBar/DeleteMessageIcon';
 import ViewIcon from '../ToolBar/ViewIcon';
+import { useState, useEffect } from 'react';
+import { match } from 'ts-pattern';
 
 export interface NormalItemProps {
   message: BaseMessage;
+  selected: boolean;
 }
 
-export default function NormalItem({ message }: NormalItemProps) {
+export default function NormalItem({ message, selected }: NormalItemProps) {
+  const [ref, setRef] = useState<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (ref && selected) {
+      ref?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+    }
+  }, [ref, selected]);
+  const sx = match(selected)
+    .with(true, () => ({ ...MessageSx, ...MessageSelectedSx }))
+    .otherwise(() => MessageSx);
   return (
     <>
-      <Box sx={MessageSx}>
+      <Box sx={sx} ref={setRef}>
         <Avatar sx={AvatarSx} src={assistant} />
         <CustomMarkdown sx={{ ...MarkdownSx }} value={message.content} />
         <ToolBar>

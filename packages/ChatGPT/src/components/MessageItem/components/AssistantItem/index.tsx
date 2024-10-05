@@ -9,15 +9,16 @@ import NormalItem from './NormalItem';
 
 export interface AssistantItemProps {
   message: BaseMessage;
+  selected: boolean;
 }
 
-export default function AssistantItem({ message }: AssistantItemProps) {
+export default function AssistantItem({ message, selected }: AssistantItemProps) {
   return useMemo(() => {
     return match(message.status)
-      .with(Status.Normal, () => <NormalItem message={message} />)
-      .with(Status.Loading, () => <LoadingItem message={message} />)
-      .with(Status.Hidden, () => <HiddenItem message={message} />)
-      .with(Status.Error, () => <ErrorItem message={message} />)
+      .with(Status.Normal, () => <NormalItem selected={selected} message={message} />)
+      .with(Status.Loading, () => <LoadingItem selected={selected} message={message} />)
+      .with(Status.Hidden, () => <HiddenItem selected={selected} message={message} />)
+      .with(Status.Error, () => <ErrorItem selected={selected} message={message} />)
       .exhaustive();
-  }, [message]);
+  }, [message, selected]);
 }
