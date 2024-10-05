@@ -14,34 +14,46 @@ import ConversationTemplateList from '@chatgpt/features/Template/List';
 import Temporary from '@chatgpt/features/Temporary';
 import TemporaryDetail from '@chatgpt/features/Temporary/Detail';
 import TemporaryList from '@chatgpt/features/Temporary/List';
-import { Route, Routes } from 'react-router-dom';
 import Errors from '../features/Errors';
 import Home from '../features/Home';
 import Setting from '../features/Setting';
 import AppDrawer from './AppDrawer';
 
-export default function AppRouter() {
-  return (
-    <Routes>
-      <Route path="/" element={<AppDrawer />}>
-        <Route index element={<Home />} />
-        <Route path="error" element={<Errors />} />
-        <Route path="add">
-          <Route path="conversation" element={<AddConversation />} />
-          <Route path="folder" element={<AddFolder />} />
-        </Route>
-        <Route path="template">
-          <Route index element={<ConversationTemplateList />} />
-          <Route path=":id" element={<ConversationTemplateDetail />} />
-          <Route path="create" element={<ConversationTemplateCreate />} />
-        </Route>
-      </Route>
-      <Route path="/setting" element={<Setting />} />
-      <Route path="/message/:id" element={<MessagePreview />} />
-      <Route path="/temporary_conversation" element={<Temporary />}>
-        <Route index element={<TemporaryList />} />
-        <Route path="detail" element={<TemporaryDetail />} />
-      </Route>
-    </Routes>
-  );
-}
+import { createBrowserRouter } from 'react-router-dom';
+
+const AppRouter = createBrowserRouter([
+  {
+    path: '/',
+    element: <AppDrawer />,
+    children: [
+      { index: true, element: <Home /> },
+      { path: 'error', element: <Errors /> },
+      {
+        path: 'add',
+        children: [
+          { path: 'conversation', element: <AddConversation /> },
+          { path: 'folder', element: <AddFolder /> },
+        ],
+      },
+      {
+        path: 'template',
+        children: [
+          { index: true, element: <ConversationTemplateList /> },
+          { path: ':id', element: <ConversationTemplateDetail /> },
+          { path: 'create', element: <ConversationTemplateCreate /> },
+        ],
+      },
+    ],
+  },
+  { path: '/setting', element: <Setting /> },
+  { path: '/message/:id', element: <MessagePreview /> },
+  {
+    path: '/temporary_conversation',
+    element: <Temporary />,
+    children: [
+      { index: true, element: <TemporaryList /> },
+      { path: 'detail', element: <TemporaryDetail /> },
+    ],
+  },
+]);
+export default AppRouter;

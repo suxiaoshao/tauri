@@ -10,26 +10,39 @@ import { useConfigStore } from '@chatgpt/features/Setting/configSlice';
 import { type Config } from '@chatgpt/features/Setting/types';
 import { useTemplateStore } from '@chatgpt/features/Template/templateSlice';
 import { type Message } from '@chatgpt/types/message';
+import { type RouterEvent } from '@chatgpt/types/router';
 import { listen } from '@tauri-apps/api/event';
 import { appWindow } from '@tauri-apps/api/window';
+import { resolveRouterEvent } from './router';
+
+export async function initForFetch() {
+  await Promise.all([
+    useConversationStore.getState().fetchConversations(),
+    useConfigStore.getState().fetchConfig(),
+    useTemplateStore.getState().fetchTemplates(),
+  ]);
+}
+
+export async function initForListen() {
+  // listen for messages and config changes simultaneously
+  await Promise.all([
+    appWindow.listen<Message>('message', (response) => {
+      useConversationStore.getState().updateMessage(response.payload);
+    }),
+    listen<Config>('config', (event) => {
+      useConfigStore.getState().setConfig(event.payload);
+    }),
+    appWindow.listen<RouterEvent>('router_event', async (event) => {
+      const { isUpdate, resolveFunc } = resolveRouterEvent(event.payload);
+      if (isUpdate) {
+        await initForFetch();
+      }
+      resolveFunc();
+    }),
+  ]);
+}
 
 export default async function init() {
-  // fetch conversations data
-  useConversationStore.getState().fetchConversations();
-
-  // listen for messages
-  await appWindow.listen<Message>('message', (response) => {
-    useConversationStore.getState().updateMessage(response.payload);
-  });
-
-  // fetch config data
-  useConfigStore.getState().fetchConfig();
-
-  // listen for config changes
-  await listen<Config>('config', (event) => {
-    useConfigStore.getState().setConfig(event.payload);
-  });
-
-  // fetch templates data
-  useTemplateStore.getState().fetchTemplates();
+  await initForFetch();
+  await initForListen();
 }

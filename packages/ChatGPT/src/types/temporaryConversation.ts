@@ -23,3 +23,11 @@ export interface TemporaryMessageEvent {
   persistentId?: number | null;
   message: TemporaryMessage;
 }
+
+export interface SaveTemporaryConversation {
+  title: string;
+  folderId: number | null;
+  icon: string;
+  info: string | null;
+  persistentId?: number | null;
+}

@@ -10,10 +10,13 @@ use time::OffsetDateTime;
 use crate::{
     errors::{ChatGPTError, ChatGPTResult},
     fetch::{ChatRequest, ChatResponse, FetchRunner, Message as FetchMessage},
-    plugins::ChatGPTConfig,
+    plugins::{
+        url_schema::{router_emit_to_main, ConversationSelected, RouterEvent},
+        ChatGPTConfig,
+    },
     store::{
-        deserialize_offset_date_time, serialize_offset_date_time, ConversationTemplate, DbConn,
-        Mode, Role, Status,
+        deserialize_offset_date_time, serialize_offset_date_time, Conversation,
+        ConversationTemplate, DbConn, Message, Mode, NewConversation, Role, Status,
     },
 };
 
@@ -291,6 +294,63 @@ pub fn clear_temporary_conversation(
     state: tauri::State<'_, Arc<Mutex<TemporaryStore>>>,
 ) -> ChatGPTResult<()> {
     state.lock()?.clear_conversation(persistent_id)?;
+    Ok(())
+}
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct SaveTemporaryConversation {
+    title: String,
+    #[serde(rename = "folderId")]
+    folder_id: Option<i32>,
+    icon: String,
+    info: Option<String>,
+    persistent_id: Option<usize>,
+}
+
+#[tauri::command(async)]
+pub fn save_temporary_conversation<R: Runtime>(
+    state: tauri::State<'_, Arc<Mutex<TemporaryStore>>>,
+    conn: tauri::State<'_, DbConn>,
+    data: SaveTemporaryConversation,
+    window: tauri::Window<R>,
+    app_handle: AppHandle<R>,
+) -> ChatGPTResult<()> {
+    let SaveTemporaryConversation {
+        title,
+        folder_id,
+        icon,
+        info,
+        persistent_id,
+    } = data;
+    let conversation = state.lock()?.get_temp_conversation(persistent_id)?;
+    let conn = &mut conn.get()?;
+    let id = conn.immediate_transaction(|conn| {
+        Conversation::insert(
+            NewConversation {
+                title,
+                folder_id,
+                icon,
+                info,
+                template_id: conversation.template.id,
+            },
+            conn,
+        )?;
+        let new_conversation = Conversation::find_latest(conn)?;
+        Message::insert_many(
+            conversation.messages,
+            new_conversation.path,
+            new_conversation.id,
+            conn,
+        )?;
+        Ok::<_, ChatGPTError>(new_conversation.id)
+    })?;
+
+    state.lock()?.delete_conversation(persistent_id);
+    window.close()?;
+    router_emit_to_main(
+        RouterEvent::new("/", Some(ConversationSelected::Conversation(id)), true),
+        &app_handle,
+    )?;
     Ok(())
 }
 

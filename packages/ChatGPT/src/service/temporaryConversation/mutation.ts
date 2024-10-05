@@ -1,4 +1,5 @@
 import { useTemporaryConversationStore } from '@chatgpt/features/Temporary/Detail/temporaryDetailSlice';
+import { type SaveTemporaryConversation } from '@chatgpt/types/temporaryConversation';
 import { appInvoke } from '@feiwen/service/base';
 
 export interface InitTemporaryConversationParams {
@@ -59,4 +60,15 @@ export async function clearTemporaryConversation(params: ClearTemporaryConversat
     params,
   );
   useTemporaryConversationStore.getState().fetchData(params.persistentId);
+}
+
+export interface SaveTemporaryConversationParams {
+  data: SaveTemporaryConversation;
+}
+
+export async function saveTemporaryConversation(params: SaveTemporaryConversationParams) {
+  await appInvoke<SaveTemporaryConversationParams, unknown>(
+    'plugin:temporary_conversation|save_temporary_conversation',
+    params,
+  );
 }

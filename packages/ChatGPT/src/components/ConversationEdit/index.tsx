@@ -112,12 +112,14 @@ export default function ConversationEdit({ initialValues, id, sx, onSubmit: subm
             sx={{
               mt: 2,
             }}
-            SelectProps={{
-              MenuProps: {
-                sx: {
-                  '& .MuiMenu-paper': {
-                    backgroundColor: (theme) => theme.palette.background.paper + 'a0',
-                    backdropFilter: 'blur(20px)',
+            slotProps={{
+              select: {
+                MenuProps: {
+                  sx: {
+                    '& .MuiMenu-paper': {
+                      backgroundColor: (theme) => theme.palette.background.paper + 'a0',
+                      backdropFilter: 'blur(20px)',
+                    },
                   },
                 },
               },

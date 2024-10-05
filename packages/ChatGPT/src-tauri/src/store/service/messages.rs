@@ -4,6 +4,7 @@ use time::OffsetDateTime;
 
 use crate::{
     errors::{ChatGPTError, ChatGPTResult},
+    plugins::TemporaryMessage,
     store::{
         model::{SqlConversation, SqlMessage, SqlNewMessage},
         Role, Status,
@@ -115,6 +116,40 @@ impl Message {
             let message = SqlMessage::last(conn)?;
             Message::try_from(message)
         })
+    }
+    pub fn insert_many(
+        messages: Vec<TemporaryMessage>,
+        path: String,
+        conversation_id: i32,
+        conn: &mut SqliteConnection,
+    ) -> ChatGPTResult<()> {
+        let messages = messages
+            .into_iter()
+            .map(
+                |TemporaryMessage {
+                     role,
+                     content,
+                     created_time,
+                     updated_time,
+                     start_time,
+                     end_time,
+                     status,
+                     ..
+                 }| SqlNewMessage {
+                    conversation_id,
+                    conversation_path: path.clone(),
+                    role: role.to_string(),
+                    content,
+                    status: status.to_string(),
+                    created_time,
+                    updated_time,
+                    start_time,
+                    end_time,
+                },
+            )
+            .collect::<Vec<_>>();
+        SqlNewMessage::insert_many(&messages, conn)?;
+        Ok(())
     }
     pub fn messages_by_conversation_id(
         conversation_id: i32,

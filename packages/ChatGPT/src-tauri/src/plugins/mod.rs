@@ -10,11 +10,14 @@ mod config;
 mod log_plugin;
 mod temporary_conversation;
 mod tray;
+mod url_schema;
 mod window;
 
 pub use chat::ChatPlugin;
 pub use config::{ChatGPTConfig, ConfigPlugin, Listenable, MainConfigListener};
 pub use log_plugin::LogPlugin;
-pub use temporary_conversation::{TemporaryConversationPlugin, TemporaryHotkeyListener};
+pub use temporary_conversation::{
+    TemporaryConversationPlugin, TemporaryHotkeyListener, TemporaryMessage,
+};
 pub use tray::TrayPlugin;
 pub use window::WindowPlugin;

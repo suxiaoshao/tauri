@@ -19,7 +19,7 @@ mod delay;
 mod history;
 mod listen;
 
-pub use listen::TemporaryHotkeyListener;
+pub use {history::TemporaryMessage, listen::TemporaryHotkeyListener};
 
 #[derive(Default)]
 pub struct TemporaryConversationPlugin {
@@ -84,7 +84,8 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for TemporaryConversationPlugin {
             history::separate_window,
             history::get_temporary_conversation,
             history::delete_temporary_conversation,
-            history::clear_temporary_conversation
+            history::clear_temporary_conversation,
+            history::save_temporary_conversation
         ]);
         (handle)(invoke);
     }

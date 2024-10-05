@@ -6,14 +6,14 @@ use time::OffsetDateTime;
 #[derive(Insertable)]
 #[diesel(table_name = conversations)]
 pub struct SqlNewConversation {
-    pub(in super::super) title: String,
-    pub(in super::super) path: String,
-    pub(in super::super) folder_id: Option<i32>,
-    pub(in super::super) icon: String,
-    pub(in super::super) created_time: OffsetDateTime,
-    pub(in super::super) updated_time: OffsetDateTime,
-    pub(in super::super) info: Option<String>,
-    pub(in super::super) template_id: i32,
+    pub(crate) title: String,
+    pub(crate) path: String,
+    pub(crate) folder_id: Option<i32>,
+    pub(crate) icon: String,
+    pub(crate) created_time: OffsetDateTime,
+    pub(crate) updated_time: OffsetDateTime,
+    pub(crate) info: Option<String>,
+    pub(crate) template_id: i32,
 }
 
 impl SqlNewConversation {
@@ -28,15 +28,15 @@ impl SqlNewConversation {
 #[derive(Queryable, AsChangeset, Debug, Insertable)]
 #[diesel(table_name = conversations)]
 pub struct SqlConversation {
-    pub(in super::super) id: i32,
-    pub(in super::super) folder_id: Option<i32>,
-    pub(in super::super) path: String,
-    pub(in super::super) title: String,
-    pub(in super::super) icon: String,
-    pub(in super::super) created_time: OffsetDateTime,
-    pub(in super::super) updated_time: OffsetDateTime,
-    pub(in super::super) info: Option<String>,
-    pub(in super::super) template_id: i32,
+    pub(crate) id: i32,
+    pub(crate) folder_id: Option<i32>,
+    pub(crate) path: String,
+    pub(crate) title: String,
+    pub(crate) icon: String,
+    pub(crate) created_time: OffsetDateTime,
+    pub(crate) updated_time: OffsetDateTime,
+    pub(crate) info: Option<String>,
+    pub(crate) template_id: i32,
 }
 
 impl SqlConversation {
@@ -105,19 +105,26 @@ impl SqlConversation {
         .get_result(conn)?;
         Ok(count)
     }
+    /// find latest conversation id
+    pub fn find_latest(conn: &mut SqliteConnection) -> ChatGPTResult<Self> {
+        let latest_id = conversations::table
+            .order(conversations::id.desc())
+            .first(conn)?;
+        Ok(latest_id)
+    }
 }
 
 #[derive(AsChangeset, Identifiable, Debug)]
 #[diesel(table_name = conversations)]
 pub struct SqlUpdateConversation {
-    pub(in super::super) id: i32,
-    pub(in super::super) folder_id: Option<i32>,
-    pub(in super::super) path: String,
-    pub(in super::super) title: String,
-    pub(in super::super) icon: String,
-    pub(in super::super) updated_time: OffsetDateTime,
-    pub(in super::super) info: Option<String>,
-    pub(in super::super) template_id: i32,
+    pub(crate) id: i32,
+    pub(crate) folder_id: Option<i32>,
+    pub(crate) path: String,
+    pub(crate) title: String,
+    pub(crate) icon: String,
+    pub(crate) updated_time: OffsetDateTime,
+    pub(crate) info: Option<String>,
+    pub(crate) template_id: i32,
 }
 
 impl SqlUpdateConversation {

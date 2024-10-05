@@ -6,6 +6,7 @@ import { Avatar, Box, IconButton, Tooltip, Typography } from '@mui/material';
 import { useCallback } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { match } from 'ts-pattern';
+import SaveConversation from './SaveConversation';
 
 export interface TemporaryHeaderProps {
   template: ConversationTemplate;
@@ -58,6 +59,7 @@ export default function TemporaryHeader({ template, persistentId }: TemporaryHea
           <CleaningServices />
         </IconButton>
       </Tooltip>
+      <SaveConversation persistentId={persistentId} />
     </Box>
   );
 }
