@@ -4,14 +4,14 @@ use crate::{
     store::{service::Novel, DbConn},
 };
 
-#[tauri::command(async)]
+#[tauri::command]
 pub async fn fetch(
     state: tauri::State<'_, DbConn>,
     url: String,
     start_page: u32,
     end_page: u32,
     cookies: String,
-) -> FeiwenResult<()> {
+) -> Result<(), ()> {
     match _fetch(state, url, start_page, end_page, cookies).await {
         Ok(_) => {
             log::info!("fetch success");
@@ -19,7 +19,7 @@ pub async fn fetch(
         }
         Err(err) => {
             log::error!("fetch error: {:?}", err);
-            Err(err)
+            Err(())
         }
     }
 }

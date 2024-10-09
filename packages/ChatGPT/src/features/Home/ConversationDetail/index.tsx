@@ -5,7 +5,7 @@ import { deleteMessage } from '@chatgpt/service/chat/mutation';
 import { fetchMessage } from '@chatgpt/service/chat/query';
 import { type Conversation } from '@chatgpt/types/conversation';
 import { Box } from '@mui/material';
-import { WebviewWindow } from '@tauri-apps/api/window';
+import { WebviewWindow } from '@tauri-apps/api/webviewWindow';
 import { useCallback } from 'react';
 import Header from './components/ConversationHeader';
 

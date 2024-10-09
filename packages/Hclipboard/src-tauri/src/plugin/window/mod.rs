@@ -13,11 +13,15 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for WindowPlugin {
     fn name(&self) -> &'static str {
         "window"
     }
-    fn initialize(&mut self, app: &AppHandle<R>, _: Value) -> tauri::plugin::Result<()> {
+    fn initialize(
+        &mut self,
+        app: &AppHandle<R>,
+        _: Value,
+    ) -> Result<(), Box<dyn std::error::Error>> {
         manager_global_shortcut(app)?;
         Ok(())
     }
-    fn created(&mut self, window: tauri::Window<R>) {
+    fn window_created(&mut self, window: tauri::Window<R>) {
         if let Err(err) = on_created(window) {
             warn!("window created error:{}", err)
         };
@@ -28,7 +32,7 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for WindowPlugin {
                 label,
                 event: tauri::WindowEvent::Focused(false),
                 ..
-            } if label == "main" => match app.get_window("main") {
+            } if label == "main" => match app.get_webview_window("main") {
                 Some(window) => {
                     if let Err(err) = window.hide() {
                         warn!("main window hide error:{}", err)

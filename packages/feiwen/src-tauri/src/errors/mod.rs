@@ -46,8 +46,6 @@ pub enum FeiwenError {
         #[from]
         std::io::Error,
     ),
-    #[error("页面shadow错误")]
-    Shadow,
     #[error("页面透明效果错误")]
     Vibrancy,
     #[error("请求头构造错误:{}",.0)]
@@ -157,11 +155,6 @@ impl From<diesel::r2d2::PoolError> for FeiwenError {
     }
 }
 
-impl From<window_shadows::Error> for FeiwenError {
-    fn from(_: window_shadows::Error) -> Self {
-        Self::Shadow
-    }
-}
 impl From<window_vibrancy::Error> for FeiwenError {
     fn from(_: window_vibrancy::Error) -> Self {
         Self::Vibrancy

@@ -4,7 +4,7 @@
 )]
 use error::ClipResult;
 use log::LevelFilter;
-use tauri_plugin_log::LogTarget;
+use tauri_plugin_log::{Target, TargetKind};
 mod clipboard;
 mod error;
 mod plugin;
@@ -24,7 +24,11 @@ fn main() -> ClipResult<()> {
         .plugin(
             tauri_plugin_log::Builder::default()
                 .level(LevelFilter::Info)
-                .targets([LogTarget::LogDir, LogTarget::Stdout, LogTarget::Webview])
+                .targets([
+                    Target::new(TargetKind::Stdout),
+                    Target::new(TargetKind::LogDir { file_name: None }),
+                    Target::new(TargetKind::Webview),
+                ])
                 .build(),
         )
         .run(tauri::generate_context!())?;

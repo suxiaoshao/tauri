@@ -1,5 +1,5 @@
 use serde_json::Value;
-use tauri::{AppHandle, Invoke, Manager, Runtime, State};
+use tauri::{ipc::Invoke, AppHandle, Manager, Runtime, State};
 
 use crate::{
     errors::{FeiwenError, FeiwenResult},
@@ -13,22 +13,27 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for StorePlugin {
     fn name(&self) -> &'static str {
         "store"
     }
-    fn initialize(&mut self, app: &AppHandle<R>, _: Value) -> tauri::plugin::Result<()> {
+    fn initialize(
+        &mut self,
+        app: &AppHandle<R>,
+        _: Value,
+    ) -> Result<(), Box<dyn std::error::Error>> {
         setup(app)?;
         Ok(())
     }
-    fn extend_api(&mut self, invoke: Invoke<R>) {
-        let handle: Box<dyn Fn(Invoke<R>) + Send + Sync> =
+    fn extend_api(&mut self, invoke: Invoke<R>) -> bool {
+        let handle: Box<dyn Fn(Invoke<R>) -> bool + Send + Sync> =
             Box::new(tauri::generate_handler![fetch::fetch, get_tags]);
-        (handle)(invoke);
+        (handle)(invoke)
     }
 }
 
 fn setup<R: Runtime>(app: &AppHandle<R>) -> FeiwenResult<()> {
-    use tauri::api::path::*;
     //data path
-    let data_path = app_config_dir(&app.config())
-        .ok_or(FeiwenError::DbPath)?
+    let data_path = app
+        .path()
+        .app_config_dir()
+        .map_err(|_| FeiwenError::DbPath)?
         .join("data.sqlite")
         .to_str()
         .ok_or(FeiwenError::DbPath)?

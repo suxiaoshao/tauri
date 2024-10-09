@@ -5,19 +5,18 @@
  * @LastEditTime: 2024-05-16 08:47:28
  * @FilePath: \tauri\packages\ChatGPT\src-tauri\src\plugins\tray\mod.rs
  */
-use tauri::CustomMenuItem;
+use tauri::menu::Menu;
+use tauri::menu::MenuItem;
+use tauri::menu::PredefinedMenuItem;
+use tauri::tray::TrayIconBuilder;
 use tauri::Manager;
 use tauri::Runtime;
-use tauri::SystemTray;
-use tauri::SystemTrayMenu;
-use tauri::SystemTrayMenuItem;
 
 use crate::create_main_window;
 use crate::errors::ChatGPTResult;
 
 pub struct TrayPlugin;
 
-const QUIT: &str = "quit";
 const TEMPORARY: &str = "temporary";
 const OPEN: &str = "open";
 
@@ -33,7 +32,7 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for TrayPlugin {
         &mut self,
         app: &tauri::AppHandle<R>,
         _config: serde_json::Value,
-    ) -> tauri::plugin::Result<()> {
+    ) -> Result<(), Box<dyn std::error::Error>> {
         if let Err(err) = init_tray(app) {
             log::warn!("tray init error:{}", err)
         }
@@ -43,48 +42,52 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for TrayPlugin {
 
 fn init_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> ChatGPTResult<()> {
     let version = get_app_version();
-    let tray_menu = SystemTrayMenu::new()
-        .add_item(CustomMenuItem::new(OPEN, "Open ChatGPT"))
-        .add_item(
-            CustomMenuItem::new(TEMPORARY, "Open Temporary Conversation").accelerator("Option+F"),
-        )
-        .add_native_item(SystemTrayMenuItem::Separator)
-        .add_item(CustomMenuItem::new(
-            "version",
-            format!("Version(V{})", version).as_str(),
-        ))
-        .add_item(CustomMenuItem::new("about", "About"))
-        .add_item(CustomMenuItem::new(QUIT, "Quit").accelerator("CmdOrCtrl+Q"));
-    let app_handle = app.clone();
-    let tray = SystemTray::new()
-        .with_menu(tray_menu)
-        .on_event(move |event| {
-            if let tauri::SystemTrayEvent::MenuItemClick { id, .. } = event {
-                match id.as_str() {
-                    QUIT => {
-                        app_handle.exit(0);
-                    }
-                    TEMPORARY => {
-                        if let Err(err) = super::temporary_conversation::on_short(&app_handle) {
-                            log::warn!("tray click error:{}", err)
-                        }
-                    }
-                    OPEN => {
-                        if let Err(err) = create_main(&app_handle) {
-                            log::warn!("tray click error:{}", err)
-                        }
-                    }
-                    _ => {}
+    let tray_menu = Menu::with_items(
+        app,
+        &[
+            &MenuItem::with_id(app, OPEN, "Open ChatGPT", true, None::<&str>)?,
+            &MenuItem::with_id(
+                app,
+                TEMPORARY,
+                "Open Temporary Conversation",
+                true,
+                Some("Option+F"),
+            )?,
+            &PredefinedMenuItem::separator(app)?,
+            &MenuItem::with_id(
+                app,
+                "version",
+                format!("Version(V{})", version),
+                true,
+                None::<&str>,
+            )?,
+            &PredefinedMenuItem::about(app, None, None)?,
+            &PredefinedMenuItem::quit(app, None)?,
+        ],
+    )?;
+    let tray = TrayIconBuilder::new()
+        .menu(&tray_menu)
+        .menu_on_left_click(true)
+        .on_menu_event(|app, event| match event.id().as_ref() {
+            TEMPORARY => {
+                if let Err(err) = super::temporary_conversation::on_short(&app) {
+                    log::warn!("tray click error:{}", err)
                 }
             }
+            OPEN => {
+                if let Err(err) = create_main(&app) {
+                    log::warn!("tray click error:{}", err)
+                }
+            }
+            _ => {}
         })
-        .with_tooltip("ChatGPT");
+        .tooltip("ChatGPT");
     tray.build(app)?;
     Ok(())
 }
 
 fn create_main<R: Runtime>(app: &tauri::AppHandle<R>) -> ChatGPTResult<()> {
-    match app.get_window("main") {
+    match app.get_webview_window("main") {
         Some(window) => {
             window.show()?;
             window.set_focus()?;

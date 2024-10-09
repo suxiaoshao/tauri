@@ -10,7 +10,7 @@ import { useSnackbar } from 'notistack';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { enqueueSnackbar, SnackbarProvider } from '.';
 
-vi.mock(import('@tauri-apps/api/notification'), async (importOriginal) => {
+vi.mock(import('@tauri-apps/plugin-notification'), async (importOriginal) => {
   const mod = await importOriginal();
   return {
     ...mod,

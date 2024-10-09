@@ -20,11 +20,12 @@ import {
   TextField,
   Tooltip,
 } from '@mui/material';
-import { dialog } from '@tauri-apps/api';
+import {} from '@tauri-apps/api';
 import { enqueueSnackbar } from 'notify';
 import { useCallback, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useShallow } from 'zustand/react/shallow';
+import * as dialog from '@tauri-apps/plugin-dialog';
 
 export interface ExportConversationProps {
   conversation: Conversation;

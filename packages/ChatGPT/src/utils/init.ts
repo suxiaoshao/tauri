@@ -12,8 +12,9 @@ import { useTemplateStore } from '@chatgpt/features/Template/templateSlice';
 import { type Message } from '@chatgpt/types/message';
 import { type RouterEvent } from '@chatgpt/types/router';
 import { listen } from '@tauri-apps/api/event';
-import { appWindow } from '@tauri-apps/api/window';
+import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import { resolveRouterEvent } from './router';
+const appWindow = getCurrentWebviewWindow();
 
 export async function initForFetch() {
   await Promise.all([

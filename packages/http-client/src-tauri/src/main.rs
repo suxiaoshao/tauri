@@ -6,34 +6,28 @@
 mod app_search;
 use app_search::AppPath;
 use tauri::{
-    AppHandle, CustomMenuItem, GlobalShortcutManager, LogicalPosition, LogicalSize, Manager, Menu,
-    SystemTray, SystemTrayEvent, SystemTrayMenu,
+    menu::{Menu, MenuItem},
+    tray::{MouseButton, TrayIconBuilder},
+    LogicalPosition, LogicalSize, Manager, Runtime,
 };
+use tauri_plugin_global_shortcut::GlobalShortcutExt;
 
 fn main() -> anyhow::Result<()> {
     let context = tauri::generate_context!();
     tauri::Builder::default()
+        .plugin(tauri_plugin_shell::init())
+        .plugin(tauri_plugin_global_shortcut::Builder::new().build())
+        .plugin(tauri_plugin_notification::init())
         .invoke_handler(tauri::generate_handler![app_search])
-        .menu(menu(&context.package_info().name))
-        .system_tray(system_tray())
-        .on_system_tray_event(on_system_tray_event)
         .setup(setup)
         .run(context)?;
     Ok(())
 }
 
-fn menu(name: &str) -> Menu {
-    if cfg!(target_os = "macos") {
-        Menu::os_default(name)
-    } else {
-        Menu::default()
-    }
-}
-
 fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
-    let mut manager = app.global_shortcut_manager();
+    let manager = app.global_shortcut();
 
-    let window = app.get_window("main").unwrap();
+    let window = app.get_webview_window("main").unwrap();
     #[cfg(debug_assertions)]
     window.open_devtools();
 
@@ -52,7 +46,7 @@ fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
         .unwrap();
 
     // 设置消失
-    let w = app.get_window("main").unwrap();
+    let w = app.get_webview_window("main").unwrap();
     window.on_window_event(move |event| {
         if let tauri::WindowEvent::Focused(false) = event {
             w.hide().unwrap();
@@ -60,46 +54,65 @@ fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
     });
 
     // 全局快捷键
-    manager.register("Alt+Space", move || {
-        if window.is_visible().unwrap() {
-            window.hide().unwrap();
-        } else {
-            window.show().unwrap();
-            window.set_focus().unwrap();
-            app_search::app_data_init();
-        }
-    })?;
+    manager.register("Alt+Space")?;
+    system_tray(app.handle())?;
 
     Ok(())
 }
 
-fn system_tray() -> SystemTray {
-    let quit = CustomMenuItem::new("hide".to_string(), "隐藏");
-    let hide = CustomMenuItem::new("close".to_string(), "关闭");
-    let tray_menu = SystemTrayMenu::new().add_item(quit).add_item(hide);
-
-    SystemTray::new().with_menu(tray_menu)
-}
-fn on_system_tray_event(app: &AppHandle, event: SystemTrayEvent) {
-    let window = app.get_window("main").unwrap();
-    match event {
-        SystemTrayEvent::LeftClick { .. } => {
-            if window.is_visible().unwrap() {
-                window.hide().unwrap();
-            } else {
-                window.show().unwrap();
-                window.set_focus().unwrap();
-                app_search::app_data_init();
-            }
-        }
-
-        SystemTrayEvent::MenuItemClick { id, .. } => match id.as_str() {
-            "close" => window.close().unwrap(),
-            "hide" => window.hide().unwrap(),
-            _ => {}
-        },
-        _ => {}
+fn on_short(window: &tauri::Window) {
+    if window.is_visible().unwrap() {
+        window.hide().unwrap();
+    } else {
+        window.show().unwrap();
+        window.set_focus().unwrap();
+        app_search::app_data_init();
     }
+}
+
+fn system_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> Result<(), Box<dyn std::error::Error>> {
+    let tray_menu = Menu::with_items(
+        app,
+        &[
+            &MenuItem::with_id(app, "hide", "隐藏", true, None::<&str>)?,
+            &MenuItem::with_id(app, "close", "关闭", true, None::<&str>)?,
+        ],
+    )?;
+    let tray = TrayIconBuilder::new()
+        .menu(&tray_menu)
+        .menu_on_left_click(false)
+        .on_menu_event(|app, event| match event.id().as_ref() {
+            "hide" => {
+                let window = app.get_webview_window("main").unwrap();
+                if window.is_visible().unwrap() {
+                    window.hide().unwrap();
+                }
+            }
+            "close" => {
+                let window = app.get_webview_window("main").unwrap();
+                window.close().unwrap();
+            }
+            _ => {}
+        })
+        .on_tray_icon_event(|app, event| match event {
+            tauri::tray::TrayIconEvent::Click {
+                button: MouseButton::Left,
+                ..
+            } => {
+                let window = app.app_handle().get_webview_window("main").unwrap();
+                if window.is_visible().unwrap() {
+                    window.hide().unwrap();
+                } else {
+                    window.show().unwrap();
+                    window.set_focus().unwrap();
+                    app_search::app_data_init();
+                }
+            }
+            _ => {}
+        });
+
+    tray.build(app)?;
+    Ok(())
 }
 
 #[tauri::command]

@@ -1,6 +1,7 @@
-import { appWindow } from '@tauri-apps/api/window';
+import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import { useCallback, useEffect, useState } from 'react';
 import { type ClipHistory, query } from '../../../rpc/query';
+const appWindow = getCurrentWebviewWindow();
 
 export default function useClipData(searchName: string | undefined) {
   // 剪切板历史

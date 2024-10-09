@@ -6,7 +6,7 @@ export default function useSettingKey() {
   const platform = usePlatform();
   useEffect(() => {
     const handleShortcut = async (event: KeyboardEvent) => {
-      const isMacos = platform === 'Darwin';
+      const isMacos = platform === 'macos';
       if (((event.metaKey && isMacos) || (event.ctrlKey && !isMacos)) && event.key === ',') {
         await createSettingWindow();
       }

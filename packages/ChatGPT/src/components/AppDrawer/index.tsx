@@ -1,8 +1,8 @@
 /*
  * @Author: suxiaoshao suxiaoshao@gmail.com
  * @Date: 2024-01-06 01:08:42
- * @LastEditors: suxiaoshao suxiaoshao@gmail.com
- * @LastEditTime: 2024-04-28 21:15:54
+ * @LastEditors: suxiaoshao 48886207+suxiaoshao@users.noreply.github.com
+ * @LastEditTime: 2024-10-07 10:24:14
  * @FilePath: /tauri/packages/ChatGPT/src/components/AppDrawer/index.tsx
  */
 import AddConversation from '@chatgpt/features/Adds/AddConversation';
@@ -22,7 +22,7 @@ export default function AppDrawer() {
   const platform = usePlatform();
   const headersHeight = useMemo(() => {
     return match(platform)
-      .with('Darwin', () => 28)
+      .with('macos', () => 28)
       .otherwise(() => 0);
   }, [platform]);
   return (

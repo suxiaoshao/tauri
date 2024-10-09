@@ -4,7 +4,9 @@ import App from './App';
 import init from './utils/init';
 
 async function main() {
-  await init();
+  try {
+    await init();
+  } catch {}
   ReactDOM.createRoot(document.querySelector('#root') as HTMLElement).render(
     // eslint-disable-next-line label-has-associated-control
     <React.StrictMode>

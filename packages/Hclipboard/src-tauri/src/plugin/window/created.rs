@@ -6,7 +6,6 @@
  * @FilePath: /self-tools/Users/sushao/Documents/code/tauri/packages/Hclipboard/src-tauri/src/plugin/window/created.rs
  */
 use tauri::Runtime;
-use window_shadows::set_shadow;
 #[cfg(target_os = "windows")]
 use window_vibrancy::apply_mica;
 #[cfg(target_os = "macos")]
@@ -20,8 +19,7 @@ pub fn on_created<R: Runtime>(window: tauri::Window<R>) -> ClipResult<()> {
 }
 
 fn window_beatify<R: Runtime>(window: &tauri::Window<R>) -> ClipResult<()> {
-    // 修改边框
-    set_shadow(window, true)?;
+    window.set_shadow(true)?;
     // 修改背景
     #[cfg(target_os = "macos")]
     apply_vibrancy(

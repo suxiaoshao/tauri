@@ -1,7 +1,7 @@
 mod fetch;
 
 use serde_json::Value;
-use tauri::{AppHandle, Invoke, Manager, Runtime};
+use tauri::{ipc::Invoke, AppHandle, Emitter, Manager, Runtime};
 
 use crate::store::{
     Conversation, ConversationTemplate, DbConn, Folder, Message, NewConversationTemplate, NewFolder,
@@ -17,34 +17,39 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for ChatPlugin {
     fn name(&self) -> &'static str {
         "chat"
     }
-    fn initialize(&mut self, app: &AppHandle<R>, _: Value) -> tauri::plugin::Result<()> {
+    fn initialize(
+        &mut self,
+        app: &AppHandle<R>,
+        _: Value,
+    ) -> Result<(), Box<dyn std::error::Error>> {
         setup(app)?;
         Ok(())
     }
-    fn extend_api(&mut self, invoke: Invoke<R>) {
-        let handle: Box<dyn Fn(Invoke<R>) + Send + Sync> = Box::new(tauri::generate_handler![
-            fetch::fetch,
-            add_conversation,
-            update_conversation,
-            delete_conversation,
-            move_conversation,
-            chat_data::get_chat_data,
-            add_folder,
-            update_folder,
-            delete_folder,
-            move_folder,
-            delete_message,
-            find_message,
-            update_message_content,
-            clear_conversation,
-            export::export,
-            all_conversation_templates,
-            find_conversation_template,
-            delete_conversation_template,
-            update_conversation_template,
-            add_conversation_template
-        ]);
-        (handle)(invoke);
+    fn extend_api(&mut self, invoke: Invoke<R>) -> bool {
+        let handle: Box<dyn Fn(Invoke<R>) -> bool + Send + Sync> =
+            Box::new(tauri::generate_handler![
+                fetch::fetch,
+                add_conversation,
+                update_conversation,
+                delete_conversation,
+                move_conversation,
+                chat_data::get_chat_data,
+                add_folder,
+                update_folder,
+                delete_folder,
+                move_folder,
+                delete_message,
+                find_message,
+                update_message_content,
+                clear_conversation,
+                export::export,
+                all_conversation_templates,
+                find_conversation_template,
+                delete_conversation_template,
+                update_conversation_template,
+                add_conversation_template
+            ]);
+        (handle)(invoke)
     }
 }
 
@@ -150,7 +155,9 @@ async fn update_message_content<R: Runtime>(
     let conn = &mut state.get()?;
     store::Message::update_content(id, content, conn)?;
     let message = store::Message::find(id, conn)?;
-    let window = app.get_window("main").ok_or(ChatGPTError::WindowNotFound)?;
+    let window = app
+        .get_webview_window("main")
+        .ok_or(ChatGPTError::WindowNotFound)?;
     window.emit("message", message)?;
     Ok(())
 }
@@ -206,9 +213,11 @@ async fn add_conversation_template(
 }
 
 fn setup<R: Runtime>(app: &AppHandle<R>) -> ChatGPTResult<()> {
-    use tauri::api::path::*;
     //data path
-    let data_path = app_config_dir(&app.config()).ok_or(ChatGPTError::DbPath)?;
+    let data_path = app
+        .path()
+        .app_config_dir()
+        .map_err(|_| ChatGPTError::DbPath)?;
     // database connection
     let conn = store::establish_connection(&data_path)?;
     app.manage(conn);

@@ -1,0 +1,15 @@
+{
+  "identifier": "migrated",
+  "description": "permissions that were migrated from v1",
+  "local": true,
+  "windows": ["*"],
+  "permissions": [
+    "core:default",
+    "notification:default",
+    "os:default",
+    "core:window:allow-start-dragging",
+    "chat:default",
+    "config:default",
+    "temporary-conversation:default"
+  ]
+}

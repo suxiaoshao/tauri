@@ -4,7 +4,7 @@ use crate::{
     store::{Conversation, ConversationTemplate, DbConn, Mode, NewMessage, Role, Status},
 };
 use crate::{plugins::ChatGPTConfig, store::Message};
-use tauri::{AppHandle, Manager, Runtime, Window};
+use tauri::{AppHandle, Emitter, Manager, Runtime, WebviewWindow};
 
 #[tauri::command(async)]
 pub async fn fetch<R: Runtime>(
@@ -28,7 +28,7 @@ pub async fn fetch<R: Runtime>(
 struct Fetch<R: Runtime> {
     message_id: i32,
     db_conn: DbConn,
-    window: Window<R>,
+    window: WebviewWindow<R>,
     config: ChatGPTConfig,
     template: ConversationTemplate,
     messages: Vec<Message>,
@@ -139,7 +139,7 @@ async fn _fetch<R: Runtime>(
     content: String,
 ) -> ChatGPTResult<i32> {
     let window = app_handle
-        .get_window("main")
+        .get_webview_window("main")
         .ok_or(ChatGPTError::WindowNotFound)?;
     // get api key
     let config = ChatGPTConfig::get(&app_handle)?;
