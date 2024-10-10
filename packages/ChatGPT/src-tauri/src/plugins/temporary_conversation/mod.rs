@@ -8,8 +8,8 @@
 use history::TemporaryStore;
 use serde_json::Value;
 use std::sync::{Arc, Mutex};
-use tauri::{AppHandle, Manager, Runtime, WebviewWindowBuilder, WindowEvent};
-use tauri_plugin_global_shortcut::GlobalShortcutExt;
+use tauri::{AppHandle, Manager, Runtime, WebviewWindow, WebviewWindowBuilder, WindowEvent};
+use tauri_plugin_global_shortcut::{GlobalShortcutExt, Shortcut};
 
 use crate::errors::ChatGPTResult;
 
@@ -110,7 +110,28 @@ pub fn manager_global_shortcut<R: Runtime>(app: &AppHandle<R>) -> ChatGPTResult<
     Ok(())
 }
 
-pub fn on_short<R: Runtime>(app: &AppHandle<R>) -> ChatGPTResult<()> {
+pub fn on_shortcut_trigger<R: Runtime>(
+    app: &AppHandle<R>,
+    shortcut: &Shortcut,
+) -> ChatGPTResult<()> {
+    // get api key
+    let config = ChatGPTConfig::get(app)?;
+    let temporary_hotkey = match config
+        .temporary_hotkey
+        .and_then::<Shortcut, _>(|data| data.try_into().ok())
+    {
+        Some(data) => data,
+        None => return Ok(()),
+    };
+    if shortcut == &temporary_hotkey {
+        if let Err(err) = trigger_temp_window(app) {
+            log::error!("trigger temporary window error:{}", err);
+        };
+    }
+    Ok(())
+}
+
+pub fn trigger_temp_window<R: Runtime>(app: &AppHandle<R>) -> ChatGPTResult<()> {
     match app.get_webview_window(TEMPORARY_WINDOW) {
         Some(window) => {
             if window.is_visible()? {
@@ -121,13 +142,13 @@ pub fn on_short<R: Runtime>(app: &AppHandle<R>) -> ChatGPTResult<()> {
             }
         }
         None => {
-            create_window(app)?;
+            create_temporary_window(app)?;
         }
     }
     Ok(())
 }
 
-fn create_window<R: Runtime>(app: &AppHandle<R>) -> ChatGPTResult<()> {
+pub fn create_temporary_window<R: Runtime>(app: &AppHandle<R>) -> ChatGPTResult<WebviewWindow<R>> {
     let window = WebviewWindowBuilder::new(
         app,
         TEMPORARY_WINDOW,
@@ -136,7 +157,7 @@ fn create_window<R: Runtime>(app: &AppHandle<R>) -> ChatGPTResult<()> {
     .title("Temporary Conversation")
     .inner_size(800.0, 600.0)
     .fullscreen(false)
-    .resizable(false)
+    .resizable(true)
     .transparent(true)
     .always_on_top(true)
     .skip_taskbar(true)
@@ -148,12 +169,10 @@ fn create_window<R: Runtime>(app: &AppHandle<R>) -> ChatGPTResult<()> {
     #[cfg(target_os = "windows")]
     let window = window.decorations(false);
     let window = window.build()?;
-    #[cfg(target_os = "windows")]
-    window.set_decorations(false)?;
     #[cfg(target_os = "macos")]
     {
         use super::window::WindowExt;
         window.set_transparent_titlebar()?;
     }
-    Ok(())
+    Ok(window)
 }

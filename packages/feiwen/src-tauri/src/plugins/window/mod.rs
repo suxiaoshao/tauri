@@ -9,7 +9,7 @@ pub struct WindowPlugin;
 
 impl<R: Runtime> tauri::plugin::Plugin<R> for WindowPlugin {
     fn name(&self) -> &'static str {
-        "window"
+        "window-beautify"
     }
     fn webview_created(&mut self, webview: tauri::Webview<R>) {
         #[cfg(debug_assertions)]

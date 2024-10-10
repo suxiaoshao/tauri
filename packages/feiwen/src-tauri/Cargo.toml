@@ -19,7 +19,7 @@ tauri = { workspace = true, features = ["macos-private-api", "tray-icon"] }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
 # log
-tauri-plugin-log = { version = "2" }
+tauri-plugin-log = { version = "2.0.1" }
 log = "0.4.22"
 
 # database
@@ -40,10 +40,12 @@ thiserror = "1.0.64"
 toml = "0.8.19"
 
 # 窗口管理
-tauri-plugin-window-state = { version = "2" }
+tauri-plugin-window-state = { version = "2.0.1" }
 window-vibrancy = "0.5.2"
 url = "2.5.2"
-tauri-plugin-shell = "2"
+
+# plugin
+tauri-plugin-notification = "2.0.1"
 
 [target.'cfg(target_os="macos")'.dependencies]
 cocoa = "0.26.0"

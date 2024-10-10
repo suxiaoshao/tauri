@@ -3,8 +3,9 @@
 
 use errors::ChatGPTResult;
 use log::LevelFilter;
-use plugins::{LogPlugin, MainConfigListener, TemporaryHotkeyListener};
+use plugins::{on_shortcut_trigger, LogPlugin, MainConfigListener, TemporaryHotkeyListener};
 use tauri::{Manager, Runtime, WebviewWindow};
+use tauri_plugin_global_shortcut::ShortcutState;
 use tauri_plugin_log::{Target, TargetKind};
 
 mod errors;
@@ -15,16 +16,20 @@ mod store;
 fn main() -> ChatGPTResult<()> {
     let context = tauri::generate_context!();
     tauri::Builder::default()
-        .plugin(tauri_plugin_os::init())
         .setup(|app| {
             create_main_window(app)?;
             Ok(())
         })
+        .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_notification::init())
         .plugin(
             tauri_plugin_global_shortcut::Builder::new()
-                .with_handler(|app, shortcut, _| {
-                    println!("Shortcut triggered: {:?}", shortcut);
+                .with_handler(|app, shortcut, event| {
+                    if event.state == ShortcutState::Pressed {
+                        if let Err(err) = on_shortcut_trigger(app, shortcut) {
+                            log::error!("global shortcut error:{}", err);
+                        };
+                    }
                 })
                 .build(),
         )
@@ -54,7 +59,7 @@ fn main() -> ChatGPTResult<()> {
 }
 
 fn create_main_window<R: Runtime, M: Manager<R>>(app: &M) -> ChatGPTResult<WebviewWindow<R>> {
-    let window = WebviewWindow::builder(app, "webview", tauri::WebviewUrl::App("/".into()))
+    let window = WebviewWindow::builder(app, "main", tauri::WebviewUrl::App("/".into()))
         .title("ChatGPT")
         .inner_size(800.0, 600.0)
         .fullscreen(false)

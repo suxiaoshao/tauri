@@ -8,15 +8,24 @@ use app_search::AppPath;
 use tauri::{
     menu::{Menu, MenuItem},
     tray::{MouseButton, TrayIconBuilder},
-    LogicalPosition, LogicalSize, Manager, Runtime,
+    AppHandle, LogicalPosition, LogicalSize, Manager, Runtime,
 };
-use tauri_plugin_global_shortcut::GlobalShortcutExt;
+use tauri_plugin_global_shortcut::ShortcutState;
 
 fn main() -> anyhow::Result<()> {
     let context = tauri::generate_context!();
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
-        .plugin(tauri_plugin_global_shortcut::Builder::new().build())
+        .plugin(
+            tauri_plugin_global_shortcut::Builder::new()
+                .with_shortcut("Alt+Space")?
+                .with_handler(|app, _shortcut, event| {
+                    if event.state == ShortcutState::Pressed {
+                        on_short(app).unwrap();
+                    }
+                })
+                .build(),
+        )
         .plugin(tauri_plugin_notification::init())
         .invoke_handler(tauri::generate_handler![app_search])
         .setup(setup)
@@ -25,8 +34,6 @@ fn main() -> anyhow::Result<()> {
 }
 
 fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
-    let manager = app.global_shortcut();
-
     let window = app.get_webview_window("main").unwrap();
     #[cfg(debug_assertions)]
     window.open_devtools();
@@ -54,20 +61,21 @@ fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
     });
 
     // 全局快捷键
-    manager.register("Alt+Space")?;
     system_tray(app.handle())?;
 
     Ok(())
 }
 
-fn on_short(window: &tauri::Window) {
-    if window.is_visible().unwrap() {
-        window.hide().unwrap();
+fn on_short<R: Runtime>(app: &AppHandle<R>) -> anyhow::Result<()> {
+    let window = app.get_webview_window("main").unwrap();
+    if window.is_visible()? {
+        window.hide()?;
     } else {
-        window.show().unwrap();
-        window.set_focus().unwrap();
+        window.show()?;
+        window.set_focus()?;
         app_search::app_data_init();
     }
+    Ok(())
 }
 
 fn system_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> Result<(), Box<dyn std::error::Error>> {

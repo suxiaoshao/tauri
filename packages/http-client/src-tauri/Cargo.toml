@@ -31,16 +31,16 @@ anyhow = "1.0.89"
 lnk = "0.5.1"
 walkdir = "2.5.0"
 pinyin = "0.10.0"
-tauri-plugin-notification = "2"
+tauri-plugin-notification = "2.0.1"
 tauri-plugin-clipboard-manager = "2.0.1"
-tauri-plugin-shell = "2"
+tauri-plugin-shell = "2.0.1"
 
 
 [target.'cfg(target_os = "macos")'.dependencies]
 plist = { version = "1.7.0" }
 
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
-tauri-plugin-global-shortcut = "2"
+tauri-plugin-global-shortcut = "2.0.1"
 
 
 [features]

@@ -70,12 +70,12 @@ fn init_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> ChatGPTResult<()> {
         .menu_on_left_click(true)
         .on_menu_event(|app, event| match event.id().as_ref() {
             TEMPORARY => {
-                if let Err(err) = super::temporary_conversation::on_short(&app) {
+                if let Err(err) = super::temporary_conversation::trigger_temp_window(app) {
                     log::warn!("tray click error:{}", err)
                 }
             }
             OPEN => {
-                if let Err(err) = create_main(&app) {
+                if let Err(err) = create_main(app) {
                     log::warn!("tray click error:{}", err)
                 }
             }

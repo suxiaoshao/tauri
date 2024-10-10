@@ -2,6 +2,13 @@
   "identifier": "migrated",
   "description": "permissions that were migrated from v1",
   "local": true,
-  "windows": ["main"],
-  "permissions": ["core:default"]
+  "windows": ["*"],
+  "permissions": [
+    "core:default",
+    "clipboard:default",
+    "notification:default",
+    "core:window:allow-start-dragging",
+    "clipboard-manager:allow-write-text",
+    "core:window:allow-hide"
+  ]
 }

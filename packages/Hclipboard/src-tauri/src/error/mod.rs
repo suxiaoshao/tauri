@@ -50,6 +50,8 @@ pub enum ClipError {
     Path,
     #[error("页面透明效果错误")]
     Vibrancy,
+    #[error("global shortcuts:{}",.0)]
+    GlobalShortcuts(#[from] tauri_plugin_global_shortcut::Error),
 }
 
 impl From<tauri::Error> for ClipError {

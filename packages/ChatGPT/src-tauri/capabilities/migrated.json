@@ -10,6 +10,8 @@
     "core:window:allow-start-dragging",
     "chat:default",
     "config:default",
-    "temporary-conversation:default"
+    "temporary-conversation:default",
+    "core:webview:allow-create-webview-window",
+    "core:window:allow-close"
   ]
 }

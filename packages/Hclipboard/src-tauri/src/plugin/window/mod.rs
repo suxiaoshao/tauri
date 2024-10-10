@@ -2,23 +2,24 @@ use log::warn;
 use serde_json::Value;
 use tauri::{AppHandle, Manager, RunEvent, Runtime};
 
-use self::{created::on_created, shortcut::manager_global_shortcut};
+use self::created::on_created;
 
 mod created;
 mod shortcut;
 
 pub struct WindowPlugin;
 
+pub use shortcut::on_short;
+
 impl<R: Runtime> tauri::plugin::Plugin<R> for WindowPlugin {
     fn name(&self) -> &'static str {
-        "window"
+        "window-beautify"
     }
     fn initialize(
         &mut self,
-        app: &AppHandle<R>,
+        _app: &AppHandle<R>,
         _: Value,
     ) -> Result<(), Box<dyn std::error::Error>> {
-        manager_global_shortcut(app)?;
         Ok(())
     }
     fn window_created(&mut self, window: tauri::Window<R>) {
