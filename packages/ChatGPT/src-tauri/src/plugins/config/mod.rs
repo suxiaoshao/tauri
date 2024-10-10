@@ -87,6 +87,7 @@ where
                 );
                 let kind = result.blocking_kind();
                 kind.block(result, tauri_resolver);
+                true
             }
             "get_config" => {
                 #[allow(unused_imports)]
@@ -114,6 +115,7 @@ where
                 );
                 let kind = result.blocking_kind();
                 kind.block(result, tauri_resolver);
+                true
             }
             "create_setting_window" => {
                 #[allow(unused_imports)]
@@ -144,13 +146,10 @@ where
                     let kind = result.async_kind();
                     kind.future(result).await
                 });
+                true
             }
-            _ => invoke.resolver.reject({
-                let res = format!("command {} not found", cmd,);
-                res
-            }),
-        };
-        true
+            _ => false,
+        }
     }
 }
 impl<T, P> ConfigPlugin<T, P>
