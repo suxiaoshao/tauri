@@ -7,7 +7,7 @@ mod app_search;
 use app_search::AppPath;
 use tauri::{
     menu::{Menu, MenuItem},
-    tray::{MouseButton, TrayIconBuilder},
+    tray::MouseButton,
     AppHandle, LogicalPosition, LogicalSize, Manager, Runtime,
 };
 use tauri_plugin_global_shortcut::ShortcutState;
@@ -79,6 +79,10 @@ fn on_short<R: Runtime>(app: &AppHandle<R>) -> anyhow::Result<()> {
 }
 
 fn system_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> Result<(), Box<dyn std::error::Error>> {
+    let tray = match app.tray_by_id("main") {
+        Some(tray) => tray,
+        None => return Ok(()),
+    };
     let tray_menu = Menu::with_items(
         app,
         &[
@@ -86,40 +90,38 @@ fn system_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> Result<(), Box<dyn std:
             &MenuItem::with_id(app, "close", "关闭", true, None::<&str>)?,
         ],
     )?;
-    let tray = TrayIconBuilder::new()
-        .menu(&tray_menu)
-        .menu_on_left_click(false)
-        .on_menu_event(|app, event| match event.id().as_ref() {
-            "hide" => {
-                let window = app.get_webview_window("main").unwrap();
-                if window.is_visible().unwrap() {
-                    window.hide().unwrap();
-                }
+    tray.set_menu(Some(tray_menu))?;
+    tray.set_show_menu_on_left_click(true)?;
+    tray.on_menu_event(|app, event| match event.id().as_ref() {
+        "hide" => {
+            let window = app.get_webview_window("main").unwrap();
+            if window.is_visible().unwrap() {
+                window.hide().unwrap();
             }
-            "close" => {
-                let window = app.get_webview_window("main").unwrap();
-                window.close().unwrap();
+        }
+        "close" => {
+            let window = app.get_webview_window("main").unwrap();
+            window.close().unwrap();
+        }
+        _ => {}
+    });
+    tray.on_tray_icon_event(|app, event| {
+        if let tauri::tray::TrayIconEvent::Click {
+            button: MouseButton::Left,
+            ..
+        } = event
+        {
+            let window = app.app_handle().get_webview_window("main").unwrap();
+            if window.is_visible().unwrap() {
+                window.hide().unwrap();
+            } else {
+                window.show().unwrap();
+                window.set_focus().unwrap();
+                app_search::app_data_init();
             }
-            _ => {}
-        })
-        .on_tray_icon_event(|app, event| match event {
-            tauri::tray::TrayIconEvent::Click {
-                button: MouseButton::Left,
-                ..
-            } => {
-                let window = app.app_handle().get_webview_window("main").unwrap();
-                if window.is_visible().unwrap() {
-                    window.hide().unwrap();
-                } else {
-                    window.show().unwrap();
-                    window.set_focus().unwrap();
-                    app_search::app_data_init();
-                }
-            }
-            _ => {}
-        });
+        }
+    });
 
-    tray.build(app)?;
     Ok(())
 }
 

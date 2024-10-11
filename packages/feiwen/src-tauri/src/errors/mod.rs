@@ -60,18 +60,6 @@ pub enum FeiwenError {
         #[from]
         reqwest::Error,
     ),
-    #[error("toml解析错误:{}",.0)]
-    TomlParse(
-        #[serde(skip_serializing)]
-        #[from]
-        toml::de::Error,
-    ),
-    #[error("toml序列化错误:{}",.0)]
-    TomlSerialize(
-        #[serde(skip_serializing)]
-        #[from]
-        toml::ser::Error,
-    ),
     #[error("serde_json错误:{}",.0)]
     SerdeJson(
         #[serde(skip_serializing)]

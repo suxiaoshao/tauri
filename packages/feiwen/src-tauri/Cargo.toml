@@ -15,7 +15,7 @@ tauri-build = { workspace = true, features = [] }
 
 [dependencies]
 # tauri
-tauri = { workspace = true, features = ["macos-private-api", "tray-icon"] }
+tauri = { workspace = true, features = ["macos-private-api"] }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
 # log
@@ -35,9 +35,6 @@ scraper = "0.20.0"
 nom = "7.1.3"
 futures = "0.3.31"
 thiserror = "1.0.64"
-
-# config
-toml = "0.8.19"
 
 # 窗口管理
 tauri-plugin-window-state = { version = "2.0.1" }

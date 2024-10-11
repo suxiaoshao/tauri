@@ -8,7 +8,7 @@
 use tauri::menu::Menu;
 use tauri::menu::MenuItem;
 use tauri::menu::PredefinedMenuItem;
-use tauri::tray::TrayIconBuilder;
+use tauri::tray::TrayIcon;
 use tauri::Manager;
 use tauri::Runtime;
 
@@ -26,21 +26,25 @@ fn get_app_version() -> &'static str {
 
 impl<R: Runtime> tauri::plugin::Plugin<R> for TrayPlugin {
     fn name(&self) -> &'static str {
-        "tray"
+        "tray-config"
     }
     fn initialize(
         &mut self,
         app: &tauri::AppHandle<R>,
         _config: serde_json::Value,
     ) -> Result<(), Box<dyn std::error::Error>> {
-        if let Err(err) = init_tray(app) {
-            log::warn!("tray init error:{}", err)
+        let tray = app.tray_by_id("main");
+        if let Some(tray) = tray {
+            if let Err(err) = init_tray(tray, app) {
+                log::warn!("tray init error:{}", err)
+            }
         }
+
         Ok(())
     }
 }
 
-fn init_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> ChatGPTResult<()> {
+fn init_tray<R: Runtime>(tray_icon: TrayIcon<R>, app: &tauri::AppHandle<R>) -> ChatGPTResult<()> {
     let version = get_app_version();
     let tray_menu = Menu::with_items(
         app,
@@ -65,24 +69,22 @@ fn init_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> ChatGPTResult<()> {
             &PredefinedMenuItem::quit(app, None)?,
         ],
     )?;
-    let tray = TrayIconBuilder::new()
-        .menu(&tray_menu)
-        .menu_on_left_click(true)
-        .on_menu_event(|app, event| match event.id().as_ref() {
-            TEMPORARY => {
-                if let Err(err) = super::temporary_conversation::trigger_temp_window(app) {
-                    log::warn!("tray click error:{}", err)
-                }
+    tray_icon.set_menu(Some(tray_menu))?;
+    tray_icon.set_tooltip(Some("ChatGPT"))?;
+    tray_icon.set_show_menu_on_left_click(true)?;
+    tray_icon.on_menu_event(|app, event| match event.id().as_ref() {
+        TEMPORARY => {
+            if let Err(err) = super::temporary_conversation::trigger_temp_window(app) {
+                log::warn!("tray click error:{}", err)
             }
-            OPEN => {
-                if let Err(err) = create_main(app) {
-                    log::warn!("tray click error:{}", err)
-                }
+        }
+        OPEN => {
+            if let Err(err) = create_main(app) {
+                log::warn!("tray click error:{}", err)
             }
-            _ => {}
-        })
-        .tooltip("ChatGPT");
-    tray.build(app)?;
+        }
+        _ => {}
+    });
     Ok(())
 }
 

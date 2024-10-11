@@ -47,7 +47,6 @@ fn main() -> ClipResult<()> {
                 })
                 .build(),
         )
-        .plugin(tauri_plugin_positioner::init())
         .plugin(plugin::clipboard::ClipboardPlugin)
         .plugin(plugin::window::WindowPlugin)
         .plugin(plugin::tracing::TracingPlugin)
