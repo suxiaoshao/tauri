@@ -27,3 +27,5 @@ dist-ssr
 target
 WixTools
 *.env
+
+/packages/*/src-tauri/gen/schemas/

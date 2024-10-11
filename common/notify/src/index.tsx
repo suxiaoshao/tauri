@@ -7,7 +7,7 @@
  */
 import { Close } from '@mui/icons-material';
 import { IconButton } from '@mui/material';
-import { isPermissionGranted, requestPermission, sendNotification } from '@tauri-apps/api/notification';
+import { isPermissionGranted, requestPermission, sendNotification } from '@tauri-apps/plugin-notification';
 import { type OptionsObject, SnackbarProvider as SourceSnackbarProvider, useSnackbar } from 'notistack';
 import { type ReactNode, useEffect, useRef } from 'react';
 import { Subject } from 'rxjs';

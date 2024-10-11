@@ -21,7 +21,7 @@ export default function TemporaryHeader({ template, persistentId }: TemporaryHea
   }, [persistentId]);
   useHotkeys(
     match(platform)
-      .with('Darwin', () => ['Meta+l'])
+      .with('macos', () => ['Meta+l'])
       .otherwise(() => ['Control+l']),
     (event) => {
       event.preventDefault();

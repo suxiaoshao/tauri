@@ -6,7 +6,6 @@
  * @FilePath: /tauri/packages/ChatGPT/src-tauri/src/plugins/window/created.rs
  */
 use tauri::Runtime;
-use window_shadows::set_shadow;
 #[cfg(target_os = "windows")]
 use window_vibrancy::apply_mica;
 #[cfg(target_os = "macos")]
@@ -24,7 +23,7 @@ pub fn on_created<R: Runtime>(window: tauri::Window<R>) -> ChatGPTResult<()> {
 fn window_beatify<R: Runtime>(window: &tauri::Window<R>) -> ChatGPTResult<()> {
     window.set_decorations(true)?;
     // 修改边框
-    set_shadow(window, true)?;
+    window.set_shadow(true)?;
     // 修改背景
     #[cfg(target_os = "macos")]
     apply_vibrancy(
@@ -41,7 +40,7 @@ fn window_beatify<R: Runtime>(window: &tauri::Window<R>) -> ChatGPTResult<()> {
 }
 
 #[cfg(target_os = "macos")]
-use tauri::Window;
+use tauri::WebviewWindow;
 
 #[cfg(target_os = "macos")]
 pub trait WindowExt {
@@ -53,7 +52,7 @@ pub trait WindowExt {
 }
 
 #[cfg(target_os = "macos")]
-impl<R: Runtime> WindowExt for Window<R> {
+impl<R: Runtime> WindowExt for WebviewWindow<R> {
     #[cfg(target_os = "macos")]
     fn set_titlebar_thick(&self, thickness: ToolbarThickness) {
         use cocoa::appkit::{NSWindow, NSWindowTitleVisibility};

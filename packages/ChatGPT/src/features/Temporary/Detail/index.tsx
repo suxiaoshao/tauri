@@ -7,7 +7,7 @@ import { PromiseStatus } from '@chatgpt/hooks/usePromise';
 import usePromiseFn from '@chatgpt/hooks/usePromiseFn';
 import { type TemporaryMessageEvent } from '@chatgpt/types/temporaryConversation';
 import { Box } from '@mui/material';
-import { appWindow, WebviewWindow } from '@tauri-apps/api/window';
+import { getCurrentWebviewWindow, WebviewWindow } from '@tauri-apps/api/webviewWindow';
 import { useCallback, useEffect } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -20,6 +20,7 @@ import {
   temporaryFetch,
   separateWindow,
 } from '@chatgpt/service/temporaryConversation/mutation';
+const appWindow = getCurrentWebviewWindow();
 
 export default function TemporaryDetail() {
   const platform = usePlatform();
@@ -83,7 +84,7 @@ export default function TemporaryDetail() {
   );
   useHotkeys(
     match(platform)
-      .with('Darwin', () => ['Meta+d'])
+      .with('macos', () => ['Meta+d'])
       .otherwise(() => ['Control+d']),
     (event) => {
       if (persistentId === null) {

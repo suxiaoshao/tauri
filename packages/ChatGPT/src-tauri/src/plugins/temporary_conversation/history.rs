@@ -4,7 +4,7 @@ use std::{
 };
 
 use serde::{Deserialize, Serialize};
-use tauri::{AppHandle, Manager, Runtime, WindowBuilder};
+use tauri::{AppHandle, Emitter, Runtime, WebviewWindowBuilder};
 use time::OffsetDateTime;
 
 use crate::{
@@ -256,9 +256,9 @@ impl<'a> TemporaryMessageEvent<'a> {
 }
 
 #[tauri::command]
-pub(super) fn init_temporary_conversation(
-    state: tauri::State<'_, Arc<Mutex<TemporaryStore>>>,
-    conn: tauri::State<'_, DbConn>,
+pub fn init_temporary_conversation(
+    state: tauri::State<Arc<Mutex<TemporaryStore>>>,
+    conn: tauri::State<DbConn>,
     template_id: i32,
 ) -> ChatGPTResult<Vec<TemporaryMessage>> {
     let conn = &mut conn.get()?;
@@ -271,7 +271,7 @@ pub(super) fn init_temporary_conversation(
 }
 
 #[tauri::command]
-pub(super) fn delete_temporary_message(
+pub fn delete_temporary_message(
     state: tauri::State<'_, Arc<Mutex<TemporaryStore>>>,
     persistent_id: Option<usize>,
     message_id: usize,
@@ -282,7 +282,7 @@ pub(super) fn delete_temporary_message(
     Ok(())
 }
 #[tauri::command(async)]
-pub(super) fn separate_window<R: Runtime>(
+pub fn separate_window<R: Runtime>(
     state: tauri::State<'_, Arc<Mutex<TemporaryStore>>>,
     app_handle: AppHandle<R>,
     window: tauri::Window<R>,
@@ -294,7 +294,7 @@ pub(super) fn separate_window<R: Runtime>(
 }
 
 #[tauri::command]
-pub(super) fn get_temporary_conversation(
+pub fn get_temporary_conversation(
     persistent_id: Option<usize>,
     state: tauri::State<'_, Arc<Mutex<TemporaryStore>>>,
 ) -> ChatGPTResult<TemporaryConversation> {
@@ -302,10 +302,12 @@ pub(super) fn get_temporary_conversation(
 }
 
 fn create_persistent_window<R: Runtime>(app: &AppHandle<R>, id: usize) -> ChatGPTResult<()> {
-    let window = WindowBuilder::new(
+    let window = WebviewWindowBuilder::new(
         app,
         format!("{}-{}", TEMPORARY_WINDOW, id),
-        tauri::WindowUrl::App(format!("/temporary_conversation/detail?persistentId={}", id).into()),
+        tauri::WebviewUrl::App(
+            format!("/temporary_conversation/detail?persistentId={}", id).into(),
+        ),
     )
     .title("Temporary Conversation")
     .inner_size(800.0, 600.0)
@@ -415,7 +417,7 @@ pub fn update_temporary_message<R: Runtime>(
         .lock()?
         .update_temp_conversation_message(persistent_id, message_id, content)?
         .clone();
-    app.emit_all(
+    app.emit(
         TEMPORARY_MESSAGE_EVENT,
         TemporaryMessageEvent::new(&message, persistent_id),
     )?;

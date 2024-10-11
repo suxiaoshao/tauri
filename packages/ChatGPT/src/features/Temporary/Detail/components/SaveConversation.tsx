@@ -51,7 +51,7 @@ export default function SaveConversation({ persistentId }: SaveConversationProps
   });
   useHotkeys(
     match(platform)
-      .with('Darwin', () => ['Meta+s'])
+      .with('macos', () => ['Meta+s'])
       .otherwise(() => ['Control+s']),
     (event) => {
       event.preventDefault();

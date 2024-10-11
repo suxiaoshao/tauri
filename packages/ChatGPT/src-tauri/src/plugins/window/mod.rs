@@ -12,9 +12,16 @@ pub struct WindowPlugin;
 
 impl<R: Runtime> tauri::plugin::Plugin<R> for WindowPlugin {
     fn name(&self) -> &'static str {
-        "window"
+        "window-beautify"
     }
-    fn created(&mut self, window: tauri::Window<R>) {
+    fn initialize(
+        &mut self,
+        _app: &tauri::AppHandle<R>,
+        _config: serde_json::Value,
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        Ok(())
+    }
+    fn window_created(&mut self, window: tauri::Window<R>) {
         if let Err(err) = on_created(window) {
             warn!("window created error:{}", err)
         };

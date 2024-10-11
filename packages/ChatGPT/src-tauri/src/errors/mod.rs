@@ -21,8 +21,6 @@ pub enum ChatGPTError {
     GetConnection(#[from] diesel::r2d2::Error),
     #[error("文件系统错误:{}",.0)]
     Fs(#[from] std::io::Error),
-    #[error("页面shadow错误")]
-    Shadow,
     #[error("页面透明效果错误")]
     Vibrancy,
     #[error("请求头构造错误:{}",.0)]
@@ -73,6 +71,8 @@ pub enum ChatGPTError {
     TemporaryConversationUninitialized,
     #[error("Temporary conversation not found:{}",.0)]
     TemporaryConversationNotFound(usize),
+    #[error("global shortcuts:{}",.0)]
+    GlobalShortcuts(#[from] tauri_plugin_global_shortcut::Error),
 }
 
 impl Serialize for ChatGPTError {
@@ -106,9 +106,6 @@ impl Serialize for ChatGPTError {
             }
             ChatGPTError::Fs(_) => {
                 state.serialize_field("code", "Fs")?;
-            }
-            ChatGPTError::Shadow => {
-                state.serialize_field("code", "Shadow")?;
             }
             ChatGPTError::Vibrancy => {
                 state.serialize_field("code", "Vibrancy")?;
@@ -193,6 +190,10 @@ impl Serialize for ChatGPTError {
                 state.serialize_field("code", "TemporaryConversationNotFound")?;
                 state.serialize_field("data", id)?;
             }
+            ChatGPTError::GlobalShortcuts(error) => {
+                state.serialize_field("code", "GlobalShortcuts")?;
+                state.serialize_field("data", error)?;
+            }
         }
         state.end()
     }
@@ -220,11 +221,6 @@ impl From<diesel::ConnectionError> for ChatGPTError {
 impl From<diesel::r2d2::PoolError> for ChatGPTError {
     fn from(error: diesel::r2d2::PoolError) -> Self {
         Self::Pool(error)
-    }
-}
-impl From<window_shadows::Error> for ChatGPTError {
-    fn from(_: window_shadows::Error) -> Self {
-        Self::Shadow
     }
 }
 impl From<window_vibrancy::Error> for ChatGPTError {

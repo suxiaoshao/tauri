@@ -8,7 +8,7 @@
 use std::{collections::HashSet, io::ErrorKind, path::PathBuf};
 
 use serde::{Deserialize, Serialize};
-use tauri::{api::path::app_config_dir, Runtime};
+use tauri::{Manager, Runtime};
 
 use crate::errors::{ChatGPTError, ChatGPTResult};
 
@@ -69,8 +69,10 @@ pub struct ChatGPTConfig {
 
 impl ChatGPTConfig {
     pub fn path<R: Runtime>(app: &tauri::AppHandle<R>) -> ChatGPTResult<PathBuf> {
-        let file = app_config_dir(&app.config())
-            .ok_or(ChatGPTError::ConfigPath)?
+        let file = app
+            .path()
+            .app_config_dir()
+            .map_err(|_| ChatGPTError::DbPath)?
             .join("config.toml");
         Ok(file)
     }

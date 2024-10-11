@@ -1,10 +1,12 @@
 import { Box, List, ListItemButton, ListItemText, TextField } from '@mui/material';
-import { invoke } from '@tauri-apps/api';
-import { open } from '@tauri-apps/api/shell';
-import { appWindow, LogicalSize } from '@tauri-apps/api/window';
+import { invoke } from '@tauri-apps/api/core';
+import { open } from '@tauri-apps/plugin-shell';
+import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import { useEffect, useState } from 'react';
 import { useKey } from 'react-use';
 import { match } from 'ts-pattern';
+import { LogicalSize } from '@tauri-apps/api/window';
+const appWindow = getCurrentWebviewWindow();
 
 interface AppPath {
   desc: string | null;

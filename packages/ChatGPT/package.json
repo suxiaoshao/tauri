@@ -10,7 +10,9 @@
     "tauri": "tauri"
   },
   "dependencies": {
-    "@mui/x-tree-view": "^7.18.0",
+    "@mui/x-tree-view": "^7.19.0",
+    "@tauri-apps/plugin-dialog": "^2.0.0",
+    "@tauri-apps/plugin-os": "^2.0.0",
     "details": "workspace:^",
     "immer": "^10.1.1",
     "markdown-to-jsx": "^7.5.0",

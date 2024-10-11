@@ -5,10 +5,11 @@ import usePromise, { PromiseStatus } from '@chatgpt/hooks/usePromise';
 import { updateTemporaryMessage } from '@chatgpt/service/temporaryConversation/mutation';
 import { getTemporaryMessage } from '@chatgpt/service/temporaryConversation/query';
 import notification from '@chatgpt/utils/notification';
-import { appWindow } from '@tauri-apps/api/window';
+import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import { useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { match, P } from 'ts-pattern';
+const appWindow = getCurrentWebviewWindow();
 
 export default function MessagePreview() {
   const [searchParams] = useSearchParams();

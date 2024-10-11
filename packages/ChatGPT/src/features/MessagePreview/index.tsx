@@ -10,7 +10,7 @@ import Loading from '@chatgpt/components/Loading';
 import usePromise, { PromiseStatus } from '@chatgpt/hooks/usePromise';
 import { findMessage } from '@chatgpt/service/chat/query';
 import notification from '@chatgpt/utils/notification';
-import { appWindow } from '@tauri-apps/api/window';
+import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import { useCallback, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { match } from 'ts-pattern';
@@ -20,6 +20,7 @@ import { updateMessageContent } from '@chatgpt/service/chat/mutation';
 export default function MessagePreview() {
   const { id } = useParams<{ id: string }>();
   const fn = useCallback(async () => {
+    const appWindow = getCurrentWebviewWindow();
     try {
       if (!id) {
         appWindow?.close();

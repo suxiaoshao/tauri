@@ -1,4 +1,9 @@
-import { type Options, isPermissionGranted, requestPermission, sendNotification } from '@tauri-apps/api/notification';
+import {
+  type Options,
+  isPermissionGranted,
+  requestPermission,
+  sendNotification,
+} from '@tauri-apps/plugin-notification';
 
 export default async function notification(options: Options | string) {
   let permissionGranted = await isPermissionGranted();

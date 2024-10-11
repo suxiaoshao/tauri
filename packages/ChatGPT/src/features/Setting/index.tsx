@@ -17,13 +17,14 @@ import {
   MenuItem,
   TextField,
 } from '@mui/material';
-import { appWindow } from '@tauri-apps/api/window';
+import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import { useCallback } from 'react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
 import { useShallow } from 'zustand/react/shallow';
 import { selectConfig, useConfigStore } from './configSlice';
 import { ChatGPTConfigSchema, type Config, Theme } from './types';
+const appWindow = getCurrentWebviewWindow();
 
 function Setting() {
   const initData = useConfigStore(useShallow(selectConfig));

@@ -9,9 +9,15 @@ pub struct WindowPlugin;
 
 impl<R: Runtime> tauri::plugin::Plugin<R> for WindowPlugin {
     fn name(&self) -> &'static str {
-        "window"
+        "window-beautify"
     }
-    fn created(&mut self, window: tauri::Window<R>) {
+    fn webview_created(&mut self, webview: tauri::Webview<R>) {
+        #[cfg(debug_assertions)]
+        {
+            webview.open_devtools()
+        }
+    }
+    fn window_created(&mut self, window: tauri::Window<R>) {
         if let Err(err) = on_created(window) {
             warn!("window created error:{}", err)
         };

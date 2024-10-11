@@ -29,7 +29,7 @@ export default function ConversationHeader({ conversation }: ConversationHeaderP
 
   useHotkeys(
     match(platform)
-      .with('Darwin', () => ['Meta+l'])
+      .with('macos', () => ['Meta+l'])
       .otherwise(() => ['Control+l']),
     (event) => {
       event.preventDefault();

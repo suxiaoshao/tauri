@@ -8,7 +8,7 @@ export interface InitTemporaryConversationParams {
 
 export async function initTemporaryConversation(params: InitTemporaryConversationParams) {
   return await appInvoke<InitTemporaryConversationParams, unknown>(
-    'plugin:temporary_conversation|init_temporary_conversation',
+    'plugin:temporary-conversation|init_temporary_conversation',
     params,
   );
 }
@@ -29,7 +29,7 @@ export interface DeleteTemporaryMessageParams {
 
 export async function deleteTemporaryMessage(params: DeleteTemporaryMessageParams) {
   await appInvoke<DeleteTemporaryMessageParams, unknown>(
-    'plugin:temporary_conversation|delete_temporary_message',
+    'plugin:temporary-conversation|delete_temporary_message',
     params,
   );
   useTemporaryConversationStore.getState().fetchData(params.persistentId);
@@ -45,7 +45,7 @@ export interface DeleteTemporaryConversationParams {
 
 export async function deleteTemporaryConversation(params: DeleteTemporaryConversationParams) {
   return await appInvoke<DeleteTemporaryConversationParams, unknown>(
-    'plugin:temporary_conversation|delete_temporary_conversation',
+    'plugin:temporary-conversation|delete_temporary_conversation',
     params,
   );
 }
@@ -56,7 +56,7 @@ export interface ClearTemporaryConversationParams {
 
 export async function clearTemporaryConversation(params: ClearTemporaryConversationParams) {
   await appInvoke<ClearTemporaryConversationParams, unknown>(
-    'plugin:temporary_conversation|clear_temporary_conversation',
+    'plugin:temporary-conversation|clear_temporary_conversation',
     params,
   );
   useTemporaryConversationStore.getState().fetchData(params.persistentId);
@@ -68,7 +68,7 @@ export interface SaveTemporaryConversationParams {
 
 export async function saveTemporaryConversation(params: SaveTemporaryConversationParams) {
   await appInvoke<SaveTemporaryConversationParams, unknown>(
-    'plugin:temporary_conversation|save_temporary_conversation',
+    'plugin:temporary-conversation|save_temporary_conversation',
     params,
   );
 }
@@ -81,7 +81,7 @@ export interface UpdateTemporaryMessageParams {
 
 export async function updateTemporaryMessage(params: UpdateTemporaryMessageParams) {
   await appInvoke<UpdateTemporaryMessageParams, unknown>(
-    'plugin:temporary_conversation|update_temporary_message',
+    'plugin:temporary-conversation|update_temporary_message',
     params,
   );
 }

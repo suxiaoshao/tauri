@@ -1,9 +1,10 @@
 import usePlatform from '@chatgpt/hooks/usePlatform';
 import { deleteTemporaryConversation } from '@chatgpt/service/temporaryConversation/mutation';
-import { appWindow } from '@tauri-apps/api/window';
+import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { Outlet, useSearchParams } from 'react-router-dom';
 import { match, P } from 'ts-pattern';
+const appWindow = getCurrentWebviewWindow();
 
 export default function Temporary() {
   const platform = usePlatform();
@@ -17,7 +18,7 @@ export default function Temporary() {
     .otherwise(() => null);
   useHotkeys(
     match(platform)
-      .with('Darwin', () => ['Meta+q', 'Meta+w'])
+      .with('macos', () => ['Meta+q', 'Meta+w'])
       .otherwise(() => ['Control+q', 'Control+w']),
     (event) => {
       event.preventDefault();

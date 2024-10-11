@@ -48,10 +48,10 @@ pub enum ClipError {
     ),
     #[error("无父文件夹")]
     Path,
-    #[error("页面shadow错误")]
-    Shadow,
     #[error("页面透明效果错误")]
     Vibrancy,
+    #[error("global shortcuts:{}",.0)]
+    GlobalShortcuts(#[from] tauri_plugin_global_shortcut::Error),
 }
 
 impl From<tauri::Error> for ClipError {
@@ -76,11 +76,6 @@ impl From<diesel::ConnectionError> for ClipError {
 impl From<diesel::r2d2::PoolError> for ClipError {
     fn from(error: diesel::r2d2::PoolError) -> Self {
         Self::Pool(error)
-    }
-}
-impl From<window_shadows::Error> for ClipError {
-    fn from(_: window_shadows::Error) -> Self {
-        Self::Shadow
     }
 }
 impl From<window_vibrancy::Error> for ClipError {

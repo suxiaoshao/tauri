@@ -46,8 +46,6 @@ pub enum FeiwenError {
         #[from]
         std::io::Error,
     ),
-    #[error("页面shadow错误")]
-    Shadow,
     #[error("页面透明效果错误")]
     Vibrancy,
     #[error("请求头构造错误:{}",.0)]
@@ -61,18 +59,6 @@ pub enum FeiwenError {
         #[serde(skip_serializing)]
         #[from]
         reqwest::Error,
-    ),
-    #[error("toml解析错误:{}",.0)]
-    TomlParse(
-        #[serde(skip_serializing)]
-        #[from]
-        toml::de::Error,
-    ),
-    #[error("toml序列化错误:{}",.0)]
-    TomlSerialize(
-        #[serde(skip_serializing)]
-        #[from]
-        toml::ser::Error,
     ),
     #[error("serde_json错误:{}",.0)]
     SerdeJson(
@@ -157,11 +143,6 @@ impl From<diesel::r2d2::PoolError> for FeiwenError {
     }
 }
 
-impl From<window_shadows::Error> for FeiwenError {
-    fn from(_: window_shadows::Error) -> Self {
-        Self::Shadow
-    }
-}
 impl From<window_vibrancy::Error> for FeiwenError {
     fn from(_: window_vibrancy::Error) -> Self {
         Self::Vibrancy

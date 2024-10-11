@@ -9,10 +9,11 @@ import CustomEdit from '@chatgpt/components/CustomEdit';
 import { type Message } from '@chatgpt/types/message';
 import { Edit, Preview, Upload } from '@mui/icons-material';
 import { Box, IconButton, ToggleButton, ToggleButtonGroup, Tooltip } from '@mui/material';
-import { appWindow } from '@tauri-apps/api/window';
+import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import { useCallback, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { match } from 'ts-pattern';
+const appWindow = getCurrentWebviewWindow();
 
 export interface SuccessProps {
   message: Pick<Message, 'content'>;

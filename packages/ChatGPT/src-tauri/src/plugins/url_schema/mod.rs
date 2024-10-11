@@ -1,4 +1,4 @@
-use tauri::{Manager, Runtime};
+use tauri::{Emitter, Manager, Runtime};
 
 use crate::{create_main_window, errors::ChatGPTResult};
 
@@ -45,7 +45,7 @@ pub fn router_emit_to_main<R: Runtime, M: Manager<R>>(
     event: RouterEvent,
     app_handle: &M,
 ) -> ChatGPTResult<()> {
-    let window = match app_handle.get_window("main") {
+    let window = match app_handle.get_webview_window("main") {
         Some(window) => window,
         None => create_main_window(app_handle)?,
     };

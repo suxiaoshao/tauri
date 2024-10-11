@@ -3,9 +3,10 @@
 
 use errors::ChatGPTResult;
 use log::LevelFilter;
-use plugins::{LogPlugin, MainConfigListener, TemporaryHotkeyListener};
-use tauri::{Manager, Runtime, Window, WindowBuilder};
-use tauri_plugin_log::LogTarget;
+use plugins::{on_shortcut_trigger, LogPlugin, MainConfigListener, TemporaryHotkeyListener};
+use tauri::{Manager, Runtime, WebviewWindow};
+use tauri_plugin_global_shortcut::ShortcutState;
+use tauri_plugin_log::{Target, TargetKind};
 
 mod errors;
 mod fetch;
@@ -13,15 +14,33 @@ mod plugins;
 mod store;
 
 fn main() -> ChatGPTResult<()> {
+    let context = tauri::generate_context!();
     tauri::Builder::default()
         .setup(|app| {
             create_main_window(app)?;
             Ok(())
         })
+        .plugin(tauri_plugin_os::init())
+        .plugin(tauri_plugin_notification::init())
+        .plugin(
+            tauri_plugin_global_shortcut::Builder::new()
+                .with_handler(|app, shortcut, event| {
+                    if event.state == ShortcutState::Pressed {
+                        if let Err(err) = on_shortcut_trigger(app, shortcut) {
+                            log::error!("global shortcut error:{}", err);
+                        };
+                    }
+                })
+                .build(),
+        )
         .plugin(
             tauri_plugin_log::Builder::default()
                 .level(LevelFilter::Info)
-                .targets([LogTarget::LogDir, LogTarget::Stdout, LogTarget::Webview])
+                .targets([
+                    Target::new(TargetKind::Stdout),
+                    Target::new(TargetKind::LogDir { file_name: None }),
+                    Target::new(TargetKind::Webview),
+                ])
                 .build(),
         )
         .plugin(LogPlugin)
@@ -35,12 +54,12 @@ fn main() -> ChatGPTResult<()> {
         .plugin(plugins::ChatPlugin)
         .plugin(plugins::TemporaryConversationPlugin::default())
         .plugin(plugins::TrayPlugin)
-        .run(tauri::generate_context!())?;
+        .run(context)?;
     Ok(())
 }
 
-fn create_main_window<R: Runtime, M: Manager<R>>(app: &M) -> ChatGPTResult<Window<R>> {
-    let window = WindowBuilder::new(app, "main", tauri::WindowUrl::App("/".into()))
+fn create_main_window<R: Runtime, M: Manager<R>>(app: &M) -> ChatGPTResult<WebviewWindow<R>> {
+    let window = WebviewWindow::builder(app, "main", tauri::WebviewUrl::App("/".into()))
         .title("ChatGPT")
         .inner_size(800.0, 600.0)
         .fullscreen(false)

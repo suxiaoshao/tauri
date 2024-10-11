@@ -6,8 +6,8 @@
 use errors::FeiwenResult;
 use log::LevelFilter;
 use plugins::{LogPlugin, WindowPlugin};
-use tauri::{App, WindowBuilder};
-use tauri_plugin_log::LogTarget;
+use tauri::{App, WebviewWindowBuilder};
+use tauri_plugin_log::{Target, TargetKind};
 mod errors;
 pub mod fetch;
 pub mod plugins;
@@ -20,10 +20,15 @@ fn main() -> FeiwenResult<()> {
             setup(app)?;
             Ok(())
         })
+        .plugin(tauri_plugin_notification::init())
         .plugin(
             tauri_plugin_log::Builder::default()
                 .level(LevelFilter::Info)
-                .targets([LogTarget::LogDir, LogTarget::Stdout, LogTarget::Webview])
+                .targets([
+                    Target::new(TargetKind::Stdout),
+                    Target::new(TargetKind::LogDir { file_name: None }),
+                    Target::new(TargetKind::Webview),
+                ])
                 .build(),
         )
         .plugin(LogPlugin)
@@ -35,7 +40,7 @@ fn main() -> FeiwenResult<()> {
 }
 
 fn setup(app: &mut App) -> FeiwenResult<()> {
-    let window = WindowBuilder::new(app, "main", tauri::WindowUrl::App("/".into()))
+    let window = WebviewWindowBuilder::new(app, "main", tauri::WebviewUrl::App("/".into()))
         .title("废文")
         .inner_size(800.0, 600.0)
         .fullscreen(false)

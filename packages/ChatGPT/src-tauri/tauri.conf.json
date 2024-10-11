@@ -2,62 +2,29 @@
   "build": {
     "beforeDevCommand": "pnpm dev",
     "beforeBuildCommand": "pnpm build",
-    "devPath": "http://localhost:1420",
-    "distDir": "../dist",
-    "withGlobalTauri": false
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:1420"
   },
-  "package": {
-    "productName": "ChatGPT",
-    "version": "0.2.0"
+  "bundle": {
+    "active": true,
+    "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.icns", "icons/icon.ico"],
+    "targets": "all"
   },
-  "tauri": {
-    "allowlist": {
-      "all": false,
-      "shell": {
-        "all": false,
-        "open": true
-      },
-      "window": {
-        "close": true,
-        "create": true,
-        "setFocus": true,
-        "show": true,
-        "startDragging": true,
-        "maximize": true,
-        "unmaximize": true
-      },
-      "os": {
-        "all": true
-      },
-      "notification": {
-        "all": true
-      },
-      "dialog": {
-        "all": false,
-        "ask": false,
-        "confirm": false,
-        "message": false,
-        "open": true,
-        "save": false
-      }
-    },
-    "systemTray": {
-      "iconPath": "icons/icon.png",
-      "iconAsTemplate": true
-    },
-    "bundle": {
-      "active": true,
-      "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.icns", "icons/icon.ico"],
-      "identifier": "chatgpt.sushao.top",
-      "targets": "all"
-    },
+  "productName": "ChatGPT",
+  "mainBinaryName": "ChatGPT",
+  "version": "0.2.0",
+  "identifier": "chatgpt.sushao.top",
+  "plugins": {},
+  "app": {
+    "withGlobalTauri": false,
+    "macOSPrivateApi": true,
+    "windows": [],
     "security": {
       "csp": null
     },
-    "updater": {
-      "active": false
-    },
-    "windows": [],
-    "macOSPrivateApi": true
+    "trayIcon": {
+      "iconPath": "icons/icon.png",
+      "iconAsTemplate": true
+    }
   }
 }

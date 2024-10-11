@@ -8,9 +8,8 @@
 use history::TemporaryStore;
 use serde_json::Value;
 use std::sync::{Arc, Mutex};
-use tauri::{
-    AppHandle, GlobalShortcutManager, Invoke, Manager, Runtime, WindowBuilder, WindowEvent,
-};
+use tauri::{AppHandle, Manager, Runtime, WebviewWindow, WebviewWindowBuilder, WindowEvent};
+use tauri_plugin_global_shortcut::{GlobalShortcutExt, Shortcut};
 
 use crate::errors::ChatGPTResult;
 
@@ -19,7 +18,7 @@ mod delay;
 mod history;
 mod listen;
 
-pub use {history::TemporaryMessage, listen::TemporaryHotkeyListener};
+pub use {history::*, listen::TemporaryHotkeyListener};
 
 #[derive(Default)]
 pub struct TemporaryConversationPlugin {
@@ -29,7 +28,7 @@ pub struct TemporaryConversationPlugin {
 impl TemporaryConversationPlugin {
     const DURATION: tokio::time::Duration = tokio::time::Duration::from_secs(10 * 60);
     fn on_blur(&mut self, app: &AppHandle<impl Runtime>) {
-        let window = match app.get_window(TEMPORARY_WINDOW) {
+        let window = match app.get_webview_window(TEMPORARY_WINDOW) {
             Some(window) => window,
             None => return,
         };
@@ -53,9 +52,13 @@ const TEMPORARY_WINDOW: &str = "temporary_conversation_window";
 
 impl<R: Runtime> tauri::plugin::Plugin<R> for TemporaryConversationPlugin {
     fn name(&self) -> &'static str {
-        "temporary_conversation"
+        "temporary-conversation"
     }
-    fn initialize(&mut self, app: &AppHandle<R>, _: Value) -> tauri::plugin::Result<()> {
+    fn initialize(
+        &mut self,
+        app: &AppHandle<R>,
+        _: Value,
+    ) -> Result<(), Box<dyn std::error::Error>> {
         app.manage(Arc::new(Mutex::new(TemporaryStore::default())));
         manager_global_shortcut(app)?;
         Ok(())
@@ -76,20 +79,21 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for TemporaryConversationPlugin {
             _ => {}
         }
     }
-    fn extend_api(&mut self, invoke: Invoke<R>) {
-        let handle: Box<dyn Fn(Invoke<R>) + Send + Sync> = Box::new(tauri::generate_handler![
-            history::init_temporary_conversation,
-            history::temporary_fetch,
-            history::delete_temporary_message,
-            history::separate_window,
-            history::get_temporary_conversation,
-            history::delete_temporary_conversation,
-            history::clear_temporary_conversation,
-            history::save_temporary_conversation,
-            history::get_temporary_message,
-            history::update_temporary_message
-        ]);
-        (handle)(invoke);
+    fn extend_api(&mut self, invoke: tauri::ipc::Invoke<R>) -> bool {
+        let handle: Box<dyn Fn(tauri::ipc::Invoke<R>) -> bool + Send + Sync> =
+            Box::new(tauri::generate_handler![
+                history::init_temporary_conversation,
+                history::temporary_fetch,
+                history::delete_temporary_message,
+                history::separate_window,
+                history::get_temporary_conversation,
+                history::delete_temporary_conversation,
+                history::clear_temporary_conversation,
+                history::save_temporary_conversation,
+                history::get_temporary_message,
+                history::update_temporary_message
+            ]);
+        (handle)(invoke)
     }
 }
 pub fn manager_global_shortcut<R: Runtime>(app: &AppHandle<R>) -> ChatGPTResult<()> {
@@ -100,21 +104,35 @@ pub fn manager_global_shortcut<R: Runtime>(app: &AppHandle<R>) -> ChatGPTResult<
         Some(data) => data,
         None => return Ok(()),
     };
-    let mut manager = app.global_shortcut_manager();
-    let app = app.clone();
+    let manager = app.global_shortcut();
     // 全局快捷键
-    manager
-        .register(&temporary_hotkey, move || {
-            if let Err(err) = on_short(&app) {
-                log::warn!("global shortcut error:{}", err)
-            };
-        })
-        .map_err(tauri::Error::Runtime)?;
+    manager.register(temporary_hotkey.as_str())?;
     Ok(())
 }
 
-pub fn on_short<R: Runtime>(app: &AppHandle<R>) -> ChatGPTResult<()> {
-    match app.get_window(TEMPORARY_WINDOW) {
+pub fn on_shortcut_trigger<R: Runtime>(
+    app: &AppHandle<R>,
+    shortcut: &Shortcut,
+) -> ChatGPTResult<()> {
+    // get api key
+    let config = ChatGPTConfig::get(app)?;
+    let temporary_hotkey = match config
+        .temporary_hotkey
+        .and_then::<Shortcut, _>(|data| data.try_into().ok())
+    {
+        Some(data) => data,
+        None => return Ok(()),
+    };
+    if shortcut == &temporary_hotkey {
+        if let Err(err) = trigger_temp_window(app) {
+            log::error!("trigger temporary window error:{}", err);
+        };
+    }
+    Ok(())
+}
+
+pub fn trigger_temp_window<R: Runtime>(app: &AppHandle<R>) -> ChatGPTResult<()> {
+    match app.get_webview_window(TEMPORARY_WINDOW) {
         Some(window) => {
             if window.is_visible()? {
                 window.hide()?;
@@ -124,22 +142,22 @@ pub fn on_short<R: Runtime>(app: &AppHandle<R>) -> ChatGPTResult<()> {
             }
         }
         None => {
-            create_window(app)?;
+            create_temporary_window(app)?;
         }
     }
     Ok(())
 }
 
-fn create_window<R: Runtime>(app: &AppHandle<R>) -> ChatGPTResult<()> {
-    let window = WindowBuilder::new(
+pub fn create_temporary_window<R: Runtime>(app: &AppHandle<R>) -> ChatGPTResult<WebviewWindow<R>> {
+    let window = WebviewWindowBuilder::new(
         app,
         TEMPORARY_WINDOW,
-        tauri::WindowUrl::App("/temporary_conversation".into()),
+        tauri::WebviewUrl::App("/temporary_conversation".into()),
     )
     .title("Temporary Conversation")
     .inner_size(800.0, 600.0)
     .fullscreen(false)
-    .resizable(false)
+    .resizable(true)
     .transparent(true)
     .always_on_top(true)
     .skip_taskbar(true)
@@ -151,12 +169,10 @@ fn create_window<R: Runtime>(app: &AppHandle<R>) -> ChatGPTResult<()> {
     #[cfg(target_os = "windows")]
     let window = window.decorations(false);
     let window = window.build()?;
-    #[cfg(target_os = "windows")]
-    window.set_decorations(false)?;
     #[cfg(target_os = "macos")]
     {
         use super::window::WindowExt;
         window.set_transparent_titlebar()?;
     }
-    Ok(())
+    Ok(window)
 }
