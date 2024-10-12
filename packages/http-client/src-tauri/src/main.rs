@@ -73,7 +73,7 @@ fn on_short<R: Runtime>(app: &AppHandle<R>) -> anyhow::Result<()> {
     } else {
         window.show()?;
         window.set_focus()?;
-        app_search::app_data_init();
+        app_search::app_data_init(app);
     }
     Ok(())
 }
@@ -117,7 +117,7 @@ fn system_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> Result<(), Box<dyn std:
             } else {
                 window.show().unwrap();
                 window.set_focus().unwrap();
-                app_search::app_data_init();
+                app_search::app_data_init(app.app_handle());
             }
         }
     });

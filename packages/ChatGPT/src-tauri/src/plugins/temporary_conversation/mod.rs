@@ -124,9 +124,12 @@ pub fn on_shortcut_trigger<R: Runtime>(
         None => return Ok(()),
     };
     if shortcut == &temporary_hotkey {
-        if let Err(err) = trigger_temp_window(app) {
-            log::error!("trigger temporary window error:{}", err);
-        };
+        let app = app.app_handle().clone();
+        tauri::async_runtime::spawn(async move {
+            if let Err(err) = trigger_temp_window(&app) {
+                log::error!("trigger temporary window error:{}", err);
+            };
+        });
     }
     Ok(())
 }

@@ -9,10 +9,11 @@ mod init_data;
 
 use self::app_data::APP_DATA;
 pub use app_data::{AppDataType, AppPath};
+use tauri::{AppHandle, Runtime};
 mod app_data;
 
-pub fn app_data_init() -> Option<()> {
-    let data = init_data::get_app_data()?;
+pub fn app_data_init<R: Runtime>(app: &AppHandle<R>) -> Option<()> {
+    let data = init_data::get_app_data(app)?;
     *APP_DATA.lock().unwrap() = data;
     Some(())
 }
