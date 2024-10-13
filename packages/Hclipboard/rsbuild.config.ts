@@ -34,7 +34,7 @@ export default defineConfig({
     },
     bundlerChain: (chain) => {
       if (process.env.RSDOCTOR) {
-        chain.plugin('rsdoctor').use(new RsdoctorRspackPlugin());
+        chain.plugin('rsdoctor').use(new RsdoctorRspackPlugin({ supports: { generateTileGraph: true } }));
       }
       if (process.env.NODE_ENV === 'development') {
         chain.plugin('code-inspector').use(codeInspectorPlugin({ bundler: 'rspack' }));

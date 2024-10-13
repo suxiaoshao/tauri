@@ -3,7 +3,6 @@ use super::AppDataType;
 mod macos;
 #[cfg(target_os = "windows")]
 mod win;
-#[cfg(target_os = "windows")]
 use tauri::{AppHandle, Runtime};
 
 #[cfg(target_os = "macos")]

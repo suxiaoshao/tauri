@@ -125,7 +125,7 @@ pub fn on_shortcut_trigger<R: Runtime>(
     };
     if shortcut == &temporary_hotkey {
         let app = app.app_handle().clone();
-        tauri::async_runtime::spawn(async move {
+        tauri::async_runtime::block_on(async move {
             if let Err(err) = trigger_temp_window(&app) {
                 log::error!("trigger temporary window error:{}", err);
             };
@@ -177,5 +177,6 @@ pub fn create_temporary_window<R: Runtime>(app: &AppHandle<R>) -> ChatGPTResult<
         use super::window::WindowExt;
         window.set_transparent_titlebar()?;
     }
+    window.hide_menu()?;
     Ok(window)
 }

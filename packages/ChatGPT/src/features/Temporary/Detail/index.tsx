@@ -76,11 +76,13 @@ export default function TemporaryDetail() {
   useHotkeys(
     'esc',
     (event) => {
-      event.preventDefault();
-      navigate(-1);
+      if (persistentId === null) {
+        event.preventDefault();
+        navigate(-1);
+      }
     },
     { enableOnFormTags: ['textarea'] },
-    [navigate],
+    [navigate, persistentId],
   );
   useHotkeys(
     match(platform)
