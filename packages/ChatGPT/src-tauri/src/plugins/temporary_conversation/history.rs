@@ -6,12 +6,13 @@ use std::{
 use serde::{Deserialize, Serialize};
 use tauri::{AppHandle, Emitter, Runtime, WebviewWindowBuilder};
 use time::OffsetDateTime;
+use url::Url;
 
 use crate::{
     errors::{ChatGPTError, ChatGPTResult},
     fetch::{ChatRequest, ChatResponse, FetchRunner, Message as FetchMessage},
     plugins::{
-        url_schema::{router_emit_to_main, ConversationSelected, RouterEvent},
+        url_schema::{router_emit_to_main, RouterEvent},
         ChatGPTConfig,
     },
     store::{
@@ -385,10 +386,15 @@ pub fn save_temporary_conversation<R: Runtime>(
 
     state.lock()?.delete_conversation(persistent_id);
     window.close()?;
-    router_emit_to_main(
-        RouterEvent::new("/", Some(ConversationSelected::Conversation(id)), true),
-        &app_handle,
+
+    let path = Url::parse_with_params(
+        "/",
+        &[
+            ("selectedType", "conversation"),
+            ("selectedId", id.to_string().as_str()),
+        ],
     )?;
+    router_emit_to_main(RouterEvent::new(path.to_string(), true), &app_handle)?;
     Ok(())
 }
 

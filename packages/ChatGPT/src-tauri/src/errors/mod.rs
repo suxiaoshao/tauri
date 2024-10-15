@@ -73,6 +73,8 @@ pub enum ChatGPTError {
     TemporaryConversationNotFound(usize),
     #[error("global shortcuts:{}",.0)]
     GlobalShortcuts(#[from] tauri_plugin_global_shortcut::Error),
+    #[error("url parse error:{}",.0)]
+    UrlParseError(#[from] url::ParseError),
 }
 
 impl Serialize for ChatGPTError {
@@ -193,6 +195,9 @@ impl Serialize for ChatGPTError {
             ChatGPTError::GlobalShortcuts(error) => {
                 state.serialize_field("code", "GlobalShortcuts")?;
                 state.serialize_field("data", error)?;
+            }
+            ChatGPTError::UrlParseError(_) => {
+                state.serialize_field("code", "UrlParseError")?;
             }
         }
         state.end()

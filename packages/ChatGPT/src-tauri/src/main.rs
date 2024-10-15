@@ -1,6 +1,8 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+use std::path::PathBuf;
+
 use errors::ChatGPTResult;
 use log::LevelFilter;
 use plugins::{on_shortcut_trigger, LogPlugin, MainConfigListener, TemporaryHotkeyListener};
@@ -17,7 +19,7 @@ fn main() -> ChatGPTResult<()> {
     let context = tauri::generate_context!();
     tauri::Builder::default()
         .setup(|app| {
-            create_main_window(app)?;
+            create_main_window(app, "/")?;
             Ok(())
         })
         .plugin(tauri_plugin_os::init())
@@ -58,8 +60,11 @@ fn main() -> ChatGPTResult<()> {
     Ok(())
 }
 
-fn create_main_window<R: Runtime, M: Manager<R>>(app: &M) -> ChatGPTResult<WebviewWindow<R>> {
-    let window = WebviewWindow::builder(app, "main", tauri::WebviewUrl::App("/".into()))
+fn create_main_window<R: Runtime, M: Manager<R>>(
+    app: &M,
+    path: impl Into<PathBuf>,
+) -> ChatGPTResult<WebviewWindow<R>> {
+    let window = WebviewWindow::builder(app, "main", tauri::WebviewUrl::App(path.into()))
         .title("ChatGPT")
         .inner_size(800.0, 600.0)
         .fullscreen(false)
