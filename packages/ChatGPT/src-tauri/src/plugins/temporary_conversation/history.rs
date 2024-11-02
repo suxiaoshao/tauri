@@ -6,7 +6,6 @@ use std::{
 use serde::{Deserialize, Serialize};
 use tauri::{AppHandle, Emitter, Runtime, WebviewWindowBuilder};
 use time::OffsetDateTime;
-use url::Url;
 
 use crate::{
     errors::{ChatGPTError, ChatGPTResult},
@@ -343,6 +342,7 @@ pub struct SaveTemporaryConversation {
     folder_id: Option<i32>,
     icon: String,
     info: Option<String>,
+    #[serde(rename = "persistentId")]
     persistent_id: Option<usize>,
 }
 
@@ -385,16 +385,10 @@ pub fn save_temporary_conversation<R: Runtime>(
     })?;
 
     state.lock()?.delete_conversation(persistent_id);
-    window.close()?;
 
-    let path = Url::parse_with_params(
-        "/",
-        &[
-            ("selectedType", "conversation"),
-            ("selectedId", id.to_string().as_str()),
-        ],
-    )?;
-    router_emit_to_main(RouterEvent::new(path.to_string(), true), &app_handle)?;
+    let path = format!("/?selectedType=conversation&selectedId={id}");
+    router_emit_to_main(RouterEvent::new(path, true), &app_handle)?;
+    window.close()?;
     Ok(())
 }
 

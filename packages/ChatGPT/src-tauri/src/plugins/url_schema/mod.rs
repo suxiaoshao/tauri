@@ -12,7 +12,7 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for UrlSchema {
     }
 }
 
-#[derive(serde::Serialize, Clone)]
+#[derive(serde::Serialize, Clone, Debug)]
 pub struct RouterEvent {
     path: String,
     #[serde(rename = "isUpdate")]

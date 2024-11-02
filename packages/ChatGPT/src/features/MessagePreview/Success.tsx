@@ -30,9 +30,8 @@ export default function Success({ message, updateMessageContent }: SuccessProps)
     (event: React.MouseEvent<HTMLElement>, newAlignment: string | null) => {
       if (newAlignment !== null) {
         setSearchParams((prev) => {
-          const newSearchParams = new URLSearchParams(prev);
-          newSearchParams.set('action', newAlignment);
-          return newSearchParams;
+          prev.set('action', newAlignment);
+          return prev;
         });
       }
     },
