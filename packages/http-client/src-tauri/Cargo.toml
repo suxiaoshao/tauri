@@ -22,10 +22,10 @@ serde_json = { workspace = true }
 diesel = { version = "2.2.4", features = ["sqlite"] }
 
 # http
-reqwest = "0.12.8"
+reqwest = "0.12.9"
 
 # 错误处理
-anyhow = "1.0.89"
+anyhow = "1.0.92"
 
 # 搜索应用
 lnk = "0.5.1"
@@ -35,7 +35,7 @@ pinyin = "0.10.0"
 # plugin
 tauri-plugin-notification = "2.0.1"
 tauri-plugin-clipboard-manager = "2.0.1"
-tauri-plugin-shell = "2.0.1"
+tauri-plugin-shell = "2.0.2"
 
 
 [target.'cfg(target_os = "macos")'.dependencies]

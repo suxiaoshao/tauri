@@ -44,14 +44,13 @@ interface extension-api {
     created: s64,
     choices: list<choice>
   }
-  on-request: func(request: chat-request) -> chat-request;
-  on-response: func(response: chat-response) -> chat-response;
-  print: func(msg: string);
+  on-request: func(request: chat-request) -> result<chat-request,string>;
+  on-response: func(response: chat-response) -> result<chat-response,string>;
+  get-name: func() -> string;
 }
 
 
 world host {
-  import print: func(msg: string);
-
+  import get-selected-text: func()-> result<string,string>;
   export extension-api;
 }
