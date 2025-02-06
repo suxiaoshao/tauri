@@ -30,10 +30,10 @@ export const useConversationStore = create<ConversationState>((set) => ({
         const conversation = findConversation(state.value, message.conversationId);
         if (conversation) {
           const messageIndex = conversation.messages.findIndex((m) => m.id === message.id);
-          if (messageIndex >= 0) {
-            conversation.messages[messageIndex] = message;
-          } else {
+          if (messageIndex === -1) {
             conversation.messages.push(message);
+          } else {
+            conversation.messages[messageIndex] = message;
           }
         }
       }),

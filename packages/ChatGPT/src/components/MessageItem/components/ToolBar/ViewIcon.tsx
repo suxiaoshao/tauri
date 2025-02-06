@@ -12,7 +12,7 @@ export default function ViewIcon({ id }: ViewIconProp) {
   const { onMessageViewed } = useContext(MessageActionContext);
   const handleClick = useCallback(() => {
     onMessageViewed?.(id);
-  }, [id]);
+  }, [id, onMessageViewed]);
   if (!onMessageViewed) {
     return null;
   }

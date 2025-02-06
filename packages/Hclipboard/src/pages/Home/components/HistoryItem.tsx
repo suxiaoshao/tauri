@@ -1,6 +1,6 @@
 import { Box, Divider, Drawer, Link, ListItemButton, Typography } from '@mui/material';
 import { encodeNonAsciiHTML } from 'entities';
-import { useEffect, useMemo, useState } from 'react';
+import { startTransition, useEffect, useMemo, useState } from 'react';
 import { type ClipHistory } from '../../../rpc/query';
 import formatTime from '../../../utils/formatTime';
 import useElementSize from '../hooks/useElementSize';
@@ -23,7 +23,9 @@ export default function HistoryItem({ item: { data, updateTime }, selected, isLa
   const [open, setOpen] = useState(false);
   useEffect(() => {
     if (selected && ref.current) {
-      ref.current?.scrollIntoView({ block: 'center', behavior: 'auto' });
+      startTransition(() => {
+        ref.current?.scrollIntoView({ block: 'center', behavior: 'auto' });
+      });
     }
   }, [ref, selected]);
   return (

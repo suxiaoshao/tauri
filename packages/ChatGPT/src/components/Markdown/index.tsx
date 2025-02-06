@@ -63,35 +63,34 @@ function CustomHead(props: TypographyProps) {
 function MyCode(props: { children: string; className?: string }) {
   if (props.className) {
     return <code className={props.className}>{props.children}</code>;
-  } else {
-    return (
-      <Box
-        component="span"
-        sx={({
-          palette: {
-            secondary: { main, contrastText },
-          },
-        }) => ({
-          borderRadius: 2,
-          p: 0.3,
-          pl: 0.5,
-          pr: 0.5,
-          m: 0.3,
-          mr: 0.5,
-          ml: 0.5,
-          minWidth: 20,
-          fontSize: 17,
-          background: main,
-          color: contrastText,
-          display: 'inline-flex',
-          justifyContent: 'center',
-        })}
-        className="code-inline"
-      >
-        {props.children}
-      </Box>
-    );
   }
+  return (
+    <Box
+      component="span"
+      sx={({
+        palette: {
+          secondary: { main, contrastText },
+        },
+      }) => ({
+        borderRadius: 2,
+        p: 0.3,
+        pl: 0.5,
+        pr: 0.5,
+        m: 0.3,
+        mr: 0.5,
+        ml: 0.5,
+        minWidth: 20,
+        fontSize: 17,
+        background: main,
+        color: contrastText,
+        display: 'inline-flex',
+        justifyContent: 'center',
+      })}
+      className="code-inline"
+    >
+      {props.children}
+    </Box>
+  );
 }
 
 function CustomPre(props: { children: string }) {

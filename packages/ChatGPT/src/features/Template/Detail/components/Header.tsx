@@ -82,7 +82,7 @@ export default function TemplateDetailHeader({
         );
       })
       .otherwise(() => null);
-  }, [data]);
+  }, [data, navigate]);
   const submitButton = useMemo(() => {
     return match(data)
       .with({ tag: PromiseStatus.data }, () => {

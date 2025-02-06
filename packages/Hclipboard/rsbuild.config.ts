@@ -8,10 +8,19 @@ import { defineConfig } from '@rsbuild/core';
 import { pluginReact } from '@rsbuild/plugin-react';
 import { RsdoctorRspackPlugin } from '@rsdoctor/rspack-plugin';
 import { codeInspectorPlugin } from 'code-inspector-plugin';
+import { pluginBabel } from '@rsbuild/plugin-babel';
 import { resolve } from 'node:path';
 
 export default defineConfig({
-  plugins: [pluginReact()],
+  plugins: [
+    pluginReact(),
+    pluginBabel({
+      include: /\.(?:jsx|tsx)$/,
+      babelLoaderOptions(opts) {
+        opts.plugins?.unshift('babel-plugin-react-compiler');
+      },
+    }),
+  ],
   server: {
     port: 1420,
   },
