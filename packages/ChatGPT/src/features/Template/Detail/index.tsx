@@ -51,7 +51,7 @@ export default function ConversationTemplateDetail() {
   }, [data]);
 
   // render content
-  const content: JSX.Element = useMemo(() => {
+  const content = useMemo(() => {
     return match(data)
       .with({ tag: PromiseStatus.loading }, () => <Loading sx={{ width: '100%', height: '100%' }} />)
       .with({ tag: PromiseStatus.error }, ({ value }) => (

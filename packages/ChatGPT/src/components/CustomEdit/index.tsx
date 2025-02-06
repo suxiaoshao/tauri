@@ -1,6 +1,6 @@
 import { Box, type BoxProps } from '@mui/material';
 import * as monaco from 'monaco-editor';
-import React, { startTransition, useCallback, useEffect, useImperativeHandle, useState } from 'react';
+import { type JSX, startTransition, useCallback, useEffect, useImperativeHandle, useState } from 'react';
 import './init';
 
 /**
@@ -27,6 +27,7 @@ export interface NotReadOnlyEditProp extends Omit<BoxProps, 'onChange'> {
    * 当编辑器代码改变时触发的方法
    * */
   onChange?(newCode: string): void;
+  ref?: React.Ref<HTMLDivElement | undefined>;
 }
 
 /**
@@ -35,10 +36,14 @@ export interface NotReadOnlyEditProp extends Omit<BoxProps, 'onChange'> {
  * @since 0.2.2
  * @description 编辑器组件
  * */
-function CustomEdit(
-  { value: code, language, readonly = false, onChange: onChangeCode, ...props }: NotReadOnlyEditProp,
-  ref?: React.Ref<HTMLDivElement | undefined>,
-): JSX.Element {
+function CustomEdit({
+  value: code,
+  language,
+  readonly = false,
+  onChange: onChangeCode,
+  ref,
+  ...props
+}: NotReadOnlyEditProp): JSX.Element {
   /**
    * 编辑器绑定的 dom 的引用
    * */
@@ -125,4 +130,4 @@ function CustomEdit(
   return <Box {...props} ref={setEditRef} />;
 }
 
-export default React.forwardRef(CustomEdit);
+export default CustomEdit;

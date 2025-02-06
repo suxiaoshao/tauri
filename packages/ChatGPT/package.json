@@ -10,25 +10,25 @@
     "tauri": "tauri"
   },
   "dependencies": {
-    "@mui/x-tree-view": "^7.19.0",
-    "@tauri-apps/plugin-dialog": "^2.0.0",
-    "@tauri-apps/plugin-os": "^2.0.0",
+    "@mui/x-tree-view": "^7.25.0",
+    "@tauri-apps/plugin-dialog": "^2.2.0",
+    "@tauri-apps/plugin-os": "^2.2.0",
     "details": "workspace:^",
     "immer": "^10.1.1",
-    "markdown-to-jsx": "^7.5.0",
-    "monaco-editor": "^0.52.0",
+    "markdown-to-jsx": "^7.7.3",
+    "monaco-editor": "^0.52.2",
     "monaco-themes": "^0.4.4",
     "notify": "workspace:^",
     "prism-themes": "^1.9.0",
     "prismjs": "^1.29.0",
-    "react-hotkeys-hook": "^4.5.1",
+    "react-hotkeys-hook": "^4.6.1",
     "react-resizable": "^3.0.5",
     "theme": "workspace:^",
     "time": "workspace:^",
     "types": "workspace:^"
   },
   "devDependencies": {
-    "@types/prismjs": "^1.26.4",
+    "@types/prismjs": "^1.26.5",
     "@types/react-resizable": "^3.0.8"
   }
 }

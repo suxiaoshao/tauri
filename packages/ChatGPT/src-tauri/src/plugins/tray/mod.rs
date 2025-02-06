@@ -95,7 +95,7 @@ fn create_main<R: Runtime>(app: &tauri::AppHandle<R>) -> ChatGPTResult<()> {
             window.set_focus()?;
         }
         None => {
-            create_main_window(app)?;
+            create_main_window(app, "/")?;
         }
     };
     Ok(())

@@ -23,7 +23,7 @@ export interface CustomThemeProps {
   children?: React.ReactNode;
 }
 
-export function CustomTheme({ children }: CustomThemeProps): JSX.Element {
+export function CustomTheme({ children }: CustomThemeProps) {
   const { systemColorScheme, setSystemColorScheme } = useThemeStore(
     useShallow(({ setSystemColorScheme, systemColorScheme }) => ({ systemColorScheme, setSystemColorScheme })),
   );

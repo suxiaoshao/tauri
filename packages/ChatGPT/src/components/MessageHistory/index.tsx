@@ -42,7 +42,7 @@ export default function MessageHistory({ messages, onMessageDeleted, onMessageVi
     [messages.length],
   );
   useHotkeys(
-    'delete',
+    ['delete', 'backspace'],
     async () => {
       if (selectedIndex !== null) {
         const message = messages.at(selectedIndex);

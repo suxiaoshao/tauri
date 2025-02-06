@@ -1,0 +1,56 @@
+package extension: host;
+
+
+interface extension-api {
+  enum role {
+    system,
+    user,
+    assistant,
+  }
+
+  record message {
+    role: role,
+    content: string,
+  }
+  record chat-request {
+    model: string,
+    messages: list<message>,
+    streams: bool,
+    temperature: f64,
+    top-p: f64,
+    n: s64,
+    max-tokens: option<s64>,
+    presence-penalty: f64,
+    frequency-penalty: f64,
+  }
+  record delta{
+    role: option<role>,
+    content: option<string>
+  }
+
+  record choice{
+    index: s64,
+    delta: delta,
+    finish-reason: option<string>
+  }
+  record usage {
+    prompt-tokens: s64,
+    completion-tokens: s64,
+    total-token: s64
+  }
+  record chat-response{
+    id: string,
+    object: string,
+    created: s64,
+    choices: list<choice>
+  }
+  on-request: func(request: chat-request) -> result<chat-request,string>;
+  on-response: func(response: chat-response) -> result<chat-response,string>;
+  get-name: func() -> string;
+}
+
+
+world host {
+  import get-selected-text: func()-> result<string,string>;
+  export extension-api;
+}

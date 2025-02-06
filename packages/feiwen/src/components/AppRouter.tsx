@@ -2,7 +2,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import Fetch from '../page/Fetch';
 import Query from '../page/Query';
 
-export default function AppRouter(): JSX.Element {
+export default function AppRouter() {
   return (
     <Routes>
       <Route path="/">

@@ -12,33 +12,17 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for UrlSchema {
     }
 }
 
-#[derive(serde::Serialize, Clone)]
-pub struct RouterEvent<'a> {
-    path: &'a str,
-    #[serde(rename = "conversationSelected")]
-    conversation_selected: Option<ConversationSelected>,
+#[derive(serde::Serialize, Clone, Debug)]
+pub struct RouterEvent {
+    path: String,
     #[serde(rename = "isUpdate")]
     is_update: bool,
 }
 
-impl<'a> RouterEvent<'a> {
-    pub fn new(
-        path: &'a str,
-        conversation_selected: Option<ConversationSelected>,
-        is_update: bool,
-    ) -> Self {
-        Self {
-            path,
-            conversation_selected,
-            is_update,
-        }
+impl RouterEvent {
+    pub fn new(path: String, is_update: bool) -> Self {
+        Self { path, is_update }
     }
-}
-#[derive(serde::Serialize, Clone)]
-#[serde(tag = "tag", content = "value")]
-pub enum ConversationSelected {
-    Forder(i32),
-    Conversation(i32),
 }
 
 pub fn router_emit_to_main<R: Runtime, M: Manager<R>>(
@@ -47,7 +31,7 @@ pub fn router_emit_to_main<R: Runtime, M: Manager<R>>(
 ) -> ChatGPTResult<()> {
     let window = match app_handle.get_webview_window("main") {
         Some(window) => window,
-        None => create_main_window(app_handle)?,
+        None => create_main_window(app_handle, event.path.as_str())?,
     };
     window.emit(ROUTER_EVENT, event)?;
     Ok(())

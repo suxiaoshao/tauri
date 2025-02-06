@@ -79,20 +79,16 @@ impl<R: Runtime> WindowExt for WebviewWindow<R> {
     }
     #[cfg(target_os = "macos")]
     fn set_transparent_titlebar(&self) -> ChatGPTResult<()> {
-        use cocoa::appkit::{NSWindow, NSWindowStyleMask, NSWindowTitleVisibility};
+        use cocoa::appkit::{NSWindow, NSWindowStyleMask};
         unsafe {
             let id = self.ns_window()? as cocoa::base::id;
-            NSWindow::setTitlebarAppearsTransparent_(id, cocoa::base::YES);
             let mut style_mask = id.styleMask();
-            style_mask.set(NSWindowStyleMask::NSFullSizeContentViewWindowMask, true);
             style_mask.remove(
                 NSWindowStyleMask::NSClosableWindowMask
                     | NSWindowStyleMask::NSMiniaturizableWindowMask
                     | NSWindowStyleMask::NSResizableWindowMask,
             );
             id.setStyleMask_(style_mask);
-            id.setTitleVisibility_(NSWindowTitleVisibility::NSWindowTitleHidden);
-            id.setTitlebarAppearsTransparent_(cocoa::base::YES);
         }
         Ok(())
     }

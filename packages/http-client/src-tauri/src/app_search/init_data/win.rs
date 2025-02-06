@@ -11,15 +11,15 @@ use std::{
 };
 
 use lnk::ShellLink;
-use tauri::api::path::data_dir;
+use tauri::{AppHandle, Manager, Runtime};
 use walkdir::{DirEntry, WalkDir};
 
 use crate::app_search::AppPath;
 
 use super::AppDataType;
 
-pub fn get_app_data() -> Option<AppDataType> {
-    let path = data_dir()?;
+pub fn get_app_data<R: Runtime>(app: &AppHandle<R>) -> Option<AppDataType> {
+    let path = app.path().data_dir().ok()?;
     let path = path.join("Microsoft/Windows/Start Menu/Programs");
     let mut map = HashMap::new();
     search_by_path(&path).into_iter().for_each(|app| {

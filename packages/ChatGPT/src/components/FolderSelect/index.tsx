@@ -1,6 +1,6 @@
 import { SELECT_FOLDERS, useConversationStore } from '@chatgpt/features/Conversations/conversationSlice';
 import { ListItemText, MenuItem, MenuList } from '@mui/material';
-import React, { type ForwardedRef, useMemo } from 'react';
+import { type ForwardedRef, useMemo } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { type FolderSelectContextType, FolderSelectContext } from './FolderSelectContext';
 import FolderSelectItem from './FolderSelectItem';
@@ -9,12 +9,10 @@ export interface FolderSelectProps {
   value?: number | null;
   onChange: (id: number | null) => void;
   disabledFolderIds?: number[];
+  ref: ForwardedRef<HTMLUListElement>;
 }
 
-function FolderSelect(
-  { value, onChange, disabledFolderIds = [] }: FolderSelectProps,
-  ref: ForwardedRef<HTMLUListElement>,
-) {
+function FolderSelect({ value, onChange, disabledFolderIds = [], ref }: FolderSelectProps) {
   const folders = useConversationStore(useShallow(SELECT_FOLDERS));
   const contextValue = useMemo<FolderSelectContextType>(() => {
     return {
@@ -38,4 +36,4 @@ function FolderSelect(
   );
 }
 
-export default React.forwardRef(FolderSelect);
+export default FolderSelect;

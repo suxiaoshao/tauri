@@ -11,7 +11,7 @@ use crate::{
     errors::{ChatGPTError, ChatGPTResult},
     fetch::{ChatRequest, ChatResponse, FetchRunner, Message as FetchMessage},
     plugins::{
-        url_schema::{router_emit_to_main, ConversationSelected, RouterEvent},
+        url_schema::{router_emit_to_main, RouterEvent},
         ChatGPTConfig,
     },
     store::{
@@ -342,6 +342,7 @@ pub struct SaveTemporaryConversation {
     folder_id: Option<i32>,
     icon: String,
     info: Option<String>,
+    #[serde(rename = "persistentId")]
     persistent_id: Option<usize>,
 }
 
@@ -384,11 +385,10 @@ pub fn save_temporary_conversation<R: Runtime>(
     })?;
 
     state.lock()?.delete_conversation(persistent_id);
+
+    let path = format!("/?selectedType=conversation&selectedId={id}");
+    router_emit_to_main(RouterEvent::new(path, true), &app_handle)?;
     window.close()?;
-    router_emit_to_main(
-        RouterEvent::new("/", Some(ConversationSelected::Conversation(id)), true),
-        &app_handle,
-    )?;
     Ok(())
 }
 

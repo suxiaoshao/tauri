@@ -5,14 +5,13 @@
  * @LastEditTime: 2024-04-29 02:46:17
  * @FilePath: /tauri/packages/ChatGPT/src/features/Home/FolderDetail/components/ContentList.tsx
  */
-import { useConversationStore } from '@chatgpt/features/Conversations/conversationSlice';
 import { SelectedType } from '@chatgpt/features/Conversations/types';
+import { useSelected } from '@chatgpt/features/Conversations/useSelected';
 import { type Conversation } from '@chatgpt/types/conversation';
 import { type Folder } from '@chatgpt/types/folder';
 import FolderIcon from '@mui/icons-material/Folder';
 import { Avatar, Divider, List, ListItemAvatar, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { useCallback } from 'react';
-import { useShallow } from 'zustand/react/shallow';
 
 export interface ContentListProps {
   folders: Folder[];
@@ -20,7 +19,7 @@ export interface ContentListProps {
 }
 
 export default function ContentList({ folders, conversations }: ContentListProps) {
-  const setSelected = useConversationStore(useShallow(({ setSelected }) => setSelected));
+  const setSelected = useSelected()[1];
   const handleFolderClick = useCallback(
     (folderId: number) => {
       setSelected({ tag: SelectedType.Folder, value: folderId });

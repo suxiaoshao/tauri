@@ -19,7 +19,7 @@ export interface TemporaryFetchParams {
 }
 
 export async function temporaryFetch(params: TemporaryFetchParams) {
-  return await appInvoke<TemporaryFetchParams, unknown>('plugin:temporary_conversation|temporary_fetch', params);
+  return await appInvoke<TemporaryFetchParams, unknown>('plugin:temporary-conversation|temporary_fetch', params);
 }
 
 export interface DeleteTemporaryMessageParams {
@@ -36,7 +36,7 @@ export async function deleteTemporaryMessage(params: DeleteTemporaryMessageParam
 }
 
 export async function separateWindow() {
-  return await appInvoke<null, unknown>('plugin:temporary_conversation|separate_window', null);
+  return await appInvoke<null, unknown>('plugin:temporary-conversation|separate_window', null);
 }
 
 export interface DeleteTemporaryConversationParams {

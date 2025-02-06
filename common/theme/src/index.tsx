@@ -10,7 +10,7 @@ import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import { createTheme, CssBaseline, ThemeProvider } from '@mui/material';
-import { useEffect } from 'react';
+import { type JSX, useEffect } from 'react';
 import { match } from 'ts-pattern';
 import { useShallow } from 'zustand/react/shallow';
 import './index.css';

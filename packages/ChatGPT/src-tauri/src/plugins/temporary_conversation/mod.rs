@@ -124,9 +124,16 @@ pub fn on_shortcut_trigger<R: Runtime>(
         None => return Ok(()),
     };
     if shortcut == &temporary_hotkey {
-        if let Err(err) = trigger_temp_window(app) {
+        let app = app.app_handle().clone();
+        if cfg!(target_os = "windows") {
+            tauri::async_runtime::spawn(async move {
+                if let Err(err) = trigger_temp_window(&app) {
+                    log::error!("trigger temporary window error:{}", err);
+                };
+            });
+        } else if let Err(err) = trigger_temp_window(&app) {
             log::error!("trigger temporary window error:{}", err);
-        };
+        }
     }
     Ok(())
 }
@@ -157,7 +164,7 @@ pub fn create_temporary_window<R: Runtime>(app: &AppHandle<R>) -> ChatGPTResult<
     .title("Temporary Conversation")
     .inner_size(800.0, 600.0)
     .fullscreen(false)
-    .resizable(true)
+    .resizable(false)
     .transparent(true)
     .always_on_top(true)
     .skip_taskbar(true)
@@ -174,5 +181,6 @@ pub fn create_temporary_window<R: Runtime>(app: &AppHandle<R>) -> ChatGPTResult<
         use super::window::WindowExt;
         window.set_transparent_titlebar()?;
     }
+    window.hide_menu()?;
     Ok(window)
 }
