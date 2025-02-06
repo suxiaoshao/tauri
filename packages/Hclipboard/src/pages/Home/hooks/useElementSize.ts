@@ -1,6 +1,6 @@
 import { type RefObject, useCallback, useEffect, useRef, useState } from 'react';
 
-export default function useElementSize(): [DOMRect | undefined, RefObject<HTMLElement>] {
+export default function useElementSize(): [DOMRect | undefined, RefObject<HTMLElement | null>] {
   const ref = useRef<HTMLElement>(null);
   const [size, setSize] = useState<DOMRect>();
   // 重设大小

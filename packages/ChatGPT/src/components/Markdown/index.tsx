@@ -17,7 +17,7 @@ import {
 } from '@mui/material';
 import MarkdownSource, { type MarkdownToJSX } from 'markdown-to-jsx';
 import Prism from 'prismjs';
-import React, { startTransition, useEffect } from 'react';
+import React, { type JSX, startTransition, useEffect } from 'react';
 import { match, P } from 'ts-pattern';
 import './init';
 

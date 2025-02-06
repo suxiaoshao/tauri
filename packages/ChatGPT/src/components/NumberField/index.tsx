@@ -9,16 +9,9 @@ import { TextField, type TextFieldProps } from '@mui/material';
 import React, { useImperativeHandle } from 'react';
 import { match, P } from 'ts-pattern';
 
-// eslint-disable-next-line ban-types
-export function fixedForwardRef<T, P = {}>(
-  render: (props: P, ref: React.Ref<T>) => React.ReactNode,
-): (props: P & React.RefAttributes<T>) => React.ReactNode {
-  // eslint-disable-next-line no-explicit-any
-  return React.forwardRef(render as any) as any;
-}
-
 export interface NumberFieldProps extends Omit<TextFieldProps, 'type' | 'onChange'> {
   onChange?: (value: { target: { value: number } }) => void;
+  ref: React.Ref<HTMLInputElement | null>;
 }
 
 export function customParseFloat(value: unknown): number {
@@ -101,7 +94,7 @@ export function proxy<T>(source: T): T {
   }
 }
 
-function NumberField({ onChange, ...props }: NumberFieldProps, ref: React.Ref<HTMLInputElement | null>) {
+function NumberField({ onChange, ref, ...props }: NumberFieldProps) {
   const [sourceRef, setSourceRef] = React.useState<HTMLInputElement | null>(null);
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = customParseFloat(event.target.value);
@@ -109,10 +102,10 @@ function NumberField({ onChange, ...props }: NumberFieldProps, ref: React.Ref<HT
       onChange({ target: { value } });
     }
   };
-  useImperativeHandle(ref, () => {
+  useImperativeHandle<HTMLInputElement | null, HTMLInputElement | null>(ref, () => {
     return proxy(sourceRef);
   }, [sourceRef]);
   return <TextField type="number" onChange={handleChange} {...props} inputRef={setSourceRef} />;
 }
 
-export default fixedForwardRef(NumberField);
+export default NumberField;

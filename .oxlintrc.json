@@ -1,4 +1,5 @@
 {
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
   "env": {
     "browser": true
   },
@@ -6,7 +7,7 @@
   "rules": {
     "default": "warn",
     "named": "warn",
-    "namespace": "warn",
+    "namespace": "off",
     "expect-expect": "warn",
     "no-conditional-expect": "warn",
     "no-disabled-tests": "warn",
@@ -125,7 +126,7 @@
     "no-dynamic-delete": "warn",
     "no-explicit-any": "warn",
     "no-import-type-side-effects": "off",
-    "no-namespace": "warn",
+    "no-namespace": "off",
     "no-non-null-asserted-nullish-coalescing": "warn",
     "no-non-null-assertion": "warn",
     "no-var-requires": "warn",
@@ -303,7 +304,7 @@
     "catch-error-name": "warn",
     "empty-brace-spaces": "warn",
     "error-message": "warn",
-    "filename-case": "warn",
+    "filename-case": "off",
     "no-await-expression-member": "warn",
     "no-console-spaces": "warn",
     "no-null": "off",
@@ -340,5 +341,19 @@
     "rules-of-hooks": "warn",
     "no-side-effects-in-initialization": "off",
     "consistent-type-imports": "warn"
-  }
+  },
+  "plugins": [
+    "react",
+    "unicorn",
+    "oxc",
+    "typescript",
+    "import",
+    "jsdoc",
+    "jest",
+    "vitest",
+    "jsx-a11y",
+    "nextjs",
+    "promise",
+    "node"
+  ]
 }
