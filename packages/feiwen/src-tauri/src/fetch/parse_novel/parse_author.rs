@@ -9,10 +9,8 @@ use std::sync::LazyLock;
 
 use nom::{
     bytes::complete::{tag, take_till},
-    combinator::complete,
     number::complete::float,
-    sequence::tuple,
-    IResult,
+    IResult, Parser,
 };
 use scraper::{Html, Selector};
 
@@ -51,12 +49,13 @@ pub fn parse_author(doc: &Html) -> FeiwenResult<Author> {
 }
 
 fn parse_author_url(name: &str) -> IResult<&str, i32> {
-    let (name, (_, _, _, data)) = complete(tuple((
+    let (name, (_, _, _, data)) = (
         tag("https://"),
         take_till(|c| c == '/'),
         tag("/users/"),
         float,
-    )))(name)?;
+    )
+        .parse_complete(name)?;
     Ok((name, data as i32))
 }
 

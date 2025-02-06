@@ -1,8 +1,8 @@
 /*
  * @Author: suxiaoshao suxiaoshao@gmail.com
  * @Date: 2024-01-06 01:08:42
- * @LastEditors: suxiaoshao suxiaoshao@gmail.com
- * @LastEditTime: 2024-01-07 19:26:07
+ * @LastEditors: suxiaoshao 48886207+suxiaoshao@users.noreply.github.com
+ * @LastEditTime: 2025-02-07 01:45:12
  * @FilePath: /tauri/packages/feiwen/src-tauri/src/fetch/parse_novel/parse_title.rs
  */
 use std::sync::LazyLock;
@@ -10,8 +10,7 @@ use std::sync::LazyLock;
 use nom::{
     bytes::complete::{tag, take_till},
     number::streaming::float,
-    sequence::tuple,
-    IResult,
+    IResult, Parser,
 };
 use scraper::{Html, Selector};
 
@@ -33,13 +32,14 @@ pub fn parse_title(doc: &Html) -> FeiwenResult<Title> {
 }
 
 fn parse_novel_url(name: &str) -> IResult<&str, i32> {
-    let (name, (_, _, _, data, _)) = tuple((
+    let (name, (_, _, _, data, _)) = (
         tag("https://"),
         take_till(|c| c == '/'),
         tag("/threads/"),
         float,
         tag("/profile"),
-    ))(name)?;
+    )
+        .parse(name)?;
     Ok((name, data as i32))
 }
 #[cfg(test)]
