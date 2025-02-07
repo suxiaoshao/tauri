@@ -72,7 +72,7 @@ export default function ConversationTemplateDetail() {
           .otherwise(() => <Loading sx={{ width: '100%', height: '100%' }} />),
       )
       .otherwise(() => <Loading sx={{ width: '100%', height: '100%' }} />);
-  }, [data, refresh, alignment]);
+  }, [data, refresh, alignment, formId]);
   return (
     <Box
       sx={{

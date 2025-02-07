@@ -1,8 +1,8 @@
 /*
  * @Author: suxiaoshao suxiaoshao@gmail.com
  * @Date: 2024-01-06 01:08:42
- * @LastEditors: suxiaoshao suxiaoshao@gmail.com
- * @LastEditTime: 2024-01-07 19:25:25
+ * @LastEditors: suxiaoshao 48886207+suxiaoshao@users.noreply.github.com
+ * @LastEditTime: 2025-02-07 01:45:38
  * @FilePath: /tauri/packages/feiwen/src-tauri/src/fetch/parse_novel/parse_count.rs
  */
 use std::sync::LazyLock;
@@ -12,8 +12,7 @@ use nom::{
     bytes::complete::tag,
     combinator::{opt, value},
     number::complete::float,
-    sequence::tuple,
-    IResult,
+    IResult, Parser,
 };
 use scraper::{Html, Selector};
 
@@ -60,13 +59,14 @@ fn parse_num_with_unit(num: &str) -> FeiwenResult<i32> {
             Qian,
             Wan,
         }
-        let (input, (num, flag)) = tuple((
+        let (input, (num, flag)) = (
             float,
             opt(alt((
                 value(Flag::Qian, tag("千")),
                 value(Flag::Wan, tag("万")),
             ))),
-        ))(num)?;
+        )
+            .parse(num)?;
         let num = match flag {
             Some(Flag::Qian) => num * 1000f32,
             Some(Flag::Wan) => num * 10000f32,

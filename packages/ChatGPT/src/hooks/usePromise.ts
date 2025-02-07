@@ -21,7 +21,7 @@ export type PromiseData<T> =
   | Enum<PromiseStatus.loading>
   | Enum<PromiseStatus.init>;
 
-export default function usePromise<T>(fn: () => Promise<T>, autoRun: boolean = true): [PromiseData<T>, () => void] {
+export default function usePromise<T>(fn: () => Promise<T>, autoRun = true): [PromiseData<T>, () => void] {
   const [state, setState] = useState<PromiseData<T>>({ tag: PromiseStatus.init });
   const func = useCallback(async () => {
     setState({ tag: PromiseStatus.loading });

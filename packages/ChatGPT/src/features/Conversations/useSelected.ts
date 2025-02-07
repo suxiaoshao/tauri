@@ -16,9 +16,11 @@ export function useSelected() {
         .otherwise(() => ({ tag: SelectedType.None }) as const),
     [conversations],
   );
+  const selectedType = searchParams.get('selectedType');
+  const selectedId = searchParams.get('selectedId');
   const selected = useMemo<Selected>(
     () =>
-      match([searchParams.get('selectedType'), Number.parseInt(searchParams.get('selectedId') ?? '', 10)])
+      match([selectedType, Number.parseInt(selectedId ?? '', 10)])
         .with(
           [SelectedType.Conversation, P.not(Number.NaN)],
           ([_, id]) =>
@@ -36,7 +38,7 @@ export function useSelected() {
             }) as const,
         )
         .otherwise(() => ({ tag: SelectedType.None })),
-    [searchParams.get('selectedType'), searchParams.get('selectedId')],
+    [selectedType, selectedId],
   );
   const setSelected = useCallback(
     (selected: Selected) => {

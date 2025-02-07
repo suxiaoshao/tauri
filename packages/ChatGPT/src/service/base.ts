@@ -5,8 +5,7 @@
  * @LastEditTime: 2024-05-01 02:42:45
  * @FilePath: /tauri/packages/ChatGPT/src/service/base.ts
  */
-import { invoke } from '@tauri-apps/api/core';
-import { type InvokeArgs } from '@tauri-apps/api/core';
+import { type InvokeArgs, invoke } from '@tauri-apps/api/core';
 import { enqueueSnackbar } from 'notify';
 import { enum_, nullish, object, parseAsync, string } from 'valibot';
 

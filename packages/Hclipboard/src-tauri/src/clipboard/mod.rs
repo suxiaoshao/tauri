@@ -1,3 +1,10 @@
+/*
+ * @Author: suxiaoshao 48886207+suxiaoshao@users.noreply.github.com
+ * @Date: 2024-10-11 13:45:30
+ * @LastEditors: suxiaoshao 48886207+suxiaoshao@users.noreply.github.com
+ * @LastEditTime: 2025-02-07 01:46:30
+ * @FilePath: /tauri/packages/Hclipboard/src-tauri/src/clipboard/mod.rs
+ */
 use clipboard_master::CallbackResult;
 use diesel::{
     r2d2::{ConnectionManager, PooledConnection},
@@ -42,7 +49,7 @@ impl<'a, R: Runtime> Clipboard<'a, R> {
     }
 }
 
-impl<'a, R: Runtime> clipboard_master::ClipboardHandler for Clipboard<'a, R> {
+impl<R: Runtime> clipboard_master::ClipboardHandler for Clipboard<'_, R> {
     fn on_clipboard_change(&mut self) -> CallbackResult {
         if let Err(err) = self.update() {
             warn!("update clipboard error:{}", err)

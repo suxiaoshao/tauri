@@ -11,8 +11,7 @@ use nom::{
     bytes::complete::{tag, take_till},
     combinator::complete,
     number::complete::float,
-    sequence::tuple,
-    IResult,
+    IResult, Parser,
 };
 use scraper::{Html, Selector};
 
@@ -35,12 +34,13 @@ pub fn parse_chapter(doc: &Html) -> FeiwenResult<Title> {
 }
 
 fn parse_chapter_url(name: &str) -> IResult<&str, i32> {
-    let (name, (_, _, _, data)) = complete(tuple((
+    let (name, (_, _, _, data)) = complete((
         tag("https://"),
         take_till(|c| c == '/'),
         tag("/posts/"),
         float,
-    )))(name)?;
+    ))
+    .parse(name)?;
     Ok((name, data as i32))
 }
 

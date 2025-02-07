@@ -25,7 +25,7 @@ function HotkeyInput({ value, onChange, onBlur, ...props }: HotkeyInputProps) {
       onChange({ target: { value } });
       setInnerValue(value);
     }
-  }, [isRecording, keys]);
+  }, [isRecording, keys, onChange]);
 
   // handle blur event and stop recording
   const handleBlur = useCallback(

@@ -9,7 +9,7 @@ import { Close } from '@mui/icons-material';
 import { IconButton } from '@mui/material';
 import { isPermissionGranted, requestPermission, sendNotification } from '@tauri-apps/plugin-notification';
 import { type OptionsObject, SnackbarProvider as SourceSnackbarProvider, useSnackbar } from 'notistack';
-import { type JSX, type ReactNode, useEffect, useRef } from 'react';
+import { type ReactNode, useEffect, useRef } from 'react';
 import { Subject } from 'rxjs';
 
 export type SnackbarData = [string, OptionsObject?];
@@ -36,7 +36,7 @@ function useSnackbarInit() {
     };
   }, [open]);
 }
-export function SnackbarProvider({ children }: { children: ReactNode }): JSX.Element {
+export function SnackbarProvider({ children }: { children: ReactNode }) {
   const ref = useRef<SourceSnackbarProvider>(null);
   function InnerUseComponent() {
     useSnackbarInit();

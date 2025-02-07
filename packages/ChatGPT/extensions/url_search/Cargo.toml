@@ -7,6 +7,6 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [dependencies]
-wit-bindgen = "0.34.0"
-reqwest = { version = "0.12.9", features = ["blocking"] }
-thiserror = "1.0.68"
+wit-bindgen = "0.39.0"
+reqwest = { version = "0.12.12", features = ["blocking"] }
+thiserror = "2.0.11"
