@@ -209,7 +209,7 @@ const option: MarkdownToJSX.Options = {
     blockquote: MyBlockquote,
   },
 };
-export default function CustomMarkdown({ value, ...props }: MarkdownProps): JSX.Element {
+export default function CustomMarkdown({ value, ...props }: MarkdownProps) {
   const [ref, setRef] = React.useState<HTMLDivElement | null>(null);
   useEffect(() => {
     if (ref === null) return;

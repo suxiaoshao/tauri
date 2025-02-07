@@ -1,6 +1,6 @@
 import { Box, type BoxProps } from '@mui/material';
 import * as monaco from 'monaco-editor';
-import { type JSX, startTransition, useCallback, useEffect, useImperativeHandle, useState } from 'react';
+import { startTransition, useCallback, useEffect, useImperativeHandle, useState } from 'react';
 import './init';
 
 /**
@@ -43,7 +43,7 @@ function CustomEdit({
   onChange: onChangeCode,
   ref,
   ...props
-}: NotReadOnlyEditProp): JSX.Element {
+}: NotReadOnlyEditProp) {
   /**
    * 编辑器绑定的 dom 的引用
    * */

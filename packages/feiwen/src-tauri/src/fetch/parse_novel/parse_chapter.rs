@@ -9,6 +9,7 @@ use std::sync::LazyLock;
 
 use nom::{
     bytes::complete::{tag, take_till},
+    combinator::complete,
     number::complete::float,
     IResult, Parser,
 };
@@ -33,13 +34,13 @@ pub fn parse_chapter(doc: &Html) -> FeiwenResult<Title> {
 }
 
 fn parse_chapter_url(name: &str) -> IResult<&str, i32> {
-    let (name, (_, _, _, data)) = (
+    let (name, (_, _, _, data)) = complete((
         tag("https://"),
         take_till(|c| c == '/'),
         tag("/posts/"),
         float,
-    )
-        .parse_complete(name)?;
+    ))
+    .parse(name)?;
     Ok((name, data as i32))
 }
 
