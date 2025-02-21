@@ -11,12 +11,12 @@ use crate::{
     errors::{ChatGPTError, ChatGPTResult},
     fetch::{ChatRequest, ChatResponse, FetchRunner, Message as FetchMessage},
     plugins::{
-        url_schema::{router_emit_to_main, RouterEvent},
         ChatGPTConfig,
+        url_schema::{RouterEvent, router_emit_to_main},
     },
     store::{
-        deserialize_offset_date_time, serialize_offset_date_time, Conversation,
-        ConversationTemplate, DbConn, Message, Mode, NewConversation, Role, Status,
+        Conversation, ConversationTemplate, DbConn, Message, Mode, NewConversation, Role, Status,
+        deserialize_offset_date_time, serialize_offset_date_time,
     },
 };
 
