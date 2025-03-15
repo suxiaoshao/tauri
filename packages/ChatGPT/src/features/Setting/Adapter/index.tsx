@@ -6,7 +6,7 @@ import Loading from '@chatgpt/components/Loading';
 import ErrorInfo from '@chatgpt/components/ErrorInfo';
 import { Box } from '@mui/material';
 
-export default function AdapterFrom() {
+export default function AdapterSettings() {
   const [data, fn] = usePromise(getAdapterSettingInputs);
   const {} = useFormContext();
   const content = match(data)

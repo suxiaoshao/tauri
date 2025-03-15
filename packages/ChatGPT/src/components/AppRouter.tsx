@@ -21,6 +21,8 @@ import Setting from '../features/Setting';
 import AppDrawer from './AppDrawer';
 
 import { createBrowserRouter } from 'react-router-dom';
+import GeneralSettings from '@chatgpt/features/Setting/General';
+import AdapterSettings from '@chatgpt/features/Setting/Adapter';
 
 const AppRouter = createBrowserRouter([
   {
@@ -46,7 +48,14 @@ const AppRouter = createBrowserRouter([
       },
     ],
   },
-  { path: '/setting', element: <Setting /> },
+  {
+    path: '/setting',
+    element: <Setting />,
+    children: [
+      { path: 'general', element: <GeneralSettings /> },
+      { path: 'adapter', element: <AdapterSettings /> },
+    ],
+  },
   { path: '/message/:id', element: <MessagePreview /> },
   {
     path: '/temporary_conversation',
