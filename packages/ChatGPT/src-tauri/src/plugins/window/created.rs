@@ -6,12 +6,12 @@
  * @FilePath: /tauri/packages/ChatGPT/src-tauri/src/plugins/window/created.rs
  */
 use tauri::Runtime;
+#[cfg(target_os = "macos")]
+use window_vibrancy::NSVisualEffectState;
 #[cfg(target_os = "windows")]
 use window_vibrancy::apply_mica;
 #[cfg(target_os = "macos")]
-use window_vibrancy::NSVisualEffectState;
-#[cfg(target_os = "macos")]
-use window_vibrancy::{apply_vibrancy, NSVisualEffectMaterial};
+use window_vibrancy::{NSVisualEffectMaterial, apply_vibrancy};
 
 use crate::errors::ChatGPTResult;
 
@@ -105,7 +105,9 @@ pub enum ToolbarThickness {
 unsafe fn make_toolbar(id: cocoa::base::id) {
     use cocoa::appkit::{NSToolbar, NSWindow};
 
-    let new_toolbar = NSToolbar::alloc(id);
-    new_toolbar.init_();
-    id.setToolbar_(new_toolbar);
+    unsafe {
+        let new_toolbar = NSToolbar::alloc(id);
+        new_toolbar.init_();
+        id.setToolbar_(new_toolbar);
+    }
 }

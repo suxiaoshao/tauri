@@ -57,6 +57,7 @@ fn main() -> ChatGPTResult<()> {
         .plugin(plugins::ChatPlugin)
         .plugin(plugins::TemporaryConversationPlugin::default())
         .plugin(plugins::TrayPlugin)
+        .plugin(plugins::AdapterPlugin)
         .run(context)?;
     Ok(())
 }

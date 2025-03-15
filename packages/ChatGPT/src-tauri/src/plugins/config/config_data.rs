@@ -69,7 +69,7 @@ pub struct ChatGPTConfig {
     pub models: HashSet<String>,
     #[serde(rename = "temporaryHotkey")]
     pub temporary_hotkey: Option<String>,
-    #[serde(rename = "adapterSettings")]
+    #[serde(rename = "adapterSettings", default)]
     adapter_settings: HashMap<String, serde_json::Value>,
 }
 

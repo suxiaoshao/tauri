@@ -5,7 +5,9 @@ use crate::{errors::ChatGPTResult, store::Message};
 mod openai;
 mod openai_stream;
 
-enum InputType {
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[serde(tag = "tag", content = "value", rename_all = "camelCase")]
+pub(crate) enum InputType {
     Text,
     Float,
     Boolean,
@@ -15,10 +17,12 @@ enum InputType {
     Object(HashMap<String, InputType>),
 }
 
-struct InputItem {
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub(crate) struct InputItem {
     id: &'static str,
     name: &'static str,
     description: &'static str,
+    #[serde(rename = "inputType")]
     input_type: InputType,
 }
 
@@ -51,4 +55,5 @@ pub trait Adapter {
     ) -> impl futures::Stream<Item = ChatGPTResult<String>>;
 }
 
+pub(crate) use openai::OpenAIAdapter;
 pub(crate) use openai_stream::OpenAIStreamAdapter;

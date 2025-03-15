@@ -1,4 +1,4 @@
-import { array, enum_, type InferOutput, nullish, object, pipe, regex, string, url } from 'valibot';
+import { any, array, enum_, type InferOutput, nullish, object, pipe, record, regex, string, url } from 'valibot';
 
 export enum Theme {
   Dark = 'dark',
@@ -16,6 +16,7 @@ export const ChatGPTConfigSchema = object({
   httpProxy: nullish(pipe(string(), url())),
   models: array(string()),
   temporaryHotkey: nullish(string()),
+  adapterSettings: record(string(), any()),
 });
 
 export type Config = InferOutput<typeof ChatGPTConfigSchema>;
