@@ -1,8 +1,6 @@
 use std::collections::HashMap;
 
-use futures::StreamExt;
 use reqwest::Client;
-use reqwest_eventsource::{Event, RequestBuilderExt};
 
 use crate::{
     errors::ChatGPTResult,
@@ -13,9 +11,9 @@ use crate::{
 
 use super::{Adapter, InputItem, InputType};
 
-pub(crate) struct OpenAIStreamAdapter;
+pub(crate) struct OpenAIAdapter;
 
-impl OpenAIStreamAdapter {
+impl OpenAIAdapter {
     fn get_body<'a>(
         template: &'a ConversationTemplate,
         history_messages: &'a [Message],
@@ -54,7 +52,7 @@ impl OpenAIStreamAdapter {
         ChatRequest {
             messages,
             model: template.model.as_str(),
-            stream: true,
+            stream: false,
             temperature: template.temperature,
             top_p: template.top_p,
             n: template.n,
@@ -79,8 +77,8 @@ impl OpenAIStreamAdapter {
     }
 }
 
-impl Adapter for OpenAIStreamAdapter {
-    const NAME: &'static str = "OpenAI Stream";
+impl Adapter for OpenAIAdapter {
+    const NAME: &'static str = "OpenAI";
 
     fn get_setting_inputs(&self) -> Vec<InputItem> {
         let setting_inputs = vec![
@@ -168,37 +166,22 @@ impl Adapter for OpenAIStreamAdapter {
         &self,
         settings: &serde_json::Value,
         template: &serde_json::Value,
-        history_messages: &[Message],
-        user_message: Message,
+        history_messages: &[crate::store::Message],
+        user_message: crate::store::Message,
     ) -> impl futures::Stream<Item = ChatGPTResult<String>> {
         async_stream::try_stream! {
             let template = serde_json::from_value(template.clone())?;
             let settings = serde_json::from_value(settings.clone())?;
             let body = Self::get_body(&template, history_messages, &user_message);
             let client = Self::get_reqwest_client(&settings)?;
-            let mut es = client.post(settings.url.as_str()).json(&body).eventsource()?;
-            while let Some(event) = es.next().await {
-                match event {
-                    Ok(Event::Open) => {},
-                    Ok(Event::Message(message)) => {
-                        let message = message.data;
-                        if message == "[DONE]" {
-                            es.close();
-                        } else {
-                            let response= serde_json::from_str::<ChatResponse>(&message)?;
-                            let content = response
-                                .choices
-                                .into_iter()
-                                .filter_map(|choice| choice.delta.content)
-                                .collect::<String>();
-                            yield content
-                        }
-                    }
-                    Err(_err) => {
-                        es.close();
-                    }
-                }
-            }
+            let response=client.post(settings.url.clone()).json(&body).send().await?;
+            let response = response.json::<ChatResponse>().await?;
+            let content = response
+                .choices
+                .into_iter()
+                .filter_map(|choice| choice.delta.content)
+                .collect::<String>();
+            yield content
         }
     }
 }

@@ -2,6 +2,7 @@ use std::collections::HashMap;
 
 use crate::{errors::ChatGPTResult, store::Message};
 
+mod openai;
 mod openai_stream;
 
 enum InputType {
@@ -38,15 +39,13 @@ impl InputItem {
 }
 
 pub trait Adapter {
-    type Settings: serde::Serialize + for<'de> serde::Deserialize<'de>;
-    type Template: serde::Serialize + for<'de> serde::Deserialize<'de>;
     const NAME: &'static str;
     fn get_setting_inputs(&self) -> Vec<InputItem>;
-    fn get_template_inputs(&self, settings: &Self::Settings) -> Vec<InputItem>;
+    fn get_template_inputs(&self, settings: &serde_json::Value) -> ChatGPTResult<Vec<InputItem>>;
     fn fetch(
         &self,
-        settings: Self::Settings,
-        template: Self::Template,
+        settings: &serde_json::Value,
+        template: &serde_json::Value,
         history_messages: &[Message],
         user_message: Message,
     ) -> impl futures::Stream<Item = ChatGPTResult<String>>;
