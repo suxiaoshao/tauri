@@ -9,12 +9,12 @@ use time::OffsetDateTime;
 
 use crate::{
     errors::ChatGPTError,
-    store::{model::SqlConversationTemplatePrompt, Role},
+    store::{Role, model::SqlConversationTemplatePrompt},
 };
 
-use super::utils::serialize_offset_date_time;
+use super::utils::{deserialize_offset_date_time, serialize_offset_date_time};
 
-#[derive(serde::Serialize, Clone)]
+#[derive(serde::Serialize, Clone, serde::Deserialize)]
 pub struct ConversationTemplatePrompt {
     pub id: i32,
     #[serde(rename = "templateId")]

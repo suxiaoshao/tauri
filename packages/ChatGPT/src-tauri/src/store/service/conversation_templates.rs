@@ -12,20 +12,21 @@ use time::OffsetDateTime;
 use crate::{
     errors::ChatGPTResult,
     store::{
+        Mode, NewConversationTemplatePrompt,
         model::{
             SqlConversation, SqlConversationTemplate, SqlConversationTemplatePrompt,
             SqlNewConversationTemplate, SqlNewConversationTemplatePrompt,
             SqlUpdateConversationTemplate,
         },
-        Mode, NewConversationTemplatePrompt,
     },
 };
 
 use super::{
-    conversation_template_prompts::ConversationTemplatePrompt, utils::serialize_offset_date_time,
+    conversation_template_prompts::ConversationTemplatePrompt,
+    utils::{deserialize_offset_date_time, serialize_offset_date_time},
 };
 
-#[derive(serde::Serialize, Clone)]
+#[derive(serde::Serialize, serde::Deserialize, Clone)]
 pub struct ConversationTemplate {
     pub id: i32,
     pub name: String,

@@ -5,11 +5,12 @@ use std::path::PathBuf;
 
 use errors::ChatGPTResult;
 use log::LevelFilter;
-use plugins::{on_shortcut_trigger, LogPlugin, MainConfigListener, TemporaryHotkeyListener};
+use plugins::{LogPlugin, MainConfigListener, TemporaryHotkeyListener, on_shortcut_trigger};
 use tauri::{Manager, Runtime, WebviewWindow};
 use tauri_plugin_global_shortcut::ShortcutState;
 use tauri_plugin_log::{Target, TargetKind};
 
+mod adapter;
 mod errors;
 mod fetch;
 mod plugins;

@@ -5,7 +5,11 @@
  * @LastEditTime: 2024-05-01 10:33:44
  * @FilePath: /tauri/packages/ChatGPT/src-tauri/src/plugins/config/config_data.rs
  */
-use std::{collections::HashSet, io::ErrorKind, path::PathBuf};
+use std::{
+    collections::{HashMap, HashSet},
+    io::ErrorKind,
+    path::PathBuf,
+};
 
 use serde::{Deserialize, Serialize};
 use tauri::{Manager, Runtime};
@@ -65,6 +69,8 @@ pub struct ChatGPTConfig {
     pub models: HashSet<String>,
     #[serde(rename = "temporaryHotkey")]
     pub temporary_hotkey: Option<String>,
+    #[serde(rename = "adapterSettings")]
+    adapter_settings: HashMap<String, serde_json::Value>,
 }
 
 impl ChatGPTConfig {
