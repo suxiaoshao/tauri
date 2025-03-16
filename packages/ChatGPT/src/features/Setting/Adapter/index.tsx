@@ -1,12 +1,13 @@
-import { useFieldArray, useFormContext } from 'react-hook-form';
+import { Controller, useFieldArray, useFormContext } from 'react-hook-form';
 import usePromise, { PromiseStatus } from '@chatgpt/hooks/usePromise';
 import { getAdapterSettingInputs, type InputItem } from '@chatgpt/service/adapter';
 import { match } from 'ts-pattern';
 import Loading from '@chatgpt/components/Loading';
 import ErrorInfo from '@chatgpt/components/ErrorInfo';
-import { Box, Divider, FormLabel, IconButton, InputAdornment, TextField, Typography } from '@mui/material';
+import { Box, Divider, FormLabel, IconButton, InputAdornment, MenuItem, TextField, Typography } from '@mui/material';
 import type { Config } from '../types';
 import { Add, Delete } from '@mui/icons-material';
+import NumberField from '@chatgpt/components/NumberField';
 
 export default function AdapterSettings() {
   const [data, fn] = usePromise(getAdapterSettingInputs);
@@ -19,19 +20,9 @@ export default function AdapterSettings() {
         {value.map(({ inputs, name }) => (
           <Box key={name} sx={{ gap: 2, display: 'flex', flexDirection: 'column' }}>
             <Typography variant="h6">{name}</Typography>
-            {inputs.map((input) =>
-              match(input.inputType)
-                .with({ tag: 'text' }, () => (
-                  <TextField
-                    fullWidth
-                    required={input.required}
-                    label={input.name}
-                    {...register(`adapterSettings.${name}.${input.id}`)}
-                  />
-                ))
-                .with({ tag: 'array' }, ({ value }) => <ArrayField {...input} prefixName={name} inputItem={value} />)
-                .otherwise(() => null),
-            )}
+            {inputs.map((input) => (
+              <InputItemForm inputItem={input} prefixName={name} />
+            ))}
             <Divider />
           </Box>
         ))}
@@ -39,6 +30,63 @@ export default function AdapterSettings() {
     ))
     .otherwise(() => <Loading sx={{ width: '100%', height: '100%' }} />);
   return content;
+}
+
+function InputItemForm({ inputItem, prefixName }: { inputItem: InputItem; prefixName: string }) {
+  const { register, control } = useFormContext<Config>();
+  return match(inputItem.inputType)
+    .with({ tag: 'text' }, () => (
+      <TextField
+        fullWidth
+        required={inputItem.required}
+        label={inputItem.name}
+        {...register(`adapterSettings.${prefixName}.${inputItem.id}`)}
+      />
+    ))
+    .with({ tag: 'integer' }, () => (
+      <NumberField
+        fullWidth
+        required={inputItem.required}
+        label={inputItem.name}
+        slotProps={{
+          htmlInput: {
+            step: 1,
+          },
+        }}
+        {...register(`adapterSettings.${prefixName}.${inputItem.id}`, { valueAsNumber: true })}
+      />
+    ))
+    .with({ tag: 'float' }, () => (
+      <NumberField
+        fullWidth
+        required={inputItem.required}
+        label={inputItem.name}
+        slotProps={{
+          htmlInput: {
+            step: 0.01,
+          },
+        }}
+        {...register(`adapterSettings.${prefixName}.${inputItem.id}`, { valueAsNumber: true })}
+      />
+    ))
+    .with({ tag: 'select' }, (value) => (
+      <Controller
+        control={control}
+        name={`adapterSettings.${prefixName}.${inputItem.id}`}
+        rules={{ required: inputItem.required }}
+        render={({ field }) => (
+          <TextField select label={inputItem.name} required={inputItem.required} fullWidth {...field}>
+            {value.value.map((item) => (
+              <MenuItem key={item} value={item}>
+                {item}
+              </MenuItem>
+            ))}
+          </TextField>
+        )}
+      />
+    ))
+    .with({ tag: 'array' }, ({ value }) => <ArrayField {...inputItem} prefixName={prefixName} inputItem={value} />)
+    .otherwise(() => null);
 }
 
 function ArrayField({

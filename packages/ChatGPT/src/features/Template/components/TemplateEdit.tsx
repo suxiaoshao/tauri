@@ -169,7 +169,13 @@ export default function TemplateEdit({ initialValues, id, onSubmit }: TemplateEd
         {...register('temperature', { required: true, min: 0, max: 1 })}
         sx={{ mt: 2 }}
         fullWidth
-        inputProps={{ min: 0, max: 1, step: 0.01 }}
+        slotProps={{
+          htmlInput: {
+            min: 0,
+            max: 1,
+            step: 0.01,
+          },
+        }}
       />
       <NumberField
         error={!!errors.topP?.message}
@@ -179,7 +185,13 @@ export default function TemplateEdit({ initialValues, id, onSubmit }: TemplateEd
         {...register('topP', { required: true, min: 0, max: 1 })}
         sx={{ mt: 2 }}
         fullWidth
-        inputProps={{ min: 0, max: 1, step: 0.01 }}
+        slotProps={{
+          htmlInput: {
+            min: 0,
+            max: 1,
+            step: 0.01,
+          },
+        }}
       />
       <NumberField
         error={!!errors.n?.message}
@@ -189,7 +201,12 @@ export default function TemplateEdit({ initialValues, id, onSubmit }: TemplateEd
         {...register('n', { required: true })}
         sx={{ mt: 2 }}
         fullWidth
-        inputProps={{ min: 1, step: 1 }}
+        slotProps={{
+          htmlInput: {
+            min: 1,
+            step: 1,
+          },
+        }}
       />
       <NumberField
         error={!!errors.presencePenalty?.message}
@@ -199,7 +216,13 @@ export default function TemplateEdit({ initialValues, id, onSubmit }: TemplateEd
         {...register('presencePenalty', { required: true })}
         sx={{ mt: 2 }}
         fullWidth
-        inputProps={{ min: -2, max: 2, step: 0.01 }}
+        slotProps={{
+          htmlInput: {
+            min: -2,
+            max: 2,
+            step: 0.01,
+          },
+        }}
       />
       <NumberField
         error={!!errors.frequencyPenalty?.message}
@@ -209,7 +232,13 @@ export default function TemplateEdit({ initialValues, id, onSubmit }: TemplateEd
         {...register('frequencyPenalty', { required: true })}
         sx={{ mt: 2 }}
         fullWidth
-        inputProps={{ min: -2, max: 2, step: 0.01 }}
+        slotProps={{
+          htmlInput: {
+            min: -2,
+            max: 2,
+            step: 0.01,
+          },
+        }}
       />
       <FormControlLabel
         control={<Checkbox checked={openMaxTokens} onChange={(_, check) => setOpenMaxTokens(check)} />}
@@ -224,7 +253,12 @@ export default function TemplateEdit({ initialValues, id, onSubmit }: TemplateEd
           {...register('maxTokens', { required: true })}
           sx={{ mt: 1 }}
           fullWidth
-          inputProps={{ min: 1, step: 1 }}
+          slotProps={{
+            htmlInput: {
+              min: 1,
+              step: 1,
+            },
+          }}
           required
         />
       )}
