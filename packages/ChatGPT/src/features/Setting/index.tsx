@@ -2,14 +2,14 @@ import useConfig from '@chatgpt/hooks/useConfig';
 import useSettingKey from '@chatgpt/hooks/useSettingKey';
 import { createSettingWindow, setConfigService } from '@chatgpt/service/config';
 import { valibotResolver } from '@hookform/resolvers/valibot';
-import { Backup, Power, Save, Settings } from '@mui/icons-material';
-import { Box, Button, Divider, List, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { Power, Save, Settings } from '@mui/icons-material';
+import { Box, Divider, List, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import { useCallback } from 'react';
-import { FormProvider, useFieldArray, useForm } from 'react-hook-form';
+import { FormProvider, useForm } from 'react-hook-form';
 import { useShallow } from 'zustand/react/shallow';
 import { selectConfig, useConfigStore } from './configSlice';
-import { ChatGPTConfigSchema, type Config, Theme } from './types';
+import { ChatGPTConfigSchema, type Config } from './types';
 import { Outlet, useMatch, useNavigate } from 'react-router-dom';
 const appWindow = getCurrentWebviewWindow();
 

@@ -13,7 +13,13 @@ pub(crate) enum InputType {
     Boolean,
     Integer,
     Select(Vec<String>),
-    Array(Box<InputType>),
+    Array {
+        #[serde(rename = "inputType")]
+        input_type: Box<InputType>,
+        name: &'static str,
+        required: bool,
+        description: &'static str,
+    },
     Object(HashMap<String, InputType>),
 }
 
@@ -24,6 +30,7 @@ pub(crate) struct InputItem {
     description: &'static str,
     #[serde(rename = "inputType")]
     input_type: InputType,
+    required: bool,
 }
 
 impl InputItem {
@@ -32,12 +39,14 @@ impl InputItem {
         name: &'static str,
         description: &'static str,
         input_type: InputType,
+        required: bool,
     ) -> Self {
         Self {
             id,
             name,
             description,
             input_type,
+            required,
         }
     }
 }

@@ -82,19 +82,38 @@ impl Adapter for OpenAIAdapter {
 
     fn get_setting_inputs(&self) -> Vec<InputItem> {
         let setting_inputs = vec![
-            InputItem::new("apiKey", "API Key", "Your OpenAI API key", InputType::Text),
-            InputItem::new("url", "API URL", "Your OpenAI API URL", InputType::Text),
+            InputItem::new(
+                "apiKey",
+                "API Key",
+                "Your OpenAI API key",
+                InputType::Text,
+                true,
+            ),
+            InputItem::new(
+                "url",
+                "API URL",
+                "Your OpenAI API URL",
+                InputType::Text,
+                true,
+            ),
             InputItem::new(
                 "httpProxy",
                 "HTTP Proxy",
                 "Your HTTP proxy",
                 InputType::Text,
+                false,
             ),
             InputItem::new(
                 "models",
                 "Models",
                 "Your models",
-                InputType::Array(Box::new(InputType::Text)),
+                InputType::Array {
+                    input_type: Box::new(InputType::Text),
+                    name: "Model",
+                    required: true,
+                    description: "The model to use",
+                },
+                true,
             ),
         ];
         setting_inputs
@@ -112,51 +131,68 @@ impl Adapter for OpenAIAdapter {
                     "single".to_string(),
                     "assistant-only".to_string(),
                 ]),
+                true,
             ),
             InputItem::new(
                 "model",
                 "Model",
                 "Your model",
                 InputType::Select(settings.models.iter().cloned().collect()),
+                true,
             ),
             InputItem::new(
                 "temperature",
                 "Temperature",
                 "Temperature",
                 InputType::Float,
+                true,
             ),
-            InputItem::new("topN", "Top N", "Top N", InputType::Float),
-            InputItem::new("n", "N", "N", InputType::Integer),
-            InputItem::new("maxTokens", "Max Tokens", "Max Tokens", InputType::Integer),
+            InputItem::new("topN", "Top N", "Top N", InputType::Float, true),
+            InputItem::new("n", "N", "N", InputType::Integer, true),
+            InputItem::new(
+                "maxTokens",
+                "Max Tokens",
+                "Max Tokens",
+                InputType::Integer,
+                false,
+            ),
             InputItem::new(
                 "presencePenalty",
                 "Presence Penalty",
                 "Presence Penalty",
                 InputType::Float,
+                true,
             ),
             InputItem::new(
                 "frequencyPenalty",
                 "Frequency Penalty",
                 "Frequency Penalty",
                 InputType::Float,
+                true,
             ),
             InputItem::new(
                 "prompts",
                 "Prompts",
                 "Prompts",
-                InputType::Array(Box::new(InputType::Object({
-                    let mut map = HashMap::new();
-                    map.insert("prompt".to_string(), InputType::Text);
-                    map.insert(
-                        "role".to_string(),
-                        InputType::Select(vec![
-                            "system".to_string(),
-                            "user".to_string(),
-                            "assistant".to_string(),
-                        ]),
-                    );
-                    map
-                }))),
+                InputType::Array {
+                    input_type: Box::new(InputType::Object({
+                        let mut map = HashMap::new();
+                        map.insert("prompt".to_string(), InputType::Text);
+                        map.insert(
+                            "role".to_string(),
+                            InputType::Select(vec![
+                                "system".to_string(),
+                                "user".to_string(),
+                                "assistant".to_string(),
+                            ]),
+                        );
+                        map
+                    })),
+                    name: "",
+                    required: true,
+                    description: "",
+                },
+                true,
             ),
         ];
         Ok(inputs)
