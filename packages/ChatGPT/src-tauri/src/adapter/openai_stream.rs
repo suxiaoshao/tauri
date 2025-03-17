@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use futures::StreamExt;
 use reqwest::Client;
 use reqwest_eventsource::{Event, RequestBuilderExt};
@@ -11,7 +9,7 @@ use crate::{
     store::{ConversationTemplate, Message, Mode, Role, Status},
 };
 
-use super::{Adapter, InputItem, InputType};
+use super::{Adapter, InputItem, OpenAIAdapter};
 
 pub(crate) struct OpenAIStreamAdapter;
 
@@ -83,121 +81,11 @@ impl Adapter for OpenAIStreamAdapter {
     const NAME: &'static str = "OpenAI Stream";
 
     fn get_setting_inputs(&self) -> Vec<InputItem> {
-        let setting_inputs = vec![
-            InputItem::new(
-                "apiKey",
-                "API Key",
-                "Your OpenAI API key",
-                InputType::Text,
-                true,
-            ),
-            InputItem::new(
-                "url",
-                "API URL",
-                "Your OpenAI API URL",
-                InputType::Text,
-                true,
-            ),
-            InputItem::new(
-                "httpProxy",
-                "HTTP Proxy",
-                "Your HTTP proxy",
-                InputType::Text,
-                false,
-            ),
-            InputItem::new(
-                "models",
-                "Models",
-                "Your models",
-                InputType::Array {
-                    input_type: Box::new(InputType::Text),
-                    name: "Model",
-                    required: true,
-                    description: "The model to use",
-                },
-                true,
-            ),
-        ];
-        setting_inputs
+        OpenAIAdapter.get_setting_inputs()
     }
 
     fn get_template_inputs(&self, settings: &serde_json::Value) -> ChatGPTResult<Vec<InputItem>> {
-        let settings: ChatGPTConfig = serde_json::from_value(settings.clone())?;
-        let inputs = vec![
-            InputItem::new(
-                "mode",
-                "Mode",
-                "Your mode",
-                InputType::Select(vec![
-                    "contextual".to_string(),
-                    "single".to_string(),
-                    "assistant-only".to_string(),
-                ]),
-                true,
-            ),
-            InputItem::new(
-                "model",
-                "Model",
-                "Your model",
-                InputType::Select(settings.models.iter().cloned().collect()),
-                true,
-            ),
-            InputItem::new(
-                "temperature",
-                "Temperature",
-                "Temperature",
-                InputType::Float,
-                true,
-            ),
-            InputItem::new("topN", "Top N", "Top N", InputType::Float, true),
-            InputItem::new("n", "N", "N", InputType::Integer, true),
-            InputItem::new(
-                "maxTokens",
-                "Max Tokens",
-                "Max Tokens",
-                InputType::Integer,
-                false,
-            ),
-            InputItem::new(
-                "presencePenalty",
-                "Presence Penalty",
-                "Presence Penalty",
-                InputType::Float,
-                true,
-            ),
-            InputItem::new(
-                "frequencyPenalty",
-                "Frequency Penalty",
-                "Frequency Penalty",
-                InputType::Float,
-                true,
-            ),
-            InputItem::new(
-                "prompts",
-                "Prompts",
-                "Prompts",
-                InputType::Array {
-                    input_type: Box::new(InputType::Object({
-                        let mut map = HashMap::new();
-                        map.insert("prompt".to_string(), InputType::Text);
-                        map.insert(
-                            "role".to_string(),
-                            InputType::Select(vec![
-                                "system".to_string(),
-                                "user".to_string(),
-                                "assistant".to_string(),
-                            ]),
-                        );
-                        map
-                    })),
-                    name: "",
-                    required: true,
-                    description: "",
-                },
-                true,
-            ),
-        ];
-        Ok(inputs)
+        OpenAIAdapter.get_template_inputs(settings)
     }
 
     fn fetch(

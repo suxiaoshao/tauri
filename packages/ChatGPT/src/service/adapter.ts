@@ -11,27 +11,53 @@ export interface InputItem {
   name: string;
   description: string;
   inputType: InputType;
-  required: boolean;
 }
 
-export type InputBaseType = Enum<'text'> | Enum<'float'> | Enum<'boolean'> | Enum<'integer'> | Enum<'select', string[]>;
-
-export type InputType =
-  | Enum<'text'>
-  | Enum<'float'>
-  | Enum<'boolean'>
-  | Enum<'integer'>
+type __InputType =
+  | Enum<
+      'text',
+      {
+        maxLen?: number;
+        minLen?: number;
+      }
+    >
+  | Enum<
+      'float',
+      {
+        max?: number;
+        min?: number;
+        step?: number;
+        default?: number;
+      }
+    >
+  | Enum<
+      'boolean',
+      {
+        default?: boolean;
+      }
+    >
+  | Enum<
+      'integer',
+      {
+        max?: number;
+        min?: number;
+        step?: number;
+        default?: number;
+      }
+    >
   | Enum<'select', string[]>
   | Enum<
       'array',
       {
-        inputType: InputType;
+        inputType: Exclude<InputType, 'array' | 'optional'>;
         name: string;
-        required: boolean;
         description: string;
       }
     >
-  | Enum<'object', Record<string, InputBaseType>>;
+  | Enum<'arrayObject', InputItem[]>
+  | Enum<'object', InputItem[]>;
+
+export type InputType = __InputType | Enum<'optional', __InputType>;
 
 export async function getAdapterSettingInputs(): Promise<[AdapterInputs]> {
   return await appInvoke<unknown, [AdapterInputs]>('plugin:adapter|get_adapter_setting_inputs', {});

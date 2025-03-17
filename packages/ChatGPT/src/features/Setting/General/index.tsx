@@ -21,12 +21,10 @@ export default function GeneralSettings() {
     <Box
       sx={{
         p: 2,
-        paddingX: 4,
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
+        pt: 3,
         flex: '1 1 0',
         overflowY: 'auto',
+        height: '100%',
       }}
     >
       <TextField

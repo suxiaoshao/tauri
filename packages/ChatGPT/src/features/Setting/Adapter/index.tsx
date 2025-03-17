@@ -16,12 +16,12 @@ export default function AdapterSettings() {
     .with({ tag: PromiseStatus.loading }, () => <Loading sx={{ width: '100%', height: '100%' }} />)
     .with({ tag: PromiseStatus.error }, ({ value }) => <ErrorInfo error={value} refetch={fn} />)
     .with({ tag: PromiseStatus.data }, ({ value }) => (
-      <Box sx={{ flex: '1 1 auto', overflowY: 'auto', p: 1, gap: 1, display: 'flex', flexDirection: 'column' }}>
+      <Box sx={{ flex: '1 1 auto', overflowY: 'auto', p: 1, px: 2, gap: 1, display: 'flex', flexDirection: 'column' }}>
         {value.map(({ inputs, name }) => (
           <Box key={name} sx={{ gap: 2, display: 'flex', flexDirection: 'column' }}>
             <Typography variant="h6">{name}</Typography>
             {inputs.map((input) => (
-              <InputItemForm inputItem={input} prefixName={name} />
+              <InputItemForm inputItem={input} prefixName={`adapterSettings.${name}`} />
             ))}
             <Divider />
           </Box>
@@ -32,50 +32,53 @@ export default function AdapterSettings() {
   return content;
 }
 
-function InputItemForm({ inputItem, prefixName }: { inputItem: InputItem; prefixName: string }) {
-  const { register, control } = useFormContext<Config>();
+function InputItemForm({
+  inputItem,
+  prefixName,
+  required = true,
+}: {
+  inputItem: InputItem;
+  prefixName: string;
+  required?: boolean;
+}) {
+  const { register, control } = useFormContext();
   return match(inputItem.inputType)
     .with({ tag: 'text' }, () => (
-      <TextField
-        fullWidth
-        required={inputItem.required}
-        label={inputItem.name}
-        {...register(`adapterSettings.${prefixName}.${inputItem.id}`)}
-      />
+      <TextField fullWidth required={required} label={inputItem.name} {...register(`${prefixName}.${inputItem.id}`)} />
     ))
     .with({ tag: 'integer' }, () => (
       <NumberField
         fullWidth
-        required={inputItem.required}
+        required={required}
         label={inputItem.name}
         slotProps={{
           htmlInput: {
             step: 1,
           },
         }}
-        {...register(`adapterSettings.${prefixName}.${inputItem.id}`, { valueAsNumber: true })}
+        {...register(`${prefixName}.${inputItem.id}`, { valueAsNumber: true })}
       />
     ))
     .with({ tag: 'float' }, () => (
       <NumberField
         fullWidth
-        required={inputItem.required}
+        required={required}
         label={inputItem.name}
         slotProps={{
           htmlInput: {
             step: 0.01,
           },
         }}
-        {...register(`adapterSettings.${prefixName}.${inputItem.id}`, { valueAsNumber: true })}
+        {...register(`${prefixName}.${inputItem.id}`, { valueAsNumber: true })}
       />
     ))
     .with({ tag: 'select' }, (value) => (
       <Controller
         control={control}
-        name={`adapterSettings.${prefixName}.${inputItem.id}`}
-        rules={{ required: inputItem.required }}
+        name={`${prefixName}.${inputItem.id}`}
+        rules={{ required: required }}
         render={({ field }) => (
-          <TextField select label={inputItem.name} required={inputItem.required} fullWidth {...field}>
+          <TextField select label={inputItem.name} required={required} fullWidth {...field}>
             {value.value.map((item) => (
               <MenuItem key={item} value={item}>
                 {item}
@@ -85,6 +88,9 @@ function InputItemForm({ inputItem, prefixName }: { inputItem: InputItem; prefix
         )}
       />
     ))
+    .with({ tag: 'optional' }, ({ value }) => (
+      <InputItemForm inputItem={{ ...inputItem, inputType: value }} prefixName={prefixName} required={false} />
+    ))
     .with({ tag: 'array' }, ({ value }) => <ArrayField {...inputItem} prefixName={prefixName} inputItem={value} />)
     .otherwise(() => null);
 }
@@ -93,29 +99,28 @@ function ArrayField({
   id,
   prefixName,
   name,
-  required,
   inputItem,
 }: InputItem & {
   prefixName: string;
-  inputItem: Pick<InputItem, 'description' | 'inputType' | 'required' | 'name'>;
+  inputItem: Pick<InputItem, 'description' | 'inputType' | 'name'>;
 }) {
-  const { register, control } = useFormContext<Config>();
+  const { register, control } = useFormContext();
   const { fields, append, remove } = useFieldArray({
     control,
-    name: `adapterSettings.${prefixName}.${id}`,
+    name: `${prefixName}.${id}`,
   });
   return (
     <>
-      <FormLabel required={required}>{name}</FormLabel>
+      <FormLabel>{name}</FormLabel>
       {fields.map((field, index) =>
         match(inputItem.inputType)
           .with({ tag: 'text' }, () => (
             <TextField
               key={field.id}
-              required={inputItem.required}
+              required
               label={inputItem.name}
               fullWidth
-              {...register(`adapterSettings.${prefixName}.${id}.${index}`)}
+              {...register(`${prefixName}.${id}.${index}`)}
               slotProps={{
                 input: {
                   endAdornment: (

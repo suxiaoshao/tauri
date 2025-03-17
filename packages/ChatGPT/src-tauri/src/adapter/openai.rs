@@ -86,34 +86,41 @@ impl Adapter for OpenAIAdapter {
                 "apiKey",
                 "API Key",
                 "Your OpenAI API key",
-                InputType::Text,
-                true,
+                InputType::Text {
+                    max_length: None,
+                    min_length: None,
+                },
             ),
             InputItem::new(
                 "url",
                 "API URL",
                 "Your OpenAI API URL",
-                InputType::Text,
-                true,
+                InputType::Text {
+                    max_length: None,
+                    min_length: None,
+                },
             ),
             InputItem::new(
                 "httpProxy",
                 "HTTP Proxy",
                 "Your HTTP proxy",
-                InputType::Text,
-                false,
+                InputType::Optional(Box::new(InputType::Text {
+                    max_length: None,
+                    min_length: None,
+                })),
             ),
             InputItem::new(
                 "models",
                 "Models",
                 "Your models",
                 InputType::Array {
-                    input_type: Box::new(InputType::Text),
+                    input_type: Box::new(InputType::Text {
+                        max_length: None,
+                        min_length: None,
+                    }),
                     name: "Model",
-                    required: true,
                     description: "The model to use",
                 },
-                true,
             ),
         ];
         setting_inputs
@@ -131,68 +138,104 @@ impl Adapter for OpenAIAdapter {
                     "single".to_string(),
                     "assistant-only".to_string(),
                 ]),
-                true,
             ),
             InputItem::new(
                 "model",
                 "Model",
                 "Your model",
                 InputType::Select(settings.models.iter().cloned().collect()),
-                true,
             ),
             InputItem::new(
                 "temperature",
                 "Temperature",
                 "Temperature",
-                InputType::Float,
-                true,
-            ),
-            InputItem::new("topN", "Top N", "Top N", InputType::Float, true),
-            InputItem::new("n", "N", "N", InputType::Integer, true),
-            InputItem::new(
-                "maxTokens",
-                "Max Tokens",
-                "Max Tokens",
-                InputType::Integer,
-                false,
+                InputType::Float {
+                    min: Some(0.0),
+                    max: Some(2.0),
+                    step: Some(0.1),
+                    default: Some(1.0),
+                },
             ),
             InputItem::new(
-                "presencePenalty",
+                "top_p",
+                "Top P",
+                "Top P",
+                InputType::Float {
+                    min: Some(0.0),
+                    max: Some(1.0),
+                    step: Some(0.1),
+                    default: Some(1.0),
+                },
+            ),
+            InputItem::new(
+                "n",
+                "N",
+                "N",
+                InputType::Integer {
+                    max: None,
+                    min: Some(1),
+                    step: Some(1),
+                    default: Some(1),
+                },
+            ),
+            InputItem::new(
+                "max_completion_tokens",
+                "Max Completion Tokens",
+                "Max Completion Tokens",
+                InputType::Optional(Box::new(InputType::Integer {
+                    max: None,
+                    min: Some(1),
+                    step: Some(1),
+                    default: None,
+                })),
+            ),
+            InputItem::new(
+                "presence_penalty",
                 "Presence Penalty",
                 "Presence Penalty",
-                InputType::Float,
-                true,
+                InputType::Float {
+                    max: Some(2.0),
+                    min: Some(-2.0),
+                    step: Some(0.1),
+                    default: Some(0.0),
+                },
             ),
             InputItem::new(
-                "frequencyPenalty",
+                "frequency_penalty",
                 "Frequency Penalty",
                 "Frequency Penalty",
-                InputType::Float,
-                true,
+                InputType::Float {
+                    max: Some(2.0),
+                    min: Some(-2.0),
+                    step: Some(0.1),
+                    default: Some(0.0),
+                },
             ),
             InputItem::new(
                 "prompts",
                 "Prompts",
                 "Prompts",
-                InputType::Array {
-                    input_type: Box::new(InputType::Object({
-                        let mut map = HashMap::new();
-                        map.insert("prompt".to_string(), InputType::Text);
-                        map.insert(
-                            "role".to_string(),
-                            InputType::Select(vec![
-                                "system".to_string(),
-                                "user".to_string(),
-                                "assistant".to_string(),
-                            ]),
-                        );
-                        map
-                    })),
-                    name: "",
-                    required: true,
-                    description: "",
-                },
-                true,
+                InputType::ArrayObject(vec![
+                    InputItem::new(
+                        "prompt",
+                        "Prompt",
+                        "Prompt",
+                        InputType::Text {
+                            max_length: None,
+                            min_length: Some(1),
+                        },
+                    ),
+                    InputItem::new(
+                        "role",
+                        "Role",
+                        "Role",
+                        InputType::Select(vec![
+                            "system".to_string(),
+                            "user".to_string(),
+                            "assistant".to_string(),
+                        ]),
+                    ),
+                ]),
             ),
         ];
         Ok(inputs)

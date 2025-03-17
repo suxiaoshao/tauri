@@ -8,19 +8,35 @@ mod openai_stream;
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[serde(tag = "tag", content = "value", rename_all = "camelCase")]
 pub(crate) enum InputType {
-    Text,
-    Float,
-    Boolean,
-    Integer,
+    Text {
+        max_length: Option<usize>,
+        min_length: Option<usize>,
+    },
+    Float {
+        max: Option<f64>,
+        min: Option<f64>,
+        step: Option<f64>,
+        default: Option<f64>,
+    },
+    Boolean {
+        default: Option<bool>,
+    },
+    Integer {
+        max: Option<i64>,
+        min: Option<i64>,
+        step: Option<i64>,
+        default: Option<i64>,
+    },
     Select(Vec<String>),
     Array {
         #[serde(rename = "inputType")]
         input_type: Box<InputType>,
         name: &'static str,
-        required: bool,
         description: &'static str,
     },
-    Object(HashMap<String, InputType>),
+    ArrayObject(Vec<InputItem>),
+    Object(Vec<InputItem>),
+    Optional(Box<InputType>),
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -30,7 +46,6 @@ pub(crate) struct InputItem {
     description: &'static str,
     #[serde(rename = "inputType")]
     input_type: InputType,
-    required: bool,
 }
 
 impl InputItem {
@@ -39,14 +54,12 @@ impl InputItem {
         name: &'static str,
         description: &'static str,
         input_type: InputType,
-        required: bool,
     ) -> Self {
         Self {
             id,
             name,
             description,
             input_type,
-            required,
         }
     }
 }
