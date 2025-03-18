@@ -1,21 +1,183 @@
-use std::collections::HashMap;
+use std::collections::HashSet;
 
 use reqwest::Client;
+use serde::{Deserialize, Serialize};
 
 use crate::{
-    errors::ChatGPTResult,
+    errors::{ChatGPTError, ChatGPTResult},
     fetch::{ChatRequest, ChatResponse, Message as FetchMessage},
-    plugins::ChatGPTConfig,
-    store::{ConversationTemplate, Message, Mode, Role, Status},
+    store::{Message, Mode, Role, Status},
 };
 
 use super::{Adapter, InputItem, InputType};
 
 pub(crate) struct OpenAIAdapter;
 
+fn default_url() -> String {
+    "https://api.openai.com/v1/chat/completions".to_string()
+}
+
+fn default_models() -> HashSet<String> {
+    let mut models = HashSet::new();
+    models.insert("gpt-3.5-turbo".to_string());
+    models.insert("o3-mini".to_string());
+    models.insert("gpt-4o-mini".to_string());
+    models.insert("gpt-4".to_string());
+    models.insert("gpt-4-turbo".to_string());
+    models.insert("gpt-4o".to_string());
+    models
+}
+
+#[derive(Default, Deserialize, Serialize)]
+struct OpenAISettings {
+    #[serde(rename = "apiKey")]
+    api_key: Option<String>,
+    #[serde(default = "default_url")]
+    pub url: String,
+    #[serde(rename = "httpProxy")]
+    pub http_proxy: Option<String>,
+    #[serde(default = "default_models")]
+    pub models: HashSet<String>,
+}
+
+#[derive(Deserialize, Serialize)]
+pub(super) struct OpenAIConversationTemplate {
+    pub(super) mode: Mode,
+    pub(super) model: String,
+    pub(super) temperature: f64,
+    pub(super) top_p: f64,
+    pub(super) n: u32,
+    pub(super) max_completion_tokens: Option<u32>,
+    pub(super) presence_penalty: f64,
+    pub(super) frequency_penalty: f64,
+    pub(super) prompts: Vec<OpenAITemplatePrompt>,
+}
+
+#[derive(Deserialize, Serialize)]
+pub(super) struct OpenAITemplatePrompt {
+    pub(super) prompt: String,
+    pub(super) role: Role,
+}
+
+pub(super) fn get_openai_template_inputs(
+    models: &HashSet<String>,
+) -> ChatGPTResult<Vec<InputItem>> {
+    let inputs = vec![
+        InputItem::new(
+            "mode",
+            "Mode",
+            "Your mode",
+            InputType::Select(vec![
+                "contextual".to_string(),
+                "single".to_string(),
+                "assistant-only".to_string(),
+            ]),
+        ),
+        InputItem::new(
+            "model",
+            "Model",
+            "Your model",
+            InputType::Select(models.iter().cloned().collect()),
+        ),
+        InputItem::new(
+            "temperature",
+            "Temperature",
+            "Temperature",
+            InputType::Float {
+                min: Some(0.0),
+                max: Some(2.0),
+                step: Some(0.1),
+                default: Some(1.0),
+            },
+        ),
+        InputItem::new(
+            "top_p",
+            "Top P",
+            "Top P",
+            InputType::Float {
+                min: Some(0.0),
+                max: Some(1.0),
+                step: Some(0.1),
+                default: Some(1.0),
+            },
+        ),
+        InputItem::new(
+            "n",
+            "N",
+            "N",
+            InputType::Integer {
+                max: None,
+                min: Some(1),
+                step: Some(1),
+                default: Some(1),
+            },
+        ),
+        InputItem::new(
+            "max_completion_tokens",
+            "Max Completion Tokens",
+            "Max Completion Tokens",
+            InputType::Optional(Box::new(InputType::Integer {
+                max: None,
+                min: Some(1),
+                step: Some(1),
+                default: None,
+            })),
+        ),
+        InputItem::new(
+            "presence_penalty",
+            "Presence Penalty",
+            "Presence Penalty",
+            InputType::Float {
+                max: Some(2.0),
+                min: Some(-2.0),
+                step: Some(0.1),
+                default: Some(0.0),
+            },
+        ),
+        InputItem::new(
+            "frequency_penalty",
+            "Frequency Penalty",
+            "Frequency Penalty",
+            InputType::Float {
+                max: Some(2.0),
+                min: Some(-2.0),
+                step: Some(0.1),
+                default: Some(0.0),
+            },
+        ),
+        InputItem::new(
+            "prompts",
+            "Prompts",
+            "Prompts",
+            InputType::ArrayObject(vec![
+                InputItem::new(
+                    "prompt",
+                    "Prompt",
+                    "Prompt",
+                    InputType::Text {
+                        max_length: None,
+                        min_length: Some(1),
+                    },
+                ),
+                InputItem::new(
+                    "role",
+                    "Role",
+                    "Role",
+                    InputType::Select(vec![
+                        "system".to_string(),
+                        "user".to_string(),
+                        "assistant".to_string(),
+                    ]),
+                ),
+            ]),
+        ),
+    ];
+    Ok(inputs)
+}
+
 impl OpenAIAdapter {
     fn get_body<'a>(
-        template: &'a ConversationTemplate,
+        template: &'a OpenAIConversationTemplate,
         history_messages: &'a [Message],
         user_message: &'a Message,
     ) -> ChatRequest<'a> {
@@ -56,13 +218,16 @@ impl OpenAIAdapter {
             temperature: template.temperature,
             top_p: template.top_p,
             n: template.n,
-            max_tokens: template.max_tokens,
+            max_completion_tokens: template.max_completion_tokens,
             presence_penalty: template.presence_penalty,
             frequency_penalty: template.frequency_penalty,
         }
     }
-    fn get_reqwest_client(settings: &ChatGPTConfig) -> ChatGPTResult<Client> {
-        let api_key = settings.get_api_key()?;
+    fn get_reqwest_client(settings: &OpenAISettings) -> ChatGPTResult<Client> {
+        let api_key = settings
+            .api_key
+            .as_deref()
+            .ok_or(ChatGPTError::ApiKeyNotSet)?;
         let mut headers = reqwest::header::HeaderMap::new();
         headers.append("Authorization", format!("Bearer {api_key}").parse()?);
         let mut client = reqwest::ClientBuilder::new().default_headers(headers);
@@ -127,118 +292,8 @@ impl Adapter for OpenAIAdapter {
     }
 
     fn get_template_inputs(&self, settings: &serde_json::Value) -> ChatGPTResult<Vec<InputItem>> {
-        let settings: ChatGPTConfig = serde_json::from_value(settings.clone())?;
-        let inputs = vec![
-            InputItem::new(
-                "mode",
-                "Mode",
-                "Your mode",
-                InputType::Select(vec![
-                    "contextual".to_string(),
-                    "single".to_string(),
-                    "assistant-only".to_string(),
-                ]),
-            ),
-            InputItem::new(
-                "model",
-                "Model",
-                "Your model",
-                InputType::Select(settings.models.iter().cloned().collect()),
-            ),
-            InputItem::new(
-                "temperature",
-                "Temperature",
-                "Temperature",
-                InputType::Float {
-                    min: Some(0.0),
-                    max: Some(2.0),
-                    step: Some(0.1),
-                    default: Some(1.0),
-                },
-            ),
-            InputItem::new(
-                "top_p",
-                "Top P",
-                "Top P",
-                InputType::Float {
-                    min: Some(0.0),
-                    max: Some(1.0),
-                    step: Some(0.1),
-                    default: Some(1.0),
-                },
-            ),
-            InputItem::new(
-                "n",
-                "N",
-                "N",
-                InputType::Integer {
-                    max: None,
-                    min: Some(1),
-                    step: Some(1),
-                    default: Some(1),
-                },
-            ),
-            InputItem::new(
-                "max_completion_tokens",
-                "Max Completion Tokens",
-                "Max Completion Tokens",
-                InputType::Optional(Box::new(InputType::Integer {
-                    max: None,
-                    min: Some(1),
-                    step: Some(1),
-                    default: None,
-                })),
-            ),
-            InputItem::new(
-                "presence_penalty",
-                "Presence Penalty",
-                "Presence Penalty",
-                InputType::Float {
-                    max: Some(2.0),
-                    min: Some(-2.0),
-                    step: Some(0.1),
-                    default: Some(0.0),
-                },
-            ),
-            InputItem::new(
-                "frequency_penalty",
-                "Frequency Penalty",
-                "Frequency Penalty",
-                InputType::Float {
-                    max: Some(2.0),
-                    min: Some(-2.0),
-                    step: Some(0.1),
-                    default: Some(0.0),
-                },
-            ),
-            InputItem::new(
-                "prompts",
-                "Prompts",
-                "Prompts",
-                InputType::ArrayObject(vec![
-                    InputItem::new(
-                        "prompt",
-                        "Prompt",
-                        "Prompt",
-                        InputType::Text {
-                            max_length: None,
-                            min_length: Some(1),
-                        },
-                    ),
-                    InputItem::new(
-                        "role",
-                        "Role",
-                        "Role",
-                        InputType::Select(vec![
-                            "system".to_string(),
-                            "user".to_string(),
-                            "assistant".to_string(),
-                        ]),
-                    ),
-                ]),
-            ),
-        ];
-        Ok(inputs)
+        let settings: OpenAISettings = serde_json::from_value(settings.clone())?;
+        get_openai_template_inputs(&settings.models)
     }
 
     fn fetch(

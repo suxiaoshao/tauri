@@ -6,25 +6,20 @@
  * @FilePath: /tauri/packages/ChatGPT/src-tauri/src/store/service/conversation_templates.rs
  */
 
+use std::str::FromStr;
+
 use diesel::SqliteConnection;
 use time::OffsetDateTime;
 
 use crate::{
     errors::ChatGPTResult,
-    store::{
-        Mode, NewConversationTemplatePrompt,
-        model::{
-            SqlConversation, SqlConversationTemplate, SqlConversationTemplatePrompt,
-            SqlNewConversationTemplate, SqlNewConversationTemplatePrompt,
-            SqlUpdateConversationTemplate,
-        },
+    store::model::{
+        SqlConversation, SqlConversationTemplate, SqlNewConversationTemplate,
+        SqlUpdateConversationTemplate,
     },
 };
 
-use super::{
-    conversation_template_prompts::ConversationTemplatePrompt,
-    utils::{deserialize_offset_date_time, serialize_offset_date_time},
-};
+use super::utils::{deserialize_offset_date_time, serialize_offset_date_time};
 
 #[derive(serde::Serialize, serde::Deserialize, Clone)]
 pub struct ConversationTemplate {
@@ -32,8 +27,8 @@ pub struct ConversationTemplate {
     pub name: String,
     pub icon: String,
     pub description: Option<String>,
-    pub mode: Mode,
-    pub model: String,
+    pub adapter: String,
+    pub template: serde_json::Value,
     #[serde(
         rename = "createdTime",
         serialize_with = "serialize_offset_date_time",
@@ -46,17 +41,6 @@ pub struct ConversationTemplate {
         deserialize_with = "deserialize_offset_date_time"
     )]
     pub updated_time: OffsetDateTime,
-    pub temperature: f64,
-    #[serde(rename = "topP")]
-    pub top_p: f64,
-    pub n: i64,
-    #[serde(rename = "maxTokens")]
-    pub max_tokens: Option<i64>,
-    #[serde(rename = "presencePenalty")]
-    pub presence_penalty: f64,
-    #[serde(rename = "frequencyPenalty")]
-    pub frequency_penalty: f64,
-    pub prompts: Vec<ConversationTemplatePrompt>,
 }
 
 impl ConversationTemplate {
@@ -65,84 +49,46 @@ impl ConversationTemplate {
             id,
             name,
             icon,
-            mode,
-            model,
-            temperature,
-            top_p,
-            n,
-            max_tokens,
-            presence_penalty,
-            frequency_penalty,
+            template,
+            adapter,
             created_time,
             updated_time,
             description,
         } = SqlConversationTemplate::find(id, conn)?;
-        let sql_prompts = SqlConversationTemplatePrompt::find_by_template_id(id, conn)?;
-        let prompts = sql_prompts
-            .into_iter()
-            .map(ConversationTemplatePrompt::try_from)
-            .collect::<ChatGPTResult<Vec<ConversationTemplatePrompt>>>()?;
         Ok(Self {
             id,
             name,
             icon,
-            mode: mode.parse()?,
-            model,
             created_time,
             updated_time,
-            temperature,
-            top_p,
-            n,
-            max_tokens,
-            presence_penalty,
-            frequency_penalty,
-            prompts,
+            adapter,
             description,
+            template: serde_json::Value::from_str(&template)?,
         })
     }
     pub fn all(conn: &mut SqliteConnection) -> ChatGPTResult<Vec<Self>> {
         let sql_conversation_templates = SqlConversationTemplate::all(conn)?;
-        let sql_conversation_template_prompts = SqlConversationTemplatePrompt::all(conn)?;
         let mut conversation_templates = Vec::new();
         for SqlConversationTemplate {
             id,
             name,
             icon,
-            mode,
-            model,
-            temperature,
-            top_p,
-            n,
-            max_tokens,
-            presence_penalty,
-            frequency_penalty,
             created_time,
             updated_time,
             description,
+            template,
+            adapter,
         } in sql_conversation_templates
         {
-            let prompts = sql_conversation_template_prompts
-                .iter()
-                .filter(|prompt| prompt.template_id == id)
-                .cloned()
-                .map(ConversationTemplatePrompt::try_from)
-                .collect::<ChatGPTResult<Vec<ConversationTemplatePrompt>>>()?;
             conversation_templates.push(Self {
                 id,
                 name,
                 icon,
-                mode: mode.parse()?,
-                model,
                 created_time,
                 updated_time,
-                temperature,
-                top_p,
-                n,
-                max_tokens,
-                presence_penalty,
-                frequency_penalty,
-                prompts,
                 description,
+                template: serde_json::Value::from_str(&template)?,
+                adapter,
             });
         }
         Ok(conversation_templates)
@@ -151,15 +97,8 @@ impl ConversationTemplate {
         NewConversationTemplate {
             name,
             icon,
-            mode,
-            model,
-            temperature,
-            top_p,
-            n,
-            max_tokens,
-            presence_penalty,
-            frequency_penalty,
-            prompts,
+            template,
+            adapter,
             description,
         }: NewConversationTemplate,
         id: i32,
@@ -172,32 +111,12 @@ impl ConversationTemplate {
                 id,
                 name,
                 icon,
-                mode: mode.to_string(),
-                model,
-                temperature,
-                top_p,
-                n,
-                max_tokens,
-                presence_penalty,
-                frequency_penalty,
+                adapter,
+                template: serde_json::to_string(&template)?,
                 updated_time: time,
                 description,
             };
             sql_new.update(conn)?;
-
-            // delete the old prompts and insert the new prompts
-            SqlConversationTemplatePrompt::delete_by_template_id(id, conn)?;
-            let prompts = prompts
-                .into_iter()
-                .map(|prompt| SqlNewConversationTemplatePrompt {
-                    template_id: id,
-                    prompt: prompt.prompt,
-                    role: prompt.role.to_string(),
-                    created_time: time,
-                    updated_time: time,
-                })
-                .collect::<Vec<SqlNewConversationTemplatePrompt>>();
-            SqlNewConversationTemplatePrompt::save_many(prompts, conn)?;
             Ok(())
         })
     }
@@ -206,7 +125,6 @@ impl ConversationTemplate {
             if SqlConversation::exists_by_template_id(id, conn)? {
                 return Err(crate::errors::ChatGPTError::TemplateHasConversation);
             }
-            SqlConversationTemplatePrompt::delete_by_template_id(id, conn)?;
             SqlConversationTemplate::delete_by_id(id, conn)?;
             Ok(())
         })
@@ -218,19 +136,8 @@ pub struct NewConversationTemplate {
     pub name: String,
     pub icon: String,
     pub description: Option<String>,
-    pub mode: Mode,
-    pub model: String,
-    pub temperature: f64,
-    #[serde(rename = "topP")]
-    pub top_p: f64,
-    pub n: i64,
-    #[serde(rename = "maxTokens")]
-    pub max_tokens: Option<i64>,
-    #[serde(rename = "presencePenalty")]
-    pub presence_penalty: f64,
-    #[serde(rename = "frequencyPenalty")]
-    pub frequency_penalty: f64,
-    pub prompts: Vec<NewConversationTemplatePrompt>,
+    pub adapter: String,
+    pub template: serde_json::Value,
 }
 
 impl NewConversationTemplate {
@@ -238,16 +145,9 @@ impl NewConversationTemplate {
         let NewConversationTemplate {
             name,
             icon,
-            mode,
-            model,
-            temperature,
-            top_p,
-            n,
-            max_tokens,
-            presence_penalty,
-            frequency_penalty,
-            prompts,
             description,
+            template,
+            adapter,
         } = self;
         let time = OffsetDateTime::now_utc();
         conn.immediate_transaction(|conn| {
@@ -255,14 +155,8 @@ impl NewConversationTemplate {
             let sql_new = SqlNewConversationTemplate {
                 name,
                 icon,
-                mode: mode.to_string(),
-                model,
-                temperature,
-                top_p,
-                n,
-                max_tokens,
-                presence_penalty,
-                frequency_penalty,
+                template: serde_json::to_string(&template)?,
+                adapter,
                 created_time: time,
                 updated_time: time,
                 description,
@@ -271,17 +165,6 @@ impl NewConversationTemplate {
 
             // Insert the prompts
             let SqlConversationTemplate { id, .. } = SqlConversationTemplate::first(conn)?;
-            let prompts = prompts
-                .into_iter()
-                .map(|prompt| SqlNewConversationTemplatePrompt {
-                    template_id: id,
-                    prompt: prompt.prompt,
-                    role: prompt.role.to_string(),
-                    created_time: time,
-                    updated_time: time,
-                })
-                .collect::<Vec<SqlNewConversationTemplatePrompt>>();
-            SqlNewConversationTemplatePrompt::save_many(prompts, conn)?;
             Ok(id)
         })
     }

@@ -13,17 +13,17 @@ use crate::{
     },
 };
 
-use diesel::{connection::SimpleConnection, SqliteConnection};
+use diesel::{SqliteConnection, connection::SimpleConnection};
 
 use self::v1::SqlConversationV1;
 
 use super::{
-    model::{SqlConversation, SqlConversationTemplate, SqlNewConversationTemplatePrompt},
-    Role, CREATE_TABLE_SQL,
+    CREATE_TABLE_SQL, Role,
+    model::{SqlConversation, SqlConversationTemplate},
 };
 
 pub(super) mod v1;
-// pub(super) mod v2;
+pub(super) mod v2;
 
 pub(in crate::store) fn v1_to_v2(
     v1_conn: &mut SqliteConnection,
@@ -41,10 +41,11 @@ pub(in crate::store) fn v1_to_v2(
     SqlFolder::migration_save(target_folders, target_conn)?;
 
     // migrate conversations
-    let (target_conversations, target_templates, target_prompts) = get_conversations(conversations);
+    let (target_conversations, target_templates) = get_conversations(conversations);
     SqlConversationTemplate::migration_save(target_templates, target_conn)?;
     SqlConversation::migration_save(target_conversations, target_conn)?;
-    SqlNewConversationTemplatePrompt::save_many(target_prompts, target_conn)?;
+    todo!();
+    // SqlNewConversationTemplatePrompt::save_many(target_prompts, target_conn)?;
 
     // migrate messages
     let target_messages = messages
@@ -57,14 +58,11 @@ pub(in crate::store) fn v1_to_v2(
 
 fn get_conversations(
     v1_conversations: Vec<SqlConversationV1>,
-) -> (
-    Vec<SqlConversation>,
-    Vec<SqlConversationTemplate>,
-    Vec<SqlNewConversationTemplatePrompt>,
-) {
+) -> (Vec<SqlConversation>, Vec<SqlConversationTemplate>) {
     let mut target_conversations = Vec::new();
     let mut target_templates = Vec::new();
-    let mut target_prompts = Vec::new();
+    todo!();
+    // let mut target_prompts = Vec::new();
     for SqlConversationV1 {
         id,
         folder_id,
@@ -85,45 +83,46 @@ fn get_conversations(
         prompt,
     } in v1_conversations
     {
-        let template = SqlConversationTemplate {
-            id,
-            name: title.clone(),
-            icon: icon.clone(),
-            mode,
-            model,
-            temperature,
-            top_p,
-            n,
-            max_tokens,
-            presence_penalty,
-            frequency_penalty,
-            created_time,
-            updated_time,
-            description: info.clone(),
-        };
-        target_templates.push(template);
-        let conversation = SqlConversation {
-            id,
-            folder_id,
-            path,
-            title,
-            icon,
-            created_time,
-            updated_time,
-            info,
-            template_id: id,
-        };
-        target_conversations.push(conversation);
-        if let Some(prompt) = prompt {
-            let prompt = SqlNewConversationTemplatePrompt {
-                template_id: id,
-                prompt,
-                created_time,
-                updated_time,
-                role: (Role::System).to_string(),
-            };
-            target_prompts.push(prompt);
-        }
+        todo!()
+        // let template = SqlConversationTemplate {
+        //     id,
+        //     name: title.clone(),
+        //     icon: icon.clone(),
+        //     mode,
+        //     model,
+        //     temperature,
+        //     top_p,
+        //     n,
+        //     max_tokens,
+        //     presence_penalty,
+        //     frequency_penalty,
+        //     created_time,
+        //     updated_time,
+        //     description: info.clone(),
+        // };
+        // target_templates.push(template);
+        // let conversation = SqlConversation {
+        //     id,
+        //     folder_id,
+        //     path,
+        //     title,
+        //     icon,
+        //     created_time,
+        //     updated_time,
+        //     info,
+        //     template_id: id,
+        // };
+        // target_conversations.push(conversation);
+        // if let Some(prompt) = prompt {
+        //     let prompt = SqlNewConversationTemplatePrompt {
+        //         template_id: id,
+        //         prompt,
+        //         created_time,
+        //         updated_time,
+        //         role: (Role::System).to_string(),
+        //     };
+        //     target_prompts.push(prompt);
+        // }
     }
-    (target_conversations, target_templates, target_prompts)
+    (target_conversations, target_templates)
 }

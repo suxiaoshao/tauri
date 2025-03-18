@@ -5,7 +5,7 @@
  * @LastEditTime: 2024-05-01 02:15:54
  * @FilePath: /tauri/packages/ChatGPT/src-tauri/src/store/model/conversation_templates.rs
  */
-use crate::{errors::ChatGPTResult, store::Mode};
+use crate::errors::ChatGPTResult;
 
 use super::super::schema::conversation_templates;
 use diesel::prelude::*;
@@ -17,14 +17,8 @@ pub struct SqlNewConversationTemplate {
     pub(in super::super) name: String,
     pub(in super::super) icon: String,
     pub(in super::super) description: Option<String>,
-    pub(in super::super) mode: String,
-    pub(in super::super) model: String,
-    pub(in super::super) temperature: f64,
-    pub(in super::super) top_p: f64,
-    pub(in super::super) n: i64,
-    pub(in super::super) max_tokens: Option<i64>,
-    pub(in super::super) presence_penalty: f64,
-    pub(in super::super) frequency_penalty: f64,
+    pub(in super::super) adapter: String,
+    pub(in super::super) template: String,
     pub(in super::super) created_time: OffsetDateTime,
     pub(in super::super) updated_time: OffsetDateTime,
 }
@@ -32,21 +26,7 @@ pub struct SqlNewConversationTemplate {
 impl SqlNewConversationTemplate {
     pub fn default() -> Self {
         let now = OffsetDateTime::now_utc();
-        Self {
-            name: "基础模板".to_string(),
-            icon: "🤖".to_string(),
-            mode: (Mode::Contextual).to_string(),
-            model: "gpt-3.5-turbo".to_string(),
-            temperature: 1.0,
-            top_p: 1.0,
-            n: 1,
-            max_tokens: None,
-            presence_penalty: 0.0,
-            frequency_penalty: 0.0,
-            created_time: now,
-            updated_time: now,
-            description: None,
-        }
+        todo!()
     }
     pub fn insert(self, conn: &mut SqliteConnection) -> ChatGPTResult<()> {
         diesel::insert_into(conversation_templates::table)
@@ -63,14 +43,8 @@ pub struct SqlConversationTemplate {
     pub(in super::super) name: String,
     pub(in super::super) icon: String,
     pub(in super::super) description: Option<String>,
-    pub(in super::super) mode: String,
-    pub(in super::super) model: String,
-    pub(in super::super) temperature: f64,
-    pub(in super::super) top_p: f64,
-    pub(in super::super) n: i64,
-    pub(in super::super) max_tokens: Option<i64>,
-    pub(in super::super) presence_penalty: f64,
-    pub(in super::super) frequency_penalty: f64,
+    pub(in super::super) adapter: String,
+    pub(in super::super) template: String,
     pub(in super::super) created_time: OffsetDateTime,
     pub(in super::super) updated_time: OffsetDateTime,
 }
@@ -112,14 +86,8 @@ pub struct SqlUpdateConversationTemplate {
     pub(in super::super) name: String,
     pub(in super::super) icon: String,
     pub(in super::super) description: Option<String>,
-    pub(in super::super) mode: String,
-    pub(in super::super) model: String,
-    pub(in super::super) temperature: f64,
-    pub(in super::super) top_p: f64,
-    pub(in super::super) n: i64,
-    pub(in super::super) max_tokens: Option<i64>,
-    pub(in super::super) presence_penalty: f64,
-    pub(in super::super) frequency_penalty: f64,
+    pub(in super::super) adapter: String,
+    pub(in super::super) template: String,
     pub(in super::super) updated_time: OffsetDateTime,
 }
 

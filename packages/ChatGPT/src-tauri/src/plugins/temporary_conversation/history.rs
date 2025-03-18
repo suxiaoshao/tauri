@@ -261,13 +261,14 @@ pub fn init_temporary_conversation(
     conn: tauri::State<DbConn>,
     template_id: i32,
 ) -> ChatGPTResult<Vec<TemporaryMessage>> {
-    let conn = &mut conn.get()?;
-    let mut template = ConversationTemplate::find(template_id, conn)?;
-    template.mode = Mode::Contextual;
-    state
-        .lock()?
-        .update_temp_conversation_by_template_id(template);
-    Ok(vec![])
+    todo!();
+    // let conn = &mut conn.get()?;
+    // let mut template = ConversationTemplate::find(template_id, conn)?;
+    // template.mode = Mode::Contextual;
+    // state
+    //     .lock()?
+    //     .update_temp_conversation_by_template_id(template);
+    // Ok(vec![])
 }
 
 #[tauri::command]
@@ -433,58 +434,59 @@ pub async fn temporary_fetch<R: Runtime>(
     content: String,
     persistent_id: Option<usize>,
 ) -> ChatGPTResult<()> {
-    let mut conversation = state.lock()?.get_temp_conversation(persistent_id)?.clone();
+    todo!();
+    // let mut conversation = state.lock()?.get_temp_conversation(persistent_id)?.clone();
 
-    let now = OffsetDateTime::now_utc();
-    let user_message = conversation.add_message(now, Role::User, content, Status::Normal);
-    window.emit(
-        TEMPORARY_MESSAGE_EVENT,
-        TemporaryMessageEvent::new(user_message, persistent_id),
-    )?;
+    // let now = OffsetDateTime::now_utc();
+    // let user_message = conversation.add_message(now, Role::User, content, Status::Normal);
+    // window.emit(
+    //     TEMPORARY_MESSAGE_EVENT,
+    //     TemporaryMessageEvent::new(user_message, persistent_id),
+    // )?;
 
-    let config = ChatGPTConfig::get(&app)?;
+    // let config = ChatGPTConfig::get(&app)?;
 
-    let conn = &mut conn.get()?;
-    let mut template = ConversationTemplate::find(conversation.template.id, conn)?;
-    template.mode = Mode::Contextual;
-    conversation.template = template;
+    // let conn = &mut conn.get()?;
+    // let mut template = ConversationTemplate::find(conversation.template.id, conn)?;
+    // template.mode = Mode::Contextual;
+    // conversation.template = template;
 
-    let new_id = conversation.new_id();
+    // let new_id = conversation.new_id();
 
-    let assistant_message = TemporaryMessage {
-        id: new_id,
-        role: Role::Assistant,
-        content: "".to_string(),
-        status: Status::Loading,
-        created_time: now,
-        updated_time: now,
-        start_time: now,
-        end_time: now,
-    };
-    window.emit(
-        TEMPORARY_MESSAGE_EVENT,
-        TemporaryMessageEvent::new(&assistant_message, persistent_id),
-    )?;
+    // let assistant_message = TemporaryMessage {
+    //     id: new_id,
+    //     role: Role::Assistant,
+    //     content: "".to_string(),
+    //     status: Status::Loading,
+    //     created_time: now,
+    //     updated_time: now,
+    //     start_time: now,
+    //     end_time: now,
+    // };
+    // window.emit(
+    //     TEMPORARY_MESSAGE_EVENT,
+    //     TemporaryMessageEvent::new(&assistant_message, persistent_id),
+    // )?;
 
-    let mut fetch = TemporaryFetch {
-        config,
-        assistant_message,
-        window,
-        conversation,
-    };
-    fetch.fetch().await?;
+    // let mut fetch = TemporaryFetch {
+    //     config,
+    //     assistant_message,
+    //     window,
+    //     conversation,
+    // };
+    // fetch.fetch().await?;
 
-    let TemporaryFetch {
-        mut conversation,
-        assistant_message,
-        ..
-    } = fetch;
-    conversation.messages.push(assistant_message);
-    state
-        .lock()?
-        .update_temp_conversation(conversation, persistent_id)?;
+    // let TemporaryFetch {
+    //     mut conversation,
+    //     assistant_message,
+    //     ..
+    // } = fetch;
+    // conversation.messages.push(assistant_message);
+    // state
+    //     .lock()?
+    //     .update_temp_conversation(conversation, persistent_id)?;
 
-    Ok(())
+    // Ok(())
 }
 
 struct TemporaryFetch<R: Runtime> {
@@ -496,33 +498,34 @@ struct TemporaryFetch<R: Runtime> {
 
 impl<R: Runtime> FetchRunner for TemporaryFetch<R> {
     fn get_body(&self) -> ChatGPTResult<ChatRequest<'_>> {
-        let mut messages = self
-            .conversation
-            .template
-            .prompts
-            .iter()
-            .map(|prompt| FetchMessage::new(prompt.role, prompt.prompt.as_str()))
-            .collect::<Vec<_>>();
+        todo!();
+        // let mut messages = self
+        //     .conversation
+        //     .template
+        //     .prompts
+        //     .iter()
+        //     .map(|prompt| FetchMessage::new(prompt.role, prompt.prompt.as_str()))
+        //     .collect::<Vec<_>>();
 
-        messages.extend(
-            self.conversation
-                .messages
-                .iter()
-                .filter(|message| message.status == Status::Normal)
-                .map(|message| FetchMessage::new(message.role, message.content.as_str())),
-        );
+        // messages.extend(
+        //     self.conversation
+        //         .messages
+        //         .iter()
+        //         .filter(|message| message.status == Status::Normal)
+        //         .map(|message| FetchMessage::new(message.role, message.content.as_str())),
+        // );
 
-        Ok(ChatRequest {
-            model: self.conversation.template.model.as_str(),
-            messages,
-            stream: true,
-            temperature: self.conversation.template.temperature,
-            top_p: self.conversation.template.top_p,
-            n: self.conversation.template.n,
-            max_tokens: self.conversation.template.max_tokens,
-            presence_penalty: self.conversation.template.presence_penalty,
-            frequency_penalty: self.conversation.template.frequency_penalty,
-        })
+        // Ok(ChatRequest {
+        //     model: self.conversation.template.model.as_str(),
+        //     messages,
+        //     stream: true,
+        //     temperature: self.conversation.template.temperature,
+        //     top_p: self.conversation.template.top_p,
+        //     n: self.conversation.template.n,
+        //     max_tokens: self.conversation.template.max_tokens,
+        //     presence_penalty: self.conversation.template.presence_penalty,
+        //     frequency_penalty: self.conversation.template.frequency_penalty,
+        // })
     }
 
     fn get_api_key(&self) -> ChatGPTResult<&str> {

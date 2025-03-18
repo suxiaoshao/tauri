@@ -14,31 +14,14 @@ create table folders
 
 CREATE TABLE conversation_templates
 (
-    id                Integer PRIMARY KEY AUTOINCREMENT not null,
-    name              TEXT                              NOT NULL,
-    icon              TEXT                              not null,
-    description       TEXT,
-    mode              TEXT                              not null check ( mode in ('contextual', 'single', 'assistant-only') )     default 'contextual',
-    model             TEXT                              not null,
-    temperature       DOUBLE                            not null check ( temperature >= 0.0 and temperature <= 1.0 )              default 1.0,
-    top_p             DOUBLE                            not null check ( top_p >= 0.0 and top_p <= 1.0 )                          default 1.0,
-    n                 BIGINT                            not null check ( n >= 1 )                                                 default 1,
-    max_tokens        BIGINT check ( max_tokens >= 1 )                                                                            default null,
-    presence_penalty  DOUBLE                            not null check ( presence_penalty >= -2.0 and presence_penalty <= 2.0 )   default 0.0,
-    frequency_penalty DOUBLE                            not null check ( frequency_penalty >= -2.0 and frequency_penalty <= 2.0 ) default 0.0,
-    created_time      DATETIME                          NOT NULL,
-    updated_time      DATETIME                          NOT NULL
-);
-
-create table conversation_template_prompts
-(
-    id           INTEGER PRIMARY KEY AUTOINCREMENT not null,
-    template_id  INTEGER                           not null,
-    prompt       TEXT                              not null,
-    role         TEXT                              not null check ( role in ('system', 'user', 'assistant') ),
-    created_time DATETIME                          NOT NULL,
-    updated_time DATETIME                          NOT NULL,
-    FOREIGN KEY (template_id) REFERENCES conversation_templates (id)
+    id           Integer PRIMARY KEY AUTOINCREMENT not null,
+    name         TEXT                              NOT NULL,
+    icon         TEXT                              not null,
+    description  TEXT,
+    adapter      TEXT                              NOT NULL,
+    template     TEXT                              NOT NULL,
+    created_time DateTime                          not null,
+    updated_time DateTime                          not null
 );
 
 create table conversations

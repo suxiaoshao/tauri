@@ -5,15 +5,10 @@
  * @LastEditTime: 2024-04-30 04:30:49
  * @FilePath: /tauri/packages/ChatGPT/src-tauri/src/store/model/mod.rs
  */
-mod conversation_template_prompts;
 mod conversation_templates;
 mod conversations;
 mod folders;
 mod messages;
-
-pub use conversation_template_prompts::{
-    SqlConversationTemplatePrompt, SqlNewConversationTemplatePrompt,
-};
 pub use conversation_templates::{
     SqlConversationTemplate, SqlNewConversationTemplate, SqlUpdateConversationTemplate,
 };
