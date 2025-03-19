@@ -75,5 +75,5 @@ pub trait Adapter {
     ) -> impl futures::Stream<Item = ChatGPTResult<String>>;
 }
 
-pub(crate) use openai::OpenAIAdapter;
+pub(crate) use openai::{OpenAIAdapter, OpenAIConversationTemplate, OpenAITemplatePrompt};
 pub(crate) use openai_stream::OpenAIStreamAdapter;

@@ -76,26 +76,25 @@ mod test {
         store::{self, NewMessage, init_tables},
     };
 
-    // todo
-    // #[test]
-    // fn test_export_csv() -> ChatGPTResult<()> {
-    //     let conn = &mut establish_connection()?;
-    //     let new_message = NewMessage {
-    //         conversation_id: 1,
-    //         role: store::Role::User,
-    //         content: "test".to_owned(),
-    //         status: store::Status::Normal,
-    //     };
-    //     store::Message::insert(new_message, conn)?;
-    //     let messages = store::Message::messages_by_conversation_id(1, conn)?;
-    //     let path = std::path::PathBuf::from("test.csv");
-    //     super::export_csv(messages, path)?;
-    //     std::fs::remove_file("test.csv")?;
-    //     Ok(())
-    // }
-    // pub fn establish_connection() -> ChatGPTResult<SqliteConnection> {
-    //     let mut conn = SqliteConnection::establish("file::memory:")?;
-    //     init_tables(&mut conn)?;
-    //     Ok(conn)
-    // }
+    #[test]
+    fn test_export_csv() -> ChatGPTResult<()> {
+        let conn = &mut establish_connection()?;
+        let new_message = NewMessage {
+            conversation_id: 1,
+            role: store::Role::User,
+            content: "test".to_owned(),
+            status: store::Status::Normal,
+        };
+        store::Message::insert(new_message, conn)?;
+        let messages = store::Message::messages_by_conversation_id(1, conn)?;
+        let path = std::path::PathBuf::from("test.csv");
+        super::export_csv(messages, path)?;
+        std::fs::remove_file("test.csv")?;
+        Ok(())
+    }
+    pub fn establish_connection() -> ChatGPTResult<SqliteConnection> {
+        let mut conn = SqliteConnection::establish("file::memory:")?;
+        init_tables(&mut conn)?;
+        Ok(conn)
+    }
 }

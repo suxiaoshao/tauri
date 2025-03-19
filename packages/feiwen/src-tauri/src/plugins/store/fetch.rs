@@ -1,7 +1,7 @@
 use crate::{
     errors::FeiwenResult,
     fetch::FetchRunner,
-    store::{service::Novel, DbConn},
+    store::{DbConn, service::Novel},
 };
 
 #[tauri::command]
@@ -51,7 +51,7 @@ impl FetchRunner for Fetch {
 
     fn resolve_novel(&self, novels: Vec<crate::store::service::Novel>) -> FeiwenResult<i64> {
         let conn = &mut self.db_conn.get()?;
-        // todo
+        // todo save many
         for novel in novels {
             novel.save(conn)?;
         }

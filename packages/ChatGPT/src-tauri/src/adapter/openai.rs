@@ -41,21 +41,36 @@ struct OpenAISettings {
 }
 
 #[derive(Deserialize, Serialize)]
-pub(super) struct OpenAIConversationTemplate {
-    pub(super) model: String,
-    pub(super) temperature: f64,
-    pub(super) top_p: f64,
-    pub(super) n: u32,
-    pub(super) max_completion_tokens: Option<u32>,
-    pub(super) presence_penalty: f64,
-    pub(super) frequency_penalty: f64,
-    pub(super) prompts: Vec<OpenAITemplatePrompt>,
+pub(crate) struct OpenAIConversationTemplate {
+    pub(crate) model: String,
+    pub(crate) temperature: f64,
+    pub(crate) top_p: f64,
+    pub(crate) n: u32,
+    pub(crate) max_completion_tokens: Option<u32>,
+    pub(crate) presence_penalty: f64,
+    pub(crate) frequency_penalty: f64,
+    pub(crate) prompts: Vec<OpenAITemplatePrompt>,
+}
+
+impl Default for OpenAIConversationTemplate {
+    fn default() -> Self {
+        Self {
+            model: "gpt-4o".to_string(),
+            temperature: 1.0,
+            top_p: 1.0,
+            n: 1,
+            max_completion_tokens: None,
+            presence_penalty: 0.0,
+            frequency_penalty: 0.0,
+            prompts: vec![],
+        }
+    }
 }
 
 #[derive(Deserialize, Serialize)]
-pub(super) struct OpenAITemplatePrompt {
-    pub(super) prompt: String,
-    pub(super) role: Role,
+pub(crate) struct OpenAITemplatePrompt {
+    pub(crate) prompt: String,
+    pub(crate) role: Role,
 }
 
 pub(super) fn get_openai_template_inputs(

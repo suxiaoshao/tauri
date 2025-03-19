@@ -58,14 +58,21 @@ impl StoreVersion {
                 Ok(conn)
             }
             StoreVersion::V1 { conn, mut v1_db } => {
-                log::info!("Migrating from V1 to V2");
-                let v2_db = &mut conn.get()?;
-                if migrations::v1_to_v2(&mut v1_db, v2_db).is_err() {
-                    init_tables(v2_db)?;
+                log::info!("Migrating from V1 to V3");
+                let v3_db = &mut conn.get()?;
+                if migrations::v1_to_v3(&mut v1_db, v3_db).is_err() {
+                    init_tables(v3_db)?;
                 };
                 Ok(conn)
             }
-            StoreVersion::V2 { conn, v2_db } => todo!(),
+            StoreVersion::V2 { conn, mut v2_db } => {
+                log::info!("Migrating from V2 to V3");
+                let v3_db = &mut conn.get()?;
+                if migrations::v2_to_v3(&mut v2_db, v3_db).is_err() {
+                    init_tables(v3_db)?;
+                };
+                Ok(conn)
+            }
             StoreVersion::V3(pool) => Ok(pool),
         }
     }
@@ -123,7 +130,7 @@ pub fn init_tables(conn: &mut SqliteConnection) -> ChatGPTResult<()> {
         // Create tables
         conn.batch_execute(CREATE_TABLE_SQL)?;
         // Insert conversation template
-        let default_conversation_template = SqlNewConversationTemplate::default();
+        let default_conversation_template = SqlNewConversationTemplate::default()?;
         default_conversation_template.insert(conn)?;
         // Insert default conversation
         let SqlConversationTemplate { id, .. } = SqlConversationTemplate::first(conn)?;

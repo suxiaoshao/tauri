@@ -5,7 +5,11 @@
  * @LastEditTime: 2024-05-01 02:15:54
  * @FilePath: /tauri/packages/ChatGPT/src-tauri/src/store/model/conversation_templates.rs
  */
-use crate::errors::ChatGPTResult;
+use crate::{
+    adapter::{Adapter, OpenAIConversationTemplate, OpenAIStreamAdapter},
+    errors::ChatGPTResult,
+    store::Mode,
+};
 
 use super::super::schema::conversation_templates;
 use diesel::prelude::*;
@@ -25,9 +29,19 @@ pub struct SqlNewConversationTemplate {
 }
 
 impl SqlNewConversationTemplate {
-    pub fn default() -> Self {
+    pub fn default() -> ChatGPTResult<Self> {
         let now = OffsetDateTime::now_utc();
-        todo!()
+        let adapter = OpenAIStreamAdapter;
+        Ok(Self {
+            name: "基础模板".to_string(),
+            icon: "🤖".to_string(),
+            description: None,
+            mode: (Mode::Contextual).to_string(),
+            adapter: adapter.name().to_string(),
+            template: serde_json::to_string(&OpenAIConversationTemplate::default())?,
+            created_time: now,
+            updated_time: now,
+        })
     }
     pub fn insert(self, conn: &mut SqliteConnection) -> ChatGPTResult<()> {
         diesel::insert_into(conversation_templates::table)
