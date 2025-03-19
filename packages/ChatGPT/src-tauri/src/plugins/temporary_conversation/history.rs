@@ -3,13 +3,14 @@ use std::{
     sync::{Arc, Mutex},
 };
 
+use futures::{StreamExt, pin_mut};
 use serde::{Deserialize, Serialize};
 use tauri::{AppHandle, Emitter, Runtime, WebviewWindowBuilder};
 use time::OffsetDateTime;
 
 use crate::{
     errors::{ChatGPTError, ChatGPTResult},
-    fetch::{ChatResponse, FetchRunner, Message as FetchMessage},
+    fetch::{FetchRunner, Message as FetchMessage},
     plugins::{
         ChatGPTConfig,
         url_schema::{RouterEvent, router_emit_to_main},
@@ -261,14 +262,13 @@ pub fn init_temporary_conversation(
     conn: tauri::State<DbConn>,
     template_id: i32,
 ) -> ChatGPTResult<Vec<TemporaryMessage>> {
-    todo!();
-    // let conn = &mut conn.get()?;
-    // let mut template = ConversationTemplate::find(template_id, conn)?;
-    // template.mode = Mode::Contextual;
-    // state
-    //     .lock()?
-    //     .update_temp_conversation_by_template_id(template);
-    // Ok(vec![])
+    let conn = &mut conn.get()?;
+    let mut template = ConversationTemplate::find(template_id, conn)?;
+    template.mode = Mode::Contextual;
+    state
+        .lock()?
+        .update_temp_conversation_by_template_id(template);
+    Ok(vec![])
 }
 
 #[tauri::command]
@@ -434,110 +434,111 @@ pub async fn temporary_fetch<R: Runtime>(
     content: String,
     persistent_id: Option<usize>,
 ) -> ChatGPTResult<()> {
-    todo!();
-    // let mut conversation = state.lock()?.get_temp_conversation(persistent_id)?.clone();
+    let mut conversation = state.lock()?.get_temp_conversation(persistent_id)?.clone();
 
-    // let now = OffsetDateTime::now_utc();
-    // let user_message = conversation.add_message(now, Role::User, content, Status::Normal);
-    // window.emit(
-    //     TEMPORARY_MESSAGE_EVENT,
-    //     TemporaryMessageEvent::new(user_message, persistent_id),
-    // )?;
+    let now = OffsetDateTime::now_utc();
+    let user_message = conversation.add_message(now, Role::User, content, Status::Normal);
+    window.emit(
+        TEMPORARY_MESSAGE_EVENT,
+        TemporaryMessageEvent::new(user_message, persistent_id),
+    )?;
 
-    // let config = ChatGPTConfig::get(&app)?;
+    let config = ChatGPTConfig::get(&app)?;
 
-    // let conn = &mut conn.get()?;
-    // let mut template = ConversationTemplate::find(conversation.template.id, conn)?;
-    // template.mode = Mode::Contextual;
-    // conversation.template = template;
+    let conn = &mut conn.get()?;
+    let mut template = ConversationTemplate::find(conversation.template.id, conn)?;
+    template.mode = Mode::Contextual;
+    conversation.template = template;
 
-    // let new_id = conversation.new_id();
+    let new_id = conversation.new_id();
 
-    // let assistant_message = TemporaryMessage {
-    //     id: new_id,
-    //     role: Role::Assistant,
-    //     content: "".to_string(),
-    //     status: Status::Loading,
-    //     created_time: now,
-    //     updated_time: now,
-    //     start_time: now,
-    //     end_time: now,
-    // };
-    // window.emit(
-    //     TEMPORARY_MESSAGE_EVENT,
-    //     TemporaryMessageEvent::new(&assistant_message, persistent_id),
-    // )?;
+    let mut assistant_message = TemporaryMessage {
+        id: new_id,
+        role: Role::Assistant,
+        content: "".to_string(),
+        status: Status::Loading,
+        created_time: now,
+        updated_time: now,
+        start_time: now,
+        end_time: now,
+    };
+    window.emit(
+        TEMPORARY_MESSAGE_EVENT,
+        TemporaryMessageEvent::new(&assistant_message, persistent_id),
+    )?;
 
-    // let mut fetch = TemporaryFetch {
-    //     config,
-    //     assistant_message,
-    //     window,
-    //     conversation,
-    // };
-    // fetch.fetch().await?;
-
-    // let TemporaryFetch {
-    //     mut conversation,
-    //     assistant_message,
-    //     ..
-    // } = fetch;
-    // conversation.messages.push(assistant_message);
-    // state
-    //     .lock()?
-    //     .update_temp_conversation(conversation, persistent_id)?;
-
-    // Ok(())
-}
-
-struct TemporaryFetch<R: Runtime> {
-    config: ChatGPTConfig,
-    assistant_message: TemporaryMessage,
-    window: tauri::Window<R>,
-    conversation: TemporaryConversation,
-}
-
-impl<R: Runtime> TemporaryFetch<R> {
-    fn on_open(&mut self) -> ChatGPTResult<()> {
+    {
+        let fetch = TemporaryFetch {
+            config,
+            window,
+            conversation: &conversation,
+        };
+        let stream = fetch.fetch();
+        pin_mut!(stream);
         log::info!("Connection Opened!");
-        Ok(())
+        #[allow(for_loops_over_fallibles)]
+        for message in stream.next().await {
+            match message {
+                Ok(message) => fetch.on_message(message, &mut assistant_message)?,
+                Err(error) => fetch.on_error(error, &mut assistant_message)?,
+            }
+        }
+        fetch.on_close(&mut assistant_message)?;
     }
+    conversation.messages.push(assistant_message);
+    state
+        .lock()?
+        .update_temp_conversation(conversation, persistent_id)?;
 
-    fn on_message(&mut self, message: ChatResponse) -> ChatGPTResult<()> {
-        let content = message
-            .choices
-            .into_iter()
-            .filter_map(|choice| choice.delta.content)
-            .collect::<String>();
-        self.assistant_message.add_content(content);
+    Ok(())
+}
+
+struct TemporaryFetch<'a, R: Runtime> {
+    config: ChatGPTConfig,
+    window: tauri::Window<R>,
+    conversation: &'a TemporaryConversation,
+}
+
+impl<R: Runtime> TemporaryFetch<'_, R> {
+    fn on_message(
+        &self,
+        message: String,
+        assistant_message: &mut TemporaryMessage,
+    ) -> ChatGPTResult<()> {
+        assistant_message.add_content(message);
         self.window.emit(
             TEMPORARY_MESSAGE_EVENT,
-            TemporaryMessageEvent::new(&self.assistant_message, self.conversation.persistent_id),
+            TemporaryMessageEvent::new(assistant_message, self.conversation.persistent_id),
         )?;
         Ok(())
     }
 
-    fn on_error(&mut self, err: reqwest_eventsource::Error) -> ChatGPTResult<()> {
+    fn on_error(
+        &self,
+        err: ChatGPTError,
+        assistant_message: &mut TemporaryMessage,
+    ) -> ChatGPTResult<()> {
         log::error!("Connection Error: {:?}", err);
-        self.assistant_message.update_status(Status::Error);
+        assistant_message.update_status(Status::Error);
         self.window.emit(
             TEMPORARY_MESSAGE_EVENT,
-            TemporaryMessageEvent::new(&self.assistant_message, self.conversation.persistent_id),
+            TemporaryMessageEvent::new(assistant_message, self.conversation.persistent_id),
         )?;
         Ok(())
     }
 
-    fn on_close(&mut self) -> ChatGPTResult<()> {
+    fn on_close(&self, assistant_message: &mut TemporaryMessage) -> ChatGPTResult<()> {
         log::info!("Connection Closed!");
-        self.assistant_message.update_status(Status::Normal);
+        assistant_message.update_status(Status::Normal);
         self.window.emit(
             TEMPORARY_MESSAGE_EVENT,
-            TemporaryMessageEvent::new(&self.assistant_message, self.conversation.persistent_id),
+            TemporaryMessageEvent::new(assistant_message, self.conversation.persistent_id),
         )?;
         Ok(())
     }
 }
 
-impl<R: Runtime> FetchRunner for TemporaryFetch<R> {
+impl<R: Runtime> FetchRunner for TemporaryFetch<'_, R> {
     fn get_adapter(&self) -> &str {
         &self.conversation.template.adapter
     }

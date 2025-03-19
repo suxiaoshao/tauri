@@ -106,9 +106,6 @@ impl ChatGPTConfig {
         };
         Ok(config)
     }
-    pub(crate) fn get_api_key(&self) -> ChatGPTResult<&str> {
-        self.api_key.as_deref().ok_or(ChatGPTError::ApiKeyNotSet)
-    }
     pub(crate) fn get_settings(&self, adapter: &str) -> Option<&serde_json::Value> {
         self.adapter_settings.get(adapter)
     }
