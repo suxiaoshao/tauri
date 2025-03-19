@@ -9,7 +9,7 @@ use time::OffsetDateTime;
 
 use crate::{
     errors::{ChatGPTError, ChatGPTResult},
-    fetch::{ChatRequest, ChatResponse, FetchRunner, Message as FetchMessage},
+    fetch::{ChatResponse, FetchRunner, Message as FetchMessage},
     plugins::{
         ChatGPTConfig,
         url_schema::{RouterEvent, router_emit_to_main},
@@ -496,46 +496,7 @@ struct TemporaryFetch<R: Runtime> {
     conversation: TemporaryConversation,
 }
 
-impl<R: Runtime> FetchRunner for TemporaryFetch<R> {
-    fn get_body(&self) -> ChatGPTResult<ChatRequest<'_>> {
-        todo!();
-        // let mut messages = self
-        //     .conversation
-        //     .template
-        //     .prompts
-        //     .iter()
-        //     .map(|prompt| FetchMessage::new(prompt.role, prompt.prompt.as_str()))
-        //     .collect::<Vec<_>>();
-
-        // messages.extend(
-        //     self.conversation
-        //         .messages
-        //         .iter()
-        //         .filter(|message| message.status == Status::Normal)
-        //         .map(|message| FetchMessage::new(message.role, message.content.as_str())),
-        // );
-
-        // Ok(ChatRequest {
-        //     model: self.conversation.template.model.as_str(),
-        //     messages,
-        //     stream: true,
-        //     temperature: self.conversation.template.temperature,
-        //     top_p: self.conversation.template.top_p,
-        //     n: self.conversation.template.n,
-        //     max_tokens: self.conversation.template.max_tokens,
-        //     presence_penalty: self.conversation.template.presence_penalty,
-        //     frequency_penalty: self.conversation.template.frequency_penalty,
-        // })
-    }
-
-    fn get_api_key(&self) -> ChatGPTResult<&str> {
-        self.config.get_api_key()
-    }
-
-    fn get_http_proxy(&self) -> ChatGPTResult<&Option<String>> {
-        Ok(&self.config.http_proxy)
-    }
-
+impl<R: Runtime> TemporaryFetch<R> {
     fn on_open(&mut self) -> ChatGPTResult<()> {
         log::info!("Connection Opened!");
         Ok(())
@@ -574,8 +535,31 @@ impl<R: Runtime> FetchRunner for TemporaryFetch<R> {
         )?;
         Ok(())
     }
+}
 
-    fn url(&self) -> &str {
-        self.config.url.as_str()
+impl<R: Runtime> FetchRunner for TemporaryFetch<R> {
+    fn get_adapter(&self) -> &str {
+        &self.conversation.template.adapter
+    }
+
+    fn get_template(&self) -> &serde_json::Value {
+        &self.conversation.template.template
+    }
+
+    fn get_config(&self) -> &ChatGPTConfig {
+        &self.config
+    }
+
+    fn get_mode(&self) -> Mode {
+        Mode::Contextual
+    }
+
+    fn get_history(&self) -> Vec<FetchMessage> {
+        self.conversation
+            .messages
+            .iter()
+            .filter(|message| message.status == Status::Normal)
+            .map(|message| FetchMessage::new(message.role, message.content.as_str()))
+            .collect()
     }
 }

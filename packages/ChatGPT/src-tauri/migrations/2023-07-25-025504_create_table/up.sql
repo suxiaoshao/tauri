@@ -18,6 +18,7 @@ CREATE TABLE conversation_templates
     name         TEXT                              NOT NULL,
     icon         TEXT                              not null,
     description  TEXT,
+    mode         TEXT                              not null check ( mode in ('contextual', 'single', 'assistant-only') ) default 'contextual',
     adapter      TEXT                              NOT NULL,
     template     TEXT                              NOT NULL,
     created_time DateTime                          not null,

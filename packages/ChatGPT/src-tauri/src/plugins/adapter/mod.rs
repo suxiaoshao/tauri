@@ -24,7 +24,7 @@ struct Inputs {
 
 impl<T: Adapter> From<T> for Inputs {
     fn from(value: T) -> Self {
-        let name = <T as Adapter>::NAME.to_string();
+        let name = value.name().to_string();
         let inputs = value.get_setting_inputs();
         Inputs { name, inputs }
     }

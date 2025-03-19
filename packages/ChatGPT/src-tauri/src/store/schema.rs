@@ -6,6 +6,7 @@ diesel::table! {
         name -> Text,
         icon -> Text,
         description -> Nullable<Text>,
+        mode -> Text,
         adapter -> Text,
         template -> Text,
         created_time -> TimestamptzSqlite,

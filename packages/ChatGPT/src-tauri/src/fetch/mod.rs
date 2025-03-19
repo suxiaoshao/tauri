@@ -5,56 +5,66 @@
  * @LastEditTime: 2024-05-15 20:42:50
  * @FilePath: /tauri/packages/ChatGPT/src-tauri/src/fetch/mod.rs
  */
-use futures::StreamExt;
-use reqwest_eventsource::{Event, RequestBuilderExt};
+use serde_json::Value;
 
-use crate::errors::ChatGPTResult;
+use futures::pin_mut;
+
+use crate::{
+    adapter::{Adapter, OpenAIAdapter, OpenAIStreamAdapter},
+    errors::{ChatGPTError, ChatGPTResult},
+    plugins::ChatGPTConfig,
+    store::Mode,
+};
 
 pub use self::types::{ChatRequest, ChatResponse, Message};
 
 mod types;
 
 pub trait FetchRunner {
-    fn get_body(&self) -> ChatGPTResult<ChatRequest<'_>>;
-    fn get_api_key(&self) -> ChatGPTResult<&str>;
-    fn get_http_proxy(&self) -> ChatGPTResult<&Option<String>>;
-    fn on_open(&mut self) -> ChatGPTResult<()>;
-    fn on_message(&mut self, message: ChatResponse) -> ChatGPTResult<()>;
-    fn on_error(&mut self, err: reqwest_eventsource::Error) -> ChatGPTResult<()>;
-    fn on_close(&mut self) -> ChatGPTResult<()>;
-    fn url(&self) -> &str;
-    async fn fetch(&mut self) -> ChatGPTResult<()> {
-        let api_key = self.get_api_key()?;
-        let body = self.get_body()?;
-        let mut headers = reqwest::header::HeaderMap::new();
-        headers.append("Authorization", format!("Bearer {api_key}").parse()?);
-        let mut client = reqwest::ClientBuilder::new().default_headers(headers);
-        match self.get_http_proxy()? {
-            None => {}
-            Some(proxy) => {
-                client = client.proxy(reqwest::Proxy::all(proxy)?);
-            }
+    fn get_adapter(&self) -> &str;
+    fn get_template(&self) -> &Value;
+    fn get_config(&self) -> &ChatGPTConfig;
+    fn get_mode(&self) -> Mode;
+    fn get_history(&self) -> Vec<Message>;
+    fn fetch(&self) -> impl futures::Stream<Item = ChatGPTResult<String>> {
+        fn get_adapter_not_found(adapter: &str) -> ChatGPTResult<()> {
+            Err(ChatGPTError::AdapterNotFound(adapter.to_string()))
         }
-        let client = client.build()?;
-        let mut es = client.post(self.url()).json(&body).eventsource()?;
-        while let Some(event) = es.next().await {
-            match event {
-                Ok(Event::Open) => self.on_open()?,
-                Ok(Event::Message(message)) => {
-                    let message = message.data;
-                    if message == "[DONE]" {
-                        self.on_close()?;
-                        es.close();
-                    } else {
-                        self.on_message(serde_json::from_str::<ChatResponse>(&message)?)?;
-                    }
-                }
-                Err(err) => {
-                    self.on_error(err)?;
-                    es.close();
-                }
-            }
+        async_stream::try_stream! {
+            let adapter = self.get_adapter();
+            let config = self.get_config();
+            let settings = config
+                .get_settings(adapter)
+                .ok_or(ChatGPTError::AdapterSettingsNotFound(adapter.to_string()))?;
+            match adapter {
+                "OpenAI" => {
+                    let adapter = OpenAIAdapter;
+                    let stream = adapter.fetch(
+                        settings,
+                        self.get_template(),
+                        self.get_mode(),
+                        self.get_history(),
+                    );
+                     pin_mut!(stream);
+                     for await item in stream {
+                         yield item?;
+                     }
+                },
+                "OpenAI Stream" => {
+                    let adapter = OpenAIStreamAdapter;
+                    let stream = adapter.fetch(
+                        settings,
+                        self.get_template(),
+                        self.get_mode(),
+                        self.get_history(),
+                    );
+                     pin_mut!(stream);
+                     for await item in stream {
+                         yield item?;
+                     }
+                },
+                _ => get_adapter_not_found(adapter)?
+            };
         }
-        Ok(())
     }
 }

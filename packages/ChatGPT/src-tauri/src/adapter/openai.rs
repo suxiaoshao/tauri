@@ -5,8 +5,8 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     errors::{ChatGPTError, ChatGPTResult},
-    fetch::{ChatRequest, ChatResponse, Message as FetchMessage},
-    store::{Message, Mode, Role, Status},
+    fetch::{ChatRequest, ChatResponse, Message},
+    store::{Mode, Role},
 };
 
 use super::{Adapter, InputItem, InputType};
@@ -42,7 +42,6 @@ struct OpenAISettings {
 
 #[derive(Deserialize, Serialize)]
 pub(super) struct OpenAIConversationTemplate {
-    pub(super) mode: Mode,
     pub(super) model: String,
     pub(super) temperature: f64,
     pub(super) top_p: f64,
@@ -63,16 +62,6 @@ pub(super) fn get_openai_template_inputs(
     models: &HashSet<String>,
 ) -> ChatGPTResult<Vec<InputItem>> {
     let inputs = vec![
-        InputItem::new(
-            "mode",
-            "Mode",
-            "Your mode",
-            InputType::Select(vec![
-                "contextual".to_string(),
-                "single".to_string(),
-                "assistant-only".to_string(),
-            ]),
-        ),
         InputItem::new(
             "model",
             "Model",
@@ -177,40 +166,28 @@ pub(super) fn get_openai_template_inputs(
 
 impl OpenAIAdapter {
     fn get_body<'a>(
+        mode: Mode,
         template: &'a OpenAIConversationTemplate,
-        history_messages: &'a [Message],
-        user_message: &'a Message,
+        history_messages: Vec<Message<'a>>,
     ) -> ChatRequest<'a> {
         let mut messages = template
             .prompts
             .iter()
-            .map(|prompt| FetchMessage::new(prompt.role, prompt.prompt.as_str()))
+            .map(|prompt| Message::new(prompt.role, prompt.prompt.as_str()))
             .collect::<Vec<_>>();
-        match template.mode {
+        match mode {
             Mode::Contextual => {
-                messages.extend(
-                    history_messages
-                        .iter()
-                        .filter(|message| message.status == Status::Normal)
-                        .map(|message| FetchMessage::new(message.role, message.content.as_str())),
-                );
+                messages.extend(history_messages);
             }
             Mode::Single => {}
             Mode::AssistantOnly => {
                 messages.extend(
                     history_messages
-                        .iter()
-                        .filter(|message| {
-                            message.role == Role::Assistant && message.status == Status::Normal
-                        })
-                        .map(|message| FetchMessage::new(message.role, message.content.as_str())),
+                        .into_iter()
+                        .filter(|message| message.role == Role::Assistant),
                 );
             }
         }
-        messages.push(FetchMessage::new(
-            user_message.role,
-            user_message.content.as_str(),
-        ));
         ChatRequest {
             messages,
             model: template.model.as_str(),
@@ -243,7 +220,9 @@ impl OpenAIAdapter {
 }
 
 impl Adapter for OpenAIAdapter {
-    const NAME: &'static str = "OpenAI";
+    fn name(&self) -> &'static str {
+        "OpenAI"
+    }
 
     fn get_setting_inputs(&self) -> Vec<InputItem> {
         let setting_inputs = vec![
@@ -300,13 +279,13 @@ impl Adapter for OpenAIAdapter {
         &self,
         settings: &serde_json::Value,
         template: &serde_json::Value,
-        history_messages: &[crate::store::Message],
-        user_message: crate::store::Message,
+        mode: Mode,
+        history_messages: Vec<Message<'_>>,
     ) -> impl futures::Stream<Item = ChatGPTResult<String>> {
         async_stream::try_stream! {
             let template = serde_json::from_value(template.clone())?;
             let settings = serde_json::from_value(settings.clone())?;
-            let body = Self::get_body(&template, history_messages, &user_message);
+            let body = Self::get_body(mode,&template, history_messages);
             let client = Self::get_reqwest_client(&settings)?;
             let response=client.post(settings.url.clone()).json(&body).send().await?;
             let response = response.json::<ChatResponse>().await?;

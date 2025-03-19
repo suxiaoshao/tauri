@@ -13,9 +13,12 @@ use time::OffsetDateTime;
 
 use crate::{
     errors::ChatGPTResult,
-    store::model::{
-        SqlConversation, SqlConversationTemplate, SqlNewConversationTemplate,
-        SqlUpdateConversationTemplate,
+    store::{
+        Mode,
+        model::{
+            SqlConversation, SqlConversationTemplate, SqlNewConversationTemplate,
+            SqlUpdateConversationTemplate,
+        },
     },
 };
 
@@ -27,6 +30,7 @@ pub struct ConversationTemplate {
     pub name: String,
     pub icon: String,
     pub description: Option<String>,
+    pub mode: Mode,
     pub adapter: String,
     pub template: serde_json::Value,
     #[serde(
@@ -54,6 +58,7 @@ impl ConversationTemplate {
             created_time,
             updated_time,
             description,
+            mode,
         } = SqlConversationTemplate::find(id, conn)?;
         Ok(Self {
             id,
@@ -64,6 +69,7 @@ impl ConversationTemplate {
             adapter,
             description,
             template: serde_json::Value::from_str(&template)?,
+            mode: mode.parse()?,
         })
     }
     pub fn all(conn: &mut SqliteConnection) -> ChatGPTResult<Vec<Self>> {
@@ -78,6 +84,7 @@ impl ConversationTemplate {
             description,
             template,
             adapter,
+            mode,
         } in sql_conversation_templates
         {
             conversation_templates.push(Self {
@@ -89,6 +96,7 @@ impl ConversationTemplate {
                 description,
                 template: serde_json::Value::from_str(&template)?,
                 adapter,
+                mode: mode.parse()?,
             });
         }
         Ok(conversation_templates)
@@ -100,6 +108,7 @@ impl ConversationTemplate {
             template,
             adapter,
             description,
+            mode,
         }: NewConversationTemplate,
         id: i32,
         conn: &mut SqliteConnection,
@@ -115,6 +124,7 @@ impl ConversationTemplate {
                 template: serde_json::to_string(&template)?,
                 updated_time: time,
                 description,
+                mode: mode.to_string(),
             };
             sql_new.update(conn)?;
             Ok(())
@@ -136,6 +146,7 @@ pub struct NewConversationTemplate {
     pub name: String,
     pub icon: String,
     pub description: Option<String>,
+    pub mode: Mode,
     pub adapter: String,
     pub template: serde_json::Value,
 }
@@ -146,6 +157,7 @@ impl NewConversationTemplate {
             name,
             icon,
             description,
+            mode,
             template,
             adapter,
         } = self;
@@ -160,6 +172,7 @@ impl NewConversationTemplate {
                 created_time: time,
                 updated_time: time,
                 description,
+                mode: mode.to_string(),
             };
             sql_new.insert(conn)?;
 

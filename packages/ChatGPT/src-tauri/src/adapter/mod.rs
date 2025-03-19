@@ -1,6 +1,4 @@
-use std::collections::HashMap;
-
-use crate::{errors::ChatGPTResult, store::Message};
+use crate::{errors::ChatGPTResult, fetch::Message, store::Mode};
 
 mod openai;
 mod openai_stream;
@@ -65,15 +63,15 @@ impl InputItem {
 }
 
 pub trait Adapter {
-    const NAME: &'static str;
+    fn name(&self) -> &'static str;
     fn get_setting_inputs(&self) -> Vec<InputItem>;
     fn get_template_inputs(&self, settings: &serde_json::Value) -> ChatGPTResult<Vec<InputItem>>;
     fn fetch(
         &self,
         settings: &serde_json::Value,
         template: &serde_json::Value,
-        history_messages: &[Message],
-        user_message: Message,
+        mode: Mode,
+        history_messages: Vec<Message>,
     ) -> impl futures::Stream<Item = ChatGPTResult<String>>;
 }
 
