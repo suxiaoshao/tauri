@@ -52,7 +52,7 @@ impl StoreVersion {
     pub fn migration(self) -> ChatGPTResult<DbConn> {
         match self {
             StoreVersion::None(conn) => {
-                log::info!("Migrating from None to V2");
+                log::info!("Migrating from None to V3");
                 let c = &mut conn.get()?;
                 init_tables(c)?;
                 Ok(conn)

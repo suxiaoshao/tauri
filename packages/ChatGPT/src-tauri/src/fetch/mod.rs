@@ -13,7 +13,6 @@ use crate::{
     adapter::{Adapter, OpenAIAdapter, OpenAIStreamAdapter},
     errors::{ChatGPTError, ChatGPTResult},
     plugins::ChatGPTConfig,
-    store::Mode,
 };
 
 pub use self::types::{ChatRequest, ChatResponse, Message};
@@ -24,7 +23,6 @@ pub trait FetchRunner {
     fn get_adapter(&self) -> &str;
     fn get_template(&self) -> &Value;
     fn get_config(&self) -> &ChatGPTConfig;
-    fn get_mode(&self) -> Mode;
     fn get_history(&self) -> Vec<Message>;
     fn fetch(&self) -> impl futures::Stream<Item = ChatGPTResult<String>> {
         fn get_adapter_not_found(adapter: &str) -> ChatGPTResult<()> {
@@ -34,15 +32,14 @@ pub trait FetchRunner {
             let adapter = self.get_adapter();
             let config = self.get_config();
             let settings = config
-                .get_settings(adapter)
+                .get_adapter_settings(adapter)
                 .ok_or(ChatGPTError::AdapterSettingsNotFound(adapter.to_string()))?;
             match adapter {
-                "OpenAI" => {
+                OpenAIAdapter::NAME => {
                     let adapter = OpenAIAdapter;
                     let stream = adapter.fetch(
                         settings,
                         self.get_template(),
-                        self.get_mode(),
                         self.get_history(),
                     );
                      pin_mut!(stream);
@@ -50,12 +47,11 @@ pub trait FetchRunner {
                          yield item?;
                      }
                 },
-                "OpenAI Stream" => {
+                OpenAIStreamAdapter::NAME => {
                     let adapter = OpenAIStreamAdapter;
                     let stream = adapter.fetch(
                         settings,
                         self.get_template(),
-                        self.get_mode(),
                         self.get_history(),
                     );
                      pin_mut!(stream);

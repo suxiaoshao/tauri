@@ -21,6 +21,7 @@ CREATE TABLE conversation_templates
     mode         TEXT                              not null check ( mode in ('contextual', 'single', 'assistant-only') ) default 'contextual',
     adapter      TEXT                              NOT NULL,
     template     TEXT                              NOT NULL,
+    prompts      TEXT                              NOT NULL,
     created_time DateTime                          not null,
     updated_time DateTime                          not null
 );

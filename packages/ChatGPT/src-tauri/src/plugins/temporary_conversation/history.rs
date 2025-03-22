@@ -551,16 +551,23 @@ impl<R: Runtime> FetchRunner for TemporaryFetch<'_, R> {
         &self.config
     }
 
-    fn get_mode(&self) -> Mode {
-        Mode::Contextual
-    }
-
     fn get_history(&self) -> Vec<FetchMessage> {
-        self.conversation
+        let mut prompts = self
+            .conversation
+            .template
+            .prompts
+            .iter()
+            .map(|prompt| FetchMessage::new(prompt.role, prompt.prompt.as_str()))
+            .collect::<Vec<_>>();
+
+        let messages = self
+            .conversation
             .messages
             .iter()
             .filter(|message| message.status == Status::Normal)
-            .map(|message| FetchMessage::new(message.role, message.content.as_str()))
-            .collect()
+            .map(|message| FetchMessage::new(message.role, message.content.as_str()));
+
+        prompts.extend(messages);
+        prompts
     }
 }

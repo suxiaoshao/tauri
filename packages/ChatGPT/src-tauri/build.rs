@@ -55,7 +55,11 @@ fn main() {
                 "adapter",
                 tauri_build::InlinedPlugin::new()
                     .default_permission(tauri_build::DefaultPermissionRule::AllowAllCommands)
-                    .commands(&["get_adapter_setting_inputs"]),
+                    .commands(&[
+                        "get_all_adapter_setting_inputs",
+                        "get_all_adapter_template_inputs",
+                        "get_adapter_template_inputs",
+                    ]),
             ),
     )
     .unwrap();

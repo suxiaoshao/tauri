@@ -106,7 +106,7 @@ impl ChatGPTConfig {
         };
         Ok(config)
     }
-    pub(crate) fn get_settings(&self, adapter: &str) -> Option<&serde_json::Value> {
+    pub(crate) fn get_adapter_settings(&self, adapter: &str) -> Option<&serde_json::Value> {
         self.adapter_settings.get(adapter)
     }
 }

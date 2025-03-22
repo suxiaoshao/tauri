@@ -6,7 +6,7 @@
  * @FilePath: /tauri/packages/ChatGPT/src-tauri/src/store/migrations/mod.rs
  */
 use crate::{
-    adapter::{Adapter, OpenAIConversationTemplate, OpenAIStreamAdapter, OpenAITemplatePrompt},
+    adapter::{Adapter, OpenAIConversationTemplate, OpenAIStreamAdapter},
     errors::ChatGPTResult,
     store::{
         migrations::v1::AllDataV1,
@@ -22,6 +22,7 @@ use self::v1::SqlConversationV1;
 use super::{
     CREATE_TABLE_SQL, Role,
     model::{SqlConversation, SqlConversationTemplate},
+    service::ConversationTemplatePrompt,
 };
 
 pub(super) mod v1;
@@ -90,7 +91,7 @@ fn get_conversations_from_v1(
             created_time,
             updated_time,
             description: info.clone(),
-            adapter: OpenAIStreamAdapter.name().to_string(),
+            adapter: OpenAIStreamAdapter::NAME.to_string(),
             template: serde_json::to_string(&OpenAIConversationTemplate {
                 model,
                 temperature,
@@ -99,13 +100,13 @@ fn get_conversations_from_v1(
                 presence_penalty,
                 frequency_penalty,
                 max_completion_tokens: max_tokens.map(|x| x as u32),
-                prompts: match prompt {
-                    Some(prompt) => vec![OpenAITemplatePrompt {
-                        prompt,
-                        role: Role::System,
-                    }],
-                    None => vec![],
-                },
+            })?,
+            prompts: serde_json::to_string(&match prompt {
+                Some(prompt) => vec![ConversationTemplatePrompt {
+                    prompt,
+                    role: Role::System,
+                }],
+                None => vec![],
             })?,
         };
         target_templates.push(template);
@@ -190,7 +191,7 @@ fn get_conversations_from_v2(
         let prompts = v2_prompts
             .iter()
             .filter(|prompt| prompt.template_id == id)
-            .map(|prompt| OpenAITemplatePrompt {
+            .map(|prompt| ConversationTemplatePrompt {
                 prompt: prompt.prompt.clone(),
                 role: Role::System,
             })
@@ -204,7 +205,7 @@ fn get_conversations_from_v2(
             name,
             description,
             mode,
-            adapter: OpenAIStreamAdapter.name().to_string(),
+            adapter: OpenAIStreamAdapter::NAME.to_string(),
             template: serde_json::to_string(&OpenAIConversationTemplate {
                 model,
                 temperature,
@@ -213,8 +214,8 @@ fn get_conversations_from_v2(
                 presence_penalty,
                 frequency_penalty,
                 max_completion_tokens: max_tokens.map(|x| x as u32),
-                prompts,
             })?,
+            prompts: serde_json::to_string(&prompts)?,
         };
         templates.push(template);
     }

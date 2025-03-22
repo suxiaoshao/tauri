@@ -8,7 +8,7 @@
 use crate::{
     adapter::{Adapter, OpenAIConversationTemplate, OpenAIStreamAdapter},
     errors::ChatGPTResult,
-    store::Mode,
+    store::{Mode, service::ConversationTemplatePrompt},
 };
 
 use super::super::schema::conversation_templates;
@@ -24,6 +24,7 @@ pub struct SqlNewConversationTemplate {
     pub(in super::super) mode: String,
     pub(in super::super) adapter: String,
     pub(in super::super) template: String,
+    pub(in super::super) prompts: String,
     pub(in super::super) created_time: OffsetDateTime,
     pub(in super::super) updated_time: OffsetDateTime,
 }
@@ -31,14 +32,14 @@ pub struct SqlNewConversationTemplate {
 impl SqlNewConversationTemplate {
     pub fn default() -> ChatGPTResult<Self> {
         let now = OffsetDateTime::now_utc();
-        let adapter = OpenAIStreamAdapter;
         Ok(Self {
             name: "基础模板".to_string(),
             icon: "🤖".to_string(),
             description: None,
             mode: (Mode::Contextual).to_string(),
-            adapter: adapter.name().to_string(),
+            adapter: OpenAIStreamAdapter::NAME.to_string(),
             template: serde_json::to_string(&OpenAIConversationTemplate::default())?,
+            prompts: serde_json::to_string(&Vec::<ConversationTemplatePrompt>::new())?,
             created_time: now,
             updated_time: now,
         })
@@ -61,6 +62,7 @@ pub struct SqlConversationTemplate {
     pub(in super::super) mode: String,
     pub(in super::super) adapter: String,
     pub(in super::super) template: String,
+    pub(in super::super) prompts: String,
     pub(in super::super) created_time: OffsetDateTime,
     pub(in super::super) updated_time: OffsetDateTime,
 }
@@ -105,6 +107,7 @@ pub struct SqlUpdateConversationTemplate {
     pub(in super::super) mode: String,
     pub(in super::super) adapter: String,
     pub(in super::super) template: String,
+    pub(in super::super) prompts: String,
     pub(in super::super) updated_time: OffsetDateTime,
 }
 

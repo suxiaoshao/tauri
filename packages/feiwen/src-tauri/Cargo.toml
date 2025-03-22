@@ -19,16 +19,16 @@ tauri = { workspace = true, features = ["macos-private-api"] }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
 # log
-tauri-plugin-log = { version = "2.3.0" }
+tauri-plugin-log = { version = "2.3.1" }
 log = "0.4.26"
 
 # database
 diesel = { version = "2.2.8", features = ["sqlite", "r2d2"] }
 libsqlite3-sys = { version = "0.31.0", features = ["bundled"] }
-time = { version = "0.3.39", features = ["serde"] }
+time = { version = "0.3.40", features = ["serde"] }
 
 # http
-reqwest = "0.12.13"
+reqwest = "0.12.15"
 
 # html
 scraper = "0.23.1"

@@ -17,7 +17,6 @@ mod plugins;
 mod store;
 
 fn main() -> ChatGPTResult<()> {
-    let context = tauri::generate_context!();
     tauri::Builder::default()
         .setup(|app| {
             create_main_window(app, "/")?;
@@ -58,7 +57,7 @@ fn main() -> ChatGPTResult<()> {
         .plugin(plugins::TemporaryConversationPlugin::default())
         .plugin(plugins::TrayPlugin)
         .plugin(plugins::AdapterPlugin)
-        .run(context)?;
+        .run(tauri::generate_context!())?;
     Ok(())
 }
 

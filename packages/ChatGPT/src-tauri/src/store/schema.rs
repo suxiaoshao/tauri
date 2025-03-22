@@ -9,6 +9,7 @@ diesel::table! {
         mode -> Text,
         adapter -> Text,
         template -> Text,
+        prompts -> Text,
         created_time -> TimestamptzSqlite,
         updated_time -> TimestamptzSqlite,
     }

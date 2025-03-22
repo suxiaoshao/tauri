@@ -22,7 +22,7 @@ serde_json = { workspace = true }
 diesel = { version = "2.2.8", features = ["sqlite"] }
 
 # http
-reqwest = "0.12.13"
+reqwest = "0.12.15"
 
 # 错误处理
 anyhow = "1.0.97"

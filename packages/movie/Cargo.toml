@@ -10,11 +10,11 @@ edition = "2024"
 thiserror = "2.0.12"
 
 # 网络请求
-reqwest = "0.12.13"
+reqwest = "0.12.15"
 scraper = "0.23.1"
 
 # 运行时
-tokio = { version = "1.44.0", features = [
+tokio = { version = "1.44.1", features = [
   "rt",
   "rt-multi-thread",
   "macros",

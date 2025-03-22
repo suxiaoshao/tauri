@@ -1,17 +1,15 @@
 import { Controller, useFieldArray, useFormContext } from 'react-hook-form';
 import usePromise, { PromiseStatus } from '@chatgpt/hooks/usePromise';
-import { getAdapterSettingInputs, type InputItem } from '@chatgpt/service/adapter';
+import { getAllAdapterSettingInputs, type InputItem } from '@chatgpt/service/adapter';
 import { match } from 'ts-pattern';
 import Loading from '@chatgpt/components/Loading';
 import ErrorInfo from '@chatgpt/components/ErrorInfo';
 import { Box, Divider, FormLabel, IconButton, InputAdornment, MenuItem, TextField, Typography } from '@mui/material';
-import type { Config } from '../types';
 import { Add, Delete } from '@mui/icons-material';
 import NumberField from '@chatgpt/components/NumberField';
 
 export default function AdapterSettings() {
-  const [data, fn] = usePromise(getAdapterSettingInputs);
-  const { register } = useFormContext<Config>();
+  const [data, fn] = usePromise(getAllAdapterSettingInputs);
   const content = match(data)
     .with({ tag: PromiseStatus.loading }, () => <Loading sx={{ width: '100%', height: '100%' }} />)
     .with({ tag: PromiseStatus.error }, ({ value }) => <ErrorInfo error={value} refetch={fn} />)
@@ -21,7 +19,7 @@ export default function AdapterSettings() {
           <Box key={name} sx={{ gap: 2, display: 'flex', flexDirection: 'column' }}>
             <Typography variant="h6">{name}</Typography>
             {inputs.map((input) => (
-              <InputItemForm inputItem={input} prefixName={`adapterSettings.${name}`} />
+              <InputItemForm key={input.id} inputItem={input} prefixName={`adapterSettings.${name}`} />
             ))}
             <Divider />
           </Box>
@@ -32,7 +30,7 @@ export default function AdapterSettings() {
   return content;
 }
 
-function InputItemForm({
+export function InputItemForm({
   inputItem,
   prefixName,
   required = true,
@@ -46,29 +44,37 @@ function InputItemForm({
     .with({ tag: 'text' }, () => (
       <TextField fullWidth required={required} label={inputItem.name} {...register(`${prefixName}.${inputItem.id}`)} />
     ))
-    .with({ tag: 'integer' }, () => (
+    .with({ tag: 'integer' }, ({ value }) => (
       <NumberField
         fullWidth
         required={required}
         label={inputItem.name}
         slotProps={{
           htmlInput: {
-            step: 1,
+            step: value.step,
+            max: value.max,
+            min: value.min,
+            defaultValue: value.default,
           },
         }}
+        defaultValue={value.default}
         {...register(`${prefixName}.${inputItem.id}`, { valueAsNumber: true })}
       />
     ))
-    .with({ tag: 'float' }, () => (
+    .with({ tag: 'float' }, ({ value }) => (
       <NumberField
         fullWidth
         required={required}
         label={inputItem.name}
         slotProps={{
           htmlInput: {
-            step: 0.01,
+            step: value.step,
+            max: value.max,
+            min: value.min,
+            defaultValue: value.default,
           },
         }}
+        defaultValue={value.default}
         {...register(`${prefixName}.${inputItem.id}`, { valueAsNumber: true })}
       />
     ))
@@ -77,6 +83,7 @@ function InputItemForm({
         control={control}
         name={`${prefixName}.${inputItem.id}`}
         rules={{ required: required }}
+        defaultValue={value.value.at(0)}
         render={({ field }) => (
           <TextField select label={inputItem.name} required={required} fullWidth {...field}>
             {value.value.map((item) => (
@@ -89,6 +96,7 @@ function InputItemForm({
       />
     ))
     .with({ tag: 'optional' }, ({ value }) => (
+      // todo optional
       <InputItemForm inputItem={{ ...inputItem, inputType: value }} prefixName={prefixName} required={false} />
     ))
     .with({ tag: 'array' }, ({ value }) => <ArrayField {...inputItem} prefixName={prefixName} inputItem={value} />)

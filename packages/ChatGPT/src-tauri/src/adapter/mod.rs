@@ -1,4 +1,4 @@
-use crate::{errors::ChatGPTResult, fetch::Message, store::Mode};
+use crate::{errors::ChatGPTResult, fetch::Message};
 
 mod openai;
 mod openai_stream;
@@ -63,17 +63,16 @@ impl InputItem {
 }
 
 pub trait Adapter {
-    fn name(&self) -> &'static str;
+    const NAME: &'static str;
     fn get_setting_inputs(&self) -> Vec<InputItem>;
     fn get_template_inputs(&self, settings: &serde_json::Value) -> ChatGPTResult<Vec<InputItem>>;
     fn fetch(
         &self,
         settings: &serde_json::Value,
         template: &serde_json::Value,
-        mode: Mode,
         history_messages: Vec<Message>,
     ) -> impl futures::Stream<Item = ChatGPTResult<String>>;
 }
 
-pub(crate) use openai::{OpenAIAdapter, OpenAIConversationTemplate, OpenAITemplatePrompt};
+pub(crate) use openai::{OpenAIAdapter, OpenAIConversationTemplate};
 pub(crate) use openai_stream::OpenAIStreamAdapter;

@@ -80,25 +80,48 @@ where
         &self.config
     }
 
-    fn get_mode(&self) -> Mode {
-        self.template.mode
-    }
-
     fn get_history(&self) -> Vec<FetchMessage> {
-        let mut history = self
-            .history_messages
+        let mut prompts_messages = self
+            .template
+            .prompts
             .iter()
-            .filter(|message| message.status == Status::Normal)
-            .map(|Message { role, content, .. }| FetchMessage {
-                content,
-                role: *role,
-            })
+            .map(|prompt| FetchMessage::new(prompt.role, prompt.prompt.as_str()))
             .collect::<Vec<_>>();
-        history.push(FetchMessage {
+        match self.template.mode {
+            Mode::Contextual => {
+                let history_messages = self
+                    .history_messages
+                    .iter()
+                    .filter(|message| message.status == Status::Normal)
+                    .map(|Message { role, content, .. }| FetchMessage {
+                        content,
+                        role: *role,
+                    });
+                prompts_messages.extend(history_messages);
+            }
+            Mode::Single => {}
+            Mode::AssistantOnly => {
+                let history = self
+                    .history_messages
+                    .iter()
+                    .filter(|message| message.status == Status::Normal)
+                    .map(|Message { role, content, .. }| FetchMessage {
+                        content,
+                        role: *role,
+                    })
+                    .collect::<Vec<_>>();
+                prompts_messages.extend(
+                    history
+                        .into_iter()
+                        .filter(|message| message.role == Role::Assistant),
+                );
+            }
+        }
+        prompts_messages.push(FetchMessage {
             content: &self.user_message.content,
             role: self.user_message.role,
         });
-        history
+        prompts_messages
     }
 }
 
