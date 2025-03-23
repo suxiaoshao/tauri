@@ -38,6 +38,7 @@ pub trait FetchRunner {
                 OpenAIAdapter::NAME => {
                     let adapter = OpenAIAdapter;
                     let stream = adapter.fetch(
+                        config,
                         settings,
                         self.get_template(),
                         self.get_history(),
@@ -50,6 +51,7 @@ pub trait FetchRunner {
                 OpenAIStreamAdapter::NAME => {
                     let adapter = OpenAIStreamAdapter;
                     let stream = adapter.fetch(
+                        config,
                         settings,
                         self.get_template(),
                         self.get_history(),

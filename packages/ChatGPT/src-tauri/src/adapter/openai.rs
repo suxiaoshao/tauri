@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 use crate::{
     errors::{ChatGPTError, ChatGPTResult},
     fetch::{ChatRequest, Message},
+    plugins::ChatGPTConfig,
 };
 
 use super::{Adapter, InputItem, InputType};
@@ -161,7 +162,10 @@ impl OpenAIAdapter {
             frequency_penalty: template.frequency_penalty,
         }
     }
-    fn get_reqwest_client(settings: &OpenAISettings) -> ChatGPTResult<Client> {
+    fn get_reqwest_client(
+        config: &ChatGPTConfig,
+        settings: &OpenAISettings,
+    ) -> ChatGPTResult<Client> {
         let api_key = settings
             .api_key
             .as_deref()
@@ -169,7 +173,7 @@ impl OpenAIAdapter {
         let mut headers = reqwest::header::HeaderMap::new();
         headers.append("Authorization", format!("Bearer {api_key}").parse()?);
         let mut client = reqwest::ClientBuilder::new().default_headers(headers);
-        match &settings.http_proxy {
+        match settings.http_proxy.as_deref().or(config.get_http_proxy()) {
             None => {}
             Some(proxy) => {
                 client = client.proxy(reqwest::Proxy::all(proxy)?);
@@ -236,6 +240,7 @@ impl Adapter for OpenAIAdapter {
 
     fn fetch(
         &self,
+        config: &ChatGPTConfig,
         settings: &serde_json::Value,
         template: &serde_json::Value,
         history_messages: Vec<Message<'_>>,
@@ -244,7 +249,7 @@ impl Adapter for OpenAIAdapter {
             let template = serde_json::from_value(template.clone())?;
             let settings = serde_json::from_value(settings.clone())?;
             let body = Self::get_body(&template, history_messages);
-            let client = Self::get_reqwest_client(&settings)?;
+            let client = Self::get_reqwest_client(config, &settings)?;
             let response=client.post(settings.url.clone()).json(&body).send().await?;
             let response = response.json::<ChatCompletion>().await?;
             let content = response

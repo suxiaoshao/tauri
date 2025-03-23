@@ -32,6 +32,4 @@ export const useConfigStore = create<ConfigState>((set) => ({
   adapterSettings: {},
 }));
 
-export const selectApiKey = (state: ConfigState) => state.apiKey;
-export const selectModels = (state: ConfigState) => state.models;
 export const selectConfig = (state: ConfigState) => state;

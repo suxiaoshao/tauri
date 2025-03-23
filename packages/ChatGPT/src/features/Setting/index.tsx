@@ -1,4 +1,3 @@
-import useConfig from '@chatgpt/hooks/useConfig';
 import useSettingKey from '@chatgpt/hooks/useSettingKey';
 import { createSettingWindow, setConfigService } from '@chatgpt/service/config';
 import { valibotResolver } from '@hookform/resolvers/valibot';
@@ -95,7 +94,6 @@ function Setting() {
 }
 
 function SettingItem() {
-  useConfig();
   useSettingKey();
   const handleSetting = useCallback(async () => {
     await createSettingWindow();

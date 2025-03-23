@@ -1,4 +1,4 @@
-use crate::{errors::ChatGPTResult, fetch::Message};
+use crate::{errors::ChatGPTResult, fetch::Message, plugins::ChatGPTConfig};
 
 mod openai;
 mod openai_stream;
@@ -68,6 +68,7 @@ pub trait Adapter {
     fn get_template_inputs(&self, settings: &serde_json::Value) -> ChatGPTResult<Vec<InputItem>>;
     fn fetch(
         &self,
+        config: &ChatGPTConfig,
         settings: &serde_json::Value,
         template: &serde_json::Value,
         history_messages: Vec<Message>,

@@ -5,11 +5,7 @@
  * @LastEditTime: 2024-05-01 10:33:44
  * @FilePath: /tauri/packages/ChatGPT/src-tauri/src/plugins/config/config_data.rs
  */
-use std::{
-    collections::{HashMap, HashSet},
-    io::ErrorKind,
-    path::PathBuf,
-};
+use std::{collections::HashMap, io::ErrorKind, path::PathBuf};
 
 use serde::{Deserialize, Serialize};
 use tauri::{Manager, Runtime};
@@ -41,32 +37,12 @@ impl Default for ThemeOption {
     }
 }
 
-fn default_url() -> String {
-    "https://api.openai.com/v1/chat/completions".to_string()
-}
-
-fn default_models() -> HashSet<String> {
-    let mut models = HashSet::new();
-    models.insert("gpt-3.5-turbo".to_string());
-    models.insert("gpt-3.5-turbo-16k".to_string());
-    models.insert("gpt-3.5-turbo-instruct".to_string());
-    models.insert("gpt-4".to_string());
-    models.insert("gpt-4-turbo".to_string());
-    models
-}
-
 #[derive(Clone, Debug, Default, Deserialize, Serialize, PartialEq, Eq)]
 pub struct ChatGPTConfig {
-    #[serde(rename = "apiKey")]
-    api_key: Option<String>,
     #[serde(default = "Default::default")]
     theme: ThemeOption,
-    #[serde(default = "default_url")]
-    pub url: String,
     #[serde(rename = "httpProxy")]
     pub http_proxy: Option<String>,
-    #[serde(default = "default_models")]
-    pub models: HashSet<String>,
     #[serde(rename = "temporaryHotkey")]
     pub temporary_hotkey: Option<String>,
     #[serde(rename = "adapterSettings", default)]
@@ -108,5 +84,8 @@ impl ChatGPTConfig {
     }
     pub(crate) fn get_adapter_settings(&self, adapter: &str) -> Option<&serde_json::Value> {
         self.adapter_settings.get(adapter)
+    }
+    pub(crate) fn get_http_proxy(&self) -> Option<&str> {
+        self.http_proxy.as_deref()
     }
 }
