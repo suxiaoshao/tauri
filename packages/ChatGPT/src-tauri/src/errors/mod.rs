@@ -1,6 +1,6 @@
 use std::sync::PoisonError;
 
-use serde::{ser::SerializeStruct, Serialize, Serializer};
+use serde::{Serialize, Serializer, ser::SerializeStruct};
 use thiserror::Error;
 
 #[derive(Error, Debug)]
@@ -73,6 +73,10 @@ pub enum ChatGPTError {
     TemporaryConversationNotFound(usize),
     #[error("global shortcuts:{}",.0)]
     GlobalShortcuts(#[from] tauri_plugin_global_shortcut::Error),
+    #[error("adapter {} settings not found",.0)]
+    AdapterSettingsNotFound(String),
+    #[error("adapter {} not found",.0)]
+    AdapterNotFound(String),
 }
 
 impl Serialize for ChatGPTError {
@@ -192,6 +196,14 @@ impl Serialize for ChatGPTError {
             }
             ChatGPTError::GlobalShortcuts(error) => {
                 state.serialize_field("code", "GlobalShortcuts")?;
+                state.serialize_field("data", error)?;
+            }
+            ChatGPTError::AdapterSettingsNotFound(error) => {
+                state.serialize_field("code", "AdapterSettingsNotFound")?;
+                state.serialize_field("data", error)?;
+            }
+            ChatGPTError::AdapterNotFound(error) => {
+                state.serialize_field("code", "AdapterNotFound")?;
                 state.serialize_field("data", error)?;
             }
         }

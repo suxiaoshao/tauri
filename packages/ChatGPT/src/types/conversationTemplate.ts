@@ -13,23 +13,9 @@ export interface ConversationTemplate {
   icon: string;
   description: string | null;
   mode: Mode;
-  model: string;
-  createdTime: string;
-  updatedTime: string;
-  temperature: number;
-  topP: number;
-  n: number;
-  maxTokens?: number;
-  presencePenalty: number;
-  frequencyPenalty: number;
+  adapter: string;
+  template: Record<string, unknown>;
   prompts: ConversationTemplatePrompt[];
-}
-
-export interface ConversationTemplatePrompt {
-  id: number;
-  templateId: number;
-  prompt: string;
-  role: Role;
   createdTime: string;
   updatedTime: string;
 }
@@ -39,17 +25,12 @@ export interface NewConversationTemplate {
   icon: string;
   description?: string | null;
   mode: Mode;
-  model: string;
-  temperature: number;
-  topP: number;
-  n: number;
-  maxTokens?: number | null;
-  presencePenalty: number;
-  frequencyPenalty: number;
-  prompts: NewConversationTemplatePrompt[]; // Assuming MewConversationTemplatePrompt is defined elsewhere
+  prompts: ConversationTemplatePrompt[];
+  adapter: string;
+  template: object;
 }
 
-export interface NewConversationTemplatePrompt {
+export interface ConversationTemplatePrompt {
   prompt: string;
   role: Role;
 }

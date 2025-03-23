@@ -13,10 +13,11 @@ export interface ChatFormProps {
 }
 
 export default function ChatForm({ status, onSendMessage }: ChatFormProps) {
-  const { register, handleSubmit, reset } = useForm<Message>({ defaultValues: { role: Role.user } });
+  const { register, handleSubmit, resetField } = useForm<Message>({ defaultValues: { role: Role.user } });
   const onSubmit = handleSubmit(async (data) => {
-    reset();
-    await onSendMessage(data.content);
+    const content = data.content;
+    resetField('content');
+    await onSendMessage(content);
   });
   const isLoading = [PromiseStatus.loading].includes(status.tag);
   // search & fucused

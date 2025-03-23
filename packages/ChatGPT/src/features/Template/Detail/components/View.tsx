@@ -9,6 +9,7 @@ import assistant from '@chatgpt/assets/assistant.jpg';
 import system from '@chatgpt/assets/system.png';
 import user from '@chatgpt/assets/user.jpg';
 import CustomMarkdown from '@chatgpt/components/Markdown';
+import type { AdapterInputs } from '@chatgpt/service/adapter';
 import { Role } from '@chatgpt/types/common';
 import { type ConversationTemplate } from '@chatgpt/types/conversationTemplate';
 import { Avatar, Box, Divider, List, ListItem, ListItemAvatar, ListItemText, Typography } from '@mui/material';
@@ -19,25 +20,26 @@ import { match } from 'ts-pattern';
 
 export interface TemplateDetailViewProps {
   data: ConversationTemplate;
+  inputs: AdapterInputs;
 }
-export default function TemplateDetailView({ data }: TemplateDetailViewProps) {
+export default function TemplateDetailView({ data, inputs }: TemplateDetailViewProps) {
   const items = useMemo<DetailsItem[]>(
     () => [
       { label: 'name', value: data.name },
       { label: 'Icon', value: data.icon },
       { label: 'Mode', value: data.mode },
-      { label: 'Model', value: data.model },
-      { label: 'Temperature', value: data.temperature },
-      { label: 'Top P', value: data.topP },
-      { label: 'N', value: data.n },
-      { label: 'Presence Penalty', value: data.presencePenalty },
-      { label: 'Frequency Penalty', value: data.frequencyPenalty },
-      { label: 'Max Tokens', value: data.maxTokens },
+      ...inputs.inputs.map(
+        (input) =>
+          ({
+            label: input.name,
+            value: data.template?.[input.id] as React.ReactNode,
+          }) as DetailsItem,
+      ),
       { label: 'Created At', value: format(data.createdTime) },
       { label: 'Updated At', value: format(data.updatedTime) },
       { label: 'Description', value: data.description, span: 3 },
     ],
-    [data],
+    [data, inputs],
   );
   return (
     <Box sx={{ flex: '1 1 0', overflowY: 'auto' }}>
@@ -54,12 +56,12 @@ export default function TemplateDetailView({ data }: TemplateDetailViewProps) {
           const avatar = match(prompt.role)
             .with(Role.user, () => user)
             .with(Role.assistant, () => assistant)
-            .with(Role.system, () => system)
+            .with(Role.developer, () => system)
             .otherwise(() => user);
           return (
             // eslint-disable-next-line label-has-associated-control
-            <React.Fragment key={prompt.id}>
-              <ListItem alignItems="flex-start" key={prompt.id}>
+            <React.Fragment key={prompt.prompt}>
+              <ListItem alignItems="flex-start">
                 <ListItemAvatar>
                   <Avatar src={avatar} />
                 </ListItemAvatar>

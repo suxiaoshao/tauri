@@ -16,7 +16,7 @@ export default function MessageItem({ message, selected }: MessageItemProps) {
     return match(message.role)
       .with(Role.user, () => <UserItem selected={selected} message={message} />)
       .with(Role.assistant, () => <AssistantItem selected={selected} message={message} />)
-      .with(Role.system, () => <SystemItem selected={selected} message={message} />)
+      .with(Role.developer, () => <SystemItem selected={selected} message={message} />)
       .exhaustive();
   }, [message, selected]);
 }

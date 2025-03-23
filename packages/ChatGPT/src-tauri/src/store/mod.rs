@@ -15,15 +15,14 @@ use std::path::Path;
 
 use crate::errors::{ChatGPTError, ChatGPTResult};
 use diesel::{
+    Connection, SqliteConnection,
     connection::SimpleConnection,
     r2d2::{ConnectionManager, Pool},
-    Connection, SqliteConnection,
 };
 
 pub use service::{
-    deserialize_offset_date_time, serialize_offset_date_time, Conversation, ConversationTemplate,
-    Folder, Message, NewConversation, NewConversationTemplate, NewConversationTemplatePrompt,
-    NewFolder, NewMessage,
+    Conversation, ConversationTemplate, Folder, Message, NewConversation, NewConversationTemplate,
+    NewFolder, NewMessage, deserialize_offset_date_time, serialize_offset_date_time,
 };
 use time::OffsetDateTime;
 pub use types::{Mode, Role, Status};
@@ -32,6 +31,7 @@ use self::model::{SqlConversationTemplate, SqlNewConversation, SqlNewConversatio
 
 const DB_FILE: &str = "history.sqlite3";
 const DB_FILE_V2: &str = "history_v2.sqlite3";
+const DB_FILE_V3: &str = "history_v3.sqlite3";
 const CREATE_TABLE_SQL: &str =
     include_str!("../../migrations/2023-07-25-025504_create_table/up.sql");
 
@@ -41,41 +41,64 @@ pub enum StoreVersion {
         conn: DbConn,
         v1_db: SqliteConnection,
     },
-    V2(DbConn),
+    V2 {
+        conn: DbConn,
+        v2_db: SqliteConnection,
+    },
+    V3(DbConn),
 }
 
 impl StoreVersion {
     pub fn migration(self) -> ChatGPTResult<DbConn> {
         match self {
             StoreVersion::None(conn) => {
-                log::info!("Migrating from None to V2");
+                log::info!("Migrating from None to V3");
                 let c = &mut conn.get()?;
                 init_tables(c)?;
                 Ok(conn)
             }
             StoreVersion::V1 { conn, mut v1_db } => {
-                log::info!("Migrating from V1 to V2");
-                let v2_db = &mut conn.get()?;
-                if migrations::v1_to_v2(&mut v1_db, v2_db).is_err() {
-                    init_tables(v2_db)?;
+                log::info!("Migrating from V1 to V3");
+                let v3_db = &mut conn.get()?;
+                if migrations::v1_to_v3(&mut v1_db, v3_db).is_err() {
+                    init_tables(v3_db)?;
                 };
                 Ok(conn)
             }
-            StoreVersion::V2(conn) => Ok(conn),
+            StoreVersion::V2 { conn, mut v2_db } => {
+                log::info!("Migrating from V2 to V3");
+                let v3_db = &mut conn.get()?;
+                if migrations::v2_to_v3(&mut v2_db, v3_db).is_err() {
+                    init_tables(v3_db)?;
+                };
+                Ok(conn)
+            }
+            StoreVersion::V3(pool) => Ok(pool),
         }
     }
     pub fn new(config_dir: &Path) -> ChatGPTResult<Self> {
         let v1_filepath = config_dir.join(DB_FILE);
         let v2_filepath = config_dir.join(DB_FILE_V2);
-        match (v1_filepath.exists(), v2_filepath.exists()) {
-            (true, false) => Ok(StoreVersion::V1 {
-                conn: get_dbconn(&v2_filepath)?,
+        let v3_filepath = config_dir.join(DB_FILE_V3);
+        match (
+            v1_filepath.exists(),
+            v2_filepath.exists(),
+            v3_filepath.exists(),
+        ) {
+            (true, false, false) => Ok(StoreVersion::V1 {
+                conn: get_dbconn(&v3_filepath)?,
                 v1_db: SqliteConnection::establish(
                     v1_filepath.to_str().ok_or(ChatGPTError::DbPath)?,
                 )?,
             }),
-            (_, true) => Ok(StoreVersion::V2(get_dbconn(&v2_filepath)?)),
-            _ => Ok(StoreVersion::None(get_dbconn(&v2_filepath)?)),
+            (_, true, false) => Ok(StoreVersion::V2 {
+                conn: get_dbconn(&v3_filepath)?,
+                v2_db: SqliteConnection::establish(
+                    v2_filepath.to_str().ok_or(ChatGPTError::DbPath)?,
+                )?,
+            }),
+            (_, _, true) => Ok(StoreVersion::V3(get_dbconn(&v3_filepath)?)),
+            _ => Ok(StoreVersion::None(get_dbconn(&v3_filepath)?)),
         }
     }
 }
@@ -107,7 +130,7 @@ pub fn init_tables(conn: &mut SqliteConnection) -> ChatGPTResult<()> {
         // Create tables
         conn.batch_execute(CREATE_TABLE_SQL)?;
         // Insert conversation template
-        let default_conversation_template = SqlNewConversationTemplate::default();
+        let default_conversation_template = SqlNewConversationTemplate::default()?;
         default_conversation_template.insert(conn)?;
         // Insert default conversation
         let SqlConversationTemplate { id, .. } = SqlConversationTemplate::first(conn)?;

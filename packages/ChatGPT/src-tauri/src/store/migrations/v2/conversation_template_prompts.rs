@@ -12,10 +12,9 @@ use time::OffsetDateTime;
 
 use super::schema::conversation_template_prompts;
 
-#[derive(Queryable, AsChangeset, Debug, Clone)]
+#[derive(Queryable, AsChangeset, Debug, Clone, Selectable)]
 #[diesel(table_name = conversation_template_prompts)]
 pub struct SqlConversationTemplatePromptV2 {
-    pub(in crate::store) id: i32,
     pub(in crate::store) template_id: i32,
     pub(in crate::store) prompt: String,
     pub(in crate::store) role: String,
@@ -25,8 +24,9 @@ pub struct SqlConversationTemplatePromptV2 {
 
 impl SqlConversationTemplatePromptV2 {
     pub fn all(conn: &mut SqliteConnection) -> ChatGPTResult<Vec<Self>> {
-        let prompts =
-            conversation_template_prompts::table.load::<SqlConversationTemplatePromptV2>(conn)?;
+        let prompts = conversation_template_prompts::table
+            .select(SqlConversationTemplatePromptV2::as_select())
+            .load::<SqlConversationTemplatePromptV2>(conn)?;
         Ok(prompts)
     }
 }

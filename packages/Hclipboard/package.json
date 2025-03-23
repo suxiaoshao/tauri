@@ -10,7 +10,7 @@
     "tauri": "tauri"
   },
   "dependencies": {
-    "@tauri-apps/plugin-clipboard-manager": "^2.2.0",
+    "@tauri-apps/plugin-clipboard-manager": "^2.2.2",
     "dayjs": "^1.11.13",
     "entities": "^6.0.0",
     "notify": "workspace:^",

@@ -29,6 +29,7 @@ export const useConfigStore = create<ConfigState>((set) => ({
     const data = await getConfig();
     set(data);
   },
+  adapterSettings: {},
 }));
 
 export const selectApiKey = (state: ConfigState) => state.apiKey;

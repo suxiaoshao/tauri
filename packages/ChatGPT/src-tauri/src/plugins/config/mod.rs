@@ -264,11 +264,12 @@ pub async fn create_setting_window<R: Runtime>(
             let child = WebviewWindowBuilder::new(
                 &app,
                 "setting",
-                tauri::WebviewUrl::App("/setting".into()),
+                tauri::WebviewUrl::App("/setting/general".into()),
             )
             .title("setting")
             .transparent(true)
-            .decorations(false);
+            .decorations(false)
+            .inner_size(800.0, 600.0);
             let child = child.parent(&window)?;
             child.build()?;
         }

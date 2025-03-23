@@ -3,7 +3,11 @@ use time::OffsetDateTime;
 
 use crate::{
     errors::ChatGPTResult,
-    store::{migrations::v1::SqlMessageV1, schema::messages, types::Status},
+    store::{
+        migrations::{v1::SqlMessageV1, v2::SqlMessageV2},
+        schema::messages,
+        types::Status,
+    },
 };
 
 #[derive(Insertable)]
@@ -64,6 +68,36 @@ impl From<SqlMessageV1> for SqlMessage {
             start_time,
             end_time,
         }: SqlMessageV1,
+    ) -> Self {
+        Self {
+            id,
+            conversation_id,
+            conversation_path,
+            role,
+            content,
+            status,
+            created_time,
+            updated_time,
+            start_time,
+            end_time,
+        }
+    }
+}
+
+impl From<SqlMessageV2> for SqlMessage {
+    fn from(
+        SqlMessageV2 {
+            id,
+            conversation_id,
+            conversation_path,
+            role,
+            content,
+            status,
+            created_time,
+            updated_time,
+            start_time,
+            end_time,
+        }: SqlMessageV2,
     ) -> Self {
         Self {
             id,

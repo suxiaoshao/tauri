@@ -5,18 +5,18 @@ use std::path::PathBuf;
 
 use errors::ChatGPTResult;
 use log::LevelFilter;
-use plugins::{on_shortcut_trigger, LogPlugin, MainConfigListener, TemporaryHotkeyListener};
+use plugins::{LogPlugin, MainConfigListener, TemporaryHotkeyListener, on_shortcut_trigger};
 use tauri::{Manager, Runtime, WebviewWindow};
 use tauri_plugin_global_shortcut::ShortcutState;
 use tauri_plugin_log::{Target, TargetKind};
 
+mod adapter;
 mod errors;
 mod fetch;
 mod plugins;
 mod store;
 
 fn main() -> ChatGPTResult<()> {
-    let context = tauri::generate_context!();
     tauri::Builder::default()
         .setup(|app| {
             create_main_window(app, "/")?;
@@ -56,7 +56,8 @@ fn main() -> ChatGPTResult<()> {
         .plugin(plugins::ChatPlugin)
         .plugin(plugins::TemporaryConversationPlugin::default())
         .plugin(plugins::TrayPlugin)
-        .run(context)?;
+        .plugin(plugins::AdapterPlugin)
+        .run(tauri::generate_context!())?;
     Ok(())
 }
 

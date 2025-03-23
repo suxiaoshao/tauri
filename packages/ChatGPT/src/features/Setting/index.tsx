@@ -1,189 +1,96 @@
-import HotkeyInput from '@chatgpt/components/HotkeyInput';
 import useConfig from '@chatgpt/hooks/useConfig';
 import useSettingKey from '@chatgpt/hooks/useSettingKey';
 import { createSettingWindow, setConfigService } from '@chatgpt/service/config';
 import { valibotResolver } from '@hookform/resolvers/valibot';
-import { Add, Delete, Settings } from '@mui/icons-material';
-import {
-  Box,
-  Button,
-  FormLabel,
-  IconButton,
-  InputAdornment,
-  InputLabel,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  MenuItem,
-  TextField,
-} from '@mui/material';
+import { Power, Save, Settings } from '@mui/icons-material';
+import { Box, Divider, List, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import { useCallback } from 'react';
-import { Controller, useFieldArray, useForm } from 'react-hook-form';
-import { match } from 'ts-pattern';
+import { FormProvider, useForm } from 'react-hook-form';
 import { useShallow } from 'zustand/react/shallow';
 import { selectConfig, useConfigStore } from './configSlice';
-import { ChatGPTConfigSchema, type Config, Theme } from './types';
+import { ChatGPTConfigSchema, type Config } from './types';
+import { Outlet, useMatch, useNavigate } from 'react-router-dom';
 const appWindow = getCurrentWebviewWindow();
 
 function Setting() {
   const initData = useConfigStore(useShallow(selectConfig));
-  const {
-    register,
-    handleSubmit,
-    control,
-    formState: { errors },
-  } = useForm<Config>({
+  const methods = useForm<Config>({
     defaultValues: initData,
     resolver: valibotResolver(ChatGPTConfigSchema),
   });
-  const { fields, append, remove } = useFieldArray({
-    control,
-    // eslint-disable-next-line ban-ts-comment
-    // @ts-expect-error
-    name: 'models',
-  });
+  const { handleSubmit } = methods;
+  const navigate = useNavigate();
+  const matchGeneral = useMatch('/setting/general');
+  const matchAdapter = useMatch('/setting/adapter');
 
   const onSubmit = handleSubmit(async (data) => {
     await setConfigService({ data });
     await appWindow.close();
   });
   return (
-    <Box
-      sx={{
-        width: '100%',
-        height: '100%',
-        backgroundColor: 'transparent',
-        position: 'relative',
-        overflowY: 'auto!important',
-      }}
-      component="form"
-      onSubmit={onSubmit}
-    >
+    <FormProvider {...methods}>
       <Box
         sx={{
-          p: 2,
-          paddingX: 4,
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'transparent',
           display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
+          flexDirection: 'row',
         }}
+        component="form"
+        onSubmit={onSubmit}
       >
-        <TextField
-          required
-          {...register('apiKey', { required: true })}
-          label="openai api key"
-          fullWidth
-          error={!!errors.apiKey?.message}
-          helperText={errors.apiKey?.message}
-        />
-        <Controller
-          control={control}
-          name="theme.theme"
-          rules={{ required: true }}
-          render={({ field, fieldState }) => (
-            <TextField
-              required
-              {...field}
-              label="Theme"
-              select
-              fullWidth
-              sx={{ mt: 2 }}
-              error={!!fieldState.error?.message}
-              helperText={fieldState.error?.message}
-            >
-              <MenuItem value={Theme.Dark}>{Theme.Dark}</MenuItem>
-              <MenuItem value={Theme.Light}>{Theme.Light}</MenuItem>
-              <MenuItem value={Theme.System}>{Theme.System}</MenuItem>
-            </TextField>
-          )}
-        />
-
-        <InputLabel htmlFor="color-input" sx={{ mt: 2 }} required error={!!errors.theme?.color?.message}>
-          Color
-        </InputLabel>
-        <Box component="input" id="color-input" type="color" {...register('theme.color', { required: true })} />
-        <Box sx={{ color: 'error.main' }}>{errors.theme?.color?.message}</Box>
-        <TextField
-          required
-          {...register('url', { required: true })}
-          label="url"
-          fullWidth
-          sx={{ mt: 2 }}
-          error={!!errors.url?.message}
-          helperText={errors.url?.message}
-        />
-        <TextField
-          {...register('httpProxy', {
-            setValueAs: (value) => {
-              return (
-                match(value?.trim())
-                  // eslint-disable-next-line no-useless-undefined
-                  .with('', () => undefined)
-                  .otherwise(() => value)
-              );
+        <Box
+          sx={{
+            width: 200,
+            flexShrink: 0,
+            '& .MuiToolbar-root': {
+              backgroundColor: 'transparent',
             },
-          })}
-          label="Http Proxy"
-          fullWidth
-          sx={{ mt: 2 }}
-          error={!!errors.httpProxy?.message}
-          helperText={errors.httpProxy?.message}
-        />
-        <Controller
-          control={control}
-          name="temporaryHotkey"
-          render={({ field, fieldState }) => (
-            <HotkeyInput
-              {...field}
-              label="Temporary Conversation Hotkey"
-              fullWidth
-              sx={{ mt: 2 }}
-              error={!!fieldState.error?.message}
-              helperText={fieldState.error?.message}
-            />
-          )}
-        />
-
-        <FormLabel sx={{ mt: 2 }} required>
-          Models
-        </FormLabel>
-
-        {fields.map((field, index) => (
-          <TextField
-            key={field.id}
-            sx={{ mt: 2 }}
-            required
-            {...register(`models.${index}`, { required: true })}
-            label="model"
-            fullWidth
-            error={!!errors.models?.[index]?.message}
-            helperText={errors.models?.[index]?.message}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton onClick={() => remove(index)}>
-                    <Delete />
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-          />
-        ))}
-        <Box sx={{ mt: 1 }}>
-          <IconButton onClick={() => append('')}>
-            <Add />
-          </IconButton>
+            backgroundColor: 'transparent',
+          }}
+          className="box"
+          data-tauri-drag-region
+        >
+          <List>
+            <ListItemButton
+              onClick={() => {
+                navigate('/setting/general');
+              }}
+              selected={matchGeneral !== null}
+            >
+              <ListItemIcon>
+                <Settings />
+              </ListItemIcon>
+              <ListItemText primary="General" />
+            </ListItemButton>
+            <ListItemButton
+              onClick={() => {
+                navigate('/setting/adapter');
+              }}
+              selected={matchAdapter !== null}
+            >
+              <ListItemIcon>
+                <Power />
+              </ListItemIcon>
+              <ListItemText primary="Adapter" />
+            </ListItemButton>
+          </List>
+          <Divider />
+          <List>
+            <ListItemButton type="submit" component="button">
+              <ListItemIcon>
+                <Save />
+              </ListItemIcon>
+              <ListItemText primary="Submit" />
+            </ListItemButton>
+          </List>
         </Box>
+        <Divider orientation="vertical" />
+        <Outlet />
       </Box>
-      <Button
-        variant="contained"
-        type="submit"
-        sx={{ position: 'fixed', right: (theme) => theme.spacing(2), bottom: (theme) => theme.spacing(2) }}
-      >
-        submit
-      </Button>
-    </Box>
+    </FormProvider>
   );
 }
 

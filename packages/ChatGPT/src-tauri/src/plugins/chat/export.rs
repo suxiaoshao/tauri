@@ -73,7 +73,7 @@ mod test {
 
     use crate::{
         errors::ChatGPTResult,
-        store::{self, init_tables, NewMessage},
+        store::{self, NewMessage, init_tables},
     };
 
     #[test]

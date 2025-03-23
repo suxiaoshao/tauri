@@ -1,9 +1,10 @@
 use crate::{
     errors::{ChatGPTError, ChatGPTResult},
-    fetch::{ChatRequest, ChatResponse, FetchRunner, Message as FetchMessage},
+    fetch::FetchRunner,
     store::{Conversation, ConversationTemplate, DbConn, Mode, NewMessage, Role, Status},
 };
-use crate::{plugins::ChatGPTConfig, store::Message};
+use crate::{fetch::Message as FetchMessage, plugins::ChatGPTConfig, store::Message};
+use futures::{StreamExt, pin_mut};
 use tauri::{AppHandle, Emitter, Manager, Runtime, WebviewWindow};
 
 #[tauri::command(async)]
@@ -31,89 +32,20 @@ struct Fetch<R: Runtime> {
     window: WebviewWindow<R>,
     config: ChatGPTConfig,
     template: ConversationTemplate,
-    messages: Vec<Message>,
+    history_messages: Vec<Message>,
     user_message: Message,
 }
 
-impl<R> FetchRunner for Fetch<R>
-where
-    R: Runtime,
-{
-    fn get_body(&self) -> ChatGPTResult<ChatRequest<'_>> {
-        let mut messages = self
-            .template
-            .prompts
-            .iter()
-            .map(|prompt| FetchMessage::new(prompt.role, prompt.prompt.as_str()))
-            .collect::<Vec<_>>();
-        match self.template.mode {
-            Mode::Contextual => {
-                messages.extend(
-                    self.messages
-                        .iter()
-                        .filter(|message| message.status == Status::Normal)
-                        .map(|message| FetchMessage::new(message.role, message.content.as_str())),
-                );
-            }
-            Mode::Single => {}
-            Mode::AssistantOnly => {
-                messages.extend(
-                    self.messages
-                        .iter()
-                        .filter(|message| {
-                            message.role == Role::Assistant && message.status == Status::Normal
-                        })
-                        .map(|message| FetchMessage::new(message.role, message.content.as_str())),
-                );
-            }
-        }
-        messages.push(FetchMessage::new(
-            self.user_message.role,
-            self.user_message.content.as_str(),
-        ));
-
-        Ok(ChatRequest {
-            messages,
-            model: self.template.model.as_str(),
-            stream: true,
-            temperature: self.template.temperature,
-            top_p: self.template.top_p,
-            n: self.template.n,
-            max_tokens: self.template.max_tokens,
-            presence_penalty: self.template.presence_penalty,
-            frequency_penalty: self.template.frequency_penalty,
-        })
-    }
-
-    fn get_api_key(&self) -> ChatGPTResult<&str> {
-        self.config.get_api_key()
-    }
-    fn get_http_proxy(&self) -> ChatGPTResult<&Option<String>> {
-        Ok(&self.config.http_proxy)
-    }
-
-    fn on_open(&mut self) -> ChatGPTResult<()> {
-        log::info!("Connection Opened!");
-        Ok(())
-    }
-    fn url(&self) -> &str {
-        self.config.url.as_str()
-    }
-
-    fn on_message(&mut self, message: ChatResponse) -> ChatGPTResult<()> {
+impl<R: Runtime> Fetch<R> {
+    fn on_message(&self, message: String) -> ChatGPTResult<()> {
         let conn = &mut self.db_conn.get()?;
-        let content = message
-            .choices
-            .into_iter()
-            .filter_map(|choice| choice.delta.content)
-            .collect::<String>();
-        Message::add_content(self.message_id, content, conn)?;
+        Message::add_content(self.message_id, message, conn)?;
         let message = Message::find(self.message_id, conn)?;
         self.window.emit("message", message)?;
         Ok(())
     }
 
-    fn on_error(&mut self, err: reqwest_eventsource::Error) -> ChatGPTResult<()> {
+    fn on_error(&self, err: ChatGPTError) -> ChatGPTResult<()> {
         log::error!("Connection Error: {:?}", err);
         let conn = &mut self.db_conn.get()?;
         Message::update_status(self.message_id, Status::Error, conn)?;
@@ -122,13 +54,74 @@ where
         Ok(())
     }
 
-    fn on_close(&mut self) -> ChatGPTResult<()> {
+    fn on_close(&self) -> ChatGPTResult<()> {
         log::info!("Connection Closed!");
         let conn = &mut self.db_conn.get()?;
         Message::update_status(self.message_id, Status::Normal, conn)?;
         let message = Message::find(self.message_id, conn)?;
         self.window.emit("message", message)?;
         Ok(())
+    }
+}
+
+impl<R> FetchRunner for Fetch<R>
+where
+    R: Runtime,
+{
+    fn get_adapter(&self) -> &str {
+        self.template.adapter.as_str()
+    }
+
+    fn get_template(&self) -> &serde_json::Value {
+        &self.template.template
+    }
+
+    fn get_config(&self) -> &ChatGPTConfig {
+        &self.config
+    }
+
+    fn get_history(&self) -> Vec<FetchMessage> {
+        let mut prompts_messages = self
+            .template
+            .prompts
+            .iter()
+            .map(|prompt| FetchMessage::new(prompt.role, prompt.prompt.as_str()))
+            .collect::<Vec<_>>();
+        match self.template.mode {
+            Mode::Contextual => {
+                let history_messages = self
+                    .history_messages
+                    .iter()
+                    .filter(|message| message.status == Status::Normal)
+                    .map(|Message { role, content, .. }| FetchMessage {
+                        content,
+                        role: *role,
+                    });
+                prompts_messages.extend(history_messages);
+            }
+            Mode::Single => {}
+            Mode::AssistantOnly => {
+                let history = self
+                    .history_messages
+                    .iter()
+                    .filter(|message| message.status == Status::Normal)
+                    .map(|Message { role, content, .. }| FetchMessage {
+                        content,
+                        role: *role,
+                    })
+                    .collect::<Vec<_>>();
+                prompts_messages.extend(
+                    history
+                        .into_iter()
+                        .filter(|message| message.role == Role::Assistant),
+                );
+            }
+        }
+        prompts_messages.push(FetchMessage {
+            content: &self.user_message.content,
+            role: self.user_message.role,
+        });
+        prompts_messages
     }
 }
 
@@ -166,16 +159,24 @@ async fn _fetch<R: Runtime>(
 
     let state = state.inner().clone();
 
-    let mut fetch = Fetch {
+    let fetch = Fetch {
         message_id,
         db_conn: state,
         window,
         config,
-        messages: conversation.messages,
+        history_messages: conversation.messages,
         template,
         user_message,
     };
-    fetch.fetch().await?;
-
+    let stream = fetch.fetch();
+    pin_mut!(stream);
+    log::info!("Connection Opened!");
+    while let Some(message) = stream.next().await {
+        match message {
+            Ok(message) => fetch.on_message(message)?,
+            Err(error) => fetch.on_error(error)?,
+        }
+    }
+    fetch.on_close()?;
     Ok(message_id)
 }

@@ -16,8 +16,8 @@ pub struct ChatRequest<'a> {
     pub stream: bool,
     pub temperature: f64,
     pub top_p: f64,
-    pub n: i64,
-    pub max_tokens: Option<i64>,
+    pub n: u32,
+    pub max_completion_tokens: Option<u32>,
     pub presence_penalty: f64,
     pub frequency_penalty: f64,
 }

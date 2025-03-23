@@ -1,20 +1,20 @@
 [package]
 name = "movie"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 # 错误处理
-thiserror = "2.0.11"
+thiserror = "2.0.12"
 
 # 网络请求
-reqwest = "0.12.12"
-scraper = "0.22.0"
+reqwest = "0.12.15"
+scraper = "0.23.1"
 
 # 运行时
-tokio = { version = "1.43.0", features = [
+tokio = { version = "1.44.1", features = [
   "rt",
   "rt-multi-thread",
   "macros",
@@ -22,8 +22,8 @@ tokio = { version = "1.43.0", features = [
 ] }
 
 # 存储
-serde = { version = "1.0.217", features = ["derive"] }
-serde_json = "1.0.138"
+serde = { version = "1.0.219", features = ["derive"] }
+serde_json = "1.0.140"
 
 # 参数
-clap = { version = "4.5.28", features = ["derive"] }
+clap = { version = "4.5.32", features = ["derive"] }

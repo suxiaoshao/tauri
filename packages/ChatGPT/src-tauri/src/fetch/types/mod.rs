@@ -15,7 +15,7 @@ pub struct Delta {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct ChatResponse {
+pub struct OpenAIStreamResponse {
     #[serde(rename = "id")]
     id: String,
 
