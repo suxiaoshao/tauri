@@ -2,7 +2,7 @@ import ErrorInfo from '@chatgpt/components/ErrorInfo';
 import Loading from '@chatgpt/components/Loading';
 import { InputItemForm } from '@chatgpt/features/Setting/Adapter';
 import usePromise, { PromiseStatus } from '@chatgpt/hooks/usePromise';
-import { getAdapterTemplateInputs, getAllAdapterTemplateInputs } from '@chatgpt/service/adapter';
+import { getAdapterTemplateInputs } from '@chatgpt/service/adapter';
 import { Box, Divider, Typography } from '@mui/material';
 import { useCallback } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';

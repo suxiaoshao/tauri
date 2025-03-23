@@ -476,8 +476,7 @@ pub async fn temporary_fetch<R: Runtime>(
         let stream = fetch.fetch();
         pin_mut!(stream);
         log::info!("Connection Opened!");
-        #[allow(for_loops_over_fallibles)]
-        for message in stream.next().await {
+        while let Some(message) = stream.next().await {
             match message {
                 Ok(message) => fetch.on_message(message, &mut assistant_message)?,
                 Err(error) => fetch.on_error(error, &mut assistant_message)?,
