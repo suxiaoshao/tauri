@@ -17,7 +17,7 @@ export function useRoleData(role: Role): UseRoleDataReturn {
         logo: assistant,
         backgroundColor: (theme: Theme) => theme.palette.primary.main + '20',
       }))
-      .with(Role.system, Role.user, () => ({
+      .with(Role.developer, Role.user, () => ({
         logo: user,
         backgroundColor: (theme: Theme) => theme.palette.secondary.main + '20',
       }))

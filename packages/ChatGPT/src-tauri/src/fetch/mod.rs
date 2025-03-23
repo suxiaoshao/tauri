@@ -15,7 +15,7 @@ use crate::{
     plugins::ChatGPTConfig,
 };
 
-pub use self::types::{ChatRequest, ChatResponse, Message};
+pub use self::types::{ChatRequest, Message, OpenAIStreamResponse};
 
 mod types;
 

@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     errors::{ChatGPTError, ChatGPTResult},
-    fetch::{ChatRequest, ChatResponse, Message},
+    fetch::{ChatRequest, Message},
 };
 
 use super::{Adapter, InputItem, InputType};
@@ -140,32 +140,6 @@ pub(super) fn get_openai_template_inputs(
                 default: Some(0.0),
             },
         ),
-        InputItem::new(
-            "prompts",
-            "Prompts",
-            "Prompts",
-            InputType::ArrayObject(vec![
-                InputItem::new(
-                    "prompt",
-                    "Prompt",
-                    "Prompt",
-                    InputType::Text {
-                        max_length: None,
-                        min_length: Some(1),
-                    },
-                ),
-                InputItem::new(
-                    "role",
-                    "Role",
-                    "Role",
-                    InputType::Select(vec![
-                        "system".to_string(),
-                        "user".to_string(),
-                        "assistant".to_string(),
-                    ]),
-                ),
-            ]),
-        ),
     ];
     Ok(inputs)
 }
@@ -272,13 +246,28 @@ impl Adapter for OpenAIAdapter {
             let body = Self::get_body(&template, history_messages);
             let client = Self::get_reqwest_client(&settings)?;
             let response=client.post(settings.url.clone()).json(&body).send().await?;
-            let response = response.json::<ChatResponse>().await?;
+            let response = response.json::<ChatCompletion>().await?;
             let content = response
                 .choices
                 .into_iter()
-                .filter_map(|choice| choice.delta.content)
+                .filter_map(|choice| choice.message.content)
                 .collect::<String>();
             yield content
         }
     }
+}
+
+#[derive(Debug, Deserialize)]
+struct ChatCompletion {
+    choices: Vec<Choice>,
+}
+
+#[derive(Debug, Deserialize)]
+struct Choice {
+    message: ResponseMessage,
+}
+
+#[derive(Debug, Deserialize)]
+struct ResponseMessage {
+    content: Option<String>,
 }

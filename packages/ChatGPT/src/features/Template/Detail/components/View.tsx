@@ -56,7 +56,7 @@ export default function TemplateDetailView({ data, inputs }: TemplateDetailViewP
           const avatar = match(prompt.role)
             .with(Role.user, () => user)
             .with(Role.assistant, () => assistant)
-            .with(Role.system, () => system)
+            .with(Role.developer, () => system)
             .otherwise(() => user);
           return (
             // eslint-disable-next-line label-has-associated-control

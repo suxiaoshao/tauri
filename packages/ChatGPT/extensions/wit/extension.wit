@@ -3,7 +3,7 @@ package extension: host;
 
 interface extension-api {
   enum role {
-    system,
+    developer,
     user,
     assistant,
   }

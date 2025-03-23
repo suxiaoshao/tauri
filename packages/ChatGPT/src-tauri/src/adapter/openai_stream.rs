@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     errors::{ChatGPTError, ChatGPTResult},
-    fetch::{ChatRequest, ChatResponse, Message},
+    fetch::{ChatRequest, Message, OpenAIStreamResponse},
 };
 
 use super::{
@@ -111,7 +111,7 @@ impl Adapter for OpenAIStreamAdapter {
                         if message == "[DONE]" {
                             es.close();
                         } else {
-                            let response= serde_json::from_str::<ChatResponse>(&message)?;
+                            let response= serde_json::from_str::<OpenAIStreamResponse>(&message)?;
                             let content = response
                                 .choices
                                 .into_iter()

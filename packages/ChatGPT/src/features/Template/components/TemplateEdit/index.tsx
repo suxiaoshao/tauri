@@ -62,7 +62,15 @@ export default function TemplateEdit({ initialValues, id, onSubmit }: TemplateEd
   return (
     <FormProvider {...methods}>
       <Box
-        sx={{ flex: '1 1 0', display: 'flex', flexDirection: 'column', position: 'relative', overflowY: 'auto', p: 2 }}
+        sx={{
+          flex: '1 1 0',
+          display: 'flex',
+          flexDirection: 'column',
+          position: 'relative',
+          overflowY: 'auto',
+          p: 2,
+          gap: 2,
+        }}
         component="form"
         id={id}
         onSubmit={handleSubmit(onSubmit)}
@@ -82,7 +90,6 @@ export default function TemplateEdit({ initialValues, id, onSubmit }: TemplateEd
           required
           {...register('icon', { required: true })}
           fullWidth
-          sx={{ mt: 2 }}
         />
         <TextField
           error={!!errors.description?.message}
@@ -90,7 +97,6 @@ export default function TemplateEdit({ initialValues, id, onSubmit }: TemplateEd
           {...register('description')}
           label="Description"
           fullWidth
-          sx={{ mt: 2 }}
         />
         <Controller
           control={control}
@@ -104,7 +110,6 @@ export default function TemplateEdit({ initialValues, id, onSubmit }: TemplateEd
               label="Mode"
               required
               fullWidth
-              sx={{ mt: 2 }}
               {...field}
             >
               <MenuItem value={Mode.Contextual}>{Mode.Contextual}</MenuItem>
@@ -114,13 +119,13 @@ export default function TemplateEdit({ initialValues, id, onSubmit }: TemplateEd
           )}
         />
         <AdapterForm />
-        <Box sx={{ mt: 2, gap: 2, display: 'flex', alignItems: 'center' }}>
+        <Box sx={{ gap: 2, display: 'flex', alignItems: 'center' }}>
           <FormLabel required>Prompts</FormLabel>
           <IconButton onClick={() => append({ role: Role.assistant, prompt: '' })}>
             <Add />
           </IconButton>
         </Box>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           {fields.map((field, index) => (
             <Box sx={{ display: 'flex', gap: 1, alignItems: 'start' }} key={field.id}>
               <Controller
@@ -140,7 +145,7 @@ export default function TemplateEdit({ initialValues, id, onSubmit }: TemplateEd
                   >
                     <MenuItem value={Role.assistant}>{Role.assistant}</MenuItem>
                     <MenuItem value={Role.user}>{Role.user}</MenuItem>
-                    <MenuItem value={Role.system}>{Role.system}</MenuItem>
+                    <MenuItem value={Role.developer}>{Role.developer}</MenuItem>
                   </TextField>
                 )}
               />

@@ -19,7 +19,7 @@ export enum Mode {
 }
 
 export enum Role {
-  system = 'system',
+  developer = 'developer',
   user = 'user',
   assistant = 'assistant',
 }

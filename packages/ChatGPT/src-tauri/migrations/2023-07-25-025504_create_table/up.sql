@@ -48,7 +48,7 @@ create table messages
     id                INTEGER primary key autoincrement not null,
     conversation_id   INTEGER                           not null,
     conversation_path TEXT                              not null,
-    role              TEXT                              not null check ( role in ('system', 'user', 'assistant') ),
+    role              TEXT                              not null check ( role in ('developer', 'user', 'assistant') ),
     content           TEXT                              not null,
     status            TEXT                              not null check ( status in ('normal', 'hidden', 'loading', 'error') ),
     created_time      DateTime                          not null,

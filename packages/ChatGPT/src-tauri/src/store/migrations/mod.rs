@@ -104,7 +104,7 @@ fn get_conversations_from_v1(
             prompts: serde_json::to_string(&match prompt {
                 Some(prompt) => vec![ConversationTemplatePrompt {
                     prompt,
-                    role: Role::System,
+                    role: Role::Developer,
                 }],
                 None => vec![],
             })?,
@@ -193,7 +193,12 @@ fn get_conversations_from_v2(
             .filter(|prompt| prompt.template_id == id)
             .map(|prompt| ConversationTemplatePrompt {
                 prompt: prompt.prompt.clone(),
-                role: Role::System,
+                role: match prompt.role.as_str() {
+                    "user" => Role::User,
+                    "assistant" => Role::Assistant,
+                    "developer" => Role::Developer,
+                    _ => Role::Developer,
+                },
             })
             .collect::<Vec<_>>();
 
