@@ -5,17 +5,29 @@ wit_bindgen::generate!({
     // the name of the world in the `*.wit` input file
     world: "host",
     pub_export_macro: true,
-    path:"../wit"
+    path:"../wit",
+    async: {
+        exports:[
+            "extension:host/extension-api#on-request",
+            "extension:host/extension-api#on-response"
+        ]
+    }
 });
-struct MyHost;
+struct UrlSearch;
 
-impl Guest for MyHost {
-    fn on_request(request: ChatRequest) -> Result<ChatRequest, String> {
-        reqwest::blocking::get(&request.messages.last().unwrap().content);
-        todo!()
+impl Guest for UrlSearch {
+    async fn on_request(mut request: ChatRequest) -> Result<ChatRequest, String> {
+        if let Some(message) = request.messages.last_mut() {
+            let response = reqwest::get(message.content.trim())
+                .await
+                .map_err(|err| err.to_string())?;
+            let text = response.text().await.map_err(|err| err.to_string())?;
+            message.content = text;
+        }
+        Ok(request)
     }
 
-    fn on_response(response: ChatResponse) -> Result<ChatResponse, String> {
+    async fn on_response(response: ChatResponse) -> Result<ChatResponse, String> {
         Ok(response)
     }
     fn get_name() -> String {
@@ -23,4 +35,4 @@ impl Guest for MyHost {
     }
 }
 
-export!(MyHost);
+export!(UrlSearch);
