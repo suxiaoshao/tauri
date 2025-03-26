@@ -12,6 +12,7 @@ use tauri_plugin_log::{Target, TargetKind};
 
 mod adapter;
 mod errors;
+mod extensions;
 mod fetch;
 mod plugins;
 mod store;
