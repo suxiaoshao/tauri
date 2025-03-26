@@ -61,6 +61,7 @@ tauri-plugin-os = "2.2.1"
 # extension
 wasmtime = { version = "31.0.0" }
 wasmtime-wasi = "31.0.0"
+get-selected-text = "0.1.6"
 
 [target.'cfg(target_os="macos")'.dependencies]
 cocoa = "0.26.0"

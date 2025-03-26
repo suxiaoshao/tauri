@@ -1,4 +1,4 @@
-package extension: host;
+package chatgpt:extension;
 
 
 interface extension-api {
@@ -24,7 +24,8 @@ interface extension-api {
 }
 
 
-world host {
+world extension {
   import get-selected-text: func()-> result<string,string>;
+  import http-client;
   export extension-api;
 }

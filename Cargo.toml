@@ -6,7 +6,7 @@ members = [
     "packages/remove",
     "packages/Hclipboard/src-tauri",
     "packages/ChatGPT/src-tauri",
-    "packages/ChatGPT/extensions/url_search", "packages/ChatGPT/extensions/extension-build",
+    "packages/ChatGPT/extensions/url_search",
 ]
 resolver = "2"
 
