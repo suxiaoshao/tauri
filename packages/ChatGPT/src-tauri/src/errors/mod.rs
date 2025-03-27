@@ -1,4 +1,4 @@
-use std::sync::PoisonError;
+use std::{path::PathBuf, sync::PoisonError};
 
 use serde::{Serialize, Serializer, ser::SerializeStruct};
 use thiserror::Error;
@@ -77,6 +77,12 @@ pub enum ChatGPTError {
     AdapterSettingsNotFound(String),
     #[error("adapter {} not found",.0)]
     AdapterNotFound(String),
+    #[error("Wasmtime engine creation failed")]
+    WasmtimeEngineCreationFailed,
+    #[error("Wasmtime component creation failed")]
+    WasmtimeComponentCreationFailed(PathBuf),
+    #[error("Wasmtime error")]
+    WasmtimeError,
 }
 
 impl Serialize for ChatGPTError {
@@ -205,6 +211,16 @@ impl Serialize for ChatGPTError {
             ChatGPTError::AdapterNotFound(error) => {
                 state.serialize_field("code", "AdapterNotFound")?;
                 state.serialize_field("data", error)?;
+            }
+            ChatGPTError::WasmtimeEngineCreationFailed => {
+                state.serialize_field("code", "WasmtimeEngineCreationFailed")?;
+            }
+            ChatGPTError::WasmtimeComponentCreationFailed(path) => {
+                state.serialize_field("code", "WasmtimeComponentCreationFailed")?;
+                state.serialize_field("data", path)?;
+            }
+            ChatGPTError::WasmtimeError => {
+                state.serialize_field("code", "WasmtimeError")?;
             }
         }
         state.end()

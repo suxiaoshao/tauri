@@ -5,12 +5,12 @@
  * @LastEditTime: 2024-05-16 08:47:28
  * @FilePath: \tauri\packages\ChatGPT\src-tauri\src\plugins\tray\mod.rs
  */
+use tauri::Manager;
+use tauri::Runtime;
 use tauri::menu::Menu;
 use tauri::menu::MenuItem;
 use tauri::menu::PredefinedMenuItem;
 use tauri::tray::TrayIcon;
-use tauri::Manager;
-use tauri::Runtime;
 
 use crate::create_main_window;
 use crate::errors::ChatGPTResult;

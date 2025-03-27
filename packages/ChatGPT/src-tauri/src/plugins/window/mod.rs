@@ -1,6 +1,8 @@
 use log::warn;
 use tauri::Runtime;
 
+use crate::{create_main_window, errors::ChatGPTResult};
+
 use self::created::on_created;
 
 mod created;
@@ -26,4 +28,24 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for WindowPlugin {
             warn!("window created error:{}", err)
         };
     }
+    #[cfg(target_os = "macos")]
+    fn on_event(&mut self, app: &tauri::AppHandle<R>, event: &tauri::RunEvent) {
+        if let tauri::RunEvent::Reopen {
+            has_visible_windows: false,
+            ..
+        } = event
+        {
+            let app = app.clone();
+            tauri::async_runtime::spawn(async move {
+                if let Err(err) = create_main(&app) {
+                    log::warn!("window created error:{}", err)
+                }
+            });
+        }
+    }
+}
+
+fn create_main<R: Runtime>(app: &tauri::AppHandle<R>) -> ChatGPTResult<()> {
+    create_main_window(app, "/")?;
+    Ok(())
 }

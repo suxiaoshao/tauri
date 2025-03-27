@@ -1,143 +1,74 @@
-use std::str::FromStr;
+use crate::errors::{ChatGPTError, ChatGPTResult};
+use component::{Extension, ExtensionState};
+use std::{collections::HashMap, path::PathBuf};
+use wasmtime::{Config, Engine, component::*};
 
-use chatgpt::extension::http_client::{HttpRequest, HttpResponse};
-use reqwest::{header::HeaderValue, redirect::Policy};
-use wasmtime::component::*;
-use wasmtime_wasi::{IoView, WasiCtx, WasiView};
+mod component;
 
-bindgen!({
-    world: "extension",
-    path:"../extensions/wit",
-    async: true
-});
+const WASM_FILE_NAME: &str = "extension.wasm";
+const CONFIG_FILE_NAME: &str = "config.toml";
 
-struct ExtensionState {
-    table: ResourceTable,
-    wasi: WasiCtx,
+#[derive(Debug, Clone, serde::Deserialize)]
+struct ExtensionConfig {
+    name: String,
 }
 
-impl IoView for ExtensionState {
-    fn table(&mut self) -> &mut ResourceTable {
-        &mut self.table
-    }
-}
-impl WasiView for ExtensionState {
-    fn ctx(&mut self) -> &mut WasiCtx {
-        &mut self.wasi
+impl ExtensionConfig {
+    fn load(config_path: PathBuf) -> ChatGPTResult<Self> {
+        let config = std::fs::read_to_string(config_path)?;
+        let data = toml::from_str(&config)?;
+        Ok(data)
     }
 }
 
-impl ExtensionImports for ExtensionState {
-    async fn get_selected_text(&mut self) -> Result<String, String> {
-        get_selected_text::get_selected_text().map_err(|err| err.to_string())
-    }
+fn initialize_wasmtime_engine() -> ChatGPTResult<Engine> {
+    let mut config = Config::new();
+    config.async_support(true);
+    let engine = Engine::new(&config).map_err(|_err| ChatGPTError::WasmtimeEngineCreationFailed)?;
+    Ok(engine)
 }
 
-impl chatgpt::extension::http_client::Host for ExtensionState {
-    async fn fetch(
-        &mut self,
-        HttpRequest {
-            headers,
-            body,
-            method,
-            redirect_policy,
-            url,
-        }: HttpRequest,
-    ) -> Result<HttpResponse, String> {
-        let client = reqwest::Client::builder().redirect(match redirect_policy {
-            chatgpt::extension::http_client::RedirectPolicy::NoFollow => Policy::none(),
-            chatgpt::extension::http_client::RedirectPolicy::FollowLimit(time) => {
-                Policy::limited(time as usize)
-            }
-            chatgpt::extension::http_client::RedirectPolicy::FollowAll => {
-                Policy::custom(|attempt| attempt.follow())
-            }
-        });
-        let mut reqwest_headers = reqwest::header::HeaderMap::new();
-        for (key, value) in headers.iter() {
-            let header_name =
-                reqwest::header::HeaderName::from_str(key).map_err(|err| err.to_string())?;
-            reqwest_headers.append(
-                header_name,
-                HeaderValue::from_str(value).map_err(|err| err.to_string())?,
-            );
+fn get_all_components(
+    engine: &Engine,
+    extensions_path: PathBuf,
+) -> ChatGPTResult<HashMap<String, Component>> {
+    let mut map = HashMap::new();
+    for entry in std::fs::read_dir(extensions_path)? {
+        let entry = entry?;
+        let path = entry.path();
+        if path.is_dir() {
+            let wasm_path = path.join(WASM_FILE_NAME);
+            let config_path = path.join(CONFIG_FILE_NAME);
+            let config = ExtensionConfig::load(config_path)?;
+            let component = Component::from_file(engine, &wasm_path)
+                .map_err(|_| ChatGPTError::WasmtimeComponentCreationFailed(wasm_path))?;
+            map.insert(config.name, component);
         }
-        let client = client
-            .default_headers(reqwest_headers)
-            .build()
-            .map_err(|err| err.to_string())?;
-        let mut request = match method {
-            chatgpt::extension::http_client::HttpMethod::Get => client.get(url),
-            chatgpt::extension::http_client::HttpMethod::Head => client.head(url),
-            chatgpt::extension::http_client::HttpMethod::Post => client.post(url),
-            chatgpt::extension::http_client::HttpMethod::Put => client.put(url),
-            chatgpt::extension::http_client::HttpMethod::Delete => client.delete(url),
-            chatgpt::extension::http_client::HttpMethod::Patch => client.patch(url),
-        };
-        if let Some(body) = body {
-            request = request.body(body);
-        }
-        let response = request.send().await.map_err(|err| err.to_string())?;
-        let response_headers = response.headers();
-        let mut headers = vec![];
-        for (header_name, header_value) in response_headers {
-            headers.push((
-                header_name.as_str().to_string(),
-                header_value
-                    .to_str()
-                    .map_err(|err| err.to_string())?
-                    .to_string(),
-            ));
-        }
-        let body = response
-            .bytes()
-            .await
-            .map_err(|err| err.to_string())?
-            .into();
-        Ok(HttpResponse { headers, body })
     }
+    Ok(map)
 }
 
-#[cfg(test)]
-mod tests {
-    use wasmtime::{Config, Engine, Store};
-    use wasmtime_wasi::WasiCtx;
+pub(crate) struct ExtensionContainer {
+    engine: Engine,
+    component_map: HashMap<String, Component>,
+    linker: Linker<ExtensionState>,
+}
 
-    use crate::extensions::exports::chatgpt::extension::extension_api::{ChatRequest, Message};
+impl ExtensionContainer {
+    pub(crate) fn new(extensions_path: PathBuf) -> ChatGPTResult<Self> {
+        // engine
+        let engine = initialize_wasmtime_engine()?;
+        let component_map = get_all_components(&engine, extensions_path)?;
 
-    use super::{exports::chatgpt::extension::extension_api::Role, *};
-
-    #[tokio::test]
-    async fn test_extension() -> anyhow::Result<()> {
-        let mut config = Config::new();
-        config.async_support(true);
-        let engine = Engine::new(&config)?;
-        let component = Component::from_file(&engine, std::env::var("WASM_PATH")?)?;
+        // linker
         let mut linker = Linker::new(&engine);
-        wasmtime_wasi::add_to_linker_async(&mut linker)?;
-        Extension::add_to_linker(&mut linker, |state: &mut ExtensionState| state)?;
-        let mut store = Store::new(
-            &engine,
-            ExtensionState {
-                table: ResourceTable::new(),
-                wasi: WasiCtx::builder().build(),
-            },
-        );
-        let bindings = Extension::instantiate_async(&mut store, &component, &linker).await?;
-        let extension_api = bindings.chatgpt_extension_extension_api();
-        let name = extension_api.call_get_name(&mut store).await?;
-        assert_eq!(name, "url_search");
-        let chat_request = ChatRequest {
-            messages: vec![Message {
-                role: Role::User,
-                content: "https://baidu.com".to_string(),
-            }],
-        };
-        let response = extension_api
-            .call_on_request(&mut store, &chat_request)
-            .await?;
-        assert!(response.is_ok());
-        println!("{:?}", response);
-        Ok(())
+        wasmtime_wasi::add_to_linker_async(&mut linker).map_err(|_| ChatGPTError::WasmtimeError)?;
+        Extension::add_to_linker(&mut linker, |state: &mut ExtensionState| state)
+            .map_err(|_| ChatGPTError::WasmtimeError)?;
+        Ok(Self {
+            engine,
+            component_map,
+            linker,
+        })
     }
 }

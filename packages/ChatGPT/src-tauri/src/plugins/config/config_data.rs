@@ -5,12 +5,12 @@
  * @LastEditTime: 2024-05-01 10:33:44
  * @FilePath: /tauri/packages/ChatGPT/src-tauri/src/plugins/config/config_data.rs
  */
-use std::{collections::HashMap, io::ErrorKind, path::PathBuf};
-
+use crate::errors::{ChatGPTError, ChatGPTResult};
 use serde::{Deserialize, Serialize};
+use std::{collections::HashMap, io::ErrorKind, path::PathBuf};
 use tauri::{Manager, Runtime};
 
-use crate::errors::{ChatGPTError, ChatGPTResult};
+const CONFIG_FILE_NAME: &str = "config.json";
 
 #[derive(Debug, Clone, Copy, Default, Deserialize, Serialize, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
@@ -54,8 +54,11 @@ impl ChatGPTConfig {
         let file = app
             .path()
             .app_config_dir()
-            .map_err(|_| ChatGPTError::DbPath)?
-            .join("config.toml");
+            .map_err(|_| ChatGPTError::DbPath)?;
+        if !file.exists() {
+            std::fs::create_dir_all(&file)?;
+        }
+        let file = file.join(CONFIG_FILE_NAME);
         Ok(file)
     }
     pub fn save<R: Runtime>(&self, app: &tauri::AppHandle<R>) -> ChatGPTResult<()> {
