@@ -10,13 +10,13 @@ use serde::{Deserialize, Serialize};
 use crate::store::Role;
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct Message<'a> {
+pub struct Message {
     pub role: Role,
-    pub content: &'a str,
+    pub content: String,
 }
 
-impl Message<'_> {
-    pub fn new(role: Role, content: &str) -> Message<'_> {
+impl Message {
+    pub fn new(role: Role, content: String) -> Message {
         Message { role, content }
     }
 }

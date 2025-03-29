@@ -1,9 +1,13 @@
-use crate::errors::{ChatGPTError, ChatGPTResult};
-use component::{Extension, ExtensionState};
+use crate::{
+    errors::{ChatGPTError, ChatGPTResult},
+    plugins::ChatGPTConfig,
+};
 use std::{collections::HashMap, path::PathBuf};
-use wasmtime::{Config, Engine, component::*};
-
+use tauri::{AppHandle, Manager, Runtime};
+use wasmtime::{Config, Engine, Store, component::*};
 mod component;
+
+pub(crate) use component::{Extension, ExtensionState};
 
 const WASM_FILE_NAME: &str = "extension.wasm";
 const CONFIG_FILE_NAME: &str = "config.toml";
@@ -70,5 +74,25 @@ impl ExtensionContainer {
             component_map,
             linker,
         })
+    }
+    pub(crate) fn load_from_app<R: Runtime>(app_handle: &AppHandle<R>) -> ChatGPTResult<&Self> {
+        let extension_container = app_handle.state::<Self>();
+        Ok(extension_container.inner())
+    }
+    pub(crate) async fn get_extension<R: Runtime>(
+        &self,
+        name: &str,
+        app_handle: &AppHandle<R>,
+    ) -> ChatGPTResult<(Extension, Store<ExtensionState>)> {
+        let component = self
+            .component_map
+            .get(name)
+            .ok_or(ChatGPTError::ExtensionNotFound(name.to_string()))?;
+        let config = ChatGPTConfig::get(app_handle)?;
+        let mut store = Store::new(&self.engine, ExtensionState::new(config));
+        let bindings = Extension::instantiate_async(&mut store, component, &self.linker)
+            .await
+            .map_err(|_| ChatGPTError::ExtensionError(name.to_string()))?;
+        Ok((bindings, store))
     }
 }

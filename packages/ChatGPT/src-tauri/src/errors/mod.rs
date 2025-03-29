@@ -83,6 +83,12 @@ pub enum ChatGPTError {
     WasmtimeComponentCreationFailed(PathBuf),
     #[error("Wasmtime error")]
     WasmtimeError,
+    #[error("Extension {} not found",.0)]
+    ExtensionNotFound(String),
+    #[error("Extension {} error",.0)]
+    ExtensionError(String),
+    #[error("Extension runtime error")]
+    ExtensionRuntimeError,
 }
 
 impl Serialize for ChatGPTError {
@@ -221,6 +227,17 @@ impl Serialize for ChatGPTError {
             }
             ChatGPTError::WasmtimeError => {
                 state.serialize_field("code", "WasmtimeError")?;
+            }
+            ChatGPTError::ExtensionNotFound(extension_name) => {
+                state.serialize_field("code", "ExtensionNotFound")?;
+                state.serialize_field("data", extension_name)?;
+            }
+            ChatGPTError::ExtensionError(name) => {
+                state.serialize_field("code", "ExtensionError")?;
+                state.serialize_field("data", name)?;
+            }
+            ChatGPTError::ExtensionRuntimeError => {
+                state.serialize_field("code", "ExtensionRuntimeError")?;
             }
         }
         state.end()

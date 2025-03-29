@@ -16,7 +16,6 @@ export default function AdapterForm() {
   });
   const [data, fn] = usePromise(getAllAdapterTemplateInputs);
 
-  // todo select adapter
   const content = match(data)
     .with({ tag: PromiseStatus.loading }, () => <Loading sx={{ width: '100%', height: '100%' }} />)
     .with({ tag: PromiseStatus.error }, ({ value }) => <ErrorInfo error={value} refetch={fn} />)

@@ -146,10 +146,10 @@ pub(super) fn get_openai_template_inputs(
 }
 
 impl OpenAIAdapter {
-    fn get_body<'a>(
-        template: &'a OpenAIConversationTemplate,
-        history_messages: Vec<Message<'a>>,
-    ) -> ChatRequest<'a> {
+    fn get_body(
+        template: &OpenAIConversationTemplate,
+        history_messages: Vec<Message>,
+    ) -> ChatRequest {
         ChatRequest {
             messages: history_messages,
             model: template.model.as_str(),
@@ -243,7 +243,7 @@ impl Adapter for OpenAIAdapter {
         config: &ChatGPTConfig,
         settings: &serde_json::Value,
         template: &serde_json::Value,
-        history_messages: Vec<Message<'_>>,
+        history_messages: Vec<Message>,
     ) -> impl futures::Stream<Item = ChatGPTResult<String>> {
         async_stream::try_stream! {
             let template = serde_json::from_value(template.clone())?;

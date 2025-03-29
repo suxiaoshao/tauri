@@ -45,10 +45,10 @@ struct OpenAIStreamSettings {
 pub(crate) struct OpenAIStreamAdapter;
 
 impl OpenAIStreamAdapter {
-    fn get_body<'a>(
-        template: &'a OpenAIConversationTemplate,
-        history_messages: Vec<Message<'a>>,
-    ) -> ChatRequest<'a> {
+    fn get_body(
+        template: &OpenAIConversationTemplate,
+        history_messages: Vec<Message>,
+    ) -> ChatRequest {
         ChatRequest {
             messages: history_messages,
             model: template.model.as_str(),

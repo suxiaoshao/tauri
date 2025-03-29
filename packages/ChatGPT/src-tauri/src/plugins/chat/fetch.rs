@@ -1,5 +1,6 @@
 use crate::{
     errors::{ChatGPTError, ChatGPTResult},
+    extensions::ExtensionContainer,
     fetch::FetchRunner,
     store::{Conversation, ConversationTemplate, DbConn, Mode, NewMessage, Role, Status},
 };
@@ -13,8 +14,9 @@ pub async fn fetch<R: Runtime>(
     state: tauri::State<'_, DbConn>,
     id: i32,
     content: String,
+    extension_name: Option<String>,
 ) -> ChatGPTResult<()> {
-    match _fetch(app_handle, state, id, content).await {
+    match _fetch(app_handle, state, id, content, extension_name).await {
         Ok(x) => {
             log::info!("fetch success: {}", x);
             Ok(())
@@ -85,7 +87,7 @@ where
             .template
             .prompts
             .iter()
-            .map(|prompt| FetchMessage::new(prompt.role, prompt.prompt.as_str()))
+            .map(|prompt| FetchMessage::new(prompt.role, prompt.prompt.clone()))
             .collect::<Vec<_>>();
         match self.template.mode {
             Mode::Contextual => {
@@ -94,7 +96,7 @@ where
                     .iter()
                     .filter(|message| message.status == Status::Normal)
                     .map(|Message { role, content, .. }| FetchMessage {
-                        content,
+                        content: content.clone(),
                         role: *role,
                     });
                 prompts_messages.extend(history_messages);
@@ -106,7 +108,7 @@ where
                     .iter()
                     .filter(|message| message.status == Status::Normal)
                     .map(|Message { role, content, .. }| FetchMessage {
-                        content,
+                        content: content.clone(),
                         role: *role,
                     })
                     .collect::<Vec<_>>();
@@ -118,7 +120,7 @@ where
             }
         }
         prompts_messages.push(FetchMessage {
-            content: &self.user_message.content,
+            content: self.user_message.content.clone(),
             role: self.user_message.role,
         });
         prompts_messages
@@ -130,6 +132,7 @@ async fn _fetch<R: Runtime>(
     state: tauri::State<'_, DbConn>,
     id: i32,
     content: String,
+    extension_name: Option<String>,
 ) -> ChatGPTResult<i32> {
     let window = app_handle
         .get_webview_window("main")
@@ -159,6 +162,17 @@ async fn _fetch<R: Runtime>(
 
     let state = state.inner().clone();
 
+    let extension_container = ExtensionContainer::load_from_app(&app_handle)?;
+    let extension = match extension_name {
+        Some(extension_name) => {
+            let extension = extension_container
+                .get_extension(&extension_name, &app_handle)
+                .await?;
+            Some(extension)
+        }
+        None => None,
+    };
+
     let fetch = Fetch {
         message_id,
         db_conn: state,
@@ -168,7 +182,7 @@ async fn _fetch<R: Runtime>(
         template,
         user_message,
     };
-    let stream = fetch.fetch();
+    let stream = fetch.fetch(extension);
     pin_mut!(stream);
     log::info!("Connection Opened!");
     while let Some(message) = stream.next().await {
