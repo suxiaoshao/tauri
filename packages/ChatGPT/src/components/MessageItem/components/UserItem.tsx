@@ -16,6 +16,7 @@ import DeleteMessageIcon from './ToolBar/DeleteMessageIcon';
 import ViewIcon from './ToolBar/ViewIcon';
 import { useEffect, useState } from 'react';
 import { match } from 'ts-pattern';
+import { getSourceContent } from '@chatgpt/utils/content';
 
 export interface UserItemProps {
   message: BaseMessage;
@@ -36,11 +37,21 @@ export default function UserItem({ message, selected }: UserItemProps) {
     <>
       <Box sx={sx} ref={setRef}>
         <Avatar sx={AvatarSx} src={user} />
-        <CustomMarkdown sx={MarkdownSx} value={message.content} />
+        {match(message.content)
+          .with({ tag: 'text' }, ({ value }) => <CustomMarkdown sx={MarkdownSx} value={value} />)
+          .with({ tag: 'extension' }, ({ value: { content, extensionName, source } }) => (
+            <>
+              <CustomMarkdown sx={MarkdownSx} value={source} />
+              <Divider> {extensionName}</Divider>
+              <CustomMarkdown sx={MarkdownSx} value={content} />
+            </>
+          ))
+          .exhaustive()}
+
         <ToolBar>
           <DeleteMessageIcon id={message.id} />
           <ViewIcon id={message.id} />
-          <CopyIcon content={message.content} />
+          <CopyIcon content={getSourceContent(message.content)} />
         </ToolBar>
       </Box>
       <Divider />

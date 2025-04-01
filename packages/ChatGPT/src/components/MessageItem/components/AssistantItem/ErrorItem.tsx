@@ -14,6 +14,7 @@ import ToolBar from '../ToolBar';
 import DeleteMessageIcon from '../ToolBar/DeleteMessageIcon';
 import { useState, useEffect } from 'react';
 import { match } from 'ts-pattern';
+import { getSourceContent } from '@chatgpt/utils/content';
 
 export interface ErrorItemProps {
   message: BaseMessage;
@@ -41,7 +42,7 @@ export default function ErrorItem({ message, selected }: ErrorItemProps) {
         ref={setRef}
       >
         <Avatar sx={AvatarSx} src={assistant} />
-        <CustomMarkdown sx={MarkdownSx} value={message.content} />
+        <CustomMarkdown sx={MarkdownSx} value={getSourceContent(message.content)} />
         <ToolBar>
           <DeleteMessageIcon id={message.id} />
         </ToolBar>

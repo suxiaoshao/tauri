@@ -6,6 +6,7 @@ import { appInvoke } from '../base';
 export interface FetchMessageParams {
   id: number;
   content: string;
+  extensionName: string | null;
 }
 
 export async function fetchMessage(params: FetchMessageParams) {

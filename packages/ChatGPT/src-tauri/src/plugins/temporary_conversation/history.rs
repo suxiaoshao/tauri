@@ -7,8 +7,8 @@ use crate::{
         url_schema::{RouterEvent, router_emit_to_main},
     },
     store::{
-        Conversation, ConversationTemplate, DbConn, Message, Mode, NewConversation, Role, Status,
-        deserialize_offset_date_time, serialize_offset_date_time,
+        Content, Conversation, ConversationTemplate, DbConn, Message, Mode, NewConversation, Role,
+        Status, deserialize_offset_date_time, serialize_offset_date_time,
     },
 };
 use futures::{StreamExt, pin_mut};
@@ -28,7 +28,7 @@ const TEMPORARY_MESSAGE_EVENT: &str = "temporary_message";
 pub struct TemporaryMessage {
     pub id: usize,
     pub role: Role,
-    pub content: String,
+    pub content: Content,
     pub status: Status,
     #[serde(
         rename = "createdTime",
@@ -59,7 +59,7 @@ pub struct TemporaryMessage {
 impl TemporaryMessage {
     fn add_content(&mut self, content: String) {
         let now = OffsetDateTime::now_utc();
-        self.content += &content;
+        self.content += content;
         self.updated_time = now;
         self.end_time = now;
     }
@@ -92,7 +92,7 @@ impl TemporaryConversation {
         &mut self,
         now: OffsetDateTime,
         role: Role,
-        content: String,
+        content: Content,
         status: Status,
     ) -> &TemporaryMessage {
         let id = self.new_id();
@@ -205,7 +205,7 @@ impl TemporaryStore {
         &mut self,
         persistent_id: Option<usize>,
         message_id: usize,
-        content: String,
+        content: Content,
     ) -> ChatGPTResult<&mut TemporaryMessage> {
         let message = self.get_temp_conversation_message_mut(persistent_id, message_id)?;
         message.content = content;
@@ -411,7 +411,7 @@ pub fn update_temporary_message<R: Runtime>(
     state: tauri::State<'_, Arc<Mutex<TemporaryStore>>>,
     persistent_id: Option<usize>,
     message_id: usize,
-    content: String,
+    content: Content,
 ) -> ChatGPTResult<()> {
     let message = state
         .lock()?
@@ -437,7 +437,19 @@ pub async fn temporary_fetch<R: Runtime>(
     let mut conversation = state.lock()?.get_temp_conversation(persistent_id)?.clone();
 
     let now = OffsetDateTime::now_utc();
-    let user_message = conversation.add_message(now, Role::User, content, Status::Normal);
+    let user_message = conversation.add_message(
+        now,
+        Role::User,
+        match &extension_name {
+            Some(extension_name) => Content::Extension {
+                source: content,
+                content: String::new(),
+                extension_name: extension_name.clone(),
+            },
+            None => Content::Text(content),
+        },
+        Status::Normal,
+    );
     window.emit(
         TEMPORARY_MESSAGE_EVENT,
         TemporaryMessageEvent::new(user_message, persistent_id),
@@ -455,7 +467,14 @@ pub async fn temporary_fetch<R: Runtime>(
     let mut assistant_message = TemporaryMessage {
         id: new_id,
         role: Role::Assistant,
-        content: "".to_string(),
+        content: match &extension_name {
+            Some(extension_name) => Content::Extension {
+                source: String::new(),
+                content: String::new(),
+                extension_name: extension_name.clone(),
+            },
+            None => Content::Text(String::new()),
+        },
         status: Status::Loading,
         created_time: now,
         updated_time: now,
@@ -578,7 +597,9 @@ impl<R: Runtime> FetchRunner for TemporaryFetch<'_, R> {
             .messages
             .iter()
             .filter(|message| message.status == Status::Normal)
-            .map(|message| FetchMessage::new(message.role, message.content.clone()));
+            .map(|message| {
+                FetchMessage::new(message.role, message.content.send_content().to_string())
+            });
 
         prompts.extend(messages);
         prompts

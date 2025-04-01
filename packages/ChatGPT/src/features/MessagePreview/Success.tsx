@@ -7,6 +7,7 @@
  */
 import CustomEdit from '@chatgpt/components/CustomEdit';
 import { type Message } from '@chatgpt/types/message';
+import { getSourceContent } from '@chatgpt/utils/content';
 import { Edit, Preview, Upload } from '@mui/icons-material';
 import { Box, IconButton, ToggleButton, ToggleButtonGroup, Tooltip } from '@mui/material';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
@@ -44,7 +45,7 @@ export default function Success({ message, updateMessageContent }: SuccessProps)
       .otherwise(() => Alignment.preview);
   }, [searchParams]);
   const [submitLoading, setSubmitLoading] = useState(false);
-  const [code, setCode] = useState<string>(message.content);
+  const [code, setCode] = useState<string>(getSourceContent(message.content));
   const handleSubmit = useCallback(async () => {
     try {
       setSubmitLoading(true);
@@ -77,7 +78,7 @@ export default function Success({ message, updateMessageContent }: SuccessProps)
       <CustomEdit
         sx={{ width: '100%', height: '100%', borderRadius: (theme) => theme.spacing(1), overflow: 'hidden' }}
         value={match(toggleValue)
-          .with(Alignment.preview, () => message.content)
+          .with(Alignment.preview, () => getSourceContent(message.content))
           .with(Alignment.edit, () => code)
           .exhaustive()}
         readonly={toggleValue === Alignment.preview}

@@ -12,6 +12,7 @@ import { AvatarSx, MarkdownSx, MessageSelectedSx, MessageSx } from '../../const'
 import { type BaseMessage } from '../../types';
 import { useState, useEffect } from 'react';
 import { match } from 'ts-pattern';
+import { getSourceContent } from '@chatgpt/utils/content';
 
 export interface LoadingItemProps {
   message: BaseMessage;
@@ -32,7 +33,7 @@ export default function LoadingItem({ message, selected }: LoadingItemProps) {
     <>
       <Box sx={sx} ref={setRef}>
         <Avatar sx={AvatarSx} src={assistant} />
-        <CustomMarkdown sx={MarkdownSx} value={message.content} />
+        <CustomMarkdown sx={MarkdownSx} value={getSourceContent(message.content)} />
         <CircularProgress size={20} sx={{ mr: 2, mt: 3 }} color="inherit" />
       </Box>
       <Divider />

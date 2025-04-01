@@ -15,6 +15,8 @@ const CONFIG_FILE_NAME: &str = "config.toml";
 #[derive(Debug, Clone, serde::Deserialize)]
 struct ExtensionConfig {
     name: String,
+    icon: Option<String>,
+    description: Option<String>,
 }
 
 impl ExtensionConfig {

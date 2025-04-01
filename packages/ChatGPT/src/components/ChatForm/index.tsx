@@ -1,23 +1,28 @@
 import { type PromiseData, PromiseStatus } from '@chatgpt/hooks/usePromise';
-import { Role } from '@chatgpt/types/common';
-import { type Message } from '@chatgpt/types/message';
 import { Send } from '@mui/icons-material';
 import { IconButton, InputBase, Paper } from '@mui/material';
 import { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useHotkeys } from 'react-hotkeys-hook';
+import { type InferInput, nullable, object, string } from 'valibot';
+
+const sendMessageSchema = object({
+  content: string(),
+  extensionName: nullable(string()),
+});
+
+type SendMessageInput = InferInput<typeof sendMessageSchema>;
 
 export interface ChatFormProps {
   status: PromiseData<void>;
-  onSendMessage: (content: string) => Promise<void>;
+  onSendMessage: (content: string, extensionName: string | null) => Promise<void>;
 }
 
 export default function ChatForm({ status, onSendMessage }: ChatFormProps) {
-  const { register, handleSubmit, resetField } = useForm<Message>({ defaultValues: { role: Role.user } });
-  const onSubmit = handleSubmit(async (data) => {
-    const content = data.content;
+  const { register, handleSubmit, resetField } = useForm<SendMessageInput>();
+  const onSubmit = handleSubmit(async ({ content, extensionName }) => {
     resetField('content');
-    await onSendMessage(content);
+    await onSendMessage(content, extensionName);
   });
   const isLoading = [PromiseStatus.loading].includes(status.tag);
   // search & fucused

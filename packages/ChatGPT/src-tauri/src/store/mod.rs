@@ -21,8 +21,9 @@ use diesel::{
 };
 
 pub use service::{
-    Conversation, ConversationTemplate, Folder, Message, NewConversation, NewConversationTemplate,
-    NewFolder, NewMessage, deserialize_offset_date_time, serialize_offset_date_time,
+    Content, Conversation, ConversationTemplate, Folder, Message, NewConversation,
+    NewConversationTemplate, NewFolder, NewMessage, deserialize_offset_date_time,
+    serialize_offset_date_time,
 };
 use time::OffsetDateTime;
 pub use types::{Mode, Role, Status};

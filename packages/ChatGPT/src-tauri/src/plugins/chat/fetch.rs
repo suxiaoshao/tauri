@@ -2,7 +2,7 @@ use crate::{
     errors::{ChatGPTError, ChatGPTResult},
     extensions::ExtensionContainer,
     fetch::FetchRunner,
-    store::{Conversation, ConversationTemplate, DbConn, Mode, NewMessage, Role, Status},
+    store::{Content, Conversation, ConversationTemplate, DbConn, Mode, NewMessage, Role, Status},
 };
 use crate::{fetch::Message as FetchMessage, plugins::ChatGPTConfig, store::Message};
 use futures::{StreamExt, pin_mut};
@@ -96,7 +96,7 @@ where
                     .iter()
                     .filter(|message| message.status == Status::Normal)
                     .map(|Message { role, content, .. }| FetchMessage {
-                        content: content.clone(),
+                        content: content.send_content().to_string(),
                         role: *role,
                     });
                 prompts_messages.extend(history_messages);
@@ -108,7 +108,7 @@ where
                     .iter()
                     .filter(|message| message.status == Status::Normal)
                     .map(|Message { role, content, .. }| FetchMessage {
-                        content: content.clone(),
+                        content: content.send_content().to_string(),
                         role: *role,
                     })
                     .collect::<Vec<_>>();
@@ -120,7 +120,7 @@ where
             }
         }
         prompts_messages.push(FetchMessage {
-            content: self.user_message.content.clone(),
+            content: self.user_message.content.send_content().to_string(),
             role: self.user_message.role,
         });
         prompts_messages
@@ -150,12 +150,17 @@ async fn _fetch<R: Runtime>(
     let template = crate::store::ConversationTemplate::find(conversation.template_id, conn)?;
 
     // insert user message
-    let user_new_message = NewMessage::new(id, Role::User, content, Status::Normal);
+    let user_new_message = NewMessage::new(id, Role::User, Content::Text(content), Status::Normal);
     let user_message = Message::insert(user_new_message, conn)?;
     window.emit("message", &user_message)?;
 
     // init bot message
-    let bot_new_message = NewMessage::new(id, Role::Assistant, "".to_string(), Status::Loading);
+    let bot_new_message = NewMessage::new(
+        id,
+        Role::Assistant,
+        Content::Text("".to_string()),
+        Status::Loading,
+    );
     let message = Message::insert(bot_new_message, conn)?;
     let message_id = message.id;
     window.emit("message", message)?;

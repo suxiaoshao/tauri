@@ -1,14 +1,14 @@
-use diesel::prelude::*;
-use time::OffsetDateTime;
-
 use crate::{
     errors::ChatGPTResult,
     store::{
         migrations::{v1::SqlMessageV1, v2::SqlMessageV2},
         schema::messages,
+        service::Content,
         types::Status,
     },
 };
+use diesel::prelude::*;
+use time::OffsetDateTime;
 
 #[derive(Insertable)]
 #[diesel(table_name = messages)]
@@ -54,8 +54,10 @@ pub struct SqlMessage {
     pub end_time: OffsetDateTime,
 }
 
-impl From<SqlMessageV1> for SqlMessage {
-    fn from(
+impl TryFrom<SqlMessageV1> for SqlMessage {
+    type Error = serde_json::Error;
+
+    fn try_from(
         SqlMessageV1 {
             id,
             conversation_id,
@@ -68,8 +70,9 @@ impl From<SqlMessageV1> for SqlMessage {
             start_time,
             end_time,
         }: SqlMessageV1,
-    ) -> Self {
-        Self {
+    ) -> Result<Self, Self::Error> {
+        let content = serde_json::to_string(&Content::Text(content))?;
+        Ok(Self {
             id,
             conversation_id,
             conversation_path,
@@ -80,12 +83,14 @@ impl From<SqlMessageV1> for SqlMessage {
             updated_time,
             start_time,
             end_time,
-        }
+        })
     }
 }
 
-impl From<SqlMessageV2> for SqlMessage {
-    fn from(
+impl TryFrom<SqlMessageV2> for SqlMessage {
+    type Error = serde_json::Error;
+
+    fn try_from(
         SqlMessageV2 {
             id,
             conversation_id,
@@ -98,8 +103,9 @@ impl From<SqlMessageV2> for SqlMessage {
             start_time,
             end_time,
         }: SqlMessageV2,
-    ) -> Self {
-        Self {
+    ) -> Result<Self, Self::Error> {
+        let content = serde_json::to_string(&Content::Text(content))?;
+        Ok(Self {
             id,
             conversation_id,
             conversation_path,
@@ -110,7 +116,7 @@ impl From<SqlMessageV2> for SqlMessage {
             updated_time,
             start_time,
             end_time,
-        }
+        })
     }
 }
 
@@ -138,7 +144,7 @@ impl SqlMessage {
     ) -> ChatGPTResult<()> {
         diesel::update(messages::table.filter(messages::id.eq(id)))
             .set((
-                messages::content.eq(messages::content.concat(content)),
+                messages::content.eq(content),
                 messages::updated_time.eq(time),
                 messages::end_time.eq(time),
             ))

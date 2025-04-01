@@ -39,3 +39,9 @@ fn extensions_path<R: Runtime>(app: &tauri::AppHandle<R>) -> ChatGPTResult<std::
     }
     Ok(file)
 }
+
+#[tauri::command]
+fn get_all_extensions<R: Runtime>(app: &tauri::AppHandle<R>) -> ChatGPTResult<Vec<String>> {
+    let extension_container = app.state::<ExtensionContainer>();
+    todo!()
+}

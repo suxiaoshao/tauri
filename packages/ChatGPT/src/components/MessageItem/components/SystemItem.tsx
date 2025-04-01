@@ -16,6 +16,7 @@ import DeleteMessageIcon from './ToolBar/DeleteMessageIcon';
 import ViewIcon from './ToolBar/ViewIcon';
 import { useState, useEffect } from 'react';
 import { match } from 'ts-pattern';
+import { getSourceContent } from '@chatgpt/utils/content';
 
 export interface SystemItemProps {
   message: BaseMessage;
@@ -36,11 +37,11 @@ export default function SystemItem({ message, selected }: SystemItemProps) {
     <>
       <Box sx={sx} ref={setRef}>
         <Avatar sx={{ ...AvatarSx, backgroundColor: 'transparent' }}>🤖</Avatar>
-        <CustomMarkdown sx={MarkdownSx} value={message.content} />
+        <CustomMarkdown sx={MarkdownSx} value={getSourceContent(message.content)} />
         <ToolBar>
           <DeleteMessageIcon id={message.id} />
           <ViewIcon id={message.id} />
-          <CopyIcon content={message.content} />
+          <CopyIcon content={getSourceContent(message.content)} />
         </ToolBar>
       </Box>
       <Divider />

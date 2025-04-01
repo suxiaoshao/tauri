@@ -16,6 +16,7 @@ export async function initTemporaryConversation(params: InitTemporaryConversatio
 export interface TemporaryFetchParams {
   content: string;
   persistentId: number | null;
+  extensionName: string | null;
 }
 
 export async function temporaryFetch(params: TemporaryFetchParams) {

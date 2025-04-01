@@ -1,10 +1,11 @@
 import { type Role, type Status } from './common';
 import { type ConversationTemplate } from './conversationTemplate';
+import type { Content } from './message';
 
 export interface TemporaryMessage {
   id: number;
   role: Role;
-  content: string;
+  content: Content;
   status: Status;
   createdTime: string;
   updatedTime: string;

@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, io::ErrorKind, path::PathBuf};
 use tauri::{Manager, Runtime};
 
-const CONFIG_FILE_NAME: &str = "config.json";
+const CONFIG_FILE_NAME: &str = "config.toml";
 
 #[derive(Debug, Clone, Copy, Default, Deserialize, Serialize, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
