@@ -150,7 +150,12 @@ async fn _fetch<R: Runtime>(
     let template = crate::store::ConversationTemplate::find(conversation.template_id, conn)?;
 
     // insert user message
-    let user_new_message = NewMessage::new(id, Role::User, Content::Text(content), Status::Normal);
+    let user_new_message = NewMessage::new(
+        id,
+        Role::User,
+        Content::Text(content.clone()),
+        Status::Normal,
+    );
     let user_message = Message::insert(user_new_message, conn)?;
     window.emit("message", &user_message)?;
 
@@ -165,8 +170,8 @@ async fn _fetch<R: Runtime>(
     let message_id = message.id;
     window.emit("message", message)?;
 
+    // extension
     let state = state.inner().clone();
-
     let extension_container = ExtensionContainer::load_from_app(&app_handle)?;
     let extension = match extension_name {
         Some(extension_name) => {
@@ -178,6 +183,12 @@ async fn _fetch<R: Runtime>(
         None => None,
     };
 
+    // update user message content
+    let user_content = Fetch::<R>::get_new_user_content(content, extension).await?;
+    Message::update_content(user_message.id, &user_content, conn)?;
+    let user_message = Message::find(user_message.id, conn)?;
+    window.emit("message", &user_message)?;
+
     let fetch = Fetch {
         message_id,
         db_conn: state,
@@ -187,7 +198,7 @@ async fn _fetch<R: Runtime>(
         template,
         user_message,
     };
-    let stream = fetch.fetch(extension);
+    let stream = fetch.fetch();
     pin_mut!(stream);
     log::info!("Connection Opened!");
     while let Some(message) = stream.next().await {

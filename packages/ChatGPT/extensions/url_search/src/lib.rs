@@ -17,19 +17,17 @@ struct UrlSearch;
 
 impl Guest for UrlSearch {
     fn on_request(mut request: ChatRequest) -> Result<ChatRequest, String> {
-        if let Some(message) = request.messages.last_mut() {
-            let req = HttpRequest {
-                method: chatgpt::extension::http_client::HttpMethod::Get,
-                url: message.content.clone(),
-                headers: vec![],
-                body: None,
-                redirect_policy: chatgpt::extension::http_client::RedirectPolicy::FollowLimit(10),
-            };
-            let response = fetch(&req)?;
-            let body = response.body;
-            let text = String::from_utf8(body).map_err(|err| err.to_string())?;
-            message.content = text;
-        }
+        let req = HttpRequest {
+            method: chatgpt::extension::http_client::HttpMethod::Get,
+            url: request.message.clone(),
+            headers: vec![],
+            body: None,
+            redirect_policy: chatgpt::extension::http_client::RedirectPolicy::FollowLimit(10),
+        };
+        let response = fetch(&req)?;
+        let body = response.body;
+        let text = String::from_utf8(body).map_err(|err| err.to_string())?;
+        request.message = text;
         Ok(request)
     }
 
@@ -37,9 +35,6 @@ impl Guest for UrlSearch {
         Ok(ChatResponse {
             message: response.message,
         })
-    }
-    fn get_name() -> String {
-        "url_search".to_string()
     }
 }
 

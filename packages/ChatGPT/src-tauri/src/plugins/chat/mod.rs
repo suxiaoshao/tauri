@@ -1,10 +1,11 @@
 mod fetch;
 
 use serde_json::Value;
-use tauri::{ipc::Invoke, AppHandle, Emitter, Manager, Runtime};
+use tauri::{AppHandle, Emitter, Manager, Runtime, ipc::Invoke};
 
 use crate::store::{
-    Conversation, ConversationTemplate, DbConn, Folder, Message, NewConversationTemplate, NewFolder,
+    Content, Conversation, ConversationTemplate, DbConn, Folder, Message, NewConversationTemplate,
+    NewFolder,
 };
 use crate::{errors::ChatGPTError, store::NewConversation};
 use crate::{errors::ChatGPTResult, store};
@@ -150,10 +151,10 @@ async fn update_message_content<R: Runtime>(
     app: AppHandle<R>,
     state: tauri::State<'_, DbConn>,
     id: i32,
-    content: String,
+    content: Content,
 ) -> ChatGPTResult<()> {
     let conn = &mut state.get()?;
-    store::Message::update_content(id, content, conn)?;
+    store::Message::update_content(id, &content, conn)?;
     let message = store::Message::find(id, conn)?;
     let window = app
         .get_webview_window("main")

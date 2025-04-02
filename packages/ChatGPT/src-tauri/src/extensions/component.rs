@@ -1,5 +1,6 @@
-use crate::{fetch::Message, plugins::ChatGPTConfig, store::Role};
+use crate::plugins::ChatGPTConfig;
 use chatgpt::extension::http_client::{HttpRequest, HttpResponse};
+pub use exports::chatgpt::extension::extension_api::ChatRequest;
 use reqwest::{header::HeaderValue, redirect::Policy};
 use std::str::FromStr;
 use wasmtime::component::*;
@@ -10,53 +11,6 @@ bindgen!({
     path:"../extensions/wit",
     async: true
 });
-
-impl From<Role> for exports::chatgpt::extension::extension_api::Role {
-    fn from(value: Role) -> Self {
-        match value {
-            Role::User => exports::chatgpt::extension::extension_api::Role::User,
-            Role::Developer => exports::chatgpt::extension::extension_api::Role::Developer,
-            Role::Assistant => exports::chatgpt::extension::extension_api::Role::Assistant,
-        }
-    }
-}
-
-impl From<exports::chatgpt::extension::extension_api::Role> for Role {
-    fn from(value: exports::chatgpt::extension::extension_api::Role) -> Self {
-        match value {
-            exports::chatgpt::extension::extension_api::Role::User => Role::User,
-            exports::chatgpt::extension::extension_api::Role::Developer => Role::Developer,
-            exports::chatgpt::extension::extension_api::Role::Assistant => Role::Assistant,
-        }
-    }
-}
-
-impl From<Vec<Message>> for exports::chatgpt::extension::extension_api::ChatRequest {
-    fn from(value: Vec<Message>) -> Self {
-        exports::chatgpt::extension::extension_api::ChatRequest {
-            messages: value
-                .into_iter()
-                .map(|msg| exports::chatgpt::extension::extension_api::Message {
-                    role: msg.role.into(),
-                    content: msg.content,
-                })
-                .collect(),
-        }
-    }
-}
-
-impl From<exports::chatgpt::extension::extension_api::ChatRequest> for Vec<Message> {
-    fn from(value: exports::chatgpt::extension::extension_api::ChatRequest) -> Self {
-        value
-            .messages
-            .into_iter()
-            .map(|msg| Message {
-                role: msg.role.into(),
-                content: msg.content,
-            })
-            .collect()
-    }
-}
 
 pub(crate) struct ExtensionState {
     table: ResourceTable,
@@ -175,8 +129,8 @@ impl chatgpt::extension::http_client::Host for ExtensionState {
 
 #[cfg(test)]
 mod tests {
-    use super::exports::chatgpt::extension::extension_api::{ChatRequest, Message};
-    use super::{exports::chatgpt::extension::extension_api::Role, *};
+    use super::exports::chatgpt::extension::extension_api::ChatRequest;
+    use super::*;
     use anyhow::anyhow;
     use wasmtime::{Config, Engine, Store};
 
@@ -192,13 +146,8 @@ mod tests {
         let mut store = Store::new(&engine, ExtensionState::new(ChatGPTConfig::default()));
         let bindings = Extension::instantiate_async(&mut store, &component, &linker).await?;
         let extension_api = bindings.chatgpt_extension_extension_api();
-        let name = extension_api.call_get_name(&mut store).await?;
-        assert_eq!(name, "url_search");
         let chat_request = ChatRequest {
-            messages: vec![Message {
-                role: Role::User,
-                content: "https://baidu.com".to_string(),
-            }],
+            message: "https://baidu.com".to_string(),
         };
         let response = extension_api
             .call_on_request(&mut store, &chat_request)

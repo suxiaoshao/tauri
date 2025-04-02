@@ -266,11 +266,11 @@ impl Message {
     }
     pub fn update_content(
         id: i32,
-        content: String,
+        content: &Content,
         conn: &mut SqliteConnection,
     ) -> ChatGPTResult<()> {
         let time = OffsetDateTime::now_utc();
-        SqlMessage::update_content(id, content, time, conn)?;
+        SqlMessage::update_content(id, serde_json::to_string(content)?, time, conn)?;
         Ok(())
     }
 }

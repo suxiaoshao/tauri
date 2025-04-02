@@ -7,20 +7,14 @@ interface extension-api {
     user,
     assistant,
   }
-
-  record message {
-    role: role,
-    content: string,
-  }
   record chat-request {
-    messages: list<message>,
+    message: string
   }
   record chat-response{
     message: string
   }
   on-request: func(request: chat-request) -> result<chat-request,string>;
   on-response: func(response: chat-response) -> result<chat-response,string>;
-  get-name: func() -> string;
 }
 
 

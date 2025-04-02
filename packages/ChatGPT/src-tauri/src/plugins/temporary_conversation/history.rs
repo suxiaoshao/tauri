@@ -107,7 +107,23 @@ impl TemporaryConversation {
             end_time: now,
         };
         self.messages.push(message);
-        self.messages.last().unwrap()
+        self.messages.last_mut().unwrap()
+    }
+    fn update_message_content(
+        &mut self,
+        id: usize,
+        content: Content,
+    ) -> ChatGPTResult<&TemporaryMessage> {
+        let now = OffsetDateTime::now_utc();
+        let message = self.messages.iter_mut().find(|m| m.id == id);
+        if let Some(message) = message {
+            message.content = content;
+            message.updated_time = now;
+            message.end_time = now;
+            Ok(message)
+        } else {
+            Err(ChatGPTError::TemporaryMessageNotFound(id))
+        }
     }
 }
 
@@ -435,18 +451,26 @@ pub async fn temporary_fetch<R: Runtime>(
     extension_name: Option<String>,
 ) -> ChatGPTResult<()> {
     let mut conversation = state.lock()?.get_temp_conversation(persistent_id)?.clone();
-
     let now = OffsetDateTime::now_utc();
+    let config = ChatGPTConfig::get(&app)?;
+
+    // update conversation template
+    let conn = &mut conn.get()?;
+    let mut template = ConversationTemplate::find(conversation.template.id, conn)?;
+    template.mode = Mode::Contextual;
+    conversation.template = template;
+
+    // user message
     let user_message = conversation.add_message(
         now,
         Role::User,
         match &extension_name {
             Some(extension_name) => Content::Extension {
-                source: content,
+                source: content.clone(),
                 content: String::new(),
                 extension_name: extension_name.clone(),
             },
-            None => Content::Text(content),
+            None => Content::Text(content.clone()),
         },
         Status::Normal,
     );
@@ -454,13 +478,7 @@ pub async fn temporary_fetch<R: Runtime>(
         TEMPORARY_MESSAGE_EVENT,
         TemporaryMessageEvent::new(user_message, persistent_id),
     )?;
-
-    let config = ChatGPTConfig::get(&app)?;
-
-    let conn = &mut conn.get()?;
-    let mut template = ConversationTemplate::find(conversation.template.id, conn)?;
-    template.mode = Mode::Contextual;
-    conversation.template = template;
+    let user_id = user_message.id;
 
     // initialize assistant conversation
     let new_id = conversation.new_id();
@@ -486,6 +504,7 @@ pub async fn temporary_fetch<R: Runtime>(
         TemporaryMessageEvent::new(&assistant_message, persistent_id),
     )?;
 
+    // extension
     let extension_container = ExtensionContainer::load_from_app(&app)?;
     let extension = match extension_name {
         Some(extension_name) => {
@@ -497,6 +516,14 @@ pub async fn temporary_fetch<R: Runtime>(
         None => None,
     };
 
+    // update user message content
+    let user_content = TemporaryFetch::<R>::get_new_user_content(content, extension).await?;
+    let user_message = conversation.update_message_content(user_id, user_content)?;
+    window.emit(
+        TEMPORARY_MESSAGE_EVENT,
+        TemporaryMessageEvent::new(user_message, persistent_id),
+    )?;
+
     // fetch
     {
         let fetch = TemporaryFetch {
@@ -504,7 +531,7 @@ pub async fn temporary_fetch<R: Runtime>(
             window,
             conversation: &conversation,
         };
-        let stream = fetch.fetch(extension);
+        let stream = fetch.fetch();
         pin_mut!(stream);
         log::info!("Connection Opened!");
         while let Some(message) = stream.next().await {
