@@ -21,17 +21,17 @@ serde_json = { workspace = true }
 # database
 diesel = { version = "2.2.8", features = ["sqlite", "r2d2", "numeric", "time"] }
 libsqlite3-sys = { version = "0.31.0", features = ["bundled-windows"] }
-time = { version = "0.3.40", features = ["serde"] }
+time = { version = "0.3.41", features = ["serde"] }
 
 # 错误处理
 thiserror = "2.0.12"
 
 # log
 tauri-plugin-log = { version = "2.3.1" }
-log = "0.4.26"
+log = "0.4.27"
 
 # 窗口管理
-tauri-plugin-window-state = { version = "2.2.1" }
+tauri-plugin-window-state = { version = "2.2.2" }
 window-vibrancy = "0.6.0"
 
 # http request

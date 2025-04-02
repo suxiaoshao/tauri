@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@mui/x-tree-view": "^7.28.1",
-    "@tauri-apps/plugin-dialog": "^2.2.0",
+    "@tauri-apps/plugin-dialog": "^2.2.1",
     "@tauri-apps/plugin-os": "^2.2.1",
     "details": "workspace:^",
     "immer": "^10.1.1",

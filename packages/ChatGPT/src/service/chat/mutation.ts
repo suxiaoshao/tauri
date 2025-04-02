@@ -124,12 +124,12 @@ export async function exportConversation(params: ExportConversationParams) {
   await appInvoke<ExportConversationParams, unknown>('plugin:chat|export', params);
 }
 
-export interface DeleteConversationParams {
+export interface DeleteConversationTemplateParams {
   id: number;
 }
 
-export async function deleteConversationTemplate(params: DeleteConversationParams) {
-  await appInvoke<DeleteConversationParams, unknown>('plugin:chat|delete_conversation_template', params);
+export async function deleteConversationTemplate(params: DeleteConversationTemplateParams) {
+  await appInvoke<DeleteConversationTemplateParams, unknown>('plugin:chat|delete_conversation_template', params);
   await useTemplateStore.getState().fetchTemplates();
 }
 
