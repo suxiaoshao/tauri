@@ -51,9 +51,6 @@ pub trait FetchRunner {
         Ok(Content::Text(send_content))
     }
     fn fetch(&self) -> impl futures::Stream<Item = ChatGPTResult<String>> {
-        fn get_adapter_not_found(adapter: &str) -> ChatGPTResult<()> {
-            Err(ChatGPTError::AdapterNotFound(adapter.to_string()))
-        }
         async_stream::try_stream! {
             let adapter = self.get_adapter();
             let config = self.get_config();
@@ -83,12 +80,12 @@ pub trait FetchRunner {
                         self.get_template(),
                         history,
                     );
-                     pin_mut!(stream);
-                     for await item in stream {
-                         yield item?;
-                     }
+                    pin_mut!(stream);
+                    for await item in stream {
+                        yield item?;
+                    }
                 },
-                _ => get_adapter_not_found(adapter)?
+                _ => Err(ChatGPTError::AdapterNotFound(adapter.to_string()))?
             };
         }
     }

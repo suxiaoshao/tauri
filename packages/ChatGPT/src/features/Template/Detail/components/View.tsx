@@ -9,7 +9,7 @@ import assistant from '@chatgpt/assets/assistant.jpg';
 import system from '@chatgpt/assets/system.png';
 import user from '@chatgpt/assets/user.jpg';
 import CustomMarkdown from '@chatgpt/components/Markdown';
-import type { AdapterInputs } from '@chatgpt/service/adapter';
+import type { AdapterInputs } from '@chatgpt/types/adapter';
 import { Role } from '@chatgpt/types/common';
 import { type ConversationTemplate } from '@chatgpt/types/conversationTemplate';
 import { Avatar, Box, Divider, List, ListItem, ListItemAvatar, ListItemText, Typography } from '@mui/material';

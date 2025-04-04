@@ -1,8 +1,8 @@
 use crate::{
     errors::{ChatGPTError, ChatGPTResult},
-    extensions::ExtensionContainer,
+    extensions::{ExtensionConfig, ExtensionContainer},
 };
-use tauri::{Manager, Runtime};
+use tauri::{Manager, Runtime, ipc::Invoke};
 pub struct ExtensionsPlugin;
 
 const EXTENSIONS_PATH: &str = "extensions";
@@ -18,6 +18,11 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for ExtensionsPlugin {
     ) -> Result<(), Box<dyn std::error::Error>> {
         setup(app)?;
         Ok(())
+    }
+    fn extend_api(&mut self, invoke: tauri::ipc::Invoke<R>) -> bool {
+        let handle: Box<dyn Fn(Invoke<R>) -> bool + Send + Sync> =
+            Box::new(tauri::generate_handler![get_all_extensions]);
+        (handle)(invoke)
     }
 }
 
@@ -41,7 +46,7 @@ fn extensions_path<R: Runtime>(app: &tauri::AppHandle<R>) -> ChatGPTResult<std::
 }
 
 #[tauri::command]
-fn get_all_extensions<R: Runtime>(app: &tauri::AppHandle<R>) -> ChatGPTResult<Vec<String>> {
+fn get_all_extensions<R: Runtime>(app: tauri::AppHandle<R>) -> ChatGPTResult<Vec<ExtensionConfig>> {
     let extension_container = app.state::<ExtensionContainer>();
-    todo!()
+    Ok(extension_container.get_all_config())
 }

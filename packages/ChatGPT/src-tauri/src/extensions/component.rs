@@ -147,7 +147,7 @@ mod tests {
         let bindings = Extension::instantiate_async(&mut store, &component, &linker).await?;
         let extension_api = bindings.chatgpt_extension_extension_api();
         let chat_request = ChatRequest {
-            message: "https://baidu.com".to_string(),
+            message: "https://www.nodejs-security.com/blog/nodejs-api-security-vulnerabilities-path-traversal-files-bucket-server".to_string(),
         };
         let response = extension_api
             .call_on_request(&mut store, &chat_request)

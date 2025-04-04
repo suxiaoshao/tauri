@@ -1,12 +1,25 @@
 import { Controller, useFieldArray, useFormContext } from 'react-hook-form';
 import usePromise, { PromiseStatus } from '@chatgpt/hooks/usePromise';
-import { getAllAdapterSettingInputs, type InputItem } from '@chatgpt/service/adapter';
+import { getAllAdapterSettingInputs } from '@chatgpt/service/adapter';
+import { type InputItem } from '@chatgpt/types/adapter';
 import { match } from 'ts-pattern';
 import Loading from '@chatgpt/components/Loading';
 import ErrorInfo from '@chatgpt/components/ErrorInfo';
-import { Box, Divider, FormLabel, IconButton, InputAdornment, MenuItem, TextField, Typography } from '@mui/material';
+import {
+  Box,
+  Checkbox,
+  Divider,
+  FormControlLabel,
+  FormLabel,
+  IconButton,
+  InputAdornment,
+  MenuItem,
+  TextField,
+  Typography,
+} from '@mui/material';
 import { Add, Delete } from '@mui/icons-material';
 import NumberField from '@chatgpt/components/NumberField';
+import { useState } from 'react';
 
 export default function AdapterSettings() {
   const [data, fn] = usePromise(getAllAdapterSettingInputs);
@@ -39,10 +52,12 @@ export function InputItemForm({
   prefixName: string;
   required?: boolean;
 }) {
-  const { register, control } = useFormContext();
+  const { register, control, setValue } = useFormContext();
+  const formPath = `${prefixName}.${inputItem.id}`;
+  const [openMaxTokens, setOpenMaxTokens] = useState(false);
   return match(inputItem.inputType)
     .with({ tag: 'text' }, () => (
-      <TextField fullWidth required={required} label={inputItem.name} {...register(`${prefixName}.${inputItem.id}`)} />
+      <TextField fullWidth required={required} label={inputItem.name} {...register(formPath)} />
     ))
     .with({ tag: 'integer' }, ({ value }) => (
       <NumberField
@@ -58,7 +73,7 @@ export function InputItemForm({
           },
         }}
         defaultValue={value.default}
-        {...register(`${prefixName}.${inputItem.id}`, { valueAsNumber: true })}
+        {...register(formPath, { valueAsNumber: true })}
       />
     ))
     .with({ tag: 'float' }, ({ value }) => (
@@ -75,13 +90,13 @@ export function InputItemForm({
           },
         }}
         defaultValue={value.default}
-        {...register(`${prefixName}.${inputItem.id}`, { valueAsNumber: true })}
+        {...register(formPath, { valueAsNumber: true })}
       />
     ))
     .with({ tag: 'select' }, (value) => (
       <Controller
         control={control}
-        name={`${prefixName}.${inputItem.id}`}
+        name={formPath}
         rules={{ required: required }}
         defaultValue={value.value.at(0)}
         render={({ field }) => (
@@ -95,10 +110,30 @@ export function InputItemForm({
         )}
       />
     ))
-    .with({ tag: 'optional' }, ({ value }) => (
-      // todo optional
-      <InputItemForm inputItem={{ ...inputItem, inputType: value }} prefixName={prefixName} required={false} />
-    ))
+    .with({ tag: 'optional' }, ({ value }) => {
+      return (
+        // todo optional
+        <>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={openMaxTokens}
+                onChange={(_, check) => {
+                  setOpenMaxTokens(check);
+                  if (!check) {
+                    setValue(formPath, null);
+                  }
+                }}
+              />
+            }
+            label={`Open ${inputItem.name}`}
+          />
+          {openMaxTokens && (
+            <InputItemForm inputItem={{ ...inputItem, inputType: value }} prefixName={prefixName} required={false} />
+          )}
+        </>
+      );
+    })
     .with({ tag: 'array' }, ({ value }) => <ArrayField {...inputItem} prefixName={prefixName} inputItem={value} />)
     .otherwise(() => null);
 }

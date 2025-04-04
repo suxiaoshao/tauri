@@ -40,11 +40,11 @@ export default function UserItem({ message, selected }: UserItemProps) {
         {match(message.content)
           .with({ tag: 'text' }, ({ value }) => <CustomMarkdown sx={MarkdownSx} value={value} />)
           .with({ tag: 'extension' }, ({ value: { content, extensionName, source } }) => (
-            <>
-              <CustomMarkdown sx={MarkdownSx} value={source} />
+            <Box sx={{ ...MarkdownSx, display: 'flex', flexDirection: 'column' }}>
+              <CustomMarkdown value={source} />
               <Divider> {extensionName}</Divider>
-              <CustomMarkdown sx={MarkdownSx} value={content} />
-            </>
+              <CustomMarkdown value={content} />
+            </Box>
           ))
           .exhaustive()}
 

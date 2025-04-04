@@ -12,6 +12,7 @@
     "config:default",
     "temporary-conversation:default",
     "adapter:default",
+    "extensions:default",
     "core:webview:allow-create-webview-window",
     "core:window:allow-close"
   ]

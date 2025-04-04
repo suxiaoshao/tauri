@@ -14,6 +14,7 @@ import { type RouterEvent } from '@chatgpt/types/router';
 import { listen } from '@tauri-apps/api/event';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import { resolveRouterEvent } from './router';
+import { useExtensionStore } from '@chatgpt/features/Extensions/extensionSlice';
 const appWindow = getCurrentWebviewWindow();
 
 export async function initForFetch() {
@@ -21,6 +22,7 @@ export async function initForFetch() {
     useConversationStore.getState().fetchConversations(),
     useConfigStore.getState().fetchConfig(),
     useTemplateStore.getState().fetchTemplates(),
+    useExtensionStore.getState().fetchExtensions(),
   ]);
 }
 

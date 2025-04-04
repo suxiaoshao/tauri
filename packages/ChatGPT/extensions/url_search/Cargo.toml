@@ -8,3 +8,6 @@ crate-type = ["cdylib"]
 
 [dependencies]
 wit-bindgen = "0.41.0"
+readability = { version = "0.3.0", default-features = false }
+url = "2.5.4"
+html2md = "0.2.15"

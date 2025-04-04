@@ -60,6 +60,12 @@ fn main() {
                         "get_all_adapter_template_inputs",
                         "get_adapter_template_inputs",
                     ]),
+            )
+            .plugin(
+                "extensions",
+                tauri_build::InlinedPlugin::new()
+                    .default_permission(tauri_build::DefaultPermissionRule::AllowAllCommands)
+                    .commands(&["get_all_extensions"]),
             ),
     )
     .unwrap();

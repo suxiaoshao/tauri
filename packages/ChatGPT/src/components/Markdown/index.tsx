@@ -163,25 +163,25 @@ const option: MarkdownToJSX.Options = {
     h1: {
       component: CustomHead,
       props: {
-        variant: 'h2',
+        variant: 'h4',
       },
     },
     h2: {
       component: CustomHead,
       props: {
-        variant: 'h3',
+        variant: 'h5',
       },
     },
     h3: {
       component: CustomHead,
       props: {
-        variant: 'h4',
+        variant: 'h6',
       },
     },
     h4: {
       component: CustomHead,
       props: {
-        variant: 'h5',
+        variant: 'h7',
       },
     },
     p: {
