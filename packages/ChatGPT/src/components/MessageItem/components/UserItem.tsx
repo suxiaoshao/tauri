@@ -7,7 +7,7 @@
  */
 import user from '@chatgpt/assets/user.jpg';
 import CustomMarkdown from '@chatgpt/components/Markdown';
-import { Avatar, Box, Divider } from '@mui/material';
+import { Avatar, Box, Chip, Divider } from '@mui/material';
 import { AvatarSx, MarkdownSx, MessageSelectedSx, MessageSx } from '../const';
 import { type BaseMessage } from '../types';
 import ToolBar from './ToolBar';
@@ -39,19 +39,18 @@ export default function UserItem({ message, selected }: UserItemProps) {
         <Avatar sx={AvatarSx} src={user} />
         {match(message.content)
           .with({ tag: 'text' }, ({ value }) => <CustomMarkdown sx={MarkdownSx} value={value} />)
-          .with({ tag: 'extension' }, ({ value: { content, extensionName, source } }) => (
-            <Box sx={{ ...MarkdownSx, display: 'flex', flexDirection: 'column' }}>
-              <CustomMarkdown value={source} />
-              <Divider> {extensionName}</Divider>
-              <CustomMarkdown value={content} />
-            </Box>
-          ))
+          .with({ tag: 'extension' }, ({ value: { source } }) => <CustomMarkdown sx={MarkdownSx} value={source} />)
           .exhaustive()}
 
         <ToolBar>
           <DeleteMessageIcon id={message.id} />
           <ViewIcon id={message.id} />
           <CopyIcon content={getSourceContent(message.content)} />
+          {match(message.content)
+            .with({ tag: 'extension' }, ({ value: { extensionName } }) => (
+              <Chip label={`plugun:${extensionName}`} size="small" />
+            ))
+            .otherwise(() => null)}
         </ToolBar>
       </Box>
       <Divider />

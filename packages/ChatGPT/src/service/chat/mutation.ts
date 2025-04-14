@@ -4,6 +4,7 @@ import { type NewConversation } from '@chatgpt/types/conversation';
 import { type NewConversationTemplate } from '@chatgpt/types/conversationTemplate';
 import { type NewFolder } from '@chatgpt/types/folder';
 import { appInvoke } from '../base';
+import type { Content } from '@chatgpt/types/message';
 
 export interface AddConversationParams {
   data: NewConversation;
@@ -92,7 +93,7 @@ export async function deleteMessage(params: DeleteMessageParams) {
 
 export interface UpdateMessageContentParams {
   id: number;
-  content: string;
+  content: Content;
 }
 
 export async function updateMessageContent(params: UpdateMessageContentParams) {

@@ -18,8 +18,8 @@ tauri = { workspace = true, features = ["macos-private-api"] }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
 # database
-diesel = { version = "2.2.8", features = ["sqlite", "r2d2"] }
-libsqlite3-sys = { version = "0.31.0", features = ["bundled-windows"] }
+diesel = { version = "2.2.9", features = ["sqlite", "r2d2"] }
+libsqlite3-sys = { version = "0.32.0", features = ["bundled-windows"] }
 time = "0.3.41"
 # 剪切板监听
 clipboard-master = "3.1.3"

@@ -1,4 +1,5 @@
 import { useTemporaryConversationStore } from '@chatgpt/features/Temporary/Detail/temporaryDetailSlice';
+import type { Content } from '@chatgpt/types/message';
 import { type SaveTemporaryConversation } from '@chatgpt/types/temporaryConversation';
 import { appInvoke } from '@feiwen/service/base';
 
@@ -77,7 +78,7 @@ export async function saveTemporaryConversation(params: SaveTemporaryConversatio
 export interface UpdateTemporaryMessageParams {
   persistentId: number | null;
   messageId: number;
-  content: string;
+  content: Content;
 }
 
 export async function updateTemporaryMessage(params: UpdateTemporaryMessageParams) {

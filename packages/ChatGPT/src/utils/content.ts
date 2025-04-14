@@ -7,3 +7,10 @@ export function getSourceContent(content: Content): string {
     .with({ tag: 'extension' }, ({ value: { source } }) => source)
     .exhaustive();
 }
+
+export function getSendContent(content: Content): string {
+  return match(content)
+    .with({ tag: 'text' }, ({ value }) => value)
+    .with({ tag: 'extension' }, ({ value: { content } }) => content)
+    .exhaustive();
+}
