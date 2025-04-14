@@ -64,8 +64,8 @@ export default function TemporaryDetail() {
 
   // send form status
   const fetchFn = useCallback(
-    async (content: string) => {
-      await temporaryFetch({ content, persistentId });
+    async (content: string, extensionName: string | null) => {
+      await temporaryFetch({ content, persistentId, extensionName });
     },
     [persistentId],
   );

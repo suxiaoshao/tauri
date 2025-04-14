@@ -6,9 +6,10 @@
  * @FilePath: /tauri/packages/ChatGPT/src/features/MessagePreview/Success.tsx
  */
 import CustomEdit from '@chatgpt/components/CustomEdit';
-import { type Message } from '@chatgpt/types/message';
+import type { Content, Message } from '@chatgpt/types/message';
+import { getSendContent, getSourceContent } from '@chatgpt/utils/content';
 import { Edit, Preview, Upload } from '@mui/icons-material';
-import { Box, IconButton, ToggleButton, ToggleButtonGroup, Tooltip } from '@mui/material';
+import { Box, FormLabel, IconButton, ToggleButton, ToggleButtonGroup, Tooltip } from '@mui/material';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import { useCallback, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
@@ -17,7 +18,7 @@ const appWindow = getCurrentWebviewWindow();
 
 export interface SuccessProps {
   message: Pick<Message, 'content'>;
-  updateMessageContent: (content: string) => Promise<void>;
+  updateMessageContent: (content: Content) => Promise<void>;
 }
 export enum Alignment {
   preview = 'preview',
@@ -44,7 +45,7 @@ export default function Success({ message, updateMessageContent }: SuccessProps)
       .otherwise(() => Alignment.preview);
   }, [searchParams]);
   const [submitLoading, setSubmitLoading] = useState(false);
-  const [code, setCode] = useState<string>(message.content);
+  const [code, setCode] = useState<Content>(message.content);
   const handleSubmit = useCallback(async () => {
     try {
       setSubmitLoading(true);
@@ -74,18 +75,90 @@ export default function Success({ message, updateMessageContent }: SuccessProps)
           </Tooltip>
         )}
       </Box>
-      <CustomEdit
-        sx={{ width: '100%', height: '100%', borderRadius: (theme) => theme.spacing(1), overflow: 'hidden' }}
-        value={match(toggleValue)
-          .with(Alignment.preview, () => message.content)
-          .with(Alignment.edit, () => code)
-          .exhaustive()}
-        readonly={toggleValue === Alignment.preview}
-        language="markdown"
-        onChange={(newValue) => {
-          setCode(newValue);
-        }}
-      />
+      {match(code)
+        .with({ tag: 'text' }, ({ value }) => (
+          <CustomEdit
+            sx={{ width: '100%', height: '100%', borderRadius: (theme) => theme.spacing(1), overflow: 'hidden' }}
+            value={match(toggleValue)
+              .with(Alignment.preview, () => getSourceContent(message.content))
+              .with(Alignment.edit, () => value)
+              .exhaustive()}
+            readonly={toggleValue === Alignment.preview}
+            language="markdown"
+            onChange={(newValue) => {
+              setCode({
+                tag: 'text',
+                value: newValue,
+              });
+            }}
+          />
+        ))
+        .with({ tag: 'extension' }, ({ value: { content, source } }) => (
+          <Box sx={{ width: '100%', height: '100%', display: 'flex', gap: 1 }}>
+            <Box sx={{ flex: '1 1 0', display: 'flex', flexDirection: 'column' }}>
+              <FormLabel>Source</FormLabel>
+              <CustomEdit
+                sx={{ flex: '1 1 0', borderRadius: (theme) => theme.spacing(1), overflow: 'hidden' }}
+                value={match(toggleValue)
+                  .with(Alignment.preview, () => getSourceContent(message.content))
+                  .with(Alignment.edit, () => source)
+                  .exhaustive()}
+                readonly={toggleValue === Alignment.preview}
+                language="markdown"
+                onChange={(newValue) => {
+                  setCode((oldValue) => {
+                    return match(oldValue)
+                      .with(
+                        { tag: 'extension' },
+                        ({ value: { content, extensionName } }) =>
+                          ({
+                            tag: 'extension',
+                            value: {
+                              content,
+                              extensionName,
+                              source: newValue,
+                            },
+                          }) satisfies Content,
+                      )
+                      .with({ tag: 'text' }, () => oldValue)
+                      .exhaustive();
+                  });
+                }}
+              />
+            </Box>
+            <Box sx={{ flex: '1 1 0', display: 'flex', flexDirection: 'column' }}>
+              <FormLabel>Send Content</FormLabel>
+              <CustomEdit
+                sx={{ flex: '1 1 0', borderRadius: (theme) => theme.spacing(1), overflow: 'hidden' }}
+                value={match(toggleValue)
+                  .with(Alignment.preview, () => getSendContent(message.content))
+                  .with(Alignment.edit, () => content)
+                  .exhaustive()}
+                readonly={toggleValue === Alignment.preview}
+                language="markdown"
+                onChange={(newValue) => {
+                  setCode((oldValue) => {
+                    return match(oldValue)
+                      .with(
+                        { tag: 'extension' },
+                        ({ value: { source, extensionName } }) =>
+                          ({
+                            tag: 'extension',
+                            value: {
+                              source,
+                              extensionName,
+                              content: newValue,
+                            },
+                          }) satisfies Content,
+                      )
+                      .otherwise(() => oldValue);
+                  });
+                }}
+              />
+            </Box>
+          </Box>
+        ))
+        .exhaustive()}
     </Box>
   );
 }

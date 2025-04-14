@@ -70,7 +70,7 @@ export default function TemplateDetailHeader({
       .with({ tag: PromiseStatus.data }, ({ value }) => {
         const handleDelete = async () => {
           await deleteConversationTemplate({ id: value.id });
-          navigate(-1);
+          navigate('/template');
           enqueueSnackbar('Conversation template deleted', { variant: 'success' });
         };
         return (

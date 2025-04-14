@@ -8,6 +8,7 @@
 mod adapter;
 mod chat;
 mod config;
+mod extensions;
 mod log_plugin;
 mod temporary_conversation;
 mod tray;
@@ -17,6 +18,7 @@ mod window;
 pub(crate) use adapter::AdapterPlugin;
 pub(crate) use chat::ChatPlugin;
 pub(crate) use config::{ChatGPTConfig, ConfigPlugin, Listenable, MainConfigListener};
+pub(crate) use extensions::ExtensionsPlugin;
 pub(crate) use log_plugin::LogPlugin;
 pub(crate) use temporary_conversation::{
     TemporaryConversationPlugin, TemporaryHotkeyListener, TemporaryMessage, on_shortcut_trigger,

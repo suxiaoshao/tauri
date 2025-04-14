@@ -12,7 +12,7 @@ use super::message::Message;
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ChatRequest<'a> {
     pub model: &'a str,
-    pub messages: Vec<Message<'a>>,
+    pub messages: Vec<Message>,
     pub stream: bool,
     pub temperature: f64,
     pub top_p: f64,

@@ -8,6 +8,7 @@ use serde::{Deserialize, Serialize};
 use crate::{
     errors::{ChatGPTError, ChatGPTResult},
     fetch::{ChatRequest, Message, OpenAIStreamResponse},
+    plugins::ChatGPTConfig,
 };
 
 use super::{
@@ -44,10 +45,10 @@ struct OpenAIStreamSettings {
 pub(crate) struct OpenAIStreamAdapter;
 
 impl OpenAIStreamAdapter {
-    fn get_body<'a>(
-        template: &'a OpenAIConversationTemplate,
-        history_messages: Vec<Message<'a>>,
-    ) -> ChatRequest<'a> {
+    fn get_body(
+        template: &OpenAIConversationTemplate,
+        history_messages: Vec<Message>,
+    ) -> ChatRequest {
         ChatRequest {
             messages: history_messages,
             model: template.model.as_str(),
@@ -60,7 +61,10 @@ impl OpenAIStreamAdapter {
             frequency_penalty: template.frequency_penalty,
         }
     }
-    fn get_reqwest_client(settings: &OpenAIStreamSettings) -> ChatGPTResult<Client> {
+    fn get_reqwest_client(
+        config: &ChatGPTConfig,
+        settings: &OpenAIStreamSettings,
+    ) -> ChatGPTResult<Client> {
         let api_key = settings
             .api_key
             .as_deref()
@@ -68,7 +72,7 @@ impl OpenAIStreamAdapter {
         let mut headers = reqwest::header::HeaderMap::new();
         headers.append("Authorization", format!("Bearer {api_key}").parse()?);
         let mut client = reqwest::ClientBuilder::new().default_headers(headers);
-        match &settings.http_proxy {
+        match settings.http_proxy.as_deref().or(config.get_http_proxy()) {
             None => {}
             Some(proxy) => {
                 client = client.proxy(reqwest::Proxy::all(proxy)?);
@@ -93,6 +97,7 @@ impl Adapter for OpenAIStreamAdapter {
 
     fn fetch(
         &self,
+        config: &ChatGPTConfig,
         settings: &serde_json::Value,
         template: &serde_json::Value,
         history_messages: Vec<Message>,
@@ -101,7 +106,7 @@ impl Adapter for OpenAIStreamAdapter {
             let template = serde_json::from_value(template.clone())?;
             let settings = serde_json::from_value(settings.clone())?;
             let body = Self::get_body(&template, history_messages);
-            let client = Self::get_reqwest_client(&settings)?;
+            let client = Self::get_reqwest_client(config, &settings)?;
             let mut es = client.post(settings.url.as_str()).json(&body).eventsource()?;
             while let Some(event) = es.next().await {
                 match event {

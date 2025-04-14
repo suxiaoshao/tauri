@@ -1,23 +1,37 @@
+import { useExtensionStore } from '@chatgpt/features/Extensions/extensionSlice';
 import { type PromiseData, PromiseStatus } from '@chatgpt/hooks/usePromise';
-import { Role } from '@chatgpt/types/common';
-import { type Message } from '@chatgpt/types/message';
 import { Send } from '@mui/icons-material';
-import { IconButton, InputBase, Paper } from '@mui/material';
+import { IconButton, InputBase, MenuItem, Paper, Select } from '@mui/material';
 import { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useHotkeys } from 'react-hotkeys-hook';
+import { match, P } from 'ts-pattern';
+import { type InferInput, nullable, object, string } from 'valibot';
+import { useShallow } from 'zustand/react/shallow';
+
+const sendMessageSchema = object({
+  content: string(),
+  extensionName: nullable(string()),
+});
+
+type SendMessageInput = InferInput<typeof sendMessageSchema>;
 
 export interface ChatFormProps {
   status: PromiseData<void>;
-  onSendMessage: (content: string) => Promise<void>;
+  onSendMessage: (content: string, extensionName: string | null) => Promise<void>;
 }
 
 export default function ChatForm({ status, onSendMessage }: ChatFormProps) {
-  const { register, handleSubmit, resetField } = useForm<Message>({ defaultValues: { role: Role.user } });
-  const onSubmit = handleSubmit(async (data) => {
-    const content = data.content;
+  const { register, handleSubmit, resetField } = useForm<SendMessageInput>();
+  const allExtensions = useExtensionStore(useShallow((value) => value.value));
+  const onSubmit = handleSubmit(async ({ content, extensionName }) => {
     resetField('content');
-    await onSendMessage(content);
+    await onSendMessage(
+      content,
+      match(extensionName)
+        .with(P.string.length(0), () => null)
+        .otherwise(() => extensionName),
+    );
   });
   const isLoading = [PromiseStatus.loading].includes(status.tag);
   // search & fucused
@@ -59,6 +73,16 @@ export default function ChatForm({ status, onSendMessage }: ChatFormProps) {
       }}
       elevation={3}
     >
+      <Select size="small" label="Extension" {...register('extensionName')}>
+        <MenuItem value="">
+          <em>None</em>
+        </MenuItem>
+        {allExtensions.map((extension) => (
+          <MenuItem key={extension.name} value={extension.name}>
+            {extension.name}
+          </MenuItem>
+        ))}
+      </Select>
       <InputBase
         sx={{ ml: 1, flex: 1, marginBottom: '4px' }}
         placeholder="Send a message"

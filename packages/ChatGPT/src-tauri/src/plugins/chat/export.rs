@@ -54,7 +54,17 @@ fn export_csv(messages: Vec<Message>, path: PathBuf) -> ChatGPTResult<()> {
     let file = std::fs::File::create(path)?;
     let mut wtr = csv::Writer::from_writer(file);
     for message in messages {
-        wtr.serialize(message)?;
+        wtr.serialize((
+            message.id,
+            message.conversation_id,
+            message.role,
+            serde_json::to_string(&message.content)?,
+            message.status,
+            message.start_time,
+            message.end_time,
+            message.created_time,
+            message.updated_time,
+        ))?;
     }
     wtr.flush()?;
     Ok(())
@@ -62,7 +72,12 @@ fn export_csv(messages: Vec<Message>, path: PathBuf) -> ChatGPTResult<()> {
 fn export_txt(messages: Vec<Message>, path: PathBuf) -> ChatGPTResult<()> {
     let mut file = std::fs::File::create(path)?;
     for message in messages {
-        writeln!(&mut file, "{}: {}", message.role, message.content)?;
+        writeln!(
+            &mut file,
+            "{}: {}",
+            message.role,
+            serde_json::to_string(&message.content)?
+        )?;
     }
     Ok(())
 }
@@ -73,7 +88,7 @@ mod test {
 
     use crate::{
         errors::ChatGPTResult,
-        store::{self, NewMessage, init_tables},
+        store::{self, Content, NewMessage, init_tables},
     };
 
     #[test]
@@ -82,7 +97,7 @@ mod test {
         let new_message = NewMessage {
             conversation_id: 1,
             role: store::Role::User,
-            content: "test".to_owned(),
+            content: Content::Text("test".to_owned()),
             status: store::Status::Normal,
         };
         store::Message::insert(new_message, conn)?;

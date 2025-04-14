@@ -50,6 +50,15 @@ export enum ChatGPTErrorCodes {
   TemporaryMessageNotFound = 'TemporaryMessageNotFound',
   TemporaryConversationUninitialized = 'TemporaryConversationUninitialized',
   TemporaryConversationNotFound = 'TemporaryConversationNotFound',
+  GlobalShortcuts = 'GlobalShortcuts',
+  AdapterSettingsNotFound = 'AdapterSettingsNotFound',
+  AdapterNotFound = 'AdapterNotFound',
+  WasmtimeEngineCreationFailed = 'WasmtimeEngineCreationFailed',
+  WasmtimeComponentCreationFailed = 'WasmtimeComponentCreationFailed',
+  WasmtimeError = 'WasmtimeError',
+  ExtensionNotFound = 'ExtensionNotFound',
+  ExtensionError = 'ExtensionError',
+  ExtensionRuntimeError = 'ExtensionRuntimeError',
 }
 
 const ChatGPTErrorCodesSchema = enum_(ChatGPTErrorCodes);

@@ -28,10 +28,11 @@ const handleMessageView = (id: number) => {
 
 export default function ConversationDetail({ conversation }: ConversationDetailProps) {
   const fetchFn = useCallback(
-    async (content: string) => {
+    async (content: string, extensionName: string | null) => {
       await fetchMessage({
         content: content,
         id: conversation.id,
+        extensionName,
       });
     },
     [conversation.id],

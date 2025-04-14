@@ -1,7 +1,8 @@
 use crate::{
     errors::{ChatGPTError, ChatGPTResult},
+    extensions::ExtensionContainer,
     fetch::FetchRunner,
-    store::{Conversation, ConversationTemplate, DbConn, Mode, NewMessage, Role, Status},
+    store::{Content, Conversation, ConversationTemplate, DbConn, Mode, NewMessage, Role, Status},
 };
 use crate::{fetch::Message as FetchMessage, plugins::ChatGPTConfig, store::Message};
 use futures::{StreamExt, pin_mut};
@@ -13,8 +14,9 @@ pub async fn fetch<R: Runtime>(
     state: tauri::State<'_, DbConn>,
     id: i32,
     content: String,
+    extension_name: Option<String>,
 ) -> ChatGPTResult<()> {
-    match _fetch(app_handle, state, id, content).await {
+    match _fetch(app_handle, state, id, content, extension_name).await {
         Ok(x) => {
             log::info!("fetch success: {}", x);
             Ok(())
@@ -85,7 +87,7 @@ where
             .template
             .prompts
             .iter()
-            .map(|prompt| FetchMessage::new(prompt.role, prompt.prompt.as_str()))
+            .map(|prompt| FetchMessage::new(prompt.role, prompt.prompt.clone()))
             .collect::<Vec<_>>();
         match self.template.mode {
             Mode::Contextual => {
@@ -94,7 +96,7 @@ where
                     .iter()
                     .filter(|message| message.status == Status::Normal)
                     .map(|Message { role, content, .. }| FetchMessage {
-                        content,
+                        content: content.send_content().to_string(),
                         role: *role,
                     });
                 prompts_messages.extend(history_messages);
@@ -106,7 +108,7 @@ where
                     .iter()
                     .filter(|message| message.status == Status::Normal)
                     .map(|Message { role, content, .. }| FetchMessage {
-                        content,
+                        content: content.send_content().to_string(),
                         role: *role,
                     })
                     .collect::<Vec<_>>();
@@ -118,7 +120,7 @@ where
             }
         }
         prompts_messages.push(FetchMessage {
-            content: &self.user_message.content,
+            content: self.user_message.content.send_content().to_string(),
             role: self.user_message.role,
         });
         prompts_messages
@@ -130,6 +132,7 @@ async fn _fetch<R: Runtime>(
     state: tauri::State<'_, DbConn>,
     id: i32,
     content: String,
+    extension_name: Option<String>,
 ) -> ChatGPTResult<i32> {
     let window = app_handle
         .get_webview_window("main")
@@ -147,17 +150,44 @@ async fn _fetch<R: Runtime>(
     let template = crate::store::ConversationTemplate::find(conversation.template_id, conn)?;
 
     // insert user message
-    let user_new_message = NewMessage::new(id, Role::User, content, Status::Normal);
+    let user_new_message = NewMessage::new(
+        id,
+        Role::User,
+        Content::Text(content.clone()),
+        Status::Normal,
+    );
     let user_message = Message::insert(user_new_message, conn)?;
     window.emit("message", &user_message)?;
 
     // init bot message
-    let bot_new_message = NewMessage::new(id, Role::Assistant, "".to_string(), Status::Loading);
+    let bot_new_message = NewMessage::new(
+        id,
+        Role::Assistant,
+        Content::Text("".to_string()),
+        Status::Loading,
+    );
     let message = Message::insert(bot_new_message, conn)?;
     let message_id = message.id;
     window.emit("message", message)?;
 
+    // extension
     let state = state.inner().clone();
+    let extension_container = ExtensionContainer::load_from_app(&app_handle)?;
+    let extension = match extension_name {
+        Some(extension_name) => {
+            let extension = extension_container
+                .get_extension(&extension_name, &app_handle)
+                .await?;
+            Some(extension)
+        }
+        None => None,
+    };
+
+    // update user message content
+    let user_content = Fetch::<R>::get_new_user_content(content, extension).await?;
+    Message::update_content(user_message.id, &user_content, conn)?;
+    let user_message = Message::find(user_message.id, conn)?;
+    window.emit("message", &user_message)?;
 
     let fetch = Fetch {
         message_id,

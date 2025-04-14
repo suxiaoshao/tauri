@@ -5,16 +5,12 @@
  * @LastEditTime: 2024-05-01 10:33:44
  * @FilePath: /tauri/packages/ChatGPT/src-tauri/src/plugins/config/config_data.rs
  */
-use std::{
-    collections::{HashMap, HashSet},
-    io::ErrorKind,
-    path::PathBuf,
-};
-
+use crate::errors::{ChatGPTError, ChatGPTResult};
 use serde::{Deserialize, Serialize};
+use std::{collections::HashMap, io::ErrorKind, path::PathBuf};
 use tauri::{Manager, Runtime};
 
-use crate::errors::{ChatGPTError, ChatGPTResult};
+const CONFIG_FILE_NAME: &str = "config.toml";
 
 #[derive(Debug, Clone, Copy, Default, Deserialize, Serialize, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
@@ -41,32 +37,12 @@ impl Default for ThemeOption {
     }
 }
 
-fn default_url() -> String {
-    "https://api.openai.com/v1/chat/completions".to_string()
-}
-
-fn default_models() -> HashSet<String> {
-    let mut models = HashSet::new();
-    models.insert("gpt-3.5-turbo".to_string());
-    models.insert("gpt-3.5-turbo-16k".to_string());
-    models.insert("gpt-3.5-turbo-instruct".to_string());
-    models.insert("gpt-4".to_string());
-    models.insert("gpt-4-turbo".to_string());
-    models
-}
-
 #[derive(Clone, Debug, Default, Deserialize, Serialize, PartialEq, Eq)]
 pub struct ChatGPTConfig {
-    #[serde(rename = "apiKey")]
-    api_key: Option<String>,
     #[serde(default = "Default::default")]
     theme: ThemeOption,
-    #[serde(default = "default_url")]
-    pub url: String,
     #[serde(rename = "httpProxy")]
     pub http_proxy: Option<String>,
-    #[serde(default = "default_models")]
-    pub models: HashSet<String>,
     #[serde(rename = "temporaryHotkey")]
     pub temporary_hotkey: Option<String>,
     #[serde(rename = "adapterSettings", default)]
@@ -78,8 +54,11 @@ impl ChatGPTConfig {
         let file = app
             .path()
             .app_config_dir()
-            .map_err(|_| ChatGPTError::DbPath)?
-            .join("config.toml");
+            .map_err(|_| ChatGPTError::DbPath)?;
+        if !file.exists() {
+            std::fs::create_dir_all(&file)?;
+        }
+        let file = file.join(CONFIG_FILE_NAME);
         Ok(file)
     }
     pub fn save<R: Runtime>(&self, app: &tauri::AppHandle<R>) -> ChatGPTResult<()> {
@@ -108,5 +87,8 @@ impl ChatGPTConfig {
     }
     pub(crate) fn get_adapter_settings(&self, adapter: &str) -> Option<&serde_json::Value> {
         self.adapter_settings.get(adapter)
+    }
+    pub(crate) fn get_http_proxy(&self) -> Option<&str> {
+        self.http_proxy.as_deref()
     }
 }

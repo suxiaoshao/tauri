@@ -19,24 +19,24 @@ serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
 
 # database
-diesel = { version = "2.2.8", features = ["sqlite", "r2d2", "numeric", "time"] }
-libsqlite3-sys = { version = "0.31.0", features = ["bundled-windows"] }
-time = { version = "0.3.40", features = ["serde"] }
+diesel = { version = "2.2.9", features = ["sqlite", "r2d2", "numeric", "time"] }
+libsqlite3-sys = { version = "0.32.0", features = ["bundled-windows"] }
+time = { version = "0.3.41", features = ["serde"] }
 
 # 错误处理
 thiserror = "2.0.12"
 
 # log
 tauri-plugin-log = { version = "2.3.1" }
-log = "0.4.26"
+log = "0.4.27"
 
 # 窗口管理
-tauri-plugin-window-state = { version = "2.2.1" }
+tauri-plugin-window-state = { version = "2.2.2" }
 window-vibrancy = "0.6.0"
 
 # http request
 reqwest = { version = "0.12.15", features = ["json"] }
-tokio = { version = "1.44.1", features = [
+tokio = { version = "1.44.2", features = [
     "rt",
     "rt-multi-thread",
     "sync",
@@ -57,6 +57,11 @@ csv = "1.3.1"
 tauri-plugin-global-shortcut = "2.2.0"
 tauri-plugin-notification = "2.2.2"
 tauri-plugin-os = "2.2.1"
+
+# extension
+wasmtime = { version = "31.0.0" }
+wasmtime-wasi = "31.0.0"
+get-selected-text = "0.1.6"
 
 [target.'cfg(target_os="macos")'.dependencies]
 cocoa = "0.26.0"

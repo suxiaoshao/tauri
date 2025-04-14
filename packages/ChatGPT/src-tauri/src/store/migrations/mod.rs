@@ -51,8 +51,8 @@ pub(in crate::store) fn v1_to_v3(
     // migrate messages
     let target_messages = messages
         .into_iter()
-        .map(SqlMessage::from)
-        .collect::<Vec<_>>();
+        .map(SqlMessage::try_from)
+        .collect::<Result<Vec<_>, _>>()?;
     SqlMessage::migration_save(target_messages, target_conn)?;
     Ok(())
 }
@@ -159,8 +159,8 @@ pub(in crate::store) fn v2_to_v3(
     // migrate messages
     let target_messages = messages
         .into_iter()
-        .map(SqlMessage::from)
-        .collect::<Vec<_>>();
+        .map(SqlMessage::try_from)
+        .collect::<Result<Vec<_>, _>>()?;
     SqlMessage::migration_save(target_messages, target_conn)?;
 
     Ok(())

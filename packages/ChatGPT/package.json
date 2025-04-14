@@ -10,8 +10,8 @@
     "tauri": "tauri"
   },
   "dependencies": {
-    "@mui/x-tree-view": "^7.26.0",
-    "@tauri-apps/plugin-dialog": "^2.2.0",
+    "@mui/x-tree-view": "^7.28.1",
+    "@tauri-apps/plugin-dialog": "^2.2.1",
     "@tauri-apps/plugin-os": "^2.2.1",
     "details": "workspace:^",
     "immer": "^10.1.1",
@@ -21,7 +21,7 @@
     "notify": "workspace:^",
     "prism-themes": "^1.9.0",
     "prismjs": "^1.30.0",
-    "react-hotkeys-hook": "^4.6.1",
+    "react-hotkeys-hook": "^5.0.1",
     "react-resizable": "^3.0.5",
     "theme": "workspace:^",
     "time": "workspace:^",

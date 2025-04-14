@@ -1,25 +1,24 @@
-use std::{
-    collections::HashMap,
-    sync::{Arc, Mutex},
-};
-
-use futures::{StreamExt, pin_mut};
-use serde::{Deserialize, Serialize};
-use tauri::{AppHandle, Emitter, Runtime, WebviewWindowBuilder};
-use time::OffsetDateTime;
-
 use crate::{
     errors::{ChatGPTError, ChatGPTResult},
+    extensions::ExtensionContainer,
     fetch::{FetchRunner, Message as FetchMessage},
     plugins::{
         ChatGPTConfig,
         url_schema::{RouterEvent, router_emit_to_main},
     },
     store::{
-        Conversation, ConversationTemplate, DbConn, Message, Mode, NewConversation, Role, Status,
-        deserialize_offset_date_time, serialize_offset_date_time,
+        Content, Conversation, ConversationTemplate, DbConn, Message, Mode, NewConversation, Role,
+        Status, deserialize_offset_date_time, serialize_offset_date_time,
     },
 };
+use futures::{StreamExt, pin_mut};
+use serde::{Deserialize, Serialize};
+use std::{
+    collections::HashMap,
+    sync::{Arc, Mutex},
+};
+use tauri::{AppHandle, Emitter, Runtime, WebviewWindowBuilder};
+use time::OffsetDateTime;
 
 use super::TEMPORARY_WINDOW;
 
@@ -29,7 +28,7 @@ const TEMPORARY_MESSAGE_EVENT: &str = "temporary_message";
 pub struct TemporaryMessage {
     pub id: usize,
     pub role: Role,
-    pub content: String,
+    pub content: Content,
     pub status: Status,
     #[serde(
         rename = "createdTime",
@@ -60,7 +59,7 @@ pub struct TemporaryMessage {
 impl TemporaryMessage {
     fn add_content(&mut self, content: String) {
         let now = OffsetDateTime::now_utc();
-        self.content += &content;
+        self.content += content;
         self.updated_time = now;
         self.end_time = now;
     }
@@ -93,7 +92,7 @@ impl TemporaryConversation {
         &mut self,
         now: OffsetDateTime,
         role: Role,
-        content: String,
+        content: Content,
         status: Status,
     ) -> &TemporaryMessage {
         let id = self.new_id();
@@ -108,7 +107,23 @@ impl TemporaryConversation {
             end_time: now,
         };
         self.messages.push(message);
-        self.messages.last().unwrap()
+        self.messages.last_mut().unwrap()
+    }
+    fn update_message_content(
+        &mut self,
+        id: usize,
+        content: Content,
+    ) -> ChatGPTResult<&TemporaryMessage> {
+        let now = OffsetDateTime::now_utc();
+        let message = self.messages.iter_mut().find(|m| m.id == id);
+        if let Some(message) = message {
+            message.content = content;
+            message.updated_time = now;
+            message.end_time = now;
+            Ok(message)
+        } else {
+            Err(ChatGPTError::TemporaryMessageNotFound(id))
+        }
     }
 }
 
@@ -206,7 +221,7 @@ impl TemporaryStore {
         &mut self,
         persistent_id: Option<usize>,
         message_id: usize,
-        content: String,
+        content: Content,
     ) -> ChatGPTResult<&mut TemporaryMessage> {
         let message = self.get_temp_conversation_message_mut(persistent_id, message_id)?;
         message.content = content;
@@ -412,7 +427,7 @@ pub fn update_temporary_message<R: Runtime>(
     state: tauri::State<'_, Arc<Mutex<TemporaryStore>>>,
     persistent_id: Option<usize>,
     message_id: usize,
-    content: String,
+    content: Content,
 ) -> ChatGPTResult<()> {
     let message = state
         .lock()?
@@ -433,29 +448,51 @@ pub async fn temporary_fetch<R: Runtime>(
     conn: tauri::State<'_, DbConn>,
     content: String,
     persistent_id: Option<usize>,
+    extension_name: Option<String>,
 ) -> ChatGPTResult<()> {
     let mut conversation = state.lock()?.get_temp_conversation(persistent_id)?.clone();
-
     let now = OffsetDateTime::now_utc();
-    let user_message = conversation.add_message(now, Role::User, content, Status::Normal);
-    window.emit(
-        TEMPORARY_MESSAGE_EVENT,
-        TemporaryMessageEvent::new(user_message, persistent_id),
-    )?;
-
     let config = ChatGPTConfig::get(&app)?;
 
+    // update conversation template
     let conn = &mut conn.get()?;
     let mut template = ConversationTemplate::find(conversation.template.id, conn)?;
     template.mode = Mode::Contextual;
     conversation.template = template;
 
-    let new_id = conversation.new_id();
+    // user message
+    let user_message = conversation.add_message(
+        now,
+        Role::User,
+        match &extension_name {
+            Some(extension_name) => Content::Extension {
+                source: content.clone(),
+                content: String::new(),
+                extension_name: extension_name.clone(),
+            },
+            None => Content::Text(content.clone()),
+        },
+        Status::Normal,
+    );
+    window.emit(
+        TEMPORARY_MESSAGE_EVENT,
+        TemporaryMessageEvent::new(user_message, persistent_id),
+    )?;
+    let user_id = user_message.id;
 
+    // initialize assistant conversation
+    let new_id = conversation.new_id();
     let mut assistant_message = TemporaryMessage {
         id: new_id,
         role: Role::Assistant,
-        content: "".to_string(),
+        content: match &extension_name {
+            Some(extension_name) => Content::Extension {
+                source: String::new(),
+                content: String::new(),
+                extension_name: extension_name.clone(),
+            },
+            None => Content::Text(String::new()),
+        },
         status: Status::Loading,
         created_time: now,
         updated_time: now,
@@ -467,6 +504,27 @@ pub async fn temporary_fetch<R: Runtime>(
         TemporaryMessageEvent::new(&assistant_message, persistent_id),
     )?;
 
+    // extension
+    let extension_container = ExtensionContainer::load_from_app(&app)?;
+    let extension = match extension_name {
+        Some(extension_name) => {
+            let extension = extension_container
+                .get_extension(&extension_name, &app)
+                .await?;
+            Some(extension)
+        }
+        None => None,
+    };
+
+    // update user message content
+    let user_content = TemporaryFetch::<R>::get_new_user_content(content, extension).await?;
+    let user_message = conversation.update_message_content(user_id, user_content)?;
+    window.emit(
+        TEMPORARY_MESSAGE_EVENT,
+        TemporaryMessageEvent::new(user_message, persistent_id),
+    )?;
+
+    // fetch
     {
         let fetch = TemporaryFetch {
             config,
@@ -484,6 +542,8 @@ pub async fn temporary_fetch<R: Runtime>(
         }
         fetch.on_close(&mut assistant_message)?;
     }
+
+    // update conversation
     conversation.messages.push(assistant_message);
     state
         .lock()?
@@ -556,7 +616,7 @@ impl<R: Runtime> FetchRunner for TemporaryFetch<'_, R> {
             .template
             .prompts
             .iter()
-            .map(|prompt| FetchMessage::new(prompt.role, prompt.prompt.as_str()))
+            .map(|prompt| FetchMessage::new(prompt.role, prompt.prompt.clone()))
             .collect::<Vec<_>>();
 
         let messages = self
@@ -564,7 +624,9 @@ impl<R: Runtime> FetchRunner for TemporaryFetch<'_, R> {
             .messages
             .iter()
             .filter(|message| message.status == Status::Normal)
-            .map(|message| FetchMessage::new(message.role, message.content.as_str()));
+            .map(|message| {
+                FetchMessage::new(message.role, message.content.send_content().to_string())
+            });
 
         prompts.extend(messages);
         prompts

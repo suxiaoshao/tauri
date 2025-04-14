@@ -1,17 +1,63 @@
-use diesel::SqliteConnection;
-use serde::{Deserialize, Serialize};
-use time::OffsetDateTime;
-
+use super::utils::{deserialize_offset_date_time, serialize_offset_date_time};
 use crate::{
     errors::{ChatGPTError, ChatGPTResult},
     plugins::TemporaryMessage,
     store::{
-        model::{SqlConversation, SqlMessage, SqlNewMessage},
         Role, Status,
+        model::{SqlConversation, SqlMessage, SqlNewMessage},
     },
 };
+use diesel::SqliteConnection;
+use serde::{Deserialize, Serialize};
+use std::ops::AddAssign;
+use time::OffsetDateTime;
 
-use super::utils::{deserialize_offset_date_time, serialize_offset_date_time};
+#[derive(Debug, Serialize, Clone, Deserialize, PartialEq, Eq)]
+#[serde(tag = "tag", content = "value", rename_all = "camelCase")]
+pub enum Content {
+    Text(String),
+    Extension {
+        source: String,
+        #[serde(rename = "extensionName")]
+        extension_name: String,
+        content: String,
+    },
+}
+
+impl AddAssign<String> for Content {
+    fn add_assign(&mut self, rhs: String) {
+        match self {
+            Content::Text(text) => {
+                *text += &rhs;
+            }
+            Content::Extension { source, .. } => {
+                *source += &rhs;
+            }
+        }
+    }
+}
+
+impl AddAssign<&str> for Content {
+    fn add_assign(&mut self, rhs: &str) {
+        match self {
+            Content::Text(text) => {
+                *text += rhs;
+            }
+            Content::Extension { source, .. } => {
+                *source += rhs;
+            }
+        }
+    }
+}
+
+impl Content {
+    pub(crate) fn send_content(&self) -> &str {
+        match self {
+            Content::Text(content) => content,
+            Content::Extension { content, .. } => content,
+        }
+    }
+}
 
 #[derive(Debug, Serialize, Clone, Deserialize, PartialEq, Eq)]
 pub struct Message {
@@ -21,7 +67,7 @@ pub struct Message {
     #[serde(rename = "conversationPath")]
     pub conversation_path: String,
     pub role: Role,
-    pub content: String,
+    pub content: Content,
     pub status: Status,
     #[serde(
         rename = "createdTime",
@@ -58,7 +104,7 @@ impl TryFrom<SqlMessage> for Message {
             conversation_id: value.conversation_id,
             conversation_path: value.conversation_path,
             role: value.role.parse()?,
-            content: value.content,
+            content: serde_json::from_str(&value.content)?,
             status: value.status.parse()?,
             created_time: value.created_time,
             updated_time: value.updated_time,
@@ -72,12 +118,12 @@ impl TryFrom<SqlMessage> for Message {
 pub struct NewMessage {
     pub conversation_id: i32,
     pub role: Role,
-    pub content: String,
+    pub content: Content,
     pub status: Status,
 }
 
 impl NewMessage {
-    pub fn new(conversation_id: i32, role: Role, content: String, status: Status) -> Self {
+    pub fn new(conversation_id: i32, role: Role, content: Content, status: Status) -> Self {
         Self {
             conversation_id,
             role,
@@ -105,7 +151,7 @@ impl Message {
                 conversation_id,
                 conversation_path: path,
                 role: role.to_string(),
-                content,
+                content: serde_json::to_string(&content)?,
                 status: status.to_string(),
                 created_time: time,
                 updated_time: time,
@@ -135,19 +181,21 @@ impl Message {
                      end_time,
                      status,
                      ..
-                 }| SqlNewMessage {
-                    conversation_id,
-                    conversation_path: path.clone(),
-                    role: role.to_string(),
-                    content,
-                    status: status.to_string(),
-                    created_time,
-                    updated_time,
-                    start_time,
-                    end_time,
+                 }| {
+                    Ok(SqlNewMessage {
+                        conversation_id,
+                        conversation_path: path.clone(),
+                        role: role.to_string(),
+                        content: serde_json::to_string(&content)?,
+                        status: status.to_string(),
+                        created_time,
+                        updated_time,
+                        start_time,
+                        end_time,
+                    })
                 },
             )
-            .collect::<Vec<_>>();
+            .collect::<Result<Vec<_>, ChatGPTError>>()?;
         SqlNewMessage::insert_many(&messages, conn)?;
         Ok(())
     }
@@ -161,9 +209,16 @@ impl Message {
             .map(TryFrom::try_from)
             .collect::<ChatGPTResult<_>>()
     }
-    pub fn add_content(id: i32, content: String, conn: &mut SqliteConnection) -> ChatGPTResult<()> {
+    pub fn add_content(
+        id: i32,
+        new_content: String,
+        conn: &mut SqliteConnection,
+    ) -> ChatGPTResult<()> {
         let time = OffsetDateTime::now_utc();
-        SqlMessage::add_content(id, content, time, conn)?;
+        let SqlMessage { content, .. } = SqlMessage::find(id, conn)?;
+        let mut content = serde_json::from_str::<Content>(&content)?;
+        content += new_content;
+        SqlMessage::add_content(id, serde_json::to_string(&content)?, time, conn)?;
         Ok(())
     }
     pub fn update_status(
@@ -211,11 +266,11 @@ impl Message {
     }
     pub fn update_content(
         id: i32,
-        content: String,
+        content: &Content,
         conn: &mut SqliteConnection,
     ) -> ChatGPTResult<()> {
         let time = OffsetDateTime::now_utc();
-        SqlMessage::update_content(id, content, time, conn)?;
+        SqlMessage::update_content(id, serde_json::to_string(content)?, time, conn)?;
         Ok(())
     }
 }

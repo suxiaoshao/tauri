@@ -1,4 +1,4 @@
-package extension: host;
+package chatgpt:extension;
 
 
 interface extension-api {
@@ -7,50 +7,19 @@ interface extension-api {
     user,
     assistant,
   }
-
-  record message {
-    role: role,
-    content: string,
-  }
   record chat-request {
-    model: string,
-    messages: list<message>,
-    streams: bool,
-    temperature: f64,
-    top-p: f64,
-    n: s64,
-    max-tokens: option<s64>,
-    presence-penalty: f64,
-    frequency-penalty: f64,
-  }
-  record delta{
-    role: option<role>,
-    content: option<string>
-  }
-
-  record choice{
-    index: s64,
-    delta: delta,
-    finish-reason: option<string>
-  }
-  record usage {
-    prompt-tokens: s64,
-    completion-tokens: s64,
-    total-token: s64
+    message: string
   }
   record chat-response{
-    id: string,
-    object: string,
-    created: s64,
-    choices: list<choice>
+    message: string
   }
   on-request: func(request: chat-request) -> result<chat-request,string>;
   on-response: func(response: chat-response) -> result<chat-response,string>;
-  get-name: func() -> string;
 }
 
 
-world host {
+world extension {
   import get-selected-text: func()-> result<string,string>;
+  import http-client;
   export extension-api;
 }

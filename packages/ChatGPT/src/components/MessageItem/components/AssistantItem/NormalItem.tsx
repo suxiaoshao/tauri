@@ -18,6 +18,7 @@ import DeleteMessageIcon from '../ToolBar/DeleteMessageIcon';
 import ViewIcon from '../ToolBar/ViewIcon';
 import { useState, useEffect } from 'react';
 import { match } from 'ts-pattern';
+import { getSourceContent } from '@chatgpt/utils/content';
 
 export interface NormalItemProps {
   message: BaseMessage;
@@ -38,12 +39,12 @@ export default function NormalItem({ message, selected }: NormalItemProps) {
     <>
       <Box sx={sx} ref={setRef}>
         <Avatar sx={AvatarSx} src={assistant} />
-        <CustomMarkdown sx={{ ...MarkdownSx }} value={message.content} />
+        <CustomMarkdown sx={{ ...MarkdownSx }} value={getSourceContent(message.content)} />
         <ToolBar>
           <CheckCircleOutlineOutlined fontSize="small" sx={ToolSx} />
           <DeleteMessageIcon id={message.id} />
           <ViewIcon id={message.id} />
-          <CopyIcon content={message.content} />
+          <CopyIcon content={getSourceContent(message.content)} />
         </ToolBar>
       </Box>
       <Divider />

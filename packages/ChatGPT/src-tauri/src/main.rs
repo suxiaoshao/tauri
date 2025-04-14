@@ -12,6 +12,7 @@ use tauri_plugin_log::{Target, TargetKind};
 
 mod adapter;
 mod errors;
+mod extensions;
 mod fetch;
 mod plugins;
 mod store;
@@ -57,6 +58,7 @@ fn main() -> ChatGPTResult<()> {
         .plugin(plugins::TemporaryConversationPlugin::default())
         .plugin(plugins::TrayPlugin)
         .plugin(plugins::AdapterPlugin)
+        .plugin(plugins::ExtensionsPlugin)
         .run(tauri::generate_context!())?;
     Ok(())
 }
