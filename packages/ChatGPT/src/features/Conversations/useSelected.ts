@@ -76,6 +76,6 @@ export function useSelected() {
           setSelected(noneSelected);
         });
       });
-  }, [selected, noneSelected, conversations]);
+  }, [selected, noneSelected, conversations, setSelected]);
   return [selected, setSelected] as const;
 }

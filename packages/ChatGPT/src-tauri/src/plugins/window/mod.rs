@@ -25,7 +25,7 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for WindowPlugin {
     }
     fn window_created(&mut self, window: tauri::Window<R>) {
         if let Err(err) = on_created(window) {
-            warn!("window created error:{}", err)
+            warn!("window created error:{err}")
         };
     }
     #[cfg(target_os = "macos")]
@@ -38,7 +38,7 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for WindowPlugin {
             let app = app.clone();
             tauri::async_runtime::spawn(async move {
                 if let Err(err) = create_main(&app) {
-                    log::warn!("window created error:{}", err)
+                    log::warn!("window created error:{err}")
                 }
             });
         }

@@ -30,7 +30,7 @@ fn main() -> ChatGPTResult<()> {
                 .with_handler(|app, shortcut, event| {
                     if event.state == ShortcutState::Pressed {
                         if let Err(err) = on_shortcut_trigger(app, shortcut) {
-                            log::error!("global shortcut error:{}", err);
+                            log::error!("global shortcut error:{err}");
                         };
                     }
                 })

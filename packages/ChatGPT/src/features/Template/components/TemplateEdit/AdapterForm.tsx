@@ -45,7 +45,9 @@ export default function AdapterForm() {
         />
         {value
           .find(({ name }) => name === adapterName)
-          ?.inputs.map((input) => <InputItemForm key={input.id} inputItem={input} prefixName="template" />)}
+          ?.inputs.map((input) => (
+            <InputItemForm key={input.id} inputItem={input} prefixName="template" />
+          ))}
         <Divider />
       </Box>
     ))

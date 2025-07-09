@@ -20,7 +20,7 @@ impl Display for ExportType {
             ExportType::Csv => "csv",
             ExportType::Txt => "txt",
         };
-        write!(f, "{}", s)
+        write!(f, "{s}")
     }
 }
 
@@ -35,7 +35,7 @@ pub async fn export(
     let Conversation {
         messages, title, ..
     } = store::Conversation::find(id, conn)?;
-    path.push(format!("{}.{}", title, export_type));
+    path.push(format!("{title}.{export_type}"));
     match export_type {
         ExportType::Json => export_json(messages, path)?,
         ExportType::Csv => export_csv(messages, path)?,

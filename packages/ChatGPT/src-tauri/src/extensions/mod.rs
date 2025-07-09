@@ -68,8 +68,9 @@ impl ExtensionContainer {
 
         // linker
         let mut linker = Linker::new(&engine);
-        wasmtime_wasi::add_to_linker_async(&mut linker).map_err(|_| ChatGPTError::WasmtimeError)?;
-        Extension::add_to_linker(&mut linker, |state: &mut ExtensionState| state)
+        wasmtime_wasi::p2::add_to_linker_async(&mut linker)
+            .map_err(|_| ChatGPTError::WasmtimeError)?;
+        Extension::add_to_linker::<_, HasSelf<_>>(&mut linker, |state: &mut ExtensionState| state)
             .map_err(|_| ChatGPTError::WasmtimeError)?;
         Ok(Self {
             engine,

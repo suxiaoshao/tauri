@@ -63,6 +63,6 @@ mod test {
     #[test]
     fn test_app_search() {
         let data = get_app_data();
-        println!("{:#?}", data);
+        println!("{data:#?}");
     }
 }

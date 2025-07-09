@@ -96,12 +96,12 @@ impl SqlFolder {
         Ok(())
     }
     pub fn delete_by_path(path: &str, conn: &mut SqliteConnection) -> ChatGPTResult<()> {
-        let path = format!("{}/%", path);
+        let path = format!("{path}/%");
         diesel::delete(folders::table.filter(folders::path.like(path))).execute(conn)?;
         Ok(())
     }
     pub fn find_by_path_pre(path: &str, conn: &mut SqliteConnection) -> ChatGPTResult<Vec<Self>> {
-        let path = format!("{}/%", path);
+        let path = format!("{path}/%");
         folders::table
             .filter(folders::path.like(path))
             .load::<Self>(conn)

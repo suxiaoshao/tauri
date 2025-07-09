@@ -18,11 +18,11 @@ pub async fn fetch<R: Runtime>(
 ) -> ChatGPTResult<()> {
     match _fetch(app_handle, state, id, content, extension_name).await {
         Ok(x) => {
-            log::info!("fetch success: {}", x);
+            log::info!("fetch success: {x}");
             Ok(())
         }
         Err(err) => {
-            log::error!("fetch error: {:?}", err);
+            log::error!("fetch error: {err:?}");
             Err(err)
         }
     }
@@ -48,7 +48,7 @@ impl<R: Runtime> Fetch<R> {
     }
 
     fn on_error(&self, err: ChatGPTError) -> ChatGPTResult<()> {
-        log::error!("Connection Error: {:?}", err);
+        log::error!("Connection Error: {err:?}");
         let conn = &mut self.db_conn.get()?;
         Message::update_status(self.message_id, Status::Error, conn)?;
         let message = Message::find(self.message_id, conn)?;

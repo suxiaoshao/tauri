@@ -53,6 +53,6 @@ export default function MessagePreview() {
         />
       ))
       .otherwise(() => <Loading sx={{ width: '100%', height: '100%' }} />);
-  }, [data, persistentId]);
+  }, [data, persistentId, fn]);
   return content;
 }

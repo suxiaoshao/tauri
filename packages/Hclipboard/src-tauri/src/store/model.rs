@@ -68,7 +68,7 @@ impl History {
     /// 根据搜索内容获取历史记录
     fn query_by_search(search_name: &str, conn: &mut SqliteConnection) -> ClipResult<Vec<History>> {
         let data = history::table
-            .filter(history::data.like(format!("%{}%", search_name)))
+            .filter(history::data.like(format!("%{search_name}%")))
             .order(history::update_time.desc())
             .load::<History>(conn)?;
         Ok(data)

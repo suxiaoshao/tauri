@@ -4,7 +4,7 @@ pub use exports::chatgpt::extension::extension_api::ChatRequest;
 use reqwest::{header::HeaderValue, redirect::Policy};
 use std::str::FromStr;
 use wasmtime::component::*;
-use wasmtime_wasi::{IoView, WasiCtx, WasiView};
+use wasmtime_wasi::p2::{IoView, WasiCtx, WasiView};
 
 bindgen!({
     world: "extension",
@@ -141,8 +141,8 @@ mod tests {
         let engine = Engine::new(&config)?;
         let component = Component::from_binary(&engine, include_bytes!("../../url_search.wasm"))?;
         let mut linker = Linker::new(&engine);
-        wasmtime_wasi::add_to_linker_async(&mut linker)?;
-        Extension::add_to_linker(&mut linker, |state: &mut ExtensionState| state)?;
+        wasmtime_wasi::p2::add_to_linker_async(&mut linker)?;
+        Extension::add_to_linker::<_, HasSelf<_>>(&mut linker, |state: &mut ExtensionState| state)?;
         let mut store = Store::new(&engine, ExtensionState::new(ChatGPTConfig::default()));
         let bindings = Extension::instantiate_async(&mut store, &component, &linker).await?;
         let extension_api = bindings.chatgpt_extension_extension_api();
@@ -154,7 +154,7 @@ mod tests {
             .await?;
         assert!(response.is_ok());
         let response = response.map_err(|err| anyhow!("{}", err))?;
-        println!("{:?}", response);
+        println!("{response:?}");
         Ok(())
     }
 }

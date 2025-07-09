@@ -24,7 +24,7 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for WindowPlugin {
     }
     fn window_created(&mut self, window: tauri::Window<R>) {
         if let Err(err) = on_created(window) {
-            warn!("window created error:{}", err)
+            warn!("window created error:{err}")
         };
     }
     fn on_event(&mut self, app: &AppHandle<R>, event: &tauri::RunEvent) {
@@ -36,7 +36,7 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for WindowPlugin {
             } if label == "main" => match app.get_webview_window("main") {
                 Some(window) => {
                     if let Err(err) = window.hide() {
-                        warn!("main window hide error:{}", err)
+                        warn!("main window hide error:{err}")
                     };
                 }
                 None => {

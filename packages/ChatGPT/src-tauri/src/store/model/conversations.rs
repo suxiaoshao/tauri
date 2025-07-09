@@ -101,13 +101,13 @@ impl SqlConversation {
         Ok(count > 0)
     }
     pub fn delete_by_path(path: &str, conn: &mut SqliteConnection) -> ChatGPTResult<()> {
-        let path = format!("{}/%", path);
+        let path = format!("{path}/%");
         diesel::delete(conversations::table.filter(conversations::path.like(path)))
             .execute(conn)?;
         Ok(())
     }
     pub fn find_by_path_pre(path: &str, conn: &mut SqliteConnection) -> ChatGPTResult<Vec<Self>> {
-        let path = format!("{}/%", path);
+        let path = format!("{path}/%");
         conversations::table
             .filter(conversations::path.like(path))
             .load::<Self>(conn)

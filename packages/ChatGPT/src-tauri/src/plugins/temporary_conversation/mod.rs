@@ -33,12 +33,12 @@ impl TemporaryConversationPlugin {
             None => return,
         };
         if let Err(err) = window.hide() {
-            log::error!("hide temporary window error:{}", err);
+            log::error!("hide temporary window error:{err}");
         }
         self.delayed_task.update(Self::DURATION, {
             async move {
                 if let Err(err) = window.close() {
-                    log::error!("close temporary window error:{}", err);
+                    log::error!("close temporary window error:{err}");
                 };
             }
         });
@@ -128,11 +128,11 @@ pub fn on_shortcut_trigger<R: Runtime>(
         if cfg!(target_os = "windows") {
             tauri::async_runtime::spawn(async move {
                 if let Err(err) = trigger_temp_window(&app) {
-                    log::error!("trigger temporary window error:{}", err);
+                    log::error!("trigger temporary window error:{err}");
                 };
             });
         } else if let Err(err) = trigger_temp_window(&app) {
-            log::error!("trigger temporary window error:{}", err);
+            log::error!("trigger temporary window error:{err}");
         }
     }
     Ok(())

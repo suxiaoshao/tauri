@@ -41,7 +41,7 @@ fn main() -> ClipResult<()> {
                 .with_handler(|app, _shortcut, event| {
                     if event.state == ShortcutState::Pressed {
                         if let Err(err) = on_short(app) {
-                            log::error!("global shortcut error:{}", err);
+                            log::error!("global shortcut error:{err}");
                         };
                     }
                 })
