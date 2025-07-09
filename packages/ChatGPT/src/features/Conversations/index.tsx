@@ -26,7 +26,7 @@ export default function ConversationTree() {
   );
   const [selected, setSelected] = useSelected();
   const handleSelect = useCallback(
-    (_event: React.SyntheticEvent, nodeIds: string | null) => {
+    (_event: React.SyntheticEvent | null, nodeIds: string | null) => {
       if (!nodeIds) {
         return;
       }

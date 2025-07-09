@@ -33,7 +33,7 @@ impl Display for Role {
             Role::User => "user",
             Role::Assistant => "assistant",
         };
-        write!(f, "{}", s)
+        write!(f, "{s}")
     }
 }
 

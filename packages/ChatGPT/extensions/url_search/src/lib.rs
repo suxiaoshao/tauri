@@ -6,12 +6,12 @@ wit_bindgen::generate!({
     // the name of the world in the `*.wit` input file
     world: "extension",
     path:"../wit",
-    async: {
-        exports:[
-            // todo async
-            // "extension:host/extension-api#on-request"
-        ]
-    }
+    // async: {
+    //     exports:[
+    //         // todo async
+    //         // "extension:host/extension-api#on-request"
+    //     ]
+    // }
 });
 
 struct UrlSearch;

@@ -36,7 +36,7 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for TrayPlugin {
         let tray = app.tray_by_id("main");
         if let Some(tray) = tray {
             if let Err(err) = init_tray(tray, app) {
-                log::warn!("tray init error:{}", err)
+                log::warn!("tray init error:{err}")
             }
         }
 
@@ -61,7 +61,7 @@ fn init_tray<R: Runtime>(tray_icon: TrayIcon<R>, app: &tauri::AppHandle<R>) -> C
             &MenuItem::with_id(
                 app,
                 "version",
-                format!("Version(V{})", version),
+                format!("Version(V{version})"),
                 true,
                 None::<&str>,
             )?,
@@ -75,12 +75,12 @@ fn init_tray<R: Runtime>(tray_icon: TrayIcon<R>, app: &tauri::AppHandle<R>) -> C
     tray_icon.on_menu_event(|app, event| match event.id().as_ref() {
         TEMPORARY => {
             if let Err(err) = super::temporary_conversation::trigger_temp_window(app) {
-                log::warn!("tray click error:{}", err)
+                log::warn!("tray click error:{err}")
             }
         }
         OPEN => {
             if let Err(err) = create_main(app) {
-                log::warn!("tray click error:{}", err)
+                log::warn!("tray click error:{err}")
             }
         }
         _ => {}

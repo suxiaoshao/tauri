@@ -9,6 +9,7 @@ use plugins::{LogPlugin, MainConfigListener, TemporaryHotkeyListener, on_shortcu
 use tauri::{Manager, Runtime, WebviewWindow};
 use tauri_plugin_global_shortcut::ShortcutState;
 use tauri_plugin_log::{Target, TargetKind};
+use tauri_plugin_opener::Builder;
 
 mod adapter;
 mod errors;
@@ -30,7 +31,7 @@ fn main() -> ChatGPTResult<()> {
                 .with_handler(|app, shortcut, event| {
                     if event.state == ShortcutState::Pressed {
                         if let Err(err) = on_shortcut_trigger(app, shortcut) {
-                            log::error!("global shortcut error:{}", err);
+                            log::error!("global shortcut error:{err}");
                         };
                     }
                 })
@@ -59,6 +60,7 @@ fn main() -> ChatGPTResult<()> {
         .plugin(plugins::TrayPlugin)
         .plugin(plugins::AdapterPlugin)
         .plugin(plugins::ExtensionsPlugin)
+        .plugin(Builder::default().build())
         .run(tauri::generate_context!())?;
     Ok(())
 }

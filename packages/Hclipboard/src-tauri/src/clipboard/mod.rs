@@ -7,8 +7,8 @@
  */
 use clipboard_master::CallbackResult;
 use diesel::{
-    r2d2::{ConnectionManager, PooledConnection},
     SqliteConnection,
+    r2d2::{ConnectionManager, PooledConnection},
 };
 use log::warn;
 use tauri::Runtime;
@@ -29,7 +29,7 @@ impl<'a, R: Runtime> Clipboard<'a, R> {
         if let Ok(text) = self.clip.read_text() {
             if self.old_data != text {
                 #[cfg(debug_assertions)]
-                println!("clipboard: {}", text);
+                println!("clipboard: {text}");
                 History::insert(&text, &mut self.conn)?;
                 self.old_data = text;
             }
@@ -52,7 +52,7 @@ impl<'a, R: Runtime> Clipboard<'a, R> {
 impl<R: Runtime> clipboard_master::ClipboardHandler for Clipboard<'_, R> {
     fn on_clipboard_change(&mut self) -> CallbackResult {
         if let Err(err) = self.update() {
-            warn!("update clipboard error:{}", err)
+            warn!("update clipboard error:{err}")
         }
         CallbackResult::Next
     }

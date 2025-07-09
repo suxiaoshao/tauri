@@ -4,10 +4,10 @@ use time::OffsetDateTime;
 use crate::{
     errors::{ChatGPTError, ChatGPTResult},
     store::{
+        Message,
         model::{
             SqlConversation, SqlFolder, SqlMessage, SqlNewConversation, SqlUpdateConversation,
         },
-        Message,
     },
 };
 
@@ -71,7 +71,7 @@ impl Conversation {
             .transpose()?;
         let path = match folder {
             Some(folder) => format!("{}/{}", folder.path, title),
-            None => format!("/{}", title),
+            None => format!("/{title}"),
         };
         if SqlFolder::path_exists(&path, conn)? {
             return Err(ChatGPTError::FolderPathExists(path));
@@ -145,7 +145,7 @@ impl Conversation {
         let old_conversation = SqlConversation::find(id, conn)?;
         let path = match folder {
             Some(folder) => format!("{}/{}", folder.path, title),
-            None => format!("/{}", title),
+            None => format!("/{title}"),
         };
         if SqlFolder::path_exists(&path, conn)? {
             return Err(ChatGPTError::FolderPathExists(path));

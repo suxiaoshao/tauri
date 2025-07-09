@@ -19,16 +19,16 @@ tauri = { workspace = true, features = ["macos-private-api"] }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
 # log
-tauri-plugin-log = { version = "2.3.1" }
+tauri-plugin-log = { version = "2.6.0" }
 log = "0.4.27"
 
 # database
-diesel = { version = "2.2.9", features = ["sqlite", "r2d2"] }
-libsqlite3-sys = { version = "0.32.0", features = ["bundled"] }
+diesel = { version = "2.2.11", features = ["sqlite", "r2d2"] }
+libsqlite3-sys = { version = "0.33.0", features = ["bundled"] }
 time = { version = "0.3.41", features = ["serde"] }
 
 # http
-reqwest = "0.12.15"
+reqwest = "0.12.22"
 
 # html
 scraper = "0.23.1"
@@ -37,15 +37,15 @@ futures = "0.3.31"
 thiserror = "2.0.12"
 
 # 窗口管理
-tauri-plugin-window-state = { version = "2.2.2" }
+tauri-plugin-window-state = { version = "2.3.0" }
 window-vibrancy = "0.6.0"
 url = "2.5.4"
 
 # plugin
-tauri-plugin-notification = "2.2.2"
+tauri-plugin-notification = "2.3.0"
 
 [target.'cfg(target_os="macos")'.dependencies]
-cocoa = "0.26.0"
+cocoa = "0.26.1"
 
 [features]
 # by default Tauri runs in production mode
@@ -56,4 +56,4 @@ default = ["custom-protocol"]
 custom-protocol = ["tauri/custom-protocol"]
 
 [dev-dependencies]
-anyhow = "1.0.97"
+anyhow = "1.0.98"

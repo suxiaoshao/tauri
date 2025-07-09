@@ -19,12 +19,12 @@ pub fn app_data_init<R: Runtime>(app: &AppHandle<R>) -> Option<()> {
 }
 
 pub fn query_app_data(path: &str) -> Vec<AppPath> {
-    let data = APP_DATA
+    let data: Vec<AppPath> = APP_DATA
         .lock()
         .unwrap()
         .values()
         .filter(|&x| x == path)
         .cloned()
-        .collect::<Vec<_>>();
+        .collect();
     data
 }

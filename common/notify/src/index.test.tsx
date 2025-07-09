@@ -7,23 +7,28 @@
  */
 import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import { useSnackbar } from 'notistack';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it } from '@jest/globals';
 import { enqueueSnackbar, SnackbarProvider } from '.';
-
-vi.mock(import('@tauri-apps/plugin-notification'), async (importOriginal) => {
-  const mod = await importOriginal();
-  return {
-    ...mod,
-    isPermissionGranted: vi.fn().mockReturnValue(true),
-    sendNotification: vi.fn(),
-  };
-});
+import { mockIPC } from '@tauri-apps/api/mocks';
 
 describe('notify', () => {
   afterEach(() => {
     cleanup();
   });
   it('use enqueueSnackbar fn', async () => {
+    mockIPC((cmd, _args) => {
+      if (cmd === 'plugin:notification|is_permission_granted') {
+        // oxlint-disable-line no-conditional-in-test
+        return true;
+      }
+    });
+    class Notification {
+      static permission = 'default';
+      //oxlint-disable-next-line no-useless-constructor no-empty-function
+      constructor() {}
+    }
+    // @ts-expect-error next-line
+    window.Notification = Notification;
     render(<SnackbarProvider>111</SnackbarProvider>);
     expect(screen.getByText('111')).toBeTruthy();
     await waitFor(async () => await enqueueSnackbar('test'));

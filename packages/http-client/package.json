@@ -9,7 +9,7 @@
     "tauri": "tauri"
   },
   "dependencies": {
-    "@tauri-apps/plugin-shell": "^2.2.1",
+    "@tauri-apps/plugin-shell": "^2.3.0",
     "notify": "workspace:^",
     "theme": "workspace:^",
     "types": "workspace:^"

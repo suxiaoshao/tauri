@@ -320,10 +320,8 @@ pub fn get_temporary_conversation(
 fn create_persistent_window<R: Runtime>(app: &AppHandle<R>, id: usize) -> ChatGPTResult<()> {
     let window = WebviewWindowBuilder::new(
         app,
-        format!("{}-{}", TEMPORARY_WINDOW, id),
-        tauri::WebviewUrl::App(
-            format!("/temporary_conversation/detail?persistentId={}", id).into(),
-        ),
+        format!("{TEMPORARY_WINDOW}-{id}"),
+        tauri::WebviewUrl::App(format!("/temporary_conversation/detail?persistentId={id}").into()),
     )
     .title("Temporary Conversation")
     .inner_size(800.0, 600.0)
@@ -577,7 +575,7 @@ impl<R: Runtime> TemporaryFetch<'_, R> {
         err: ChatGPTError,
         assistant_message: &mut TemporaryMessage,
     ) -> ChatGPTResult<()> {
-        log::error!("Connection Error: {:?}", err);
+        log::error!("Connection Error: {err:?}");
         assistant_message.update_status(Status::Error);
         self.window.emit(
             TEMPORARY_MESSAGE_EVENT,

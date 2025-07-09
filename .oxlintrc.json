@@ -312,18 +312,18 @@
     "consistent-type-imports": "warn"
   },
   "plugins": [
-    "react",
-    "unicorn",
-    "oxc",
     "typescript",
+    "unicorn",
+    "react",
+    "nextjs",
+    "oxc",
     "import",
     "jsdoc",
-    "jest",
-    "vitest",
     "jsx-a11y",
-    "nextjs",
+    "node",
     "promise",
-    "node"
+    "jest",
+    "vitest"
   ],
   "ignorePatterns": ["changelog.config.js", "*.d.ts"]
 }
