@@ -18,7 +18,7 @@ pub async fn fetch(
             Ok(())
         }
         Err(err) => {
-            log::error!("fetch error: {:?}", err);
+            log::error!("fetch error: {err:?}");
             Err(())
         }
     }

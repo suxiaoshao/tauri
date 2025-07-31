@@ -14,11 +14,9 @@ static SELECTOR_TAGS: LazyLock<Selector> = LazyLock::new(|| {
 });
 
 pub fn parse_tags(doc: &Html) -> FeiwenResult<HashSet<Tag>> {
-    let tags = doc
-        .select(&SELECTOR_TAGS)
+    doc.select(&SELECTOR_TAGS)
         .map(parse_tag)
-        .collect::<FeiwenResult<HashSet<_>>>();
-    tags
+        .collect::<FeiwenResult<HashSet<_>>>()
 }
 
 fn parse_tag(title: ElementRef) -> FeiwenResult<Tag> {

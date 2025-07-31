@@ -15,8 +15,8 @@ strip = "symbols"
 
 [workspace.dependencies]
 # tauri
-tauri = { version = "2.6.2" }
+tauri = { version = "2.7.0" }
 serde = { version = "1.0.219", features = ["derive"] }
-serde_json = "1.0.140"
+serde_json = "1.0.141"
 
-tauri-build = { version = "2.3.0" }
+tauri-build = { version = "2.3.1" }

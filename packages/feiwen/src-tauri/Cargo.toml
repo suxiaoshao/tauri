@@ -23,8 +23,8 @@ tauri-plugin-log = { version = "2.6.0" }
 log = "0.4.27"
 
 # database
-diesel = { version = "2.2.11", features = ["sqlite", "r2d2"] }
-libsqlite3-sys = { version = "0.33.0", features = ["bundled"] }
+diesel = { version = "2.2.12", features = ["sqlite", "r2d2"] }
+libsqlite3-sys = { version = "0.35.0", features = ["bundled"] }
 time = { version = "0.3.41", features = ["serde"] }
 
 # http
@@ -37,7 +37,7 @@ futures = "0.3.31"
 thiserror = "2.0.12"
 
 # 窗口管理
-tauri-plugin-window-state = { version = "2.3.0" }
+tauri-plugin-window-state = { version = "2.4.0" }
 window-vibrancy = "0.6.0"
 url = "2.5.4"
 
