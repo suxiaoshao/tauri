@@ -39,10 +39,7 @@ function getFilteredTemplates(
 function reducer(state: Data, action: Action): Data {
   return match(action)
     .with({ tag: 'up' }, () => {
-      if (state.selectedIndex === null) {
-        return state;
-      }
-      if (state.selectedIndex <= 0) {
+      if (state.selectedIndex === null || state.selectedIndex <= 0) {
         return { ...state, selectedIndex: state.filteredTemplates.length - 1 };
       }
       return { ...state, selectedIndex: state.selectedIndex - 1 };
