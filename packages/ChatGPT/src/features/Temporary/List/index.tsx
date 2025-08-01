@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { match } from 'ts-pattern';
 import { type Enum } from 'types';
 import { useShallow } from 'zustand/react/shallow';
+import { pinyin } from 'pinyin-pro';
 
 interface Data {
   selectedIndex: number | null;
@@ -32,7 +33,12 @@ function getFilteredTemplates(
   }
   const lowerSearchText = searchText.toLowerCase();
   return sourceTemplates.filter(({ name, description }) => {
-    return name.toLowerCase().includes(lowerSearchText) || description?.toLowerCase().includes(lowerSearchText);
+    return (
+      name.toLowerCase().includes(lowerSearchText) ||
+      description?.toLowerCase().includes(lowerSearchText) ||
+      pinyin(name, { toneType: 'none', type: 'string', separator: '' }).includes(lowerSearchText) ||
+      pinyin(description || '', { toneType: 'none', type: 'string', separator: '' }).includes(lowerSearchText)
+    );
   });
 }
 

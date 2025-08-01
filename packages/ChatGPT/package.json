@@ -20,6 +20,7 @@
     "monaco-editor": "^0.52.2",
     "monaco-themes": "^0.4.6",
     "notify": "workspace:^",
+    "pinyin-pro": "^3.26.0",
     "prism-themes": "^1.9.0",
     "prismjs": "^1.30.0",
     "react-hotkeys-hook": "^5.1.0",
