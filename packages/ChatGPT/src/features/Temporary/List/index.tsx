@@ -110,7 +110,7 @@ export default function TemporaryList() {
       dispatch({ tag: 'up' });
     },
     { enableOnFormTags: ['INPUT'] },
-    [templates],
+    [],
   );
   useHotkeys(
     'down',
@@ -119,7 +119,7 @@ export default function TemporaryList() {
       dispatch({ tag: 'down' });
     },
     { enableOnFormTags: ['INPUT'] },
-    [templates],
+    [],
   );
   useHotkeys(
     'enter',
@@ -150,7 +150,7 @@ export default function TemporaryList() {
   const [ref, setRef] = useState<HTMLDivElement | null>(null);
   useEffect(() => {
     if (ref) {
-      ref?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+      ref?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     }
   }, [ref]);
 
@@ -167,8 +167,8 @@ export default function TemporaryList() {
           pl: 2,
           pr: 2,
         }}
-        placeholder="Search Google Maps"
-        inputProps={{ 'aria-label': 'search google maps' }}
+        placeholder="Search Templates"
+        inputProps={{ 'aria-label': 'search templates', spellCheck: false }}
         inputRef={setInputRef}
         data-tauri-drag-region
         onChange={handleSearch}

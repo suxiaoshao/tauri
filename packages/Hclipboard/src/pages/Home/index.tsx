@@ -67,7 +67,7 @@ export default function Home() {
         placeholder="搜索"
         sx={{ margin: 1 }}
         {...register('searchData')}
-        inputProps={{ spellcheck: 'false' }}
+        slotProps={{ htmlInput: { spellCheck: 'false' } }}
       />
       <List sx={{ flex: '1 1 0', overflowY: 'auto', width: '100%' }}>
         {data.map((item, index) => (

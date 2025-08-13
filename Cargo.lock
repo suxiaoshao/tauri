@@ -937,6 +937,7 @@ dependencies = [
  "libsqlite3-sys",
  "log",
  "notify",
+ "pinyin",
  "reqwest",
  "reqwest-eventsource",
  "serde",

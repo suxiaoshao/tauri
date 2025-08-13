@@ -61,7 +61,7 @@ export default function Home() {
         placeholder="搜索"
         fullWidth
         slotProps={{
-          htmlInput: { spellcheck: 'false' },
+          htmlInput: { spellCheck: 'false' },
         }}
         onChange={async (e) => {
           const data: AppPath[] = await invoke('app_search', { path: e.target.value });

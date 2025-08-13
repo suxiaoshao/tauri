@@ -27,6 +27,7 @@ diesel = { version = "2.2.12", features = [
 ] }
 libsqlite3-sys = { version = "0.35.0", features = ["bundled-windows"] }
 time = { version = "0.3.41", features = ["serde"] }
+pinyin = "0.10.0"
 
 # 错误处理
 thiserror = "2.0.12"

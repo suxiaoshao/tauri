@@ -9,7 +9,7 @@ import { Alert, Box, type BoxProps, Link, Typography } from '@mui/material';
 
 export interface ErrorInfoProps extends BoxProps {
   error: Error;
-  refetch: () => void;
+  refetch?: () => void;
 }
 
 export default function ErrorInfo({ error, refetch, sx, ...props }: ErrorInfoProps) {
@@ -38,13 +38,15 @@ export default function ErrorInfo({ error, refetch, sx, ...props }: ErrorInfoPro
         <Alert sx={{ width: '70%' }} variant="filled" severity="error">
           Error : {error.message}
         </Alert>
-        <Typography variant="body1" gutterBottom component="div">
-          Please click the{' '}
-          <Link component="button" variant="body1" onClick={refetch}>
-            button
-          </Link>{' '}
-          to retry.
-        </Typography>
+        {refetch && (
+          <Typography variant="body1" gutterBottom component="div">
+            Please click the{' '}
+            <Link component="button" variant="body1" onClick={refetch}>
+              button
+            </Link>{' '}
+            to retry.
+          </Typography>
+        )}
       </Box>
     </Box>
   );

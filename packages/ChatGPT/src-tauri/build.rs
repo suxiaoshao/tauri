@@ -26,6 +26,7 @@ fn main() {
                         "delete_conversation_template",
                         "update_conversation_template",
                         "add_conversation_template",
+                        "search_conversation",
                     ]),
             )
             .plugin(
