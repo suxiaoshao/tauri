@@ -34,10 +34,10 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for TrayPlugin {
         _config: serde_json::Value,
     ) -> Result<(), Box<dyn std::error::Error>> {
         let tray = app.tray_by_id("main");
-        if let Some(tray) = tray {
-            if let Err(err) = init_tray(tray, app) {
-                log::warn!("tray init error:{err}")
-            }
+        if let Some(tray) = tray
+            && let Err(err) = init_tray(tray, app)
+        {
+            log::warn!("tray init error:{err}")
         }
 
         Ok(())

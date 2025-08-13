@@ -28,10 +28,9 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for WindowPlugin {
             event: tauri::WindowEvent::CloseRequested { .. },
             ..
         } = event
+            && label == "main"
         {
-            if label == "main" {
-                app.exit(0);
-            }
+            app.exit(0);
         }
     }
 }

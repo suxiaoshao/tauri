@@ -2,15 +2,7 @@ use tauri::{Emitter, Manager, Runtime};
 
 use crate::{create_main_window, errors::ChatGPTResult};
 
-pub struct UrlSchema;
-
 const ROUTER_EVENT: &str = "router_event";
-
-impl<R: Runtime> tauri::plugin::Plugin<R> for UrlSchema {
-    fn name(&self) -> &'static str {
-        "url_schema"
-    }
-}
 
 #[derive(serde::Serialize, Clone, Debug)]
 pub struct RouterEvent {

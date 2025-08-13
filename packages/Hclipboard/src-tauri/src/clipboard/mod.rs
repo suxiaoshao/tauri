@@ -26,13 +26,13 @@ pub struct Clipboard<'a, R: Runtime> {
 
 impl<'a, R: Runtime> Clipboard<'a, R> {
     fn update(&mut self) -> ClipResult<()> {
-        if let Ok(text) = self.clip.read_text() {
-            if self.old_data != text {
-                #[cfg(debug_assertions)]
-                println!("clipboard: {text}");
-                History::insert(&text, &mut self.conn)?;
-                self.old_data = text;
-            }
+        if let Ok(text) = self.clip.read_text()
+            && self.old_data != text
+        {
+            #[cfg(debug_assertions)]
+            println!("clipboard: {text}");
+            History::insert(&text, &mut self.conn)?;
+            self.old_data = text;
         }
         Ok(())
     }
