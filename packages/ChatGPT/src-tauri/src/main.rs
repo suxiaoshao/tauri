@@ -29,8 +29,8 @@ fn main() -> ChatGPTResult<()> {
         .plugin(
             tauri_plugin_global_shortcut::Builder::new()
                 .with_handler(|app, shortcut, event| {
-                    if let Err(err) = on_shortcut_trigger(app, shortcut)
-                        && event.state == ShortcutState::Pressed
+                    if event.state == ShortcutState::Pressed
+                        && let Err(err) = on_shortcut_trigger(app, shortcut)
                     {
                         log::error!("global shortcut error:{err}");
                     };
