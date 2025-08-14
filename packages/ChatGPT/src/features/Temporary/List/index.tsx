@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { match } from 'ts-pattern';
 import { type Enum } from 'types';
 import { useShallow } from 'zustand/react/shallow';
+import { pinyin } from 'pinyin-pro';
 
 interface Data {
   selectedIndex: number | null;
@@ -32,17 +33,19 @@ function getFilteredTemplates(
   }
   const lowerSearchText = searchText.toLowerCase();
   return sourceTemplates.filter(({ name, description }) => {
-    return name.toLowerCase().includes(lowerSearchText) || description?.toLowerCase().includes(lowerSearchText);
+    return (
+      name.toLowerCase().includes(lowerSearchText) ||
+      description?.toLowerCase().includes(lowerSearchText) ||
+      pinyin(name, { toneType: 'none', type: 'string', separator: '' }).includes(lowerSearchText) ||
+      pinyin(description || '', { toneType: 'none', type: 'string', separator: '' }).includes(lowerSearchText)
+    );
   });
 }
 
 function reducer(state: Data, action: Action): Data {
   return match(action)
     .with({ tag: 'up' }, () => {
-      if (state.selectedIndex === null) {
-        return state;
-      }
-      if (state.selectedIndex <= 0) {
+      if (state.selectedIndex === null || state.selectedIndex <= 0) {
         return { ...state, selectedIndex: state.filteredTemplates.length - 1 };
       }
       return { ...state, selectedIndex: state.selectedIndex - 1 };
@@ -107,7 +110,7 @@ export default function TemporaryList() {
       dispatch({ tag: 'up' });
     },
     { enableOnFormTags: ['INPUT'] },
-    [templates],
+    [],
   );
   useHotkeys(
     'down',
@@ -116,7 +119,7 @@ export default function TemporaryList() {
       dispatch({ tag: 'down' });
     },
     { enableOnFormTags: ['INPUT'] },
-    [templates],
+    [],
   );
   useHotkeys(
     'enter',
@@ -147,7 +150,7 @@ export default function TemporaryList() {
   const [ref, setRef] = useState<HTMLDivElement | null>(null);
   useEffect(() => {
     if (ref) {
-      ref?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+      ref?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     }
   }, [ref]);
 
@@ -164,8 +167,8 @@ export default function TemporaryList() {
           pl: 2,
           pr: 2,
         }}
-        placeholder="Search Google Maps"
-        inputProps={{ 'aria-label': 'search google maps' }}
+        placeholder="Search Templates"
+        inputProps={{ 'aria-label': 'search templates', spellCheck: false }}
         inputRef={setInputRef}
         data-tauri-drag-region
         onChange={handleSearch}

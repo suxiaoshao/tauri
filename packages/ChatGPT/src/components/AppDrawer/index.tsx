@@ -8,6 +8,7 @@
 import AddConversation from '@chatgpt/features/Adds/AddConversation';
 import AddFolder from '@chatgpt/features/Adds/AddFolder';
 import ConversationTree from '@chatgpt/features/Conversations';
+import Search from '@chatgpt/features/Search';
 import Setting from '@chatgpt/features/Setting';
 import ConversationTemplateList from '@chatgpt/features/Template/List';
 import usePlatform from '@chatgpt/hooks/usePlatform';
@@ -17,6 +18,7 @@ import { Resizable } from 'react-resizable';
 import 'react-resizable/css/styles.css';
 import { Outlet } from 'react-router-dom';
 import { match } from 'ts-pattern';
+
 export default function AppDrawer() {
   const [drawerWidth, setDrawerWidth] = useState(250);
   const platform = usePlatform();
@@ -63,7 +65,7 @@ export default function AppDrawer() {
           className="box"
           data-tauri-drag-region
         >
-          <Toolbar sx={{}} data-tauri-drag-region />
+          <Toolbar data-tauri-drag-region />
           <Box sx={{ overflow: 'auto' }}>
             <ConversationTree />
             <Divider />
@@ -76,6 +78,7 @@ export default function AppDrawer() {
               <ConversationTemplateList.Item />
               {/* eslint-disable-next-line label-has-associated-control */}
               <Setting.Item />
+              <Search />
             </List>
           </Box>
         </Box>

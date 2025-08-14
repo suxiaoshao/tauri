@@ -33,7 +33,7 @@ pub trait FetchRunner {
             for i in start..=end {
                 let data = fetch_one(url, i, cookies, &client).await?;
                 let total = self.resolve_novel(data)?;
-                println!("正在获取第{}/{}页,总共{}", i, end, total);
+                println!("正在获取第{i}/{end}页,总共{total}");
             }
             Ok(())
         }

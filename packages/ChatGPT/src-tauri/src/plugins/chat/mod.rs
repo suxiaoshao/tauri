@@ -48,7 +48,8 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for ChatPlugin {
                 find_conversation_template,
                 delete_conversation_template,
                 update_conversation_template,
-                add_conversation_template
+                add_conversation_template,
+                search_conversation
             ]);
         (handle)(invoke)
     }
@@ -211,6 +212,16 @@ async fn add_conversation_template(
     let conn = &mut state.get()?;
     let id = data.insert(conn)?;
     Ok(id)
+}
+
+#[tauri::command]
+async fn search_conversation(
+    state: tauri::State<'_, DbConn>,
+    query: String,
+) -> ChatGPTResult<Vec<Conversation>> {
+    let conn = &mut state.get()?;
+    let conversations = Conversation::search(&query, conn)?;
+    Ok(conversations)
 }
 
 fn setup<R: Runtime>(app: &AppHandle<R>) -> ChatGPTResult<()> {

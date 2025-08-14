@@ -1,4 +1,5 @@
 use diesel::SqliteConnection;
+use pinyin::ToPinyin;
 use time::OffsetDateTime;
 
 use crate::{
@@ -246,5 +247,43 @@ impl Conversation {
     pub fn find_latest(conn: &mut SqliteConnection) -> ChatGPTResult<SqlConversation> {
         let sql_conversation = SqlConversation::find_latest(conn)?;
         Ok(sql_conversation)
+    }
+    pub fn search(query: &str, conn: &mut SqliteConnection) -> ChatGPTResult<Vec<Conversation>> {
+        let all_conversations = SqlConversation::get_all(conn)?;
+        let data = all_conversations
+            .into_iter()
+            .filter(|SqlConversation { title, info, .. }| {
+                title.contains(query)
+                    || get_chinese_str(title).contains(query)
+                    || info.as_ref().is_some_and(|info| info.contains(query))
+                    || get_chinese_str(info.as_ref().unwrap_or(&"".to_string())).contains(query)
+            })
+            .map(|sql_conversation| Self::from_sql_conversation(sql_conversation, conn))
+            .collect::<ChatGPTResult<_>>()?;
+        Ok(data)
+    }
+}
+
+fn get_chinese_str(data: &str) -> String {
+    data.chars()
+        .map(|x| {
+            x.to_pinyin()
+                .map(|x| x.plain().to_string())
+                .unwrap_or(x.to_string())
+        })
+        .fold("".to_string(), |acc, x| acc + &x)
+}
+
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+
+    #[test]
+    fn test_pinyin() {
+        let data = "我爱你";
+        assert_eq!(get_chinese_str(data), "woaini");
+        let data = "编写 issue 详情";
+        assert_eq!(get_chinese_str(data), "bianxie issue xiangqing");
     }
 }

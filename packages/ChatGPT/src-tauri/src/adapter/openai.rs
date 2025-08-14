@@ -147,9 +147,9 @@ pub(super) fn get_openai_template_inputs(
 
 impl OpenAIAdapter {
     fn get_body(
-        template: &OpenAIConversationTemplate,
+        template: &'_ OpenAIConversationTemplate,
         history_messages: Vec<Message>,
-    ) -> ChatRequest {
+    ) -> ChatRequest<'_> {
         ChatRequest {
             messages: history_messages,
             model: template.model.as_str(),

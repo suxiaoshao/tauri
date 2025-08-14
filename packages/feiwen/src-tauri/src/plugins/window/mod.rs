@@ -19,7 +19,7 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for WindowPlugin {
     }
     fn window_created(&mut self, window: tauri::Window<R>) {
         if let Err(err) = on_created(window) {
-            warn!("window created error:{}", err)
+            warn!("window created error:{err}")
         };
     }
     fn on_event(&mut self, app: &tauri::AppHandle<R>, event: &tauri::RunEvent) {
@@ -28,10 +28,9 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for WindowPlugin {
             event: tauri::WindowEvent::CloseRequested { .. },
             ..
         } = event
+            && label == "main"
         {
-            if label == "main" {
-                app.exit(0);
-            }
+            app.exit(0);
         }
     }
 }

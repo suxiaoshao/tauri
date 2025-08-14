@@ -140,6 +140,11 @@ impl SqlConversation {
             .first(conn)?;
         Ok(latest_id)
     }
+    /// get all conversations
+    pub fn get_all(conn: &mut SqliteConnection) -> ChatGPTResult<Vec<Self>> {
+        let sql_conversations = conversations::table.load::<Self>(conn)?;
+        Ok(sql_conversations)
+    }
 }
 
 #[derive(AsChangeset, Identifiable, Debug)]
