@@ -42,20 +42,23 @@ export function useSelected() {
   );
   const setSelected = useCallback(
     (selected: Selected) => {
-      setSearchParams((oldUrlSearchParams) => {
-        oldUrlSearchParams.set('selectedType', selected.tag);
-        match(selected)
-          .with({ tag: SelectedType.Conversation }, ({ value }) => {
-            oldUrlSearchParams.set('selectedId', value.toString());
-          })
-          .with({ tag: SelectedType.Folder }, ({ value }) => {
-            oldUrlSearchParams.set('selectedId', value.toString());
-          })
-          .with({ tag: SelectedType.None }, () => {
-            oldUrlSearchParams.delete('selectedId');
-          });
-        return oldUrlSearchParams;
-      });
+      setSearchParams(
+        (oldUrlSearchParams) => {
+          oldUrlSearchParams.set('selectedType', selected.tag);
+          match(selected)
+            .with({ tag: SelectedType.Conversation }, ({ value }) => {
+              oldUrlSearchParams.set('selectedId', value.toString());
+            })
+            .with({ tag: SelectedType.Folder }, ({ value }) => {
+              oldUrlSearchParams.set('selectedId', value.toString());
+            })
+            .with({ tag: SelectedType.None }, () => {
+              oldUrlSearchParams.delete('selectedId');
+            });
+          return oldUrlSearchParams;
+        },
+        { replace: true },
+      );
     },
     [setSearchParams],
   );
