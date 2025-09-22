@@ -63,8 +63,8 @@ csv = "1.3.1"
 tauri-plugin-global-shortcut = "2.3.0"
 tauri-plugin-notification = "2.3.1"
 tauri-plugin-os = "2.3.1"
-tauri-plugin-opener = "2"
-
+tauri-plugin-opener = "2.3.1"
+tauri-plugin-dialog = "2.3.1"
 
 # extension
 wasmtime = { version = "36.0.2" }

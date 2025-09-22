@@ -8,9 +8,9 @@
 use std::sync::LazyLock;
 
 use nom::{
+    IResult, Parser,
     bytes::complete::{tag, take_till},
     number::streaming::float,
-    IResult, Parser,
 };
 use scraper::{Html, Selector};
 
@@ -19,7 +19,7 @@ use crate::{
     store::types::UrlWithName,
 };
 
-use super::{parse_url::parse_url, Title};
+use super::{Title, parse_url::parse_url};
 
 static SELECTOR_NOVEL: LazyLock<Selector> =
     LazyLock::new(|| Selector::parse("div:nth-child(1) > span:nth-child(1) > a").unwrap());

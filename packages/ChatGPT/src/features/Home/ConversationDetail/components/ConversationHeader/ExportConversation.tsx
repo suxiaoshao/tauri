@@ -32,8 +32,8 @@ export interface ExportConversationProps {
 }
 async function selectFolder() {
   const result = await dialog.open({
-    directory: true, // 设置为 true 以允许目录选择
-    // 其他可选属性...
+    directory: true,
+    canCreateDirectories: true,
   });
   return result as string;
 }

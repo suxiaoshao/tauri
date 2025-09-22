@@ -1,8 +1,8 @@
 use crate::errors::{FeiwenError, FeiwenResult};
 use diesel::{
+    SqliteConnection,
     connection::SimpleConnection,
     r2d2::{ConnectionManager, Pool},
-    SqliteConnection,
 };
 
 pub mod model;

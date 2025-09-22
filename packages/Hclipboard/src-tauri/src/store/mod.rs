@@ -1,7 +1,7 @@
 use diesel::{
+    SqliteConnection,
     connection::SimpleConnection,
     r2d2::{ConnectionManager, Pool},
-    SqliteConnection,
 };
 
 pub mod model;

@@ -3,7 +3,7 @@ use crate::{
     store::{self, DbConn, History},
 };
 use serde_json::Value;
-use tauri::{ipc::Invoke, AppHandle, Manager, Runtime};
+use tauri::{AppHandle, Manager, Runtime, ipc::Invoke};
 use tauri_plugin_clipboard_manager::ClipboardExt;
 #[tauri::command]
 fn query_history(

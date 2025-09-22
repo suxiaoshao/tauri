@@ -1,5 +1,5 @@
-use crate::errors::MovieErrors;
 use crate::MovieResult;
+use crate::errors::MovieErrors;
 use scraper::{ElementRef, Html, Selector};
 use serde::{Deserialize, Serialize};
 use std::{collections::HashSet, fmt::Debug, sync::LazyLock};

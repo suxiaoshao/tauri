@@ -2,7 +2,7 @@ use crate::{errors::FeiwenResult, store::service::Tag};
 
 use super::super::schema::{novel_tag, tag};
 use diesel::dsl::count;
-use diesel::{prelude::*, QueryDsl};
+use diesel::{QueryDsl, prelude::*};
 
 #[derive(Queryable, Insertable, Debug)]
 #[diesel(table_name = tag)]
