@@ -50,7 +50,12 @@ fn main() {
                 "config",
                 tauri_build::InlinedPlugin::new()
                     .default_permission(tauri_build::DefaultPermissionRule::AllowAllCommands)
-                    .commands(&["get_config", "set_config", "create_setting_window"]),
+                    .commands(&[
+                        "get_config",
+                        "set_config",
+                        "create_setting_window",
+                        "open_setting_file",
+                    ]),
             )
             .plugin(
                 "adapter",

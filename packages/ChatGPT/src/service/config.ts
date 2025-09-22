@@ -16,3 +16,7 @@ export async function setConfigService(params: SetConfigParams) {
 export async function createSettingWindow() {
   await appInvoke<unknown, unknown>('plugin:config|create_setting_window', null);
 }
+
+export async function openSettingFile() {
+  await appInvoke<unknown, unknown>('plugin:config|open_setting_file', null);
+}
