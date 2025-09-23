@@ -40,27 +40,3 @@ pub struct Choice {
     #[serde(rename = "finish_reason")]
     finish_reason: Option<String>,
 }
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct Usage {
-    #[serde(rename = "prompt_tokens")]
-    prompt_tokens: i64,
-
-    #[serde(rename = "completion_tokens")]
-    completion_tokens: i64,
-
-    #[serde(rename = "total_tokens")]
-    total_tokens: i64,
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct ChatRequestError {
-    #[serde(rename = "error")]
-    error: ChatRequestErrorContent,
-}
-#[derive(Serialize, Deserialize)]
-pub struct ChatRequestErrorContent {
-    message: String,
-    #[serde(rename = "type")]
-    type_code: String,
-}

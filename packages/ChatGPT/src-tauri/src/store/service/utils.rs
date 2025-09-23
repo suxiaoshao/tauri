@@ -1,5 +1,5 @@
 use serde::{Deserialize, Deserializer, Serializer};
-use time::{format_description::well_known::Rfc3339, OffsetDateTime};
+use time::{OffsetDateTime, format_description::well_known::Rfc3339};
 
 pub fn serialize_offset_date_time<S>(
     date: &OffsetDateTime,

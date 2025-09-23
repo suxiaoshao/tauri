@@ -8,10 +8,10 @@
 use std::sync::LazyLock;
 
 use nom::{
+    IResult, Parser,
     bytes::complete::{tag, take_till},
     combinator::complete,
     number::complete::float,
-    IResult, Parser,
 };
 use scraper::{Html, Selector};
 
@@ -20,7 +20,7 @@ use crate::{
     store::types::UrlWithName,
 };
 
-use super::{parse_url::parse_url, Title};
+use super::{Title, parse_url::parse_url};
 
 static SELECTOR_CHAPTER: LazyLock<Selector> = LazyLock::new(|| {
     Selector::parse("div.col-xs-12.h5.brief > span.grayout.smaller-20 > a").unwrap()

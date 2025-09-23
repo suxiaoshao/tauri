@@ -7,6 +7,6 @@ edition = "2024"
 
 [dependencies]
 futures = "0.3.31"
-tokio = { version = "1.47.0", features = ["macros", "fs", "rt-multi-thread"] }
-clap = { version = "4.5.42", features = ["derive"] }
+tokio = { version = "1.47.1", features = ["macros", "fs", "rt-multi-thread"] }
+clap = { version = "4.5.47", features = ["derive"] }
 async-recursion = "1.1.1"

@@ -8,11 +8,11 @@
 use std::sync::LazyLock;
 
 use nom::{
+    IResult, Parser,
     branch::alt,
     bytes::complete::tag,
     combinator::{opt, value},
     number::complete::float,
-    IResult, Parser,
 };
 use scraper::{Html, Selector};
 

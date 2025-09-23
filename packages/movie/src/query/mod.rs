@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use crate::{errors::MovieResult, fetch::PATH, parse::Movie, OrderBy, Query};
+use crate::{OrderBy, Query, errors::MovieResult, fetch::PATH, parse::Movie};
 
 pub(crate) async fn query(
     Query {

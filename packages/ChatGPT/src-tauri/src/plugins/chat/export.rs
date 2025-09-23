@@ -1,9 +1,8 @@
-use std::{fmt::Display, io::Write, path::PathBuf};
-
 use crate::{
     errors::ChatGPTResult,
     store::{self, Conversation, DbConn, Message},
 };
+use std::{fmt::Display, fs::File, io::Write, path::PathBuf};
 
 #[derive(Debug, Clone, Copy, PartialEq, serde::Deserialize)]
 #[serde(rename_all = "lowercase")]
@@ -29,29 +28,56 @@ pub async fn export(
     state: tauri::State<'_, DbConn>,
     id: i32,
     export_type: ExportType,
-    mut path: PathBuf,
+    path: PathBuf,
 ) -> ChatGPTResult<()> {
     let conn = &mut state.get()?;
     let Conversation {
         messages, title, ..
     } = store::Conversation::find(id, conn)?;
-    path.push(format!("{title}.{export_type}"));
+    let file = create_unique_file(path, &title, export_type)?;
     match export_type {
-        ExportType::Json => export_json(messages, path)?,
-        ExportType::Csv => export_csv(messages, path)?,
-        ExportType::Txt => export_txt(messages, path)?,
+        ExportType::Json => export_json(messages, file)?,
+        ExportType::Csv => export_csv(messages, file)?,
+        ExportType::Txt => export_txt(messages, file)?,
     }
     Ok(())
 }
 
-fn export_json(messages: Vec<Message>, path: PathBuf) -> ChatGPTResult<()> {
-    let file = std::fs::File::create(path)?;
+pub fn create_unique_file(
+    base_path: PathBuf,
+    filename: &str,
+    export_name: ExportType,
+) -> ChatGPTResult<File> {
+    // 确保目录存在
+    if let Some(parent) = base_path.parent() {
+        std::fs::create_dir_all(parent)?;
+    }
+
+    // 从 1 开始尝试，i == 1 时是最基础的 "{filename}.{export_name}"
+    for i in 1.. {
+        let name = if i == 1 {
+            format!("{}.{}", filename, export_name)
+        } else {
+            format!("{}({}).{}", filename, i, export_name)
+        };
+        let candidate = base_path.join(&name);
+
+        if !candidate.exists() {
+            let file = File::create(candidate)?;
+            return Ok(file);
+        }
+    }
+
+    // 理论上不会到这里
+    unreachable!("无限循环终止");
+}
+
+fn export_json(messages: Vec<Message>, file: File) -> ChatGPTResult<()> {
     serde_json::to_writer_pretty(file, &messages)?;
     Ok(())
 }
 
-fn export_csv(messages: Vec<Message>, path: PathBuf) -> ChatGPTResult<()> {
-    let file = std::fs::File::create(path)?;
+fn export_csv(messages: Vec<Message>, file: File) -> ChatGPTResult<()> {
     let mut wtr = csv::Writer::from_writer(file);
     for message in messages {
         wtr.serialize((
@@ -69,8 +95,7 @@ fn export_csv(messages: Vec<Message>, path: PathBuf) -> ChatGPTResult<()> {
     wtr.flush()?;
     Ok(())
 }
-fn export_txt(messages: Vec<Message>, path: PathBuf) -> ChatGPTResult<()> {
-    let mut file = std::fs::File::create(path)?;
+fn export_txt(messages: Vec<Message>, mut file: File) -> ChatGPTResult<()> {
     for message in messages {
         writeln!(
             &mut file,
@@ -84,6 +109,8 @@ fn export_txt(messages: Vec<Message>, path: PathBuf) -> ChatGPTResult<()> {
 
 #[cfg(test)]
 mod test {
+    use std::fs::File;
+
     use diesel::{Connection, SqliteConnection};
 
     use crate::{
@@ -102,8 +129,8 @@ mod test {
         };
         store::Message::insert(new_message, conn)?;
         let messages = store::Message::messages_by_conversation_id(1, conn)?;
-        let path = std::path::PathBuf::from("test.csv");
-        super::export_csv(messages, path)?;
+        let file = File::create("test.csv")?;
+        super::export_csv(messages, file)?;
         std::fs::remove_file("test.csv")?;
         Ok(())
     }

@@ -1,6 +1,6 @@
 use std::future::Future;
 use tokio::sync::oneshot;
-use tokio::time::{sleep, Duration};
+use tokio::time::{Duration, sleep};
 
 #[derive(Default)]
 pub struct DelayedTask {

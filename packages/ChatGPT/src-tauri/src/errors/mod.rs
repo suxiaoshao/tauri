@@ -89,6 +89,8 @@ pub enum ChatGPTError {
     ExtensionError(String),
     #[error("Extension runtime error")]
     ExtensionRuntimeError,
+    #[error("Open error:{}",.0)]
+    OpenError(#[from] tauri_plugin_opener::Error),
 }
 
 impl Serialize for ChatGPTError {
@@ -238,6 +240,10 @@ impl Serialize for ChatGPTError {
             }
             ChatGPTError::ExtensionRuntimeError => {
                 state.serialize_field("code", "ExtensionRuntimeError")?;
+            }
+            ChatGPTError::OpenError(error) => {
+                state.serialize_field("code", "OpenError")?;
+                state.serialize_field("data", error)?;
             }
         }
         state.end()

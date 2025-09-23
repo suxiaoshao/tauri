@@ -1,7 +1,7 @@
 import useSettingKey from '@chatgpt/hooks/useSettingKey';
-import { createSettingWindow, setConfigService } from '@chatgpt/service/config';
+import { createSettingWindow, openSettingFile, setConfigService } from '@chatgpt/service/config';
 import { valibotResolver } from '@hookform/resolvers/valibot';
-import { Power, Save, Settings } from '@mui/icons-material';
+import { FileOpen, Power, Save, Settings } from '@mui/icons-material';
 import { Box, Divider, List, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import { useCallback } from 'react';
@@ -42,7 +42,7 @@ function Setting() {
       >
         <Box
           sx={{
-            width: 200,
+            width: 220,
             flexShrink: 0,
             '& .MuiToolbar-root': {
               backgroundColor: 'transparent',
@@ -78,11 +78,17 @@ function Setting() {
           </List>
           <Divider />
           <List>
-            <ListItemButton type="submit" component="button">
+            <ListItemButton onClick={onSubmit}>
               <ListItemIcon>
                 <Save />
               </ListItemIcon>
               <ListItemText primary="Submit" />
+            </ListItemButton>
+            <ListItemButton onClick={openSettingFile}>
+              <ListItemIcon>
+                <FileOpen />
+              </ListItemIcon>
+              <ListItemText primary="Open Setting File" />
             </ListItemButton>
           </List>
         </Box>

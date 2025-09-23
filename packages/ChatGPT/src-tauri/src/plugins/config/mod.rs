@@ -4,12 +4,12 @@
  * @LastEditTime: 2024-05-09 20:18:56
  * @FilePath: /tauri/packages/ChatGPT/src-tauri/src/plugins/config/mod.rs
  */
+use crate::errors::{ChatGPTError, ChatGPTResult};
+use notify::{Config, EventHandler, RecommendedWatcher, RecursiveMode, Watcher};
 use std::time::Duration;
 use tauri::{Emitter, Manager, Runtime, WebviewWindowBuilder};
+use tauri_plugin_opener::OpenerExt;
 use tokio::time::interval;
-
-use crate::errors::ChatGPTResult;
-use notify::{Config, EventHandler, RecommendedWatcher, RecursiveMode, Watcher};
 mod config_data;
 mod listen;
 pub use config_data::ChatGPTConfig;
@@ -148,6 +148,30 @@ where
                 });
                 true
             }
+            "open_setting_file" => {
+                #[allow(unused_imports)]
+                use tauri::ipc::private::*;
+                #[allow(unused_variables)]
+                let tauri::ipc::Invoke {
+                    message: tauri_message,
+                    resolver: tauri_resolver,
+                    acl: tauri_acl,
+                } = invoke;
+                tauri_resolver.respond_async_serialized(async move {
+                    let result = open_setting_file(tauri::ipc::CommandArg::from_command(
+                        tauri::ipc::CommandItem {
+                            name: "open_setting_file",
+                            key: "app",
+                            message: &tauri_message,
+                            plugin: None,
+                            acl: &tauri_acl,
+                        },
+                    )?);
+                    let kind = result.async_kind();
+                    kind.future(result).await
+                });
+                true
+            }
             _ => false,
         }
     }
@@ -274,6 +298,14 @@ pub async fn create_setting_window<R: Runtime>(
             child.build()?;
         }
     };
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn open_setting_file<R: Runtime>(app: tauri::AppHandle<R>) -> ChatGPTResult<()> {
+    let path = ChatGPTConfig::path(&app)?;
+    let path = path.to_str().ok_or(ChatGPTError::ConfigPath)?;
+    app.opener().open_path(path, None::<&str>)?;
     Ok(())
 }
 

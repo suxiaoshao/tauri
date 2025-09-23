@@ -4,43 +4,46 @@ pub use exports::chatgpt::extension::extension_api::ChatRequest;
 use reqwest::{header::HeaderValue, redirect::Policy};
 use std::str::FromStr;
 use wasmtime::component::*;
-use wasmtime_wasi::p2::{IoView, WasiCtx, WasiView};
+use wasmtime_wasi::{WasiCtx, WasiCtxView, WasiView};
 
 bindgen!({
     world: "extension",
     path:"../extensions/wit",
-    async: true
+    exports:{
+        "chatgpt:extension/extension-api":async,
+    },
+    imports:{
+        "chatgpt:extension/http-client":async,
+    }
 });
 
 pub(crate) struct ExtensionState {
-    table: ResourceTable,
-    wasi: WasiCtx,
+    pub wasi_ctx: WasiCtx,
+    pub resource_table: ResourceTable,
     app_config: ChatGPTConfig,
 }
 
 impl ExtensionState {
     pub(super) fn new(app_config: ChatGPTConfig) -> Self {
         Self {
-            table: ResourceTable::new(),
-            wasi: WasiCtx::builder().build(),
+            resource_table: ResourceTable::new(),
+            wasi_ctx: WasiCtx::builder().inherit_stdio().inherit_args().build(),
             app_config,
         }
     }
 }
 
-impl IoView for ExtensionState {
-    fn table(&mut self) -> &mut ResourceTable {
-        &mut self.table
-    }
-}
 impl WasiView for ExtensionState {
-    fn ctx(&mut self) -> &mut WasiCtx {
-        &mut self.wasi
+    fn ctx(&mut self) -> WasiCtxView<'_> {
+        WasiCtxView {
+            ctx: &mut self.wasi_ctx,
+            table: &mut self.resource_table,
+        }
     }
 }
 
 impl ExtensionImports for ExtensionState {
-    async fn get_selected_text(&mut self) -> Result<String, String> {
+    fn get_selected_text(&mut self) -> Result<String, String> {
         get_selected_text::get_selected_text().map_err(|err| err.to_string())
     }
 }

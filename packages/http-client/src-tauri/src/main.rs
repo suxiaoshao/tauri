@@ -6,9 +6,9 @@
 mod app_search;
 use app_search::AppPath;
 use tauri::{
+    AppHandle, LogicalPosition, LogicalSize, Manager, Runtime,
     menu::{Menu, MenuItem},
     tray::MouseButton,
-    AppHandle, LogicalPosition, LogicalSize, Manager, Runtime,
 };
 use tauri_plugin_global_shortcut::ShortcutState;
 

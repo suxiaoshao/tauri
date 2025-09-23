@@ -1,5 +1,5 @@
 use crate::parse::Movie;
-use crate::{parse_page, MovieResult};
+use crate::{MovieResult, parse_page};
 use reqwest::Client;
 
 pub(crate) static PATH: &str = "C:/Users/Administrator/Downloads";
