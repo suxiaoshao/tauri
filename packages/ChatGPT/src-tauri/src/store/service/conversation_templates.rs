@@ -190,10 +190,7 @@ impl NewConversationTemplate {
                 mode: mode.to_string(),
                 prompts: serde_json::to_string(&prompts)?,
             };
-            sql_new.insert(conn)?;
-
-            // Insert the prompts
-            let SqlConversationTemplate { id, .. } = SqlConversationTemplate::first(conn)?;
+            let SqlConversationTemplate { id, .. } = sql_new.insert(conn)?;
             Ok(id)
         })
     }

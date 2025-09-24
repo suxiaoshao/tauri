@@ -132,9 +132,7 @@ pub fn init_tables(conn: &mut SqliteConnection) -> ChatGPTResult<()> {
         conn.batch_execute(CREATE_TABLE_SQL)?;
         // Insert conversation template
         let default_conversation_template = SqlNewConversationTemplate::default()?;
-        default_conversation_template.insert(conn)?;
-        // Insert default conversation
-        let SqlConversationTemplate { id, .. } = SqlConversationTemplate::first(conn)?;
+        let SqlConversationTemplate { id, .. } = default_conversation_template.insert(conn)?;
         let now = OffsetDateTime::now_utc();
         let default_conversation = SqlNewConversation {
             title: "默认".to_string(),

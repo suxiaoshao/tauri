@@ -65,7 +65,7 @@ impl Conversation {
             template_id,
         }: NewConversation,
         conn: &mut SqliteConnection,
-    ) -> ChatGPTResult<()> {
+    ) -> ChatGPTResult<Self> {
         let time = OffsetDateTime::now_utc();
         let folder = folder_id
             .map(|folder_id| SqlFolder::find(folder_id, conn))
@@ -90,8 +90,8 @@ impl Conversation {
             updated_time: time,
             template_id,
         };
-        sql_new.insert(conn)?;
-        Ok(())
+        let conversation = sql_new.insert(conn)?;
+        Self::from_sql_conversation(conversation, conn)
     }
     /// 获取没有文件夹的会话
     pub fn query_without_folder(conn: &mut SqliteConnection) -> ChatGPTResult<Vec<Conversation>> {
@@ -243,10 +243,6 @@ impl Conversation {
     pub fn clear(id: i32, conn: &mut SqliteConnection) -> ChatGPTResult<()> {
         SqlMessage::delete_by_conversation_id(id, conn)?;
         Ok(())
-    }
-    pub fn find_latest(conn: &mut SqliteConnection) -> ChatGPTResult<SqlConversation> {
-        let sql_conversation = SqlConversation::find_latest(conn)?;
-        Ok(sql_conversation)
     }
     pub fn search(query: &str, conn: &mut SqliteConnection) -> ChatGPTResult<Vec<Conversation>> {
         let all_conversations = SqlConversation::get_all(conn)?;

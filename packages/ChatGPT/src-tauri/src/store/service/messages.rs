@@ -158,8 +158,7 @@ impl Message {
                 start_time: time,
                 end_time: time,
             };
-            new_message.insert(conn)?;
-            let message = SqlMessage::last(conn)?;
+            let message = new_message.insert(conn)?;
             Message::try_from(message)
         })
     }
