@@ -9,7 +9,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d7cb28d49c934e5f32a0b2227510e00999423596eff62f257962db130c3fa716"
 dependencies = [
  "accessibility-sys-ng",
- "cocoa 0.24.1",
+ "cocoa",
  "core-foundation 0.9.4",
  "core-graphics-types 0.1.3",
  "objc",
@@ -953,7 +953,6 @@ version = "0.2.0"
 dependencies = [
  "anyhow",
  "async-stream",
- "cocoa 0.26.1",
  "csv",
  "diesel",
  "dotenv",
@@ -962,6 +961,9 @@ dependencies = [
  "libsqlite3-sys",
  "log",
  "notify",
+ "objc2 0.6.2",
+ "objc2-app-kit",
+ "objc2-foundation 0.3.1",
  "pinyin",
  "reqwest",
  "reqwest-eventsource",
@@ -1090,26 +1092,10 @@ checksum = "f425db7937052c684daec3bd6375c8abe2d146dca4b8b143d6db777c39138f3a"
 dependencies = [
  "bitflags 1.3.2",
  "block",
- "cocoa-foundation 0.1.2",
+ "cocoa-foundation",
  "core-foundation 0.9.4",
  "core-graphics 0.22.3",
  "foreign-types 0.3.2",
- "libc",
- "objc",
-]
-
-[[package]]
-name = "cocoa"
-version = "0.26.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ad36507aeb7e16159dfe68db81ccc27571c3ccd4b76fb2fb72fc59e7a4b1b64c"
-dependencies = [
- "bitflags 2.9.4",
- "block",
- "cocoa-foundation 0.2.1",
- "core-foundation 0.10.1",
- "core-graphics 0.24.0",
- "foreign-types 0.5.0",
  "libc",
  "objc",
 ]
@@ -1125,19 +1111,6 @@ dependencies = [
  "core-foundation 0.9.4",
  "core-graphics-types 0.1.3",
  "libc",
- "objc",
-]
-
-[[package]]
-name = "cocoa-foundation"
-version = "0.2.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "81411967c50ee9a1fc11365f8c585f863a22a9697c89239c452292c40ba79b0d"
-dependencies = [
- "bitflags 2.9.4",
- "block",
- "core-foundation 0.10.1",
- "core-graphics-types 0.2.0",
  "objc",
 ]
 
@@ -1271,9 +1244,9 @@ dependencies = [
 
 [[package]]
 name = "cpp_demangle"
-version = "0.4.4"
+version = "0.4.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "96e58d342ad113c2b878f16d5d034c03be492ae460cdbc02b7f0f2284d310c7d"
+checksum = "f2bb79cb74d735044c972aae58ed0aaa9a837e85b01106a54c39e42e97f62253"
 dependencies = [
  "cfg-if",
 ]
@@ -2098,7 +2071,6 @@ name = "feiwen"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "cocoa 0.26.1",
  "diesel",
  "futures",
  "libsqlite3-sys",
@@ -2514,7 +2486,7 @@ dependencies = [
  "accessibility-sys-ng",
  "active-win-pos-rs",
  "arboard",
- "cocoa 0.24.1",
+ "cocoa",
  "core-foundation 0.9.4",
  "core-graphics 0.22.3",
  "debug_print",
@@ -2779,10 +2751,12 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "clipboard-master",
- "cocoa 0.26.1",
  "diesel",
  "libsqlite3-sys",
  "log",
+ "objc2 0.6.2",
+ "objc2-app-kit",
+ "objc2-foundation 0.3.1",
  "serde",
  "serde_json",
  "tauri",

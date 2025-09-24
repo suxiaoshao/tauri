@@ -44,9 +44,6 @@ use tauri::WebviewWindow;
 
 #[cfg(target_os = "macos")]
 pub trait WindowExt {
-    #[allow(dead_code)]
-    #[cfg(target_os = "macos")]
-    fn set_titlebar_thick(&self, thickness: ToolbarThickness);
     #[cfg(target_os = "macos")]
     fn set_transparent_titlebar(&self) -> ChatGPTResult<()>;
 }
@@ -54,41 +51,20 @@ pub trait WindowExt {
 #[cfg(target_os = "macos")]
 impl<R: Runtime> WindowExt for WebviewWindow<R> {
     #[cfg(target_os = "macos")]
-    fn set_titlebar_thick(&self, thickness: ToolbarThickness) {
-        use cocoa::appkit::{NSWindow, NSWindowTitleVisibility};
-
-        unsafe {
-            let id = self.ns_window().unwrap() as cocoa::base::id;
-
-            id.setTitlebarAppearsTransparent_(cocoa::base::YES);
-
-            match thickness {
-                ToolbarThickness::Thick => {
-                    self.set_title("").expect("Title wasn't set to ''");
-                    make_toolbar(id);
-                }
-                ToolbarThickness::Medium => {
-                    id.setTitleVisibility_(NSWindowTitleVisibility::NSWindowTitleHidden);
-                    make_toolbar(id);
-                }
-                ToolbarThickness::Thin => {
-                    id.setTitleVisibility_(NSWindowTitleVisibility::NSWindowTitleHidden);
-                }
-            }
-        }
-    }
-    #[cfg(target_os = "macos")]
     fn set_transparent_titlebar(&self) -> ChatGPTResult<()> {
-        use cocoa::appkit::{NSWindow, NSWindowStyleMask};
         unsafe {
-            let id = self.ns_window()? as cocoa::base::id;
+            use objc2_app_kit::NSWindowStyleMask;
+
+            let id = (self.ns_window()? as *mut objc2_app_kit::NSWindow)
+                .as_ref()
+                .unwrap();
             let mut style_mask = id.styleMask();
             style_mask.remove(
-                NSWindowStyleMask::NSClosableWindowMask
-                    | NSWindowStyleMask::NSMiniaturizableWindowMask
-                    | NSWindowStyleMask::NSResizableWindowMask,
+                NSWindowStyleMask::Closable
+                    | NSWindowStyleMask::Miniaturizable
+                    | NSWindowStyleMask::Resizable,
             );
-            id.setStyleMask_(style_mask);
+            id.setStyleMask(style_mask);
         }
         Ok(())
     }
@@ -99,15 +75,4 @@ pub enum ToolbarThickness {
     Thick,
     Medium,
     Thin,
-}
-
-#[cfg(target_os = "macos")]
-unsafe fn make_toolbar(id: cocoa::base::id) {
-    use cocoa::appkit::{NSToolbar, NSWindow};
-
-    unsafe {
-        let new_toolbar = NSToolbar::alloc(id);
-        new_toolbar.init_();
-        id.setToolbar_(new_toolbar);
-    }
 }

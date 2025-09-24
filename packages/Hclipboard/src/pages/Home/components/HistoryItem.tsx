@@ -1,9 +1,8 @@
 import { Box, Divider, Drawer, Link, ListItemButton, Typography } from '@mui/material';
 import { encodeNonAsciiHTML } from 'entities';
-import { startTransition, useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { type ClipHistory } from '../../../rpc/query';
 import formatTime from '../../../utils/formatTime';
-import useElementSize from '../hooks/useElementSize';
 
 export interface HistoryItemProps {
   item: ClipHistory;
@@ -11,26 +10,26 @@ export interface HistoryItemProps {
   isLast: boolean;
   index: number;
   onClick?: () => void;
+  ref?: React.Ref<HTMLDivElement> | undefined;
 }
 
-export default function HistoryItem({ item: { data, updateTime }, selected, isLast, index }: HistoryItemProps) {
+export default function HistoryItem({
+  item: { data, updateTime },
+  selected,
+  isLast,
+  index,
+  onClick,
+  ref,
+}: HistoryItemProps) {
   // 设置空格
   const dataList = useMemo(
     () => data.split('\n').map((value) => encodeNonAsciiHTML(value).replaceAll(' ', '&nbsp;')),
     [data],
   );
-  const [{ height } = { height: 0 }, ref] = useElementSize();
   const [open, setOpen] = useState(false);
-  useEffect(() => {
-    if (selected && ref.current) {
-      startTransition(() => {
-        ref.current?.scrollIntoView({ block: 'center', behavior: 'auto' });
-      });
-    }
-  }, [ref, selected]);
   return (
     <>
-      <ListItemButton sx={{ display: 'flex', overflowX: 'hidden' }} selected={selected}>
+      <ListItemButton ref={ref} sx={{ display: 'flex', overflowX: 'hidden' }} selected={selected} onClick={onClick}>
         <Box sx={{ flex: '0 0 80px' }}>
           <Typography color="text.secondary" variant="body2">
             {formatTime(updateTime)}
@@ -38,19 +37,19 @@ export default function HistoryItem({ item: { data, updateTime }, selected, isLa
         </Box>
         <Box sx={{ flex: '1 1 calc(100% - 110px)', maxWidth: 'calc(100% - 110px)' }}>
           <Box sx={{ maxHeight: '120px', overflowY: 'hidden', width: '100%' }}>
-            <Box ref={ref} sx={{ width: '100%' }}>
-              {dataList.map((value) => (
+            <Box sx={{ width: '100%' }}>
+              {dataList.map((value, index) => (
                 <Typography
                   sx={{ width: '100%', wordBreak: 'break-all' }}
                   variant="body1"
                   // eslint-disable-next-line no-danger
                   dangerouslySetInnerHTML={{ __html: value }}
-                  key={value}
+                  key={index}
                 />
               ))}
             </Box>
           </Box>
-          {height > 120 && (
+          {dataList.length > 6 && (
             <Link
               onClick={(event) => {
                 event.stopPropagation();
@@ -71,13 +70,13 @@ export default function HistoryItem({ item: { data, updateTime }, selected, isLa
       {!isLast && <Divider />}
       <Drawer anchor="right" open={open} onClose={() => setOpen(false)}>
         <Box sx={{ padding: 1, width: '60vw' }}>
-          {dataList.map((value) => (
+          {dataList.map((value, index) => (
             <Typography
               sx={{ width: '100%', wordBreak: 'break-all' }}
               variant="body1"
               // eslint-disable-next-line no-danger
               dangerouslySetInnerHTML={{ __html: value }}
-              key={value}
+              key={index}
             />
           ))}
         </Box>

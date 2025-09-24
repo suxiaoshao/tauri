@@ -38,7 +38,9 @@ tauri-plugin-global-shortcut = "2.3.0"
 tauri-plugin-notification = "2.3.1"
 
 [target.'cfg(target_os="macos")'.dependencies]
-cocoa = "0.26.1"
+objc2 = "0.6.2"
+objc2-app-kit = "0.3.1"
+objc2-foundation = "0.3.1"
 
 [dev-dependencies]
 anyhow = "1.0.100"

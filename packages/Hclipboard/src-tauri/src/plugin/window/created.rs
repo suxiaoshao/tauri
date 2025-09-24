@@ -22,12 +22,14 @@ fn window_beatify<R: Runtime>(window: &tauri::Window<R>) -> ClipResult<()> {
     window.set_shadow(true)?;
     // 修改背景
     #[cfg(target_os = "macos")]
-    apply_vibrancy(
-        window,
-        NSVisualEffectMaterial::HudWindow,
-        Some(NSVisualEffectState::Active),
-        None,
-    )?;
+    {
+        apply_vibrancy(
+            window,
+            NSVisualEffectMaterial::HudWindow,
+            Some(NSVisualEffectState::Active),
+            None,
+        )?;
+    }
     #[cfg(target_os = "windows")]
     {
         window.set_decorations(false)?;
@@ -43,20 +45,19 @@ fn window_beatify<R: Runtime>(window: &tauri::Window<R>) -> ClipResult<()> {
     // 标题栏
     #[cfg(target_os = "macos")]
     {
-        use cocoa::appkit::{NSWindow, NSWindowStyleMask, NSWindowTitleVisibility};
         unsafe {
-            let id = window.ns_window()? as cocoa::base::id;
-            NSWindow::setTitlebarAppearsTransparent_(id, cocoa::base::YES);
+            use objc2_app_kit::NSWindowStyleMask;
+
+            let id = (window.ns_window()? as *mut objc2_app_kit::NSWindow)
+                .as_ref()
+                .unwrap();
             let mut style_mask = id.styleMask();
-            style_mask.set(NSWindowStyleMask::NSFullSizeContentViewWindowMask, true);
             style_mask.remove(
-                NSWindowStyleMask::NSClosableWindowMask
-                    | NSWindowStyleMask::NSMiniaturizableWindowMask
-                    | NSWindowStyleMask::NSResizableWindowMask,
+                NSWindowStyleMask::Closable
+                    | NSWindowStyleMask::Miniaturizable
+                    | NSWindowStyleMask::Resizable,
             );
-            id.setStyleMask_(style_mask);
-            id.setTitleVisibility_(NSWindowTitleVisibility::NSWindowTitleHidden);
-            id.setTitlebarAppearsTransparent_(cocoa::base::YES);
+            id.setStyleMask(style_mask);
         }
     }
     Ok(())

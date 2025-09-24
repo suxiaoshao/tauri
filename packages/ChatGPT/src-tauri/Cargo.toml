@@ -72,7 +72,9 @@ wasmtime-wasi = "37.0.1"
 get-selected-text = "0.1.6"
 
 [target.'cfg(target_os="macos")'.dependencies]
-cocoa = "0.26.1"
+objc2 = "0.6.2"
+objc2-app-kit = "0.3.1"
+objc2-foundation = "0.3.1"
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem

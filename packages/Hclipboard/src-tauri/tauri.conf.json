@@ -50,7 +50,9 @@
         "skipTaskbar": true,
         "transparent": true,
         "alwaysOnTop": true,
-        "visible": false
+        "visible": false,
+        "titleBarStyle": "Overlay",
+        "title": ""
       }
     ],
     "security": {

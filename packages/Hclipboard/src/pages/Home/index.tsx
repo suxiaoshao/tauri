@@ -13,6 +13,7 @@ import { useForm } from 'react-hook-form';
 import { useKey } from 'react-use';
 import HistoryItem from './components/HistoryItem';
 import useClipData from './hooks/useClipData';
+import { match } from 'ts-pattern';
 const appWindow = getCurrentWebviewWindow();
 
 export default function Home() {
@@ -59,6 +60,12 @@ export default function Home() {
       })();
     };
   }, [setValue]);
+  const [ref, setRef] = useState<HTMLDivElement | undefined>();
+  useEffect(() => {
+    if (ref) {
+      ref?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+  }, [ref]);
   return (
     <Box
       sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 1 }}
@@ -77,6 +84,9 @@ export default function Home() {
             item={item}
             selected={selectIndex === index}
             isLast={index === data.length - 1}
+            {...match(selectIndex)
+              .with(index, () => ({ ref: setRef }))
+              .otherwise(() => ({}))}
           />
         ))}
       </List>
