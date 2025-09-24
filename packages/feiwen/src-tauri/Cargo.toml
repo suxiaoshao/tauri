@@ -23,9 +23,9 @@ tauri-plugin-log = { version = "2.7.0" }
 log = "0.4.28"
 
 # database
-diesel = { version = "2.3.1", features = ["sqlite", "r2d2"] }
+diesel = { version = "2.3.2", features = ["sqlite", "r2d2"] }
 libsqlite3-sys = { version = "0.35.0", features = ["bundled"] }
-time = { version = "0.3.43", features = ["serde"] }
+time = { version = "0.3.44", features = ["serde"] }
 
 # http
 reqwest = "0.12.23"
@@ -56,4 +56,4 @@ default = ["custom-protocol"]
 custom-protocol = ["tauri/custom-protocol"]
 
 [dev-dependencies]
-anyhow = "1.0.99"
+anyhow = "1.0.100"
