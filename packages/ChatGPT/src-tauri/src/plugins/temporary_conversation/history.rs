@@ -378,7 +378,7 @@ pub fn save_temporary_conversation<R: Runtime>(
     let conversation = state.lock()?.get_temp_conversation(persistent_id)?.clone();
     let conn = &mut conn.get()?;
     let id = conn.immediate_transaction(|conn| {
-        Conversation::insert(
+        let new_conversation = Conversation::insert(
             NewConversation {
                 title,
                 folder_id,
@@ -388,7 +388,6 @@ pub fn save_temporary_conversation<R: Runtime>(
             },
             conn,
         )?;
-        let new_conversation = Conversation::find_latest(conn)?;
         Message::insert_many(
             conversation.messages,
             new_conversation.path,

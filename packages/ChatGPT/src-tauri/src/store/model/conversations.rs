@@ -17,11 +17,11 @@ pub struct SqlNewConversation {
 }
 
 impl SqlNewConversation {
-    pub fn insert(self, conn: &mut SqliteConnection) -> ChatGPTResult<()> {
-        diesel::insert_into(conversations::table)
+    pub fn insert(self, conn: &mut SqliteConnection) -> ChatGPTResult<SqlConversation> {
+        let conversation = diesel::insert_into(conversations::table)
             .values(self)
-            .execute(conn)?;
-        Ok(())
+            .get_result(conn)?;
+        Ok(conversation)
     }
 }
 
@@ -132,13 +132,6 @@ impl SqlConversation {
         ))
         .get_result(conn)?;
         Ok(count)
-    }
-    /// find latest conversation id
-    pub fn find_latest(conn: &mut SqliteConnection) -> ChatGPTResult<Self> {
-        let latest_id = conversations::table
-            .order(conversations::id.desc())
-            .first(conn)?;
-        Ok(latest_id)
     }
     /// get all conversations
     pub fn get_all(conn: &mut SqliteConnection) -> ChatGPTResult<Vec<Self>> {

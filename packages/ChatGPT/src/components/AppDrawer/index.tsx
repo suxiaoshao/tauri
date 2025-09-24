@@ -61,12 +61,13 @@ export default function AppDrawer() {
               backgroundColor: 'transparent',
             },
             backgroundColor: 'transparent',
+            height: '100%',
           }}
           className="box"
           data-tauri-drag-region
         >
           <Toolbar data-tauri-drag-region />
-          <Box sx={{ overflow: 'auto' }}>
+          <Box sx={{ height: 'calc(100% - 28px)', display: 'flex', flexDirection: 'column' }}>
             <ConversationTree />
             <Divider />
             <List>

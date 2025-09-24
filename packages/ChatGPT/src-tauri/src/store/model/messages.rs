@@ -25,11 +25,11 @@ pub struct SqlNewMessage {
 }
 
 impl SqlNewMessage {
-    pub fn insert(&self, conn: &mut SqliteConnection) -> ChatGPTResult<()> {
-        diesel::insert_into(messages::table)
+    pub fn insert(&self, conn: &mut SqliteConnection) -> ChatGPTResult<SqlMessage> {
+        let sql_message = diesel::insert_into(messages::table)
             .values(self)
-            .execute(conn)?;
-        Ok(())
+            .get_result(conn)?;
+        Ok(sql_message)
     }
     pub fn insert_many(data: &[Self], conn: &mut SqliteConnection) -> ChatGPTResult<()> {
         diesel::insert_into(messages::table)
@@ -121,12 +121,6 @@ impl TryFrom<SqlMessageV2> for SqlMessage {
 }
 
 impl SqlMessage {
-    pub fn last(conn: &mut SqliteConnection) -> ChatGPTResult<Self> {
-        messages::table
-            .order(messages::id.desc())
-            .first(conn)
-            .map_err(|e| e.into())
-    }
     pub fn query_by_conversation_id(
         conversation_id: i32,
         conn: &mut SqliteConnection,

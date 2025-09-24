@@ -44,11 +44,11 @@ impl SqlNewConversationTemplate {
             updated_time: now,
         })
     }
-    pub fn insert(self, conn: &mut SqliteConnection) -> ChatGPTResult<()> {
-        diesel::insert_into(conversation_templates::table)
+    pub fn insert(self, conn: &mut SqliteConnection) -> ChatGPTResult<SqlConversationTemplate> {
+        let new_data = diesel::insert_into(conversation_templates::table)
             .values(self)
-            .execute(conn)?;
-        Ok(())
+            .get_result(conn)?;
+        Ok(new_data)
     }
 }
 
@@ -68,12 +68,6 @@ pub struct SqlConversationTemplate {
 }
 
 impl SqlConversationTemplate {
-    pub fn first(conn: &mut SqliteConnection) -> ChatGPTResult<Self> {
-        let first = conversation_templates::table
-            .order(conversation_templates::id.desc())
-            .first::<Self>(conn)?;
-        Ok(first)
-    }
     pub fn migration_save(
         data: Vec<SqlConversationTemplate>,
         conn: &mut SqliteConnection,
