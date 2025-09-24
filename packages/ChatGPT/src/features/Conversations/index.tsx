@@ -41,7 +41,7 @@ export default function ConversationTree() {
   return (
     <SimpleTreeView
       aria-label="file system navigator"
-      sx={{ flexGrow: 1, width: '100%', overflowY: 'auto' }}
+      sx={{ flex: '1 auto 0', width: '100%', overflowY: 'auto' }}
       selectedItems={getNodeId(selected)}
       onSelectedItemsChange={handleSelect}
       multiSelect={false}
