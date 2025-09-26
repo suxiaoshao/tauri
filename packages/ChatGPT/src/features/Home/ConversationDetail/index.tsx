@@ -8,6 +8,7 @@ import { Box } from '@mui/material';
 import { WebviewWindow } from '@tauri-apps/api/webviewWindow';
 import { useCallback } from 'react';
 import Header from './components/ConversationHeader';
+import { useTranslation } from 'react-i18next';
 
 export interface ConversationDetailProps {
   conversation: Conversation;
@@ -16,17 +17,18 @@ export interface ConversationDetailProps {
 const handleMessageDelete = async (id: number) => {
   await deleteMessage({ id });
 };
-const handleMessageView = (id: number) => {
-  // eslint-disable-next-line no-new
-  new WebviewWindow(`message-${id}`, {
-    url: `/message/${id}`,
-    title: `message-${id}`,
-    transparent: true,
-    decorations: false,
-  });
-};
 
 export default function ConversationDetail({ conversation }: ConversationDetailProps) {
+  const { t } = useTranslation();
+  const handleMessageView = (id: number) => {
+    // eslint-disable-next-line no-new
+    new WebviewWindow(`message-${id}`, {
+      url: `/message/${id}`,
+      title: t('message_preview_title', { id }),
+      transparent: true,
+      decorations: false,
+    });
+  };
   const fetchFn = useCallback(
     async (content: string, extensionName: string | null) => {
       await fetchMessage({

@@ -16,6 +16,7 @@ import {
 import { useState, useCallback } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useHotkeys } from 'react-hotkeys-hook';
+import { useTranslation } from 'react-i18next';
 import { match } from 'ts-pattern';
 import { object, string, pipe, emoji, number, integer, type InferInput, nullable } from 'valibot';
 
@@ -62,9 +63,10 @@ export default function SaveConversation({ persistentId }: SaveConversationProps
     },
     [platform, handleOpen],
   );
+  const { t } = useTranslation();
   return (
     <>
-      <Tooltip title="save conversation">
+      <Tooltip title={t('save_conversation')}>
         <IconButton onClick={handleOpen}>
           <Save />
         </IconButton>

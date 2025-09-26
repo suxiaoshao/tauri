@@ -28,6 +28,7 @@ function Setting() {
     await setConfigService({ data });
     await appWindow.close();
   });
+  const { t } = useTranslation();
   return (
     <FormProvider {...methods}>
       <Box
@@ -63,7 +64,7 @@ function Setting() {
               <ListItemIcon>
                 <Settings />
               </ListItemIcon>
-              <ListItemText primary="General" />
+              <ListItemText primary={t('general')} />
             </ListItemButton>
             <ListItemButton
               onClick={() => {
@@ -74,7 +75,7 @@ function Setting() {
               <ListItemIcon>
                 <Power />
               </ListItemIcon>
-              <ListItemText primary="Adapter" />
+              <ListItemText primary={t('adapter')} />
             </ListItemButton>
           </List>
           <Divider />
@@ -83,13 +84,13 @@ function Setting() {
               <ListItemIcon>
                 <Save />
               </ListItemIcon>
-              <ListItemText primary="Submit" />
+              <ListItemText primary={t('submit')} />
             </ListItemButton>
             <ListItemButton onClick={openSettingFile}>
               <ListItemIcon>
                 <FileOpen />
               </ListItemIcon>
-              <ListItemText primary="Open Setting File" />
+              <ListItemText primary={t('open_setting_file')} />
             </ListItemButton>
           </List>
         </Box>
