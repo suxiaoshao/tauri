@@ -10,6 +10,7 @@ import { match } from 'ts-pattern';
 import { type Enum } from 'types';
 import { useShallow } from 'zustand/react/shallow';
 import { pinyin } from 'pinyin-pro';
+import { useTranslation } from 'react-i18next';
 
 interface Data {
   selectedIndex: number | null;
@@ -158,6 +159,7 @@ export default function TemporaryList() {
     const searchText = event.target.value;
     dispatch({ tag: 'setSearch', value: searchText });
   };
+  const { t } = useTranslation();
   return (
     <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
       <InputBase
@@ -167,7 +169,7 @@ export default function TemporaryList() {
           pl: 2,
           pr: 2,
         }}
-        placeholder="Search Templates"
+        placeholder={t('search_templates')}
         inputProps={{ 'aria-label': 'search templates', spellCheck: false }}
         inputRef={setInputRef}
         data-tauri-drag-region

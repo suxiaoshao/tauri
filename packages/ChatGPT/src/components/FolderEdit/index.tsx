@@ -11,6 +11,7 @@ import { Box, FormLabel, TextField, type BoxProps } from '@mui/material';
 import { Controller, useForm, type Resolver } from 'react-hook-form';
 import { integer, nullish, number, object, pipe, string, type InferInput } from 'valibot';
 import FolderSelect from '../FolderSelect';
+import { useTranslation } from 'react-i18next';
 
 const folderSchema = object({ name: string(), parentId: nullish(pipe(number(), integer())) });
 
@@ -34,6 +35,7 @@ export default function FolderEdit({ initialValues, id, sx, onSubmit: submit, ..
     defaultValues: initialValues ?? DefaultValues,
   });
   const onSubmit = handleSubmit(submit);
+  const { t } = useTranslation();
   return (
     <Box
       {...props}
@@ -55,10 +57,10 @@ export default function FolderEdit({ initialValues, id, sx, onSubmit: submit, ..
         helperText={errors.name?.message}
         {...register('name', { required: true })}
         required
-        label="Title"
+        label={t('title')}
         fullWidth
       />
-      <FormLabel sx={{ mt: 2 }}>Folder</FormLabel>
+      <FormLabel sx={{ mt: 2 }}>{t('folder')}</FormLabel>
       <Controller control={control} name="parentId" render={({ field }) => <FolderSelect {...field} />} />
     </Box>
   );

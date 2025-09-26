@@ -13,6 +13,7 @@ import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import PublishIcon from '@mui/icons-material/Publish';
 import { Box, IconButton, ListItemButton, ListItemIcon, ListItemText, Toolbar, Typography } from '@mui/material';
 import { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useMatch, useNavigate } from 'react-router-dom';
 
 function AddFolder() {
@@ -29,6 +30,7 @@ function AddFolder() {
     },
     [navigate],
   );
+  const { t } = useTranslation();
   return (
     <Box
       sx={{
@@ -49,7 +51,7 @@ function AddFolder() {
             <KeyboardArrowLeftIcon />
           </IconButton>
           <Typography data-tauri-drag-region variant="h6">
-            Add Folder
+            {t('add_folder')}
           </Typography>
           <Box sx={{ flexGrow: 1 }} />
           <IconButton form="folder-form" type="submit">
@@ -65,6 +67,7 @@ function AddFolder() {
 function AddFolderItem() {
   const navigate = useNavigate();
   const matchAdd = useMatch('/add/folder');
+  const { t } = useTranslation();
   return (
     <ListItemButton
       onClick={() => {
@@ -79,7 +82,7 @@ function AddFolderItem() {
       <ListItemIcon>
         <Add />
       </ListItemIcon>
-      <ListItemText primary="Add Folder" />
+      <ListItemText primary={t('add_folder')} />
     </ListItemButton>
   );
 }

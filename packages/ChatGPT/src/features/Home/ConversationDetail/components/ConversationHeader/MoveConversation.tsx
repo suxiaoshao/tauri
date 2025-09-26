@@ -14,6 +14,7 @@ import {
 } from '@mui/material';
 import { useCallback, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 export interface MoveConversationProps {
   conversation: Conversation;
@@ -35,9 +36,10 @@ export default function MoveConversation({ conversation }: MoveConversationProps
     },
     [conversation.id, handleClose],
   );
+  const { t } = useTranslation();
   return (
     <>
-      <Tooltip title="Move">
+      <Tooltip title={t('move')}>
         <IconButton onClick={handleOpen}>
           <DriveFileMoveIcon />
         </IconButton>
@@ -56,14 +58,14 @@ export default function MoveConversation({ conversation }: MoveConversationProps
           },
         }}
       >
-        <DialogTitle>Move Conversation</DialogTitle>
+        <DialogTitle>{t('move_conversation')}</DialogTitle>
         <DialogContent>
-          <FormLabel sx={{ display: 'block' }}>Folder :</FormLabel>
+          <FormLabel sx={{ display: 'block' }}>{t('folder')}</FormLabel>
           <Controller control={control} name="folderId" render={({ field }) => <FolderSelect {...field} />} />
         </DialogContent>
         <DialogActions>
           <Button variant="text" type="submit">
-            Move
+            {t('move')}
           </Button>
         </DialogActions>
       </Dialog>

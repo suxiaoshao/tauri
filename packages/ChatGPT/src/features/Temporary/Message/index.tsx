@@ -7,11 +7,13 @@ import { getTemporaryMessage } from '@chatgpt/service/temporaryConversation/quer
 import notification from '@chatgpt/utils/notification';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import { useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { match, P } from 'ts-pattern';
 const appWindow = getCurrentWebviewWindow();
 
 export default function MessagePreview() {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const { messageId, persistentId } = match([searchParams.get('persistentId'), searchParams.get('messageId')])
     .with([P.nonNullable, P.nonNullable], ([persistentId, messageId]) => ({
@@ -27,7 +29,7 @@ export default function MessagePreview() {
     try {
       if (!messageId) {
         appWindow?.close();
-        notification('messageId is empty');
+        notification(t('message_id_is_empty'));
         throw new Error('messageId is empty');
       }
       return await getTemporaryMessage({ messageId, persistentId });
@@ -35,12 +37,12 @@ export default function MessagePreview() {
       if (error instanceof Error) {
         notification(error.message);
       } else {
-        notification('unknown error');
+        notification(t('unknown_error'));
       }
       appWindow?.close();
       throw error;
     }
-  }, [messageId, persistentId]);
+  }, [messageId, persistentId, t]);
   const [data] = usePromise(fn);
   const content = useMemo(() => {
     return match(data)

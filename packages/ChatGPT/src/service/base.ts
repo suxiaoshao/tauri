@@ -6,6 +6,7 @@
  * @FilePath: /tauri/packages/ChatGPT/src/service/base.ts
  */
 import { type InvokeArgs, invoke } from '@tauri-apps/api/core';
+import { t } from 'i18next';
 import { enqueueSnackbar } from 'notify';
 import { enum_, nullish, object, parseAsync, string } from 'valibot';
 
@@ -85,7 +86,7 @@ export async function appInvoke<P, R>(cmd: string, params: P): Promise<R> {
       } catch (error) {
         // eslint-disable-next-line no-console
         console.error('Validation failed:', error);
-        await enqueueSnackbar('An unknown error occurred', { variant: 'error' });
+        await enqueueSnackbar(t('an_unknown_error_occurred'), { variant: 'error' });
       }
     }
     // eslint-disable-next-line no-console

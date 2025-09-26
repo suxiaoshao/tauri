@@ -37,10 +37,23 @@ impl Default for ThemeOption {
     }
 }
 
+#[derive(Debug, Clone, Copy, Default, Deserialize, Serialize, PartialEq, Eq)]
+#[serde(rename_all = "lowercase")]
+enum Language {
+    #[serde(rename = "en")]
+    English,
+    #[serde(rename = "zh")]
+    Chinese,
+    #[default]
+    System,
+}
+
 #[derive(Clone, Debug, Default, Deserialize, Serialize, PartialEq, Eq)]
 pub struct ChatGPTConfig {
     #[serde(default = "Default::default")]
     theme: ThemeOption,
+    #[serde(default = "Default::default")]
+    language: Language,
     #[serde(rename = "httpProxy")]
     pub http_proxy: Option<String>,
     #[serde(rename = "temporaryHotkey")]

@@ -21,8 +21,10 @@ import TemplateDetailHeader from './components/Header';
 import TemplateDetailView from './components/View';
 import { getAdapterTemplateInputs } from '@chatgpt/service/adapter';
 import type { ConversationTemplate } from '@chatgpt/types/conversationTemplate';
+import { useTranslation } from 'react-i18next';
 
 export default function ConversationTemplateDetail() {
+  const { t } = useTranslation();
   const [alignment, setAlignment] = useState(Alignment.preview);
   const handleAlignment = useCallback((event: React.MouseEvent<HTMLElement>, newAlignment: string | null) => {
     match(newAlignment)
@@ -66,7 +68,7 @@ export default function ConversationTemplateDetail() {
           .with(Alignment.edit, () => {
             const onSubmit = async (formData: TemplateForm) => {
               await updateConversationTemplate({ data: formData, id: value.template.id });
-              enqueueSnackbar('Template updated successfully', { variant: 'success' });
+              enqueueSnackbar(t('template_updated_successfully'), { variant: 'success' });
               refresh();
               setAlignment(Alignment.preview);
             };
@@ -75,7 +77,7 @@ export default function ConversationTemplateDetail() {
           .otherwise(() => <Loading sx={{ width: '100%', height: '100%' }} />),
       )
       .otherwise(() => <Loading sx={{ width: '100%', height: '100%' }} />);
-  }, [data, refresh, alignment, formId]);
+  }, [data, refresh, alignment, formId, t]);
   return (
     <Box
       sx={{

@@ -14,6 +14,7 @@ import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import { Avatar, Box, IconButton, Skeleton, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from '@mui/material';
 import { enqueueSnackbar } from 'notify';
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { match } from 'ts-pattern';
 
@@ -33,6 +34,7 @@ export default function TemplateDetailHeader({
   formId,
 }: TemplateDetailHeaderProps) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const content = useMemo(() => {
     return match(data)
       .with({ tag: PromiseStatus.loading }, () => (
@@ -43,38 +45,38 @@ export default function TemplateDetailHeader({
       ))
       .with({ tag: PromiseStatus.error }, () => (
         <Typography data-tauri-drag-region variant="h6" component="span">
-          Conversation Templates
+          {t('conversation_templates')}
         </Typography>
       ))
       .with({ tag: PromiseStatus.data }, ({ value }) => (
         <>
           <Typography data-tauri-drag-region variant="h6" component="span">
-            Conversation Templates
+            {value.name}
           </Typography>
           <Avatar data-tauri-drag-region sx={{ backgroundColor: 'transparent' }}>
             {value.icon}
           </Avatar>
           <Typography sx={{ ml: 1 }} data-tauri-drag-region variant="body2" color="inherit" component="span">
-            {value.name}
+            {value.description}
           </Typography>
         </>
       ))
       .otherwise(() => (
         <Typography data-tauri-drag-region variant="h6" component="span">
-          Conversation Templates
+          {t('conversation_templates')}
         </Typography>
       ));
-  }, [data]);
+  }, [data, t]);
   const deleteButton = useMemo(() => {
     return match(data)
       .with({ tag: PromiseStatus.data }, ({ value }) => {
         const handleDelete = async () => {
           await deleteConversationTemplate({ id: value.id });
           navigate('/template');
-          enqueueSnackbar('Conversation template deleted', { variant: 'success' });
+          enqueueSnackbar(t('conversation_template_deleted'), { variant: 'success' });
         };
         return (
-          <Tooltip title="Delete">
+          <Tooltip title={t('delete')}>
             <IconButton onClick={handleDelete}>
               <Delete />
             </IconButton>
@@ -82,13 +84,13 @@ export default function TemplateDetailHeader({
         );
       })
       .otherwise(() => null);
-  }, [data, navigate]);
+  }, [data, navigate, t]);
   const submitButton = useMemo(() => {
     return match(data)
       .with({ tag: PromiseStatus.data }, () => {
         return match(alignment)
           .with(Alignment.edit, () => (
-            <Tooltip title="Save">
+            <Tooltip title={t('save')}>
               <IconButton type="submit" form={formId}>
                 <Save />
               </IconButton>
@@ -97,7 +99,7 @@ export default function TemplateDetailHeader({
           .otherwise(() => null);
       })
       .otherwise(() => null);
-  }, [data, formId, alignment]);
+  }, [data, formId, alignment, t]);
   return (
     <Box
       data-tauri-drag-region

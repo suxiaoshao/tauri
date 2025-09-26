@@ -13,6 +13,9 @@ import { Controller, FormProvider, useFieldArray, useForm } from 'react-hook-for
 import { type InferInput, any, array, emoji, enum_, nullish, object, pipe, string } from 'valibot';
 import AdapterForm from './AdapterForm';
 import { Add, Delete } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
+import { getModeKey } from '@chatgpt/utils/getModeKey';
+import { getRoleKey } from '@chatgpt/utils/getRoleKey';
 
 const templateSchema = object({
   name: string(),
@@ -59,6 +62,8 @@ export default function TemplateEdit({ initialValues, id, onSubmit }: TemplateEd
     name: 'prompts',
   });
 
+  const { t } = useTranslation();
+
   return (
     <FormProvider {...methods}>
       <Box
@@ -80,13 +85,13 @@ export default function TemplateEdit({ initialValues, id, onSubmit }: TemplateEd
           helperText={errors.name?.message}
           {...register('name', { required: true })}
           required
-          label="Name"
+          label={t('name')}
           fullWidth
         />
         <TextField
           error={!!errors.icon?.message}
           helperText={errors.icon?.message}
-          label="Icon"
+          label={t('icon')}
           required
           {...register('icon', { required: true })}
           fullWidth
@@ -95,7 +100,7 @@ export default function TemplateEdit({ initialValues, id, onSubmit }: TemplateEd
           error={!!errors.description?.message}
           helperText={errors.description?.message}
           {...register('description')}
-          label="Description"
+          label={t('description')}
           fullWidth
         />
         <Controller
@@ -107,20 +112,20 @@ export default function TemplateEdit({ initialValues, id, onSubmit }: TemplateEd
               error={!!fieldState?.error?.message}
               helperText={fieldState?.error?.message}
               select
-              label="Mode"
+              label={t('mode')}
               required
               fullWidth
               {...field}
             >
-              <MenuItem value={Mode.Contextual}>{Mode.Contextual}</MenuItem>
-              <MenuItem value={Mode.Single}>{Mode.Single}</MenuItem>
-              <MenuItem value={Mode.AssistantOnly}>{Mode.AssistantOnly}</MenuItem>
+              <MenuItem value={Mode.Contextual}>{t(getModeKey(Mode.Contextual))}</MenuItem>
+              <MenuItem value={Mode.Single}>{t(getModeKey(Mode.Single))}</MenuItem>
+              <MenuItem value={Mode.AssistantOnly}>{t(getModeKey(Mode.AssistantOnly))}</MenuItem>
             </TextField>
           )}
         />
         <AdapterForm />
         <Box sx={{ gap: 2, display: 'flex', alignItems: 'center' }}>
-          <FormLabel required>Prompts</FormLabel>
+          <FormLabel required>{t('prompts')}</FormLabel>
           <IconButton onClick={() => append({ role: Role.assistant, prompt: '' })}>
             <Add />
           </IconButton>
@@ -137,15 +142,15 @@ export default function TemplateEdit({ initialValues, id, onSubmit }: TemplateEd
                     error={!!fieldState?.error?.message}
                     helperText={fieldState?.error?.message}
                     select
-                    label="Role"
+                    label={t('role')}
                     required
                     fullWidth
                     sx={{ flex: '1 1 0' }}
                     {...field}
                   >
-                    <MenuItem value={Role.assistant}>{Role.assistant}</MenuItem>
-                    <MenuItem value={Role.user}>{Role.user}</MenuItem>
-                    <MenuItem value={Role.developer}>{Role.developer}</MenuItem>
+                    <MenuItem value={Role.assistant}>{t(getRoleKey(Role.assistant))}</MenuItem>
+                    <MenuItem value={Role.user}>{t(getRoleKey(Role.user))}</MenuItem>
+                    <MenuItem value={Role.developer}>{t(getRoleKey(Role.developer))}</MenuItem>
                   </TextField>
                 )}
               />
@@ -153,7 +158,7 @@ export default function TemplateEdit({ initialValues, id, onSubmit }: TemplateEd
                 error={!!errors?.prompts?.[index]?.prompt?.message}
                 helperText={errors?.prompts?.[index]?.prompt?.message}
                 {...register(`prompts.${index}.prompt`, { required: true })}
-                label="Prompt"
+                label={t('prompt')}
                 fullWidth
                 sx={{ flex: '1 1 0' }}
                 multiline

@@ -24,6 +24,7 @@ import { Controller, type Resolver, useForm } from 'react-hook-form';
 import { type InferOutput, emoji, integer, nullish, number, object, pipe, string } from 'valibot';
 import { useShallow } from 'zustand/react/shallow';
 import FolderSelect from '../FolderSelect';
+import { useTranslation } from 'react-i18next';
 
 const conversationSchema = object({
   title: string(),
@@ -56,6 +57,7 @@ export default function ConversationEdit({ initialValues, id, sx, onSubmit: subm
   });
   const onSubmit = handleSubmit(submit);
   const templates = useTemplateStore(useShallow(selectTemplates));
+  const { t } = useTranslation();
   return (
     <Box
       {...props}
@@ -77,13 +79,13 @@ export default function ConversationEdit({ initialValues, id, sx, onSubmit: subm
         helperText={errors.title?.message}
         {...register('title', { required: true })}
         required
-        label="Title"
+        label={t('title')}
         fullWidth
       />
       <TextField
         error={!!errors.icon?.message}
         helperText={errors.icon?.message}
-        label="Icon"
+        label={t('icon')}
         required
         {...register('icon', { required: true })}
         fullWidth
@@ -93,7 +95,7 @@ export default function ConversationEdit({ initialValues, id, sx, onSubmit: subm
         error={!!errors.info?.message}
         helperText={errors.info?.message}
         {...register('info')}
-        label="Info"
+        label={t('info')}
         fullWidth
         sx={{ mt: 2 }}
       />
@@ -106,7 +108,7 @@ export default function ConversationEdit({ initialValues, id, sx, onSubmit: subm
             error={!!fieldState?.error?.message}
             helperText={fieldState?.error?.message}
             select
-            label="Model"
+            label={t('template')}
             required
             fullWidth
             sx={{
@@ -139,7 +141,7 @@ export default function ConversationEdit({ initialValues, id, sx, onSubmit: subm
           </TextField>
         )}
       />
-      <FormLabel sx={{ mt: 2 }}>Folder</FormLabel>
+      <FormLabel sx={{ mt: 2 }}>{t('folder')}</FormLabel>
       <Controller control={control} name="folderId" render={({ field }) => <FolderSelect {...field} />} />
     </Box>
   );

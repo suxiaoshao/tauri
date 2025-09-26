@@ -10,6 +10,7 @@ import { useShallow } from 'zustand/react/shallow';
 import { selectConfig, useConfigStore } from './configSlice';
 import { ChatGPTConfigSchema, type Config } from './types';
 import { Outlet, useMatch, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 const appWindow = getCurrentWebviewWindow();
 
 function Setting() {
@@ -27,6 +28,7 @@ function Setting() {
     await setConfigService({ data });
     await appWindow.close();
   });
+  const { t } = useTranslation();
   return (
     <FormProvider {...methods}>
       <Box
@@ -62,7 +64,7 @@ function Setting() {
               <ListItemIcon>
                 <Settings />
               </ListItemIcon>
-              <ListItemText primary="General" />
+              <ListItemText primary={t('general')} />
             </ListItemButton>
             <ListItemButton
               onClick={() => {
@@ -73,7 +75,7 @@ function Setting() {
               <ListItemIcon>
                 <Power />
               </ListItemIcon>
-              <ListItemText primary="Adapter" />
+              <ListItemText primary={t('adapter')} />
             </ListItemButton>
           </List>
           <Divider />
@@ -82,13 +84,13 @@ function Setting() {
               <ListItemIcon>
                 <Save />
               </ListItemIcon>
-              <ListItemText primary="Submit" />
+              <ListItemText primary={t('submit')} />
             </ListItemButton>
             <ListItemButton onClick={openSettingFile}>
               <ListItemIcon>
                 <FileOpen />
               </ListItemIcon>
-              <ListItemText primary="Open Setting File" />
+              <ListItemText primary={t('open_setting_file')} />
             </ListItemButton>
           </List>
         </Box>
@@ -104,12 +106,13 @@ function SettingItem() {
   const handleSetting = useCallback(async () => {
     await createSettingWindow();
   }, []);
+  const { t } = useTranslation();
   return (
     <ListItemButton onClick={handleSetting}>
       <ListItemIcon>
         <Settings />
       </ListItemIcon>
-      <ListItemText primary="Setting" />
+      <ListItemText primary={t('settings')} />
     </ListItemButton>
   );
 }

@@ -7,6 +7,7 @@ import { useCallback } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { match } from 'ts-pattern';
 import SaveConversation from './SaveConversation';
+import { useTranslation } from 'react-i18next';
 
 export interface TemporaryHeaderProps {
   template: ConversationTemplate;
@@ -32,6 +33,7 @@ export default function TemporaryHeader({ template, persistentId }: TemporaryHea
     },
     [platform, handleClear],
   );
+  const { t } = useTranslation();
   return (
     <Box
       data-tauri-drag-region
@@ -54,7 +56,7 @@ export default function TemporaryHeader({ template, persistentId }: TemporaryHea
           {template.description}
         </Typography>
       </Box>
-      <Tooltip title="clear messages">
+      <Tooltip title={t('clear_messages')}>
         <IconButton onClick={handleClear}>
           <CleaningServices />
         </IconButton>

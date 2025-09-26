@@ -1,8 +1,9 @@
 import HotkeyInput from '@chatgpt/components/HotkeyInput';
-import { Box, TextField, MenuItem, InputLabel, FormLabel } from '@mui/material';
+import { Box, TextField, MenuItem, InputLabel } from '@mui/material';
 import { Controller, useFormContext } from 'react-hook-form';
 import { match } from 'ts-pattern';
-import { type Config, Theme } from '../types';
+import { type Config, Language, Theme } from '../types';
+import { useTranslation } from 'react-i18next';
 
 export default function GeneralSettings() {
   const {
@@ -10,6 +11,7 @@ export default function GeneralSettings() {
     formState: { errors },
     control,
   } = useFormContext<Config>();
+  const { t } = useTranslation();
   return (
     <Box
       sx={{
@@ -28,25 +30,46 @@ export default function GeneralSettings() {
           <TextField
             required
             {...field}
-            label="Theme"
+            label={t('theme')}
             select
             fullWidth
             sx={{ mt: 2 }}
             error={!!fieldState.error?.message}
             helperText={fieldState.error?.message}
           >
-            <MenuItem value={Theme.Dark}>{Theme.Dark}</MenuItem>
-            <MenuItem value={Theme.Light}>{Theme.Light}</MenuItem>
-            <MenuItem value={Theme.System}>{Theme.System}</MenuItem>
+            <MenuItem value={Theme.Dark}>{t(Theme.Dark)}</MenuItem>
+            <MenuItem value={Theme.Light}>{t(Theme.Light)}</MenuItem>
+            <MenuItem value={Theme.System}>{t(Theme.System)}</MenuItem>
           </TextField>
         )}
       />
 
       <InputLabel htmlFor="color-input" sx={{ mt: 2 }} required error={!!errors.theme?.color?.message}>
-        Color
+        {t('color')}
       </InputLabel>
       <Box component="input" id="color-input" type="color" {...register('theme.color', { required: true })} />
       <Box sx={{ color: 'error.main' }}>{errors.theme?.color?.message}</Box>
+      <Controller
+        control={control}
+        name="language"
+        rules={{ required: true }}
+        render={({ field, fieldState }) => (
+          <TextField
+            required
+            {...field}
+            label={t('language')}
+            select
+            fullWidth
+            sx={{ mt: 2 }}
+            error={!!fieldState.error?.message}
+            helperText={fieldState.error?.message}
+          >
+            <MenuItem value={Language.System}>{t(Language.System)}</MenuItem>
+            <MenuItem value={Language.Chinese}>{t(Language.Chinese)}</MenuItem>
+            <MenuItem value={Language.English}>{t(Language.English)}</MenuItem>
+          </TextField>
+        )}
+      />
       <TextField
         {...register('httpProxy', {
           setValueAs: (value) => {
@@ -58,7 +81,7 @@ export default function GeneralSettings() {
             );
           },
         })}
-        label="Http Proxy"
+        label={t('http_proxy')}
         fullWidth
         sx={{ mt: 2 }}
         error={!!errors.httpProxy?.message}
@@ -70,7 +93,7 @@ export default function GeneralSettings() {
         render={({ field, fieldState }) => (
           <HotkeyInput
             {...field}
-            label="Temporary Conversation Hotkey"
+            label={t('temporary_conversation_hotkey')}
             fullWidth
             sx={{ mt: 2 }}
             error={!!fieldState.error?.message}
@@ -78,10 +101,6 @@ export default function GeneralSettings() {
           />
         )}
       />
-
-      <FormLabel sx={{ mt: 2 }} required>
-        Models
-      </FormLabel>
     </Box>
   );
 }

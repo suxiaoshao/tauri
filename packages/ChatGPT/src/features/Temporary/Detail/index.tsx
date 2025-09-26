@@ -20,9 +20,11 @@ import {
   temporaryFetch,
   separateWindow,
 } from '@chatgpt/service/temporaryConversation/mutation';
+import { useTranslation } from 'react-i18next';
 const appWindow = getCurrentWebviewWindow();
 
 export default function TemporaryDetail() {
+  const { t } = useTranslation();
   const platform = usePlatform();
   const [searchParams] = useSearchParams();
   const persistentId = match(searchParams.get('persistentId'))
@@ -103,7 +105,7 @@ export default function TemporaryDetail() {
     // eslint-disable-next-line no-new
     new WebviewWindow(`temporary-${persistentId}-message-${id}`, {
       url: `/temporary_conversation/message?persistentId=${persistentId}&messageId=${id}`,
-      title: `temporary-${persistentId}-message-${id}`,
+      title: t('temporary_message_preview_title', { persistentId, id }),
       transparent: true,
       decorations: false,
     });

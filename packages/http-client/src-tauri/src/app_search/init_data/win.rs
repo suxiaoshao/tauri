@@ -2,7 +2,7 @@
  * @Author: suxiaoshao suxiaoshao@gamil.com
  * @Date: 2022-09-11 02:49:00
  * @LastEditors: suxiaoshao suxiaoshao@gamil.com
- * @LastEditTime: 2024-05-08 23:48:49
+ * @LastEditTime: 2025-09-11 15:21:13
  * @FilePath: \tauri\packages\http-client\src-tauri\src\app_search\init_data\win.rs
  */
 use std::{
@@ -10,7 +10,7 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use lnk::ShellLink;
+use lnk::{ShellLink, encoding::WINDOWS_1252};
 use tauri::{AppHandle, Manager, Runtime};
 use walkdir::{DirEntry, WalkDir};
 
@@ -49,14 +49,14 @@ fn filter_lnk(path: &DirEntry) -> bool {
 fn map_lnk(dir: DirEntry) -> Option<AppPath> {
     let name = dir
         .path()
-        .iter()
-        .last()?
+        .file_name()?
         .to_str()?
         .split('.')
         .next()?
         .to_string();
-    let data = ShellLink::open(dir.path()).ok()?;
-    let desc = data.name().clone();
+    let data = ShellLink::open(dir.path(), WINDOWS_1252).ok()?;
+    let data = data.string_data();
+    let desc = data.name_string().clone();
     let icon = data.icon_location().as_ref().map(PathBuf::from);
     let path = data.relative_path().as_ref().map(PathBuf::from)?;
     let path = push_path(dir.path(), &path);

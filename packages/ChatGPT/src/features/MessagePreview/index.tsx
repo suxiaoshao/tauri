@@ -16,15 +16,17 @@ import { useParams } from 'react-router-dom';
 import { match } from 'ts-pattern';
 import Success from './Success';
 import { updateMessageContent } from '@chatgpt/service/chat/mutation';
+import { useTranslation } from 'react-i18next';
 
 export default function MessagePreview() {
   const { id } = useParams<{ id: string }>();
+  const { t } = useTranslation();
   const fn = useCallback(async () => {
     const appWindow = getCurrentWebviewWindow();
     try {
       if (!id) {
         appWindow?.close();
-        notification('id is empty');
+        notification(t('id_is_empty'));
         throw new Error('id is empty');
       }
       const messageId = Number.parseInt(id, 10);
@@ -33,12 +35,12 @@ export default function MessagePreview() {
       if (error instanceof Error) {
         notification(error.message);
       } else {
-        notification('unknown error');
+        notification(t('unknown_error'));
       }
       appWindow?.close();
       throw error;
     }
-  }, [id]);
+  }, [id, t]);
   const [data, func] = usePromise(fn);
   const content = useMemo(() => {
     return match(data)

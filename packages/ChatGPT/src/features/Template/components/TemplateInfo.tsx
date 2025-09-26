@@ -7,11 +7,14 @@
  */
 import { Mode } from '@chatgpt/types/common';
 import { type ConversationTemplate } from '@chatgpt/types/conversationTemplate';
+import { getModeKey } from '@chatgpt/utils/getModeKey';
 import { Chip, type ChipProps, Typography } from '@mui/material';
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { match } from 'ts-pattern';
 
 export default function TemplateInfo({ description, mode }: Pick<ConversationTemplate, 'description' | 'mode'>) {
+  const { t } = useTranslation();
   const color = useMemo<ChipProps['color']>(
     () =>
       match(mode)
@@ -23,7 +26,7 @@ export default function TemplateInfo({ description, mode }: Pick<ConversationTem
   );
   return (
     <Typography variant="body2">
-      <Chip color={color} label={mode} size="small" variant="outlined" />
+      <Chip color={color} label={t(getModeKey(mode))} size="small" variant="outlined" />
       {description && ` ${description}`}
     </Typography>
   );

@@ -1,9 +1,8 @@
+use self::created::on_created;
+#[cfg(target_os = "macos")]
+use crate::{create_main_window, errors::ChatGPTResult};
 use log::warn;
 use tauri::Runtime;
-
-use crate::{create_main_window, errors::ChatGPTResult};
-
-use self::created::on_created;
 
 mod created;
 
@@ -45,6 +44,7 @@ impl<R: Runtime> tauri::plugin::Plugin<R> for WindowPlugin {
     }
 }
 
+#[cfg(target_os = "macos")]
 fn create_main<R: Runtime>(app: &tauri::AppHandle<R>) -> ChatGPTResult<()> {
     create_main_window(app, "/")?;
     Ok(())

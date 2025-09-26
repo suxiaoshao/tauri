@@ -4,6 +4,7 @@ import { type ForwardedRef, useMemo } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { type FolderSelectContextType, FolderSelectContext } from './FolderSelectContext';
 import FolderSelectItem from './FolderSelectItem';
+import { useTranslation } from 'react-i18next';
 
 export interface FolderSelectProps {
   value?: number | null;
@@ -21,11 +22,12 @@ function FolderSelect({ value, onChange, disabledFolderIds = [], ref }: FolderSe
       disabledFolderIds,
     };
   }, [disabledFolderIds, onChange, value]);
+  const { t } = useTranslation();
   return (
     <FolderSelectContext.Provider value={contextValue}>
       <MenuList ref={ref}>
         <MenuItem selected={value === null} onClick={() => onChange(null)}>
-          <ListItemText primary="root" secondary="/" />
+          <ListItemText primary={t('root')} secondary="/" />
         </MenuItem>
 
         {folders.map((folder) => (

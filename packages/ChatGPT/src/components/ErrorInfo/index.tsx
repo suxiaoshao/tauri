@@ -6,6 +6,7 @@
  * @FilePath: /tauri/packages/ChatGPT/src/components/ErrorInfo/index.tsx
  */
 import { Alert, Box, type BoxProps, Link, Typography } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 
 export interface ErrorInfoProps extends BoxProps {
   error: Error;
@@ -13,6 +14,7 @@ export interface ErrorInfoProps extends BoxProps {
 }
 
 export default function ErrorInfo({ error, refetch, sx, ...props }: ErrorInfoProps) {
+  const { t } = useTranslation();
   return (
     <Box
       sx={{
@@ -36,15 +38,15 @@ export default function ErrorInfo({ error, refetch, sx, ...props }: ErrorInfoPro
         }}
       >
         <Alert sx={{ width: '70%' }} variant="filled" severity="error">
-          Error : {error.message}
+          {t('error')} : {error.message}
         </Alert>
         {refetch && (
           <Typography variant="body1" gutterBottom component="div">
-            Please click the{' '}
+            {t('error_page_button_tips1')}
             <Link component="button" variant="body1" onClick={refetch}>
-              button
-            </Link>{' '}
-            to retry.
+              {t('error_page_button_tips2')}
+            </Link>
+            {t('error_page_button_tips3')}
           </Typography>
         )}
       </Box>

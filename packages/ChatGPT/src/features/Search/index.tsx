@@ -3,6 +3,7 @@ import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { useCallback, useState } from 'react';
 import useSearchKey from './useSearchKey';
 import SearchDialog from './components/SearchDialog';
+import { useTranslation } from 'react-i18next';
 
 export default function Search() {
   // dialog
@@ -14,13 +15,15 @@ export default function Search() {
   // hotkeys
   useSearchKey(handleSearch);
 
+  const { t } = useTranslation();
+
   return (
     <>
       <ListItemButton onClick={handleOpen}>
         <ListItemIcon>
           <SearchIcon />
         </ListItemIcon>
-        <ListItemText primary="Search Conversation" />
+        <ListItemText primary={t('search_conversation')} />
       </ListItemButton>
       <SearchDialog open={open} onClose={handleClose} />
     </>

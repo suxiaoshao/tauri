@@ -36,7 +36,7 @@ impl SqlNewConversationTemplate {
             name: "基础模板".to_string(),
             icon: "🤖".to_string(),
             description: None,
-            mode: (Mode::Contextual).to_string(),
+            mode: Mode::Contextual.to_string(),
             adapter: OpenAIStreamAdapter::NAME.to_string(),
             template: serde_json::to_string(&OpenAIConversationTemplate::default())?,
             prompts: serde_json::to_string(&Vec::<ConversationTemplatePrompt>::new())?,
