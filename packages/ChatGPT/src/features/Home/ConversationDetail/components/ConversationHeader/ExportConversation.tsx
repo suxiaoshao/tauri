@@ -26,6 +26,7 @@ import { useCallback, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useShallow } from 'zustand/react/shallow';
 import * as dialog from '@tauri-apps/plugin-dialog';
+import { useTranslation } from 'react-i18next';
 
 export interface ExportConversationProps {
   conversation: Conversation;
@@ -54,9 +55,10 @@ export default function ExportConversation({ conversation }: ExportConversationP
     },
     [conversation.id, fetchConversations, handleClose],
   );
+  const { t } = useTranslation();
   return (
     <>
-      <Tooltip title="Export">
+      <Tooltip title={t('export')}>
         <IconButton onClick={handleOpen}>
           <IosShareIcon />
         </IconButton>
@@ -75,14 +77,14 @@ export default function ExportConversation({ conversation }: ExportConversationP
           },
         }}
       >
-        <DialogTitle>Export Messages</DialogTitle>
+        <DialogTitle>{t('export_messages')}</DialogTitle>
         <DialogContent>
           <Controller
             control={control}
             name="exportType"
             rules={{ required: true }}
             render={({ field }) => (
-              <TextField sx={{ mt: 2 }} label="Export Type" fullWidth select {...field} required>
+              <TextField sx={{ mt: 2 }} label={t('export_type')} fullWidth select {...field} required>
                 <MenuItem value={ExportType.JSON}>{ExportType.JSON}</MenuItem>
                 <MenuItem value={ExportType.CSV}>{ExportType.CSV}</MenuItem>
                 <MenuItem value={ExportType.TXT}>{ExportType.TXT}</MenuItem>
@@ -92,7 +94,7 @@ export default function ExportConversation({ conversation }: ExportConversationP
         </DialogContent>
         <DialogActions>
           <Button variant="text" type="submit">
-            Export
+            {t('export')}
           </Button>
         </DialogActions>
       </Dialog>

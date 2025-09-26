@@ -13,6 +13,7 @@ import { useShallow } from 'zustand/react/shallow';
 import TemplateInfo from '../components/TemplateInfo';
 import { selectTemplates, useTemplateStore } from '../templateSlice';
 import TemplateListHeader from './components/Header';
+import { useTranslation } from 'react-i18next';
 
 function ConversationTemplateList() {
   const templates = useTemplateStore(useShallow(selectTemplates));
@@ -59,6 +60,7 @@ function TemplateItem() {
   const pathname = useLocation().pathname;
   const matchAdd = useMatch('/template');
   const match = useMemo(() => pathname.startsWith('/template'), [pathname]);
+  const { t } = useTranslation();
   return (
     <ListItemButton
       onClick={() => {
@@ -73,7 +75,7 @@ function TemplateItem() {
       <ListItemIcon>
         <Apps />
       </ListItemIcon>
-      <ListItemText primary="Templates" />
+      <ListItemText primary={t('template')} />
     </ListItemButton>
   );
 }

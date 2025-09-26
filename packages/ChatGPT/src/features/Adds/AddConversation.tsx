@@ -14,6 +14,7 @@ import { Box, IconButton, ListItemButton, ListItemIcon, ListItemText, Toolbar, T
 import { useCallback } from 'react';
 import { useLocation, useMatch, useNavigate } from 'react-router-dom';
 import ConversationEdit, { type ConversationForm } from '../../components/ConversationEdit';
+import { useTranslation } from 'react-i18next';
 
 function AddConversation() {
   const navigate = useNavigate();
@@ -66,6 +67,7 @@ function AddConversation() {
 function AddConversationItem() {
   const navigate = useNavigate();
   const matchAdd = useMatch('/add/conversation');
+  const { t } = useTranslation();
   return (
     <ListItemButton
       onClick={() => {
@@ -80,7 +82,7 @@ function AddConversationItem() {
       <ListItemIcon>
         <Add />
       </ListItemIcon>
-      <ListItemText primary="Add Conversation" />
+      <ListItemText primary={t('add_conversation')} />
     </ListItemButton>
   );
 }

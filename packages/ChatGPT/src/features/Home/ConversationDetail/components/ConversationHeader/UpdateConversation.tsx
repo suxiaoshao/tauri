@@ -11,6 +11,7 @@ import { type Conversation, type NewConversation } from '@chatgpt/types/conversa
 import EditIcon from '@mui/icons-material/Edit';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Tooltip } from '@mui/material';
 import { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export interface UpdateConversationProps {
   conversation: Conversation;
@@ -33,9 +34,10 @@ export default function UpdateConversation({ conversation }: UpdateConversationP
     },
     [conversation.id, handleClose],
   );
+  const { t } = useTranslation();
   return (
     <>
-      <Tooltip title="modify">
+      <Tooltip title={t('modify')}>
         <IconButton onClick={handleOpen}>
           <EditIcon />
         </IconButton>
@@ -52,7 +54,7 @@ export default function UpdateConversation({ conversation }: UpdateConversationP
           },
         }}
       >
-        <DialogTitle>Update Conversation</DialogTitle>
+        <DialogTitle>{t('modify_conversation')}</DialogTitle>
         <DialogContent dividers>
           <ConversationEdit
             initialValues={conversation}
@@ -67,7 +69,7 @@ export default function UpdateConversation({ conversation }: UpdateConversationP
         </DialogContent>
         <DialogActions>
           <Button variant="text" type="submit" form="conversation-form">
-            Save changes
+            {t('save_changes')}
           </Button>
         </DialogActions>
       </Dialog>

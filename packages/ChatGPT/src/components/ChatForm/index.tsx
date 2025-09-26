@@ -5,6 +5,7 @@ import { IconButton, InputBase, MenuItem, Paper, Select } from '@mui/material';
 import { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useHotkeys } from 'react-hotkeys-hook';
+import { useTranslation } from 'react-i18next';
 import { match, P } from 'ts-pattern';
 import { type InferInput, nullable, object, string } from 'valibot';
 import { useShallow } from 'zustand/react/shallow';
@@ -56,6 +57,7 @@ export default function ChatForm({ status, onSendMessage }: ChatFormProps) {
     {},
     [inputRef],
   );
+  const { t } = useTranslation();
   return (
     <Paper
       onSubmit={onSubmit}
@@ -75,7 +77,7 @@ export default function ChatForm({ status, onSendMessage }: ChatFormProps) {
     >
       <Select size="small" label="Extension" {...register('extensionName')}>
         <MenuItem value="">
-          <em>None</em>
+          <em>{t('none')}</em>
         </MenuItem>
         {allExtensions.map((extension) => (
           <MenuItem key={extension.name} value={extension.name}>
@@ -85,7 +87,7 @@ export default function ChatForm({ status, onSendMessage }: ChatFormProps) {
       </Select>
       <InputBase
         sx={{ ml: 1, flex: 1, marginBottom: '4px' }}
-        placeholder="Send a message"
+        placeholder={t('send_message')}
         multiline
         maxRows={4}
         inputRef={setInputRef}

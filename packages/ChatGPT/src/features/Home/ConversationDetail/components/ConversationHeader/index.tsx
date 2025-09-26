@@ -10,6 +10,7 @@ import UpdateConversation from './UpdateConversation';
 import { useHotkeys } from 'react-hotkeys-hook';
 import usePlatform from '@chatgpt/hooks/usePlatform';
 import { match } from 'ts-pattern';
+import { useTranslation } from 'react-i18next';
 export interface ConversationHeaderProps {
   conversation: Conversation;
 }
@@ -40,6 +41,7 @@ export default function ConversationHeader({ conversation }: ConversationHeaderP
     },
     [platform, handleClear],
   );
+  const { t } = useTranslation();
 
   return (
     <Box
@@ -64,18 +66,18 @@ export default function ConversationHeader({ conversation }: ConversationHeaderP
         </Typography>
       </Box>
       <UpdateConversation conversation={conversation} />
-      <Tooltip title="delete">
+      <Tooltip title={t('delete')}>
         <IconButton onClick={handleDelete}>
           <Delete />
         </IconButton>
       </Tooltip>
-      <Tooltip title="copy to new conversation">
+      <Tooltip title={t('copy_to_new_conversation')}>
         <IconButton onClick={handleCopy}>
           <CopyAll />
         </IconButton>
       </Tooltip>
       <MoveConversation conversation={conversation} />
-      <Tooltip title="clear messages">
+      <Tooltip title={t('clear_messages')}>
         <IconButton onClick={handleClear}>
           <CleaningServices />
         </IconButton>

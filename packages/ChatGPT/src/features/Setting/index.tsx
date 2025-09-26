@@ -10,6 +10,7 @@ import { useShallow } from 'zustand/react/shallow';
 import { selectConfig, useConfigStore } from './configSlice';
 import { ChatGPTConfigSchema, type Config } from './types';
 import { Outlet, useMatch, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 const appWindow = getCurrentWebviewWindow();
 
 function Setting() {
@@ -104,12 +105,13 @@ function SettingItem() {
   const handleSetting = useCallback(async () => {
     await createSettingWindow();
   }, []);
+  const { t } = useTranslation();
   return (
     <ListItemButton onClick={handleSetting}>
       <ListItemIcon>
         <Settings />
       </ListItemIcon>
-      <ListItemText primary="Setting" />
+      <ListItemText primary={t('settings')} />
     </ListItemButton>
   );
 }
