@@ -40,6 +40,7 @@ async function selectFolder() {
 }
 
 export default function ExportConversation({ conversation }: ExportConversationProps) {
+  const { t } = useTranslation();
   const fetchConversations = useConversationStore(useShallow(({ fetchConversations }) => fetchConversations));
   const [open, setOpen] = useState(false);
   const handleOpen = useCallback(() => setOpen(true), []);
@@ -51,11 +52,10 @@ export default function ExportConversation({ conversation }: ExportConversationP
       await exportConversation({ path, exportType, id: conversation.id });
       fetchConversations();
       handleClose();
-      await enqueueSnackbar('Exported successfully', { variant: 'success' });
+      await enqueueSnackbar(t('exported_successfully'), { variant: 'success' });
     },
-    [conversation.id, fetchConversations, handleClose],
+    [conversation.id, fetchConversations, handleClose, t],
   );
-  const { t } = useTranslation();
   return (
     <>
       <Tooltip title={t('export')}>

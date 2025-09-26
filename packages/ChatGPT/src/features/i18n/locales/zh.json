@@ -71,5 +71,9 @@
   "search_templates": "搜索模板",
   "save_conversation": "保存会话",
   "temporary_message_preview_title": "临时-{{persistentId}}-消息-{{id}}",
-  "message_preview_title": "消息-{{id}}"
+  "message_preview_title": "消息-{{id}}",
+  "copied_to_clipboard": "已复制到剪贴板",
+  "exported_successfully": "导出成功",
+  "conversation_template_deleted": "会话模板已删除",
+  "an_unknown_error_occurred": "发生了未知错误"
 }

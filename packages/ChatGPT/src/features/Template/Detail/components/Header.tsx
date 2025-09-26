@@ -73,7 +73,7 @@ export default function TemplateDetailHeader({
         const handleDelete = async () => {
           await deleteConversationTemplate({ id: value.id });
           navigate('/template');
-          enqueueSnackbar('Conversation template deleted', { variant: 'success' });
+          enqueueSnackbar(t('conversation_template_deleted'), { variant: 'success' });
         };
         return (
           <Tooltip title={t('delete')}>

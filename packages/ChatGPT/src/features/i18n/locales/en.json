@@ -71,5 +71,9 @@
   "search_templates": "Search Templates",
   "save_conversation": "Save Conversation",
   "temporary_message_preview_title": "Temporary-{{persistentId}}-Message-{{id}}",
-  "message_preview_title": "Message-{{id}}"
+  "message_preview_title": "Message-{{id}}",
+  "copied_to_clipboard": "Copied to clipboard",
+  "exported_successfully": "Exported successfully",
+  "conversation_template_deleted": "Conversation template deleted",
+  "an_unknown_error_occurred": "An unknown error occurred"
 }

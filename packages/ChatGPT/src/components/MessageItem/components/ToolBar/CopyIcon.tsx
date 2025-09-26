@@ -10,11 +10,11 @@ export interface CopyIconProps {
 }
 
 export default function CopyIcon({ content }: CopyIconProps) {
+  const { t } = useTranslation();
   const handleCopy = useCallback(async () => {
     await navigator.clipboard.writeText(content);
-    enqueueSnackbar('Copied to clipboard', { variant: 'success' });
-  }, [content]);
-  const { t } = useTranslation();
+    enqueueSnackbar(t('copied_to_clipboard'), { variant: 'success' });
+  }, [content, t]);
   return (
     <Tooltip title={t('copy')}>
       <IconButton size="small" onClick={handleCopy}>
