@@ -30,6 +30,7 @@ function AddFolder() {
     },
     [navigate],
   );
+  const { t } = useTranslation();
   return (
     <Box
       sx={{
@@ -50,7 +51,7 @@ function AddFolder() {
             <KeyboardArrowLeftIcon />
           </IconButton>
           <Typography data-tauri-drag-region variant="h6">
-            Add Folder
+            {t('add_folder')}
           </Typography>
           <Box sx={{ flexGrow: 1 }} />
           <IconButton form="folder-form" type="submit">

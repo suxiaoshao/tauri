@@ -31,6 +31,7 @@ function AddConversation() {
     [navigate],
   );
   const { state } = useLocation();
+  const { t } = useTranslation();
   return (
     <Box
       sx={{
@@ -51,7 +52,7 @@ function AddConversation() {
             <KeyboardArrowLeftIcon />
           </IconButton>
           <Typography data-tauri-drag-region variant="h6" sx={{ ml: 1 }}>
-            Add Conversation
+            {t('add_conversation')}
           </Typography>
           <Box sx={{ flexGrow: 1 }} />
           <IconButton form="conversation-form" type="submit">

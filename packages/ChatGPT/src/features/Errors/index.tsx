@@ -1,6 +1,8 @@
 import { Box, Paper, Typography } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 
 export default function Error() {
+  const { t } = useTranslation();
   return (
     <Box sx={{ width: '100%', height: '100%' }} component={Paper} square>
       <Box
@@ -14,10 +16,10 @@ export default function Error() {
         }}
       >
         <Typography variant="h5" gutterBottom component="div">
-          Error
+          {t('error')}
         </Typography>
         <Typography variant="body1" gutterBottom component="div">
-          Please set your openai api key in setting page.
+          {t('error_page_message')}
         </Typography>
       </Box>
     </Box>

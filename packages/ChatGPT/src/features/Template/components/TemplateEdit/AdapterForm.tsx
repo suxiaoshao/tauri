@@ -7,6 +7,7 @@ import { Box, Divider, MenuItem, TextField } from '@mui/material';
 import { Controller, useFormContext, useWatch } from 'react-hook-form';
 import { match } from 'ts-pattern';
 import type { TemplateForm } from '.';
+import { useTranslation } from 'react-i18next';
 
 export default function AdapterForm() {
   const { control } = useFormContext<TemplateForm>();
@@ -15,6 +16,7 @@ export default function AdapterForm() {
     name: 'adapter',
   });
   const [data, fn] = usePromise(getAllAdapterTemplateInputs);
+  const { t } = useTranslation();
 
   const content = match(data)
     .with({ tag: PromiseStatus.loading }, () => <Loading sx={{ width: '100%', height: '100%' }} />)
@@ -30,7 +32,7 @@ export default function AdapterForm() {
               error={!!fieldState?.error?.message}
               helperText={fieldState?.error?.message}
               select
-              label="Adapter"
+              label={t('adapter')}
               required
               fullWidth
               {...field}

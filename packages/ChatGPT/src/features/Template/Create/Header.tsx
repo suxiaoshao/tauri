@@ -8,6 +8,7 @@
 import { Publish } from '@mui/icons-material';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import { Box, IconButton, Typography } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 export interface TemplateCreateHeaderProps {
@@ -16,6 +17,7 @@ export interface TemplateCreateHeaderProps {
 
 export default function TemplateCreateHeader({ formId }: TemplateCreateHeaderProps) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   return (
     <Box
       data-tauri-drag-region
@@ -32,7 +34,7 @@ export default function TemplateCreateHeader({ formId }: TemplateCreateHeaderPro
           <KeyboardArrowLeftIcon />
         </IconButton>
         <Typography data-tauri-drag-region variant="h6" component="span">
-          Create Template
+          {t('create_template')}
         </Typography>
       </Box>
       <IconButton type="submit" form={formId}>

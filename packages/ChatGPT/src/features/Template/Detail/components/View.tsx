@@ -12,9 +12,11 @@ import CustomMarkdown from '@chatgpt/components/Markdown';
 import type { AdapterInputs } from '@chatgpt/types/adapter';
 import { Role } from '@chatgpt/types/common';
 import { type ConversationTemplate } from '@chatgpt/types/conversationTemplate';
+import { getRoleKey } from '@chatgpt/utils/getRoleKey';
 import { Avatar, Box, Divider, List, ListItem, ListItemAvatar, ListItemText, Typography } from '@mui/material';
 import { Details, type DetailsItem } from 'details';
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { format } from 'time';
 import { match } from 'ts-pattern';
 
@@ -23,11 +25,12 @@ export interface TemplateDetailViewProps {
   inputs: AdapterInputs;
 }
 export default function TemplateDetailView({ data, inputs }: TemplateDetailViewProps) {
+  const { t } = useTranslation();
   const items = useMemo<DetailsItem[]>(
     () => [
-      { label: 'name', value: data.name },
-      { label: 'Icon', value: data.icon },
-      { label: 'Mode', value: data.mode },
+      { label: t('name'), value: data.name },
+      { label: t('icon'), value: data.icon },
+      { label: t('mode'), value: data.mode },
       ...inputs.inputs.map(
         (input) =>
           ({
@@ -35,21 +38,21 @@ export default function TemplateDetailView({ data, inputs }: TemplateDetailViewP
             value: data.template?.[input.id] as React.ReactNode,
           }) as DetailsItem,
       ),
-      { label: 'Created At', value: format(data.createdTime) },
-      { label: 'Updated At', value: format(data.updatedTime) },
-      { label: 'Description', value: data.description, span: 3 },
+      { label: t('created_at'), value: format(data.createdTime) },
+      { label: t('updated_at'), value: format(data.updatedTime) },
+      { label: t('description'), value: data.description, span: 3 },
     ],
-    [data, inputs],
+    [data, inputs, t],
   );
   return (
     <Box sx={{ flex: '1 1 0', overflowY: 'auto' }}>
       <Typography sx={{ ml: 2, mt: 2 }} variant="h6">
-        Base Information
+        {t('base_information')}
       </Typography>
       <Details sx={{ p: 2 }} items={items} />
       <Divider variant="middle" sx={{ mt: 1, mb: 1 }} />
       <Typography sx={{ ml: 2 }} variant="h6">
-        Prompts
+        {t('prompts')}
       </Typography>
       <List>
         {data.prompts.map((prompt) => {
@@ -65,7 +68,10 @@ export default function TemplateDetailView({ data, inputs }: TemplateDetailViewP
                 <ListItemAvatar>
                   <Avatar src={avatar} />
                 </ListItemAvatar>
-                <ListItemText primary={prompt.role} secondary={<CustomMarkdown value={prompt.prompt} />} />
+                <ListItemText
+                  primary={t(getRoleKey(prompt.role))}
+                  secondary={<CustomMarkdown value={prompt.prompt} />}
+                />
               </ListItem>
               <Divider sx={{ mr: 2 }} variant="inset" component="li" />
             </React.Fragment>

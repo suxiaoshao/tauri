@@ -11,6 +11,7 @@ import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useShallow } from 'zustand/react/shallow';
 import { selectTemplateCount, useTemplateStore } from '../../templateSlice';
+import { useTranslation } from 'react-i18next';
 
 export default function TemplateListHeader() {
   const { count, fetchTemplates } = useTemplateStore(
@@ -23,6 +24,7 @@ export default function TemplateListHeader() {
   const goToCreate = useCallback(() => {
     navigate('/template/create');
   }, [navigate]);
+  const { t } = useTranslation();
   return (
     <Box
       data-tauri-drag-region
@@ -36,17 +38,10 @@ export default function TemplateListHeader() {
     >
       <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', ml: 1 }} data-tauri-drag-region>
         <Typography data-tauri-drag-region variant="h6" component="span">
-          Conversation Templates
+          {t('conversation_templates')}
         </Typography>
-        <Typography
-          sx={{ ml: 1 }}
-          data-tauri-drag-region
-          variant="body2"
-          color="inherit"
-          component="span"
-          paragraph={false}
-        >
-          {count} Templates
+        <Typography sx={{ ml: 1 }} data-tauri-drag-region variant="body2" color="inherit" component="p">
+          {count} {t('templates')}
         </Typography>
       </Box>
       <IconButton onClick={refresh}>
