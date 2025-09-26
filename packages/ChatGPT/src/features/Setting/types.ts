@@ -6,11 +6,18 @@ export enum Theme {
   System = 'system',
 }
 
+export enum Language {
+  English = 'en',
+  Chinese = 'zh',
+  System = 'system',
+}
+
 export const ChatGPTConfigSchema = object({
   theme: object({
     theme: enum_(Theme),
     color: pipe(string(), regex(/^#(?:[0-9a-fA-F]{3}){1,2}$/, 'Invalid color format')),
   }),
+  language: enum_(Language),
   httpProxy: nullish(pipe(string(), url())),
   temporaryHotkey: nullish(string()),
   adapterSettings: record(string(), any()),

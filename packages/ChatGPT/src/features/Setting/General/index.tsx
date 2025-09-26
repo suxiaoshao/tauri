@@ -2,7 +2,7 @@ import HotkeyInput from '@chatgpt/components/HotkeyInput';
 import { Box, TextField, MenuItem, InputLabel, FormLabel } from '@mui/material';
 import { Controller, useFormContext } from 'react-hook-form';
 import { match } from 'ts-pattern';
-import { type Config, Theme } from '../types';
+import { type Config, Language, Theme } from '../types';
 
 export default function GeneralSettings() {
   const {
@@ -47,6 +47,27 @@ export default function GeneralSettings() {
       </InputLabel>
       <Box component="input" id="color-input" type="color" {...register('theme.color', { required: true })} />
       <Box sx={{ color: 'error.main' }}>{errors.theme?.color?.message}</Box>
+      <Controller
+        control={control}
+        name="language"
+        rules={{ required: true }}
+        render={({ field, fieldState }) => (
+          <TextField
+            required
+            {...field}
+            label="Language"
+            select
+            fullWidth
+            sx={{ mt: 2 }}
+            error={!!fieldState.error?.message}
+            helperText={fieldState.error?.message}
+          >
+            <MenuItem value={Language.System}>{Language.System}</MenuItem>
+            <MenuItem value={Language.Chinese}>{Language.Chinese}</MenuItem>
+            <MenuItem value={Language.English}>{Language.English}</MenuItem>
+          </TextField>
+        )}
+      />
       <TextField
         {...register('httpProxy', {
           setValueAs: (value) => {

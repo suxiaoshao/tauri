@@ -60,10 +60,6 @@ export function CustomTheme({ children }: CustomThemeProps) {
 
 export { argbFromHex, hexFromArgb, themeFromSourceColor } from '@material/material-color-utilities';
 
-export { selectActiveYouTheme } from './themeSlice';
-
-export { default as ThemeDrawerItem } from './components/ThemeDrawerItem';
-
 export { youThemeToMuiTheme } from './utils/youTheme';
 
 export { default as setYouThemeToCssVars } from './utils/cssVar';

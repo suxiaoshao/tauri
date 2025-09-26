@@ -7,7 +7,7 @@
  */
 import { getConfig } from '@chatgpt/service/config';
 import { create } from 'zustand';
-import { type Config, Theme } from './types';
+import { type Config, Language, Theme } from './types';
 
 interface ConfigState extends Config {
   setConfig: (config: Config) => void;
@@ -20,6 +20,7 @@ export const useConfigStore = create<ConfigState>((set) => ({
     color: '#3271ae',
     theme: Theme.System,
   },
+  language: Language.System,
   url: null,
   httpProxy: '',
   models: [],
