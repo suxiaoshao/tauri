@@ -75,5 +75,6 @@
   "copied_to_clipboard": "已复制到剪贴板",
   "exported_successfully": "导出成功",
   "conversation_template_deleted": "会话模板已删除",
-  "an_unknown_error_occurred": "发生了未知错误"
+  "an_unknown_error_occurred": "发生了未知错误",
+  "message_id_is_empty": "消息 ID 为空"
 }
