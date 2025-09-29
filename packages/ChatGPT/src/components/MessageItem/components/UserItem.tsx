@@ -17,6 +17,7 @@ import ViewIcon from './ToolBar/ViewIcon';
 import { useEffect, useState } from 'react';
 import { match } from 'ts-pattern';
 import { getSourceContent } from '@chatgpt/utils/content';
+import { useTranslation } from 'react-i18next';
 
 export interface UserItemProps {
   message: BaseMessage;
@@ -27,12 +28,13 @@ export default function UserItem({ message, selected }: UserItemProps) {
   const [ref, setRef] = useState<HTMLDivElement | null>(null);
   useEffect(() => {
     if (ref && selected) {
-      ref?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+      ref?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     }
   }, [ref, selected]);
   const sx = match(selected)
     .with(true, () => ({ ...MessageSx, ...MessageSelectedSx }))
     .otherwise(() => MessageSx);
+  const { t } = useTranslation();
   return (
     <>
       <Box sx={sx} ref={setRef}>
@@ -48,7 +50,7 @@ export default function UserItem({ message, selected }: UserItemProps) {
           <CopyIcon content={getSourceContent(message.content)} />
           {match(message.content)
             .with({ tag: 'extension' }, ({ value: { extensionName } }) => (
-              <Chip label={`plugun:${extensionName}`} size="small" />
+              <Chip label={t('plugin_name', { name: extensionName })} size="small" />
             ))
             .otherwise(() => null)}
         </ToolBar>

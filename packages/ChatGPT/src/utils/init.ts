@@ -17,8 +17,8 @@ import { resolveRouterEvent } from './router';
 import { useExtensionStore } from '@chatgpt/features/Extensions/extensionSlice';
 const appWindow = getCurrentWebviewWindow();
 
-export async function initForFetch() {
-  await Promise.all([
+function initForFetch() {
+  return Promise.all([
     useConversationStore.getState().fetchConversations(),
     useConfigStore.getState().fetchConfig(),
     useTemplateStore.getState().fetchTemplates(),
@@ -26,7 +26,7 @@ export async function initForFetch() {
   ]);
 }
 
-export async function initForListen() {
+async function initForListen() {
   // listen for messages and config changes simultaneously
   await Promise.all([
     appWindow.listen<Message>('message', (response) => {

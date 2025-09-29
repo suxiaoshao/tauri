@@ -14,7 +14,7 @@ export interface NumberFieldProps extends Omit<TextFieldProps, 'type' | 'onChang
   ref: React.Ref<HTMLInputElement | null>;
 }
 
-export function customParseFloat(value: unknown): number {
+function customParseFloat(value: unknown): number {
   return match(value)
     .with(P.number, (v) => v)
     .with(P.string, (v) => {
@@ -27,7 +27,7 @@ export function customParseFloat(value: unknown): number {
     .otherwise(() => 0);
 }
 
-export function proxy<T>(source: T): T {
+function proxy<T>(source: T): T {
   switch (typeof source) {
     case 'object':
     case 'function': {

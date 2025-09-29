@@ -76,5 +76,6 @@
   "exported_successfully": "Exported successfully",
   "conversation_template_deleted": "Conversation template deleted",
   "an_unknown_error_occurred": "An unknown error occurred",
-  "message_id_is_empty": "Message ID is empty"
+  "message_id_is_empty": "Message ID is empty",
+  "plugin_name": "plugin:{{name}}"
 }

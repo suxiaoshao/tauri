@@ -1,6 +1,6 @@
 import { check, forward, type InferInput, integer, minValue, number, object, pipe, string, url } from 'valibot';
 
-export const fetchInputSchema = pipe(
+const fetchInputSchema = pipe(
   object({
     url: pipe(string(), url()),
     startPage: pipe(number(), integer(), minValue(1)),
