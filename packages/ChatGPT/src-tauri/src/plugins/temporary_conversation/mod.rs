@@ -6,6 +6,8 @@
  * @FilePath: /tauri/packages/ChatGPT/src-tauri/src/plugins/temporary_conversation/mod.rs
  */
 use history::TemporaryStore;
+use objc2::rc::Retained;
+use objc2_app_kit::{NSApplicationActivationOptions, NSRunningApplication, NSWorkspace};
 use serde_json::Value;
 use std::sync::{Arc, Mutex};
 use tauri::{AppHandle, Manager, Runtime, WebviewWindow, WebviewWindowBuilder, WindowEvent};
@@ -138,17 +140,61 @@ pub fn on_shortcut_trigger<R: Runtime>(
     Ok(())
 }
 
+fn record_frontmost_app() -> Option<Retained<NSRunningApplication>> {
+    // 获取 [NSWorkspace sharedWorkspace].frontmostApplication
+    let workspace = unsafe { NSWorkspace::sharedWorkspace() };
+    unsafe { workspace.frontmostApplication() }
+}
+
+fn restore_frontmost_app(prev_app: &Option<Retained<NSRunningApplication>>) {
+    // 调用 [prevApp activateWithOptions:NSApplicationActivateIgnoringOtherApps]
+    const NSAPPLICATION_ACTIVATE_IGNORING_OTHER_APPS: usize = 1 << 1;
+    if let Some(app) = prev_app.as_ref() {
+        unsafe {
+            app.activateWithOptions(NSApplicationActivationOptions(
+                NSAPPLICATION_ACTIVATE_IGNORING_OTHER_APPS,
+            ));
+        }
+    }
+}
+
+type FrontmostApp = Arc<Mutex<Option<Retained<NSRunningApplication>>>>;
+
 pub fn trigger_temp_window<R: Runtime>(app: &AppHandle<R>) -> ChatGPTResult<()> {
     match app.get_webview_window(TEMPORARY_WINDOW) {
         Some(window) => {
             if window.is_visible()? {
                 window.hide()?;
+                let prev_app = app.try_state::<FrontmostApp>();
+                if let Some(prev_app) = prev_app {
+                    let prev_app = prev_app.inner().lock().unwrap();
+
+                    restore_frontmost_app(&prev_app);
+                };
             } else {
+                let prev_app = record_frontmost_app();
+                match app.try_state::<FrontmostApp>() {
+                    Some(old_prev_app) => {
+                        *old_prev_app.lock().unwrap() = prev_app;
+                    }
+                    None => {
+                        app.manage(Arc::new(Mutex::new(prev_app)));
+                    }
+                }
                 window.show()?;
                 window.set_focus()?;
             }
         }
         None => {
+            let prev_app = record_frontmost_app();
+            match app.try_state::<FrontmostApp>() {
+                Some(old_prev_app) => {
+                    *old_prev_app.lock().unwrap() = prev_app;
+                }
+                None => {
+                    app.manage(Arc::new(Mutex::new(prev_app)));
+                }
+            }
             create_temporary_window(app)?;
         }
     }
