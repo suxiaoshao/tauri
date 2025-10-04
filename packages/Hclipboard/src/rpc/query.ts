@@ -15,3 +15,7 @@ export type QueryHistoryResponse = ClipHistory[];
 export async function query(data: QueryHistoryRequest): Promise<QueryHistoryResponse> {
   return await invoke('plugin:clipboard|query_history', data as InvokeArgs);
 }
+
+export async function copyToClipboard(data: string): Promise<void> {
+  await invoke('plugin:clipboard|copy_to_clipboard', { data } as InvokeArgs);
+}

@@ -9,7 +9,7 @@ mod shortcut;
 
 pub struct WindowPlugin;
 
-pub use shortcut::on_short;
+pub use shortcut::{FrontmostApp, on_short, restore_frontmost_app};
 
 impl<R: Runtime> tauri::plugin::Plugin<R> for WindowPlugin {
     fn name(&self) -> &'static str {

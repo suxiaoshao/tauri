@@ -6,14 +6,14 @@
  * @FilePath: /self-tools/Users/sushao/Documents/code/tauri/packages/Hclipboard/src/pages/Home/index.tsx
  */
 import { Box, List, TextField } from '@mui/material';
-import { writeText } from '@tauri-apps/plugin-clipboard-manager';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useKey } from 'react-use';
+import { match } from 'ts-pattern';
+import { copyToClipboard } from '../../rpc/query';
 import HistoryItem from './components/HistoryItem';
 import useClipData from './hooks/useClipData';
-import { match } from 'ts-pattern';
 const appWindow = getCurrentWebviewWindow();
 
 export default function Home() {
@@ -43,8 +43,7 @@ export default function Home() {
     'Enter',
     async () => {
       const item = data[selectIndex];
-      await writeText(item.data);
-      await appWindow.hide();
+      await copyToClipboard(item.data);
     },
     undefined,
     [data, selectIndex],

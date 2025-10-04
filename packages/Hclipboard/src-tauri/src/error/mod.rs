@@ -52,6 +52,24 @@ pub enum ClipError {
     Vibrancy,
     #[error("global shortcuts:{}",.0)]
     GlobalShortcuts(#[from] tauri_plugin_global_shortcut::Error),
+    #[error("enigo error:{}",.0)]
+    EnigoNewCon(
+        #[serde(skip_serializing)]
+        #[from]
+        enigo::NewConError,
+    ),
+    #[error("enigo error:{}",.0)]
+    EnigoInput(
+        #[serde(skip_serializing)]
+        #[from]
+        enigo::InputError,
+    ),
+    #[error("clipboard error:{}",.0)]
+    Clipboard(
+        #[serde(skip_serializing)]
+        #[from]
+        tauri_plugin_clipboard_manager::Error,
+    ),
 }
 
 impl From<tauri::Error> for ClipError {

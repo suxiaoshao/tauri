@@ -31,7 +31,7 @@ time = { version = "0.3.44", features = ["serde"] }
 pinyin = "0.10.0"
 
 # 错误处理
-thiserror = "2.0.16"
+thiserror = "2.0.17"
 
 # log
 tauri-plugin-log = { version = "2.7.0" }
@@ -66,6 +66,7 @@ tauri-plugin-notification = "2.3.1"
 tauri-plugin-os = "2.3.1"
 tauri-plugin-opener = "2.5.0"
 tauri-plugin-dialog = "2.4.0"
+tauri-plugin-positioner = "2.3.0"
 
 # extension
 wasmtime = { version = "37.0.1" }
