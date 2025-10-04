@@ -4,7 +4,7 @@ fn main() {
             "clipboard",
             tauri_build::InlinedPlugin::new()
                 .default_permission(tauri_build::DefaultPermissionRule::AllowAllCommands)
-                .commands(&["query_history"]),
+                .commands(&["query_history", "copy_to_clipboard"]),
         ),
     )
     .unwrap();

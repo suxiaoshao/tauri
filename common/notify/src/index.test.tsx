@@ -17,8 +17,8 @@ describe('notify', () => {
   });
   it('use enqueueSnackbar fn', async () => {
     mockIPC((cmd, _args) => {
+      // oxlint-disable-next-line no-conditional-in-test
       if (cmd === 'plugin:notification|is_permission_granted') {
-        // oxlint-disable-line no-conditional-in-test
         return true;
       }
     });
