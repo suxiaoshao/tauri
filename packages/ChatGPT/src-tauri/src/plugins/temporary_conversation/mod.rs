@@ -12,6 +12,7 @@ use serde_json::Value;
 use std::sync::{Arc, Mutex};
 use tauri::{AppHandle, Manager, Runtime, WebviewWindow, WebviewWindowBuilder, WindowEvent};
 use tauri_plugin_global_shortcut::{GlobalShortcutExt, Shortcut};
+use tauri_plugin_positioner::{Position, WindowExt};
 
 use crate::errors::ChatGPTResult;
 
@@ -168,7 +169,6 @@ pub fn trigger_temp_window<R: Runtime>(app: &AppHandle<R>) -> ChatGPTResult<()> 
                 let prev_app = app.try_state::<FrontmostApp>();
                 if let Some(prev_app) = prev_app {
                     let prev_app = prev_app.inner().lock().unwrap();
-
                     restore_frontmost_app(&prev_app);
                 };
             } else {
@@ -182,6 +182,7 @@ pub fn trigger_temp_window<R: Runtime>(app: &AppHandle<R>) -> ChatGPTResult<()> 
                     }
                 }
                 window.show()?;
+                window.move_window(Position::Center)?;
                 window.set_focus()?;
             }
         }
@@ -228,5 +229,6 @@ pub fn create_temporary_window<R: Runtime>(app: &AppHandle<R>) -> ChatGPTResult<
         window.set_transparent_titlebar()?;
     }
     window.hide_menu()?;
+    window.move_window(Position::Center)?;
     Ok(window)
 }
