@@ -9,7 +9,9 @@ mod shortcut;
 
 pub struct WindowPlugin;
 
-pub use shortcut::{FrontmostApp, on_short, restore_frontmost_app};
+pub use shortcut::on_short;
+#[cfg(target_os = "macos")]
+pub use shortcut::{FrontmostApp, restore_frontmost_app};
 
 impl<R: Runtime> tauri::plugin::Plugin<R> for WindowPlugin {
     fn name(&self) -> &'static str {

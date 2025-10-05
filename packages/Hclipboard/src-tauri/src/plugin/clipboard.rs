@@ -1,6 +1,7 @@
+#[cfg(target_os = "macos")]
+use crate::plugin::window::{FrontmostApp, restore_frontmost_app};
 use crate::{
     error::{ClipError, ClipResult},
-    plugin::window::{FrontmostApp, restore_frontmost_app},
     store::{self, DbConn, History},
 };
 use enigo::{Enigo, Keyboard, Settings};
@@ -64,12 +65,19 @@ fn query_history(
 
 #[tauri::command]
 fn copy_to_clipboard<R: Runtime>(data: String, app_handle: AppHandle<R>) -> ClipResult<()> {
-    if let Some(prev_app) = app_handle.try_state::<FrontmostApp>() {
-        let prev_app = prev_app.inner().lock().unwrap();
-        restore_frontmost_app(&prev_app);
-        app_handle.clipboard().write_text(&data)?;
-        let mut enigo = Enigo::new(&Settings::default())?;
-        enigo.text(&data)?;
+    if cfg!(target_os = "macos") {
+        #[cfg(target_os = "macos")]
+        {
+            if let Some(prev_app) = app_handle.try_state::<FrontmostApp>() {
+                let prev_app = prev_app.inner().lock().unwrap();
+                restore_frontmost_app(&prev_app);
+                app_handle.clipboard().write_text(&data)?;
+            }
+        }
+    } else if let Some(window) = app_handle.get_webview_window("main") {
+        window.hide()?;
     }
+    let mut enigo = Enigo::new(&Settings::default())?;
+    enigo.text(&data)?;
     Ok(())
 }
