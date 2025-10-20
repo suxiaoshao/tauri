@@ -65,11 +65,7 @@ pub enum ClipError {
         enigo::InputError,
     ),
     #[error("clipboard error:{}",.0)]
-    Clipboard(
-        #[serde(skip_serializing)]
-        #[from]
-        tauri_plugin_clipboard_manager::Error,
-    ),
+    Clipboard(String),
 }
 
 impl From<tauri::Error> for ClipError {

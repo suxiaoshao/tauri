@@ -1,13 +1,14 @@
 #[cfg(target_os = "macos")]
 use crate::plugin::window::{FrontmostApp, restore_frontmost_app};
 use crate::{
+    clipboard::Clipboard,
     error::{ClipError, ClipResult},
     store::{self, DbConn, History},
 };
+use clipboard_rs::ClipboardWatcher;
 use enigo::{Enigo, Keyboard, Settings};
 use serde_json::Value;
 use tauri::{AppHandle, Manager, Runtime, ipc::Invoke};
-use tauri_plugin_clipboard_manager::ClipboardExt;
 
 pub struct ClipboardPlugin;
 
@@ -43,13 +44,14 @@ fn setup<R: Runtime>(app: &AppHandle<R>) -> ClipResult<()> {
     // database connection
     let conn = store::establish_connection(&data_path)?;
     app.manage(conn);
-
-    let app2 = app.clone();
     let conn = app.state::<DbConn>().get()?;
+    let clip = Clipboard::new(conn)?;
+    let mut watch = clip.init()?;
+    let shutdown_channel = watch.get_shutdown_channel();
     std::thread::spawn(move || {
-        let clip = app2.clipboard();
-        crate::clipboard::Clipboard::init(clip, conn);
+        watch.start_watch();
     });
+    app.manage(shutdown_channel);
     Ok(())
 }
 
@@ -69,9 +71,13 @@ fn copy_to_clipboard<R: Runtime>(data: String, app_handle: AppHandle<R>) -> Clip
         #[cfg(target_os = "macos")]
         {
             if let Some(prev_app) = app_handle.try_state::<FrontmostApp>() {
+                use clipboard_rs::{Clipboard, ClipboardContext};
                 let prev_app = prev_app.inner().lock().unwrap();
                 restore_frontmost_app(&prev_app);
-                app_handle.clipboard().write_text(&data)?;
+                let ctx =
+                    ClipboardContext::new().map_err(|err| ClipError::Clipboard(err.to_string()))?;
+                ctx.set_text(data.clone())
+                    .map_err(|err| ClipError::Clipboard(err.to_string()))?;
             }
         }
     } else if let Some(window) = app_handle.get_webview_window("main") {

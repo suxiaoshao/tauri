@@ -19,8 +19,7 @@ fn main() -> ClipResult<()> {
         app.set_activation_policy(tauri::ActivationPolicy::Accessory);
         Ok(())
     });
-    app.plugin(tauri_plugin_clipboard_manager::init())
-        .plugin(tauri_plugin_notification::init())
+    app.plugin(tauri_plugin_notification::init())
         .plugin(
             tauri_plugin_log::Builder::default()
                 .level(LevelFilter::Info)

@@ -5,28 +5,32 @@
  * @LastEditTime: 2025-02-07 01:46:30
  * @FilePath: /tauri/packages/Hclipboard/src-tauri/src/clipboard/mod.rs
  */
-use clipboard_master::CallbackResult;
+use clipboard_rs::{
+    Clipboard as ClipboardTrait, ClipboardContext, ClipboardHandler, ClipboardWatcher,
+    ClipboardWatcherContext,
+};
 use diesel::{
     SqliteConnection,
     r2d2::{ConnectionManager, PooledConnection},
 };
 use log::warn;
-use tauri::Runtime;
-use tauri_plugin_clipboard_manager::Clipboard as ClipboardManager;
 
-use crate::{error::ClipResult, store::History};
+use crate::{
+    error::{ClipError, ClipResult},
+    store::History,
+};
 
 type ClipConn = PooledConnection<ConnectionManager<SqliteConnection>>;
 
-pub struct Clipboard<'a, R: Runtime> {
+pub struct Clipboard {
     old_data: String,
-    clip: &'a ClipboardManager<R>,
     conn: ClipConn,
+    ctx: ClipboardContext,
 }
 
-impl<'a, R: Runtime> Clipboard<'a, R> {
+impl Clipboard {
     fn update(&mut self) -> ClipResult<()> {
-        if let Ok(text) = self.clip.read_text()
+        if let Ok(text) = self.ctx.get_text()
             && self.old_data != text
         {
             #[cfg(debug_assertions)]
@@ -36,24 +40,25 @@ impl<'a, R: Runtime> Clipboard<'a, R> {
         }
         Ok(())
     }
-    pub fn new(clip: &'a ClipboardManager<R>, conn: ClipConn) -> Self {
-        Self {
+    pub fn new(conn: ClipConn) -> ClipResult<Self> {
+        let ctx = ClipboardContext::new().map_err(|err| ClipError::Clipboard(err.to_string()))?;
+        Ok(Self {
             old_data: String::new(),
-            clip,
             conn,
-        }
+            ctx,
+        })
     }
-    pub fn init(clip: &'a ClipboardManager<R>, conn: ClipConn) {
-        let clip = Self::new(clip, conn);
-        let _ = clipboard_master::Master::new(clip).run();
+    pub fn init(self) -> ClipResult<ClipboardWatcherContext<Clipboard>> {
+        let mut watcher =
+            ClipboardWatcherContext::new().map_err(|err| ClipError::Clipboard(err.to_string()))?;
+        watcher.add_handler(self);
+        Ok(watcher)
     }
 }
-
-impl<R: Runtime> clipboard_master::ClipboardHandler for Clipboard<'_, R> {
-    fn on_clipboard_change(&mut self) -> CallbackResult {
+impl ClipboardHandler for Clipboard {
+    fn on_clipboard_change(&mut self) {
         if let Err(err) = self.update() {
             warn!("update clipboard error:{err}")
         }
-        CallbackResult::Next
     }
 }
