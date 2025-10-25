@@ -1,16 +1,15 @@
 import { SnackbarProvider } from 'notify';
 import { BrowserRouter } from 'react-router-dom';
-import { CustomTheme } from 'theme';
 import AppRouter from './components/AppRouter';
+import { useListenColorMode } from './features/theme';
 function App() {
+  useListenColorMode();
   return (
-    <CustomTheme>
-      <SnackbarProvider>
-        <BrowserRouter>
-          <AppRouter />
-        </BrowserRouter>
-      </SnackbarProvider>
-    </CustomTheme>
+    <SnackbarProvider>
+      <BrowserRouter>
+        <AppRouter />
+      </BrowserRouter>
+    </SnackbarProvider>
   );
 }
 

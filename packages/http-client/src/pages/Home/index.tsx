@@ -66,6 +66,7 @@ export default function Home() {
         onChange={async (e) => {
           const data: AppPath[] = await invoke('app_search', { path: e.target.value });
           setAppPath(data);
+          // oxlint-disable-next-line no-console
           console.log(data);
         }}
         onKeyDown={(e) => {

@@ -1,86 +1,58 @@
-import { Box, Divider, Drawer, Link, ListItemButton, Typography } from '@mui/material';
-import { encodeNonAsciiHTML } from 'entities';
-import { useMemo, useState } from 'react';
-import { type ClipHistory } from '../../../rpc/query';
-import formatTime from '../../../utils/formatTime';
+import { Text, File, Image, CodeXml, Code } from 'lucide-react';
+import { ClipType, type ClipHistory } from '../hooks/useClipData';
+import { match } from 'ts-pattern';
+import { cn } from '@hclipboard/lib/utils';
 
 export interface HistoryItemProps {
   item: ClipHistory;
   selected: boolean;
-  isLast: boolean;
-  index: number;
-  onClick?: () => void;
-  ref?: React.Ref<HTMLDivElement> | undefined;
+  onPointerMove?: () => void;
+  ref?: React.Ref<HTMLLIElement>;
 }
 
-export default function HistoryItem({
-  item: { data, updateTime },
-  selected,
-  isLast,
-  index,
-  onClick,
-  ref,
-}: HistoryItemProps) {
-  // 设置空格
-  const dataList = useMemo(
-    () => data.split('\n').map((value) => encodeNonAsciiHTML(value).replaceAll(' ', '&nbsp;')),
-    [data],
-  );
-  const [open, setOpen] = useState(false);
+export default function HistoryItem({ item: { data, type }, selected, ref, onPointerMove }: HistoryItemProps) {
+  const decoder = new TextDecoder('utf8');
   return (
-    <>
-      <ListItemButton ref={ref} sx={{ display: 'flex', overflowX: 'hidden' }} selected={selected} onClick={onClick}>
-        <Box sx={{ flex: '0 0 80px' }}>
-          <Typography color="text.secondary" variant="body2">
-            {formatTime(updateTime)}
-          </Typography>
-        </Box>
-        <Box sx={{ flex: '1 1 calc(100% - 110px)', maxWidth: 'calc(100% - 110px)' }}>
-          <Box sx={{ maxHeight: '120px', overflowY: 'hidden', width: '100%' }}>
-            <Box sx={{ width: '100%' }}>
-              {dataList.map((value, index) => (
-                <Typography
-                  sx={{ width: '100%', wordBreak: 'break-all' }}
-                  variant="body1"
-                  // eslint-disable-next-line no-danger
-                  dangerouslySetInnerHTML={{ __html: value }}
-                  key={index}
-                />
-              ))}
-            </Box>
-          </Box>
-          {dataList.length > 6 && (
-            <Link
-              onClick={(event) => {
-                event.stopPropagation();
-                setOpen(true);
-              }}
-              variant="body2"
-            >
-              查看全部 {'>>'}
-            </Link>
-          )}
-        </Box>
-        <Box sx={{ flex: '0 0 30px' }}>
-          <Typography align="right" color="text.secondary" variant="body2">
-            {index + 1}
-          </Typography>
-        </Box>
-      </ListItemButton>
-      {!isLast && <Divider />}
-      <Drawer anchor="right" open={open} onClose={() => setOpen(false)}>
-        <Box sx={{ padding: 1, width: '60vw' }}>
-          {dataList.map((value, index) => (
-            <Typography
-              sx={{ width: '100%', wordBreak: 'break-all' }}
-              variant="body1"
-              // eslint-disable-next-line no-danger
-              dangerouslySetInnerHTML={{ __html: value }}
-              key={index}
-            />
-          ))}
-        </Box>
-      </Drawer>
-    </>
+    <li
+      className={cn(
+        'flex gap-2 px-2 py-3 text-sm outline-hidden select-none',
+        selected && 'bg-accent text-accent-foreground',
+      )}
+      ref={ref}
+      onPointerMove={onPointerMove}
+    >
+      {match(type)
+        .with(ClipType.Text, () => (
+          <>
+            <Text />
+            <span className="truncate">{decoder.decode(data)}</span>
+          </>
+        ))
+        .with(ClipType.Image, () => (
+          <>
+            <Image />
+            <span></span>
+          </>
+        ))
+        .with(ClipType.Files, () => (
+          <>
+            <File />
+            <span></span>
+          </>
+        ))
+        .with(ClipType.Rtf, () => (
+          <>
+            <Code />
+            <span></span>
+          </>
+        ))
+        .with(ClipType.Html, () => (
+          <>
+            <CodeXml />
+            <span></span>
+          </>
+        ))
+        .exhaustive()}
+    </li>
   );
 }

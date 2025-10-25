@@ -5,10 +5,14 @@ use crate::{
     error::{ClipError, ClipResult},
     store::{self, DbConn, History},
 };
+use ciborium::into_writer;
 use clipboard_rs::ClipboardWatcher;
 use enigo::{Enigo, Keyboard, Settings};
 use serde_json::Value;
-use tauri::{AppHandle, Manager, Runtime, ipc::Invoke};
+use tauri::{
+    AppHandle, Manager, Runtime,
+    ipc::{Invoke, Response},
+};
 
 pub struct ClipboardPlugin;
 
@@ -56,13 +60,12 @@ fn setup<R: Runtime>(app: &AppHandle<R>) -> ClipResult<()> {
 }
 
 #[tauri::command]
-fn query_history(
-    search_name: Option<String>,
-    state: tauri::State<DbConn>,
-) -> ClipResult<Vec<History>> {
+fn query_history(search_name: Option<String>, state: tauri::State<DbConn>) -> ClipResult<Response> {
     let mut conn = state.get()?;
-    let data = History::query(search_name.as_ref(), &mut conn)?;
-    Ok(data)
+    let data = History::query(search_name.as_ref().map(|data| data.as_bytes()), &mut conn)?;
+    let mut bytes = Vec::new();
+    into_writer(&data, &mut bytes)?;
+    Ok(Response::new(bytes))
 }
 
 #[tauri::command]

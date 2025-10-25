@@ -66,6 +66,18 @@ pub enum ClipError {
     ),
     #[error("clipboard error:{}",.0)]
     Clipboard(String),
+    #[error("serde error:{}",.0)]
+    Serde(
+        #[serde(skip_serializing)]
+        #[from]
+        serde_json::Error,
+    ),
+    #[error("ciborium error:{}",.0)]
+    Ciborium(
+        #[serde(skip_serializing)]
+        #[from]
+        ciborium::ser::Error<std::io::Error>,
+    ),
 }
 
 impl From<tauri::Error> for ClipError {

@@ -1,0 +1,22 @@
+{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "style": "new-york",
+  "rsc": false,
+  "tsx": true,
+  "tailwind": {
+    "config": "",
+    "css": "src/index.css",
+    "baseColor": "neutral",
+    "cssVariables": true,
+    "prefix": ""
+  },
+  "iconLibrary": "lucide",
+  "aliases": {
+    "components": "@hclipboard/components",
+    "utils": "@hclipboard/lib/utils",
+    "ui": "@hclipboard/components/ui",
+    "lib": "@hclipboard/lib",
+    "hooks": "@hclipboard/hooks"
+  },
+  "registries": {}
+}

@@ -17,7 +17,8 @@
     "jsx": "react-jsx",
     "paths": {
       "@chatgpt/*": ["./packages/ChatGPT/src/*"],
-      "@feiwen/*": ["./packages/feiwen/src/*"]
+      "@feiwen/*": ["./packages/feiwen/src/*"],
+      "@hclipboard/*": ["./packages/Hclipboard/src/*"]
     },
     "types": ["./config/types/types.d.ts"]
   },

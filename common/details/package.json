@@ -6,7 +6,5 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "types": "workspace:*"
-  }
+  "dependencies": {}
 }

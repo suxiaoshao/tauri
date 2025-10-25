@@ -5,52 +5,28 @@
  * @LastEditTime: 2024-03-07 00:42:35
  * @FilePath: /self-tools/Users/sushao/Documents/code/tauri/packages/Hclipboard/src/pages/Home/index.tsx
  */
-import { Box, List, TextField } from '@mui/material';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
-import { useCallback, useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { useKey } from 'react-use';
-import { match } from 'ts-pattern';
-import { copyToClipboard } from '../../rpc/query';
+import React, { useEffect, useState } from 'react';
 import HistoryItem from './components/HistoryItem';
 import useClipData from './hooks/useClipData';
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@hclipboard/components/ui/resizable';
+import { Separator } from '@hclipboard/components/ui/separator';
+import { match } from 'ts-pattern';
+import { copyToClipboard } from '@hclipboard/rpc/query';
 const appWindow = getCurrentWebviewWindow();
 
 export default function Home() {
   // 表单
-  const { register, watch, setValue } = useForm<{ searchData?: string }>();
-  const searchName = watch('searchData');
+  const [searchName, setSearchName] = useState<string>('');
   // 历史记录
   const data = useClipData(searchName);
-  // 被选择
-  const [selectIndex, setSelectIndex] = useState<number>(0);
+  const [selectedIndex, setSelectedIndex] = useState<number>(0);
   useEffect(() => {
-    setSelectIndex(0);
+    setSelectedIndex(0);
   }, [data]);
-  const add = useCallback(() => {
-    if (selectIndex < data.length - 1) {
-      setSelectIndex((value) => value + 1);
-    }
-  }, [data.length, selectIndex]);
-  const sub = useCallback(() => {
-    if (selectIndex >= 1) {
-      setSelectIndex((value) => value - 1);
-    }
-  }, [selectIndex]);
-  useKey('ArrowUp', sub, undefined, [sub]);
-  useKey('ArrowDown', add, undefined, [add]);
-  useKey(
-    'Enter',
-    async () => {
-      const item = data[selectIndex];
-      await copyToClipboard(item.data);
-    },
-    undefined,
-    [data, selectIndex],
-  );
   useEffect(() => {
     const fn = appWindow.onFocusChanged(() => {
-      setValue('searchData', '');
+      setSearchName('');
     });
     return () => {
       (async () => {
@@ -58,37 +34,81 @@ export default function Home() {
         f();
       })();
     };
-  }, [setValue]);
-  const [ref, setRef] = useState<HTMLDivElement | undefined>();
+  }, []);
+  // focus
+  const [inputRef, setInputRef] = useState<HTMLInputElement | null>(null);
   useEffect(() => {
-    if (ref) {
-      ref?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    if (inputRef) {
+      inputRef.focus();
     }
-  }, [ref]);
+  }, [inputRef]);
+  const detail = data.at(selectedIndex);
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    // Check if IME composition is finished before triggering key binds
+    // This prevents unwanted triggering while user is still inputting text with IME
+    // e.keyCode === 229 is for the CJK IME with Legacy Browser [https://w3c.github.io/uievents/#determine-keydown-keyup-keyCode]
+    // isComposing is for the CJK IME with Modern Browser [https://developer.mozilla.org/en-US/docs/Web/API/CompositionEvent/isComposing]
+    const isComposing = e.nativeEvent.isComposing;
+
+    if (e.defaultPrevented || isComposing) {
+      return;
+    }
+    match(e.key)
+      .with('ArrowUp', () => {
+        if (selectedIndex > 0) {
+          setSelectedIndex(selectedIndex - 1);
+        }
+      })
+      .with('ArrowDown', () => {
+        if (selectedIndex < data.length - 1) {
+          setSelectedIndex(selectedIndex + 1);
+        }
+      })
+      .with('Enter', async () => {
+        const item = data[selectedIndex];
+        // todo
+        // await copyToClipboard(item.data);
+      })
+      // oxlint-disable-next-line no-empty-function
+      .otherwise(() => {});
+  };
+  const [selectedRef, setSelectedRef] = useState<HTMLInputElement | null>(null);
+  useEffect(() => {
+    if (selectedRef) {
+      selectedRef?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+  }, [selectedRef]);
+
   return (
-    <Box
-      sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 1 }}
-    >
-      <TextField
+    <div className="w-full h-full flex flex-col" onKeyDown={handleKeyDown}>
+      <input
+        className="p-3 pl-4 pr-4 appearance-none border-none focus:outline-none"
+        ref={setInputRef}
         placeholder="搜索"
-        sx={{ margin: 1 }}
-        {...register('searchData')}
-        slotProps={{ htmlInput: { spellCheck: 'false' } }}
+        spellCheck={false}
+        value={searchName}
+        onChange={(e) => setSearchName(e.target.value)}
       />
-      <List sx={{ flex: '1 1 0', overflowY: 'auto', width: '100%' }}>
-        {data.map((item, index) => (
-          <HistoryItem
-            index={index}
-            key={item.id}
-            item={item}
-            selected={selectIndex === index}
-            isLast={index === data.length - 1}
-            {...match(selectIndex)
-              .with(index, () => ({ ref: setRef }))
-              .otherwise(() => ({}))}
-          />
-        ))}
-      </List>
-    </Box>
+      <Separator />
+      <ResizablePanelGroup className="flex-1" direction="horizontal">
+        <ResizablePanel defaultSize={35}>
+          <ul className="overflow-y-auto h-full">
+            {data.map((item, index) => (
+              <HistoryItem
+                key={item.id}
+                item={item}
+                selected={index === selectedIndex}
+                {...match(selectedIndex)
+                  .with(index, () => ({ ref: setSelectedRef }))
+                  .otherwise(() => ({}))}
+                onPointerMove={() => setSelectedIndex(index)}
+              />
+            ))}
+          </ul>
+        </ResizablePanel>
+        <ResizableHandle />
+        <ResizablePanel>2222</ResizablePanel>
+      </ResizablePanelGroup>
+    </div>
   );
 }
