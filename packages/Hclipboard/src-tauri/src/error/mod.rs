@@ -1,3 +1,5 @@
+use std::string::FromUtf8Error;
+
 use thiserror::Error;
 
 #[derive(Error, Debug, serde::Serialize)]
@@ -72,11 +74,31 @@ pub enum ClipError {
         #[from]
         serde_json::Error,
     ),
-    #[error("ciborium error:{}",.0)]
+    #[error("ciborium serialization error:{}",.0)]
     Ciborium(
         #[serde(skip_serializing)]
         #[from]
         ciborium::ser::Error<std::io::Error>,
+    ),
+    #[error("ciborium deserialization error:{}",.0)]
+    CiboriumDeserialization(
+        #[serde(skip_serializing)]
+        #[from]
+        ciborium::de::Error<std::io::Error>,
+    ),
+    #[error("clipboard type error:{}",.0)]
+    InvalidClipboardType(String),
+    #[error("string error")]
+    StringError(
+        #[serde(skip_serializing)]
+        #[from]
+        FromUtf8Error,
+    ),
+    #[error("png DecodingError")]
+    PngDecodingError(
+        #[serde(skip_serializing)]
+        #[from]
+        png::DecodingError,
     ),
 }
 

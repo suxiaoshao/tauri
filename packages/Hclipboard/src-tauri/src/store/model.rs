@@ -1,10 +1,10 @@
-use std::fmt::{Display, Formatter};
-
-use crate::error::ClipResult;
-
 use super::schema::history;
+use crate::error::{ClipError, ClipResult};
 use diesel::prelude::*;
-use time::OffsetDateTime;
+use std::{
+    fmt::{Display, Formatter},
+    str::FromStr,
+};
 
 #[derive(Clone, Copy)]
 pub enum ClipboardType {
@@ -27,15 +27,30 @@ impl Display for ClipboardType {
     }
 }
 
+impl FromStr for ClipboardType {
+    type Err = ClipError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "text" => Ok(ClipboardType::Text),
+            "image" => Ok(ClipboardType::Image),
+            "files" => Ok(ClipboardType::Files),
+            "rtf" => Ok(ClipboardType::Rtf),
+            "html" => Ok(ClipboardType::Html),
+            _ => Err(ClipError::InvalidClipboardType(s.to_string())),
+        }
+    }
+}
+
 #[derive(Queryable, serde::Serialize)]
-pub struct History {
-    id: i32,
+pub struct HistoryModel {
+    pub(super) id: i32,
     #[serde(with = "serde_bytes")]
-    data: Vec<u8>,
+    pub(super) data: Vec<u8>,
     #[serde(rename = "type")]
-    type_: String,
+    pub(super) type_: String,
     #[serde(rename = "updateTime")]
-    update_time: i64,
+    pub(super) update_time: i64,
 }
 
 #[derive(Insertable)]
@@ -46,38 +61,41 @@ pub struct NewHistory<'a> {
     update_time: i64,
 }
 
-impl History {
-    /// 如果没有相同数据插入，有的话更新时间
-    pub fn insert(
+impl HistoryModel {
+    pub fn find_by_data(data: &[u8], conn: &mut SqliteConnection) -> ClipResult<Option<Self>> {
+        let history = history::table
+            .filter(history::data.eq(data))
+            .first::<HistoryModel>(conn);
+        match history {
+            Ok(history) => Ok(Some(history)),
+            Err(diesel::NotFound) => Ok(None),
+            Err(e) => Err(e.into()),
+        }
+    }
+    pub fn find_by_id(id: i32, conn: &mut SqliteConnection) -> ClipResult<Self> {
+        let data = history::table
+            .filter(history::id.eq(id))
+            .first::<HistoryModel>(conn)?;
+        Ok(data)
+    }
+    /// 更新数据时间
+    pub(super) fn update_time_by_data(
         data: &[u8],
-        r#type: ClipboardType,
+        time: i64,
         conn: &mut SqliteConnection,
     ) -> ClipResult<()> {
-        match history::table
-            .filter(history::data.eq(data))
-            .first::<History>(conn)
-        {
-            Ok(old_history) => old_history.update_data(data, conn)?,
-            Err(diesel::NotFound) => {
-                Self::create(data, r#type, conn)?;
-            }
-            Err(e) => {
-                return Err(e.into());
-            }
-        };
-        Ok(())
-    }
-    /// 更新数据
-    fn update_data(&self, data: &[u8], conn: &mut SqliteConnection) -> ClipResult<()> {
-        let time = OffsetDateTime::now_utc().unix_timestamp();
-        diesel::update(history::table.find(self.id))
-            .set((history::update_time.eq(time), history::data.eq(data)))
+        diesel::update(history::table.filter(history::data.eq(data)))
+            .set(history::update_time.eq(time))
             .execute(conn)?;
         Ok(())
     }
     /// 插入数据
-    fn create(data: &[u8], r#type: ClipboardType, conn: &mut SqliteConnection) -> ClipResult<()> {
-        let time = OffsetDateTime::now_utc().unix_timestamp();
+    pub(super) fn create(
+        data: &[u8],
+        r#type: ClipboardType,
+        time: i64,
+        conn: &mut SqliteConnection,
+    ) -> ClipResult<()> {
         diesel::insert_into(history::table)
             .values(NewHistory {
                 data,
@@ -87,28 +105,11 @@ impl History {
             .execute(conn)?;
         Ok(())
     }
-    /// 根据数据获取历史记录
-    pub fn query(
-        search_content: Option<&[u8]>,
-        conn: &mut SqliteConnection,
-    ) -> ClipResult<Vec<History>> {
-        let data = Self::query_all(conn)?;
-        match search_content {
-            None => Ok(data),
-            Some(search_name) => Ok(data
-                .into_iter()
-                .filter(|History { data, .. }| {
-                    data.windows(search_name.len())
-                        .any(|window| window == search_name)
-                })
-                .collect::<Vec<_>>()),
-        }
-    }
     /// 获取所有历史记录
-    fn query_all(conn: &mut SqliteConnection) -> ClipResult<Vec<History>> {
+    pub(super) fn query_all(conn: &mut SqliteConnection) -> ClipResult<Vec<HistoryModel>> {
         let data = history::table
             .order(history::update_time.desc())
-            .load::<History>(conn)?;
+            .load::<HistoryModel>(conn)?;
         Ok(data)
     }
 }
@@ -128,7 +129,12 @@ mod tests {
     fn insert() -> anyhow::Result<()> {
         let conn = establish_connection()?;
         let conn = &mut conn.get()?;
-        History::insert(b"test", ClipboardType::Text, conn)?;
+        HistoryModel::create(
+            b"test",
+            ClipboardType::Text,
+            time::OffsetDateTime::now_utc().unix_timestamp(),
+            conn,
+        )?;
         Ok(())
     }
     pub fn establish_connection() -> ClipResult<DbConn> {

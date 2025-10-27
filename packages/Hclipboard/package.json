@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@radix-ui/react-separator": "^1.1.7",
+    "@radix-ui/react-slot": "^1.2.3",
     "cbor2": "^2.0.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -18,9 +19,10 @@
     "entities": "^7.0.0",
     "lucide-react": "^0.546.0",
     "notify": "workspace:^",
+    "pretty-bytes": "^7.1.0",
     "react-resizable-panels": "^3.0.6",
-    "tailwind-merge": "^3.3.1",
-    "theme": "workspace:^"
+    "rtf.js": "^3.0.9",
+    "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.14",

@@ -7,12 +7,12 @@
  */
 use crate::{
     error::{ClipError, ClipResult},
-    store::{History, model::ClipboardType},
+    store::{ClipboardType, History, HistoryData},
 };
 use ciborium::into_writer;
 use clipboard_rs::{
     Clipboard as ClipboardTrait, ClipboardContext, ClipboardHandler, ClipboardWatcher,
-    ClipboardWatcherContext, common::RustImage,
+    ClipboardWatcherContext, RustImageData, common::RustImage,
 };
 use diesel::{
     SqliteConnection,
@@ -39,7 +39,7 @@ impl Clipboard {
             if text.as_bytes() != self.old_data {
                 #[cfg(debug_assertions)]
                 println!("clipboard: {text}");
-                History::insert(text.as_bytes(), ClipboardType::Text, &mut self.conn)?;
+                History::insert_or_update(text.as_bytes(), ClipboardType::Text, &mut self.conn)?;
                 self.old_data = text.as_bytes().to_vec();
             }
         }
@@ -55,7 +55,7 @@ impl Clipboard {
             if png.get_bytes() != self.old_data {
                 #[cfg(debug_assertions)]
                 println!("clipboard: image");
-                History::insert(png.get_bytes(), ClipboardType::Image, &mut self.conn)?;
+                History::insert_or_update(png.get_bytes(), ClipboardType::Image, &mut self.conn)?;
                 self.old_data = png.get_bytes().to_vec();
             }
         }
@@ -68,7 +68,7 @@ impl Clipboard {
             if rtf.as_bytes() != self.old_data {
                 #[cfg(debug_assertions)]
                 println!("clipboard: rtf");
-                History::insert(rtf.as_bytes(), ClipboardType::Rtf, &mut self.conn)?;
+                History::insert_or_update(rtf.as_bytes(), ClipboardType::Rtf, &mut self.conn)?;
                 self.old_data = rtf.as_bytes().to_vec();
             }
         }
@@ -81,7 +81,7 @@ impl Clipboard {
             if html.as_bytes() != self.old_data {
                 #[cfg(debug_assertions)]
                 println!("clipboard: html");
-                History::insert(html.as_bytes(), ClipboardType::Html, &mut self.conn)?;
+                History::insert_or_update(html.as_bytes(), ClipboardType::Html, &mut self.conn)?;
                 self.old_data = html.as_bytes().to_vec();
             }
         }
@@ -96,7 +96,7 @@ impl Clipboard {
             if bytes != self.old_data {
                 #[cfg(debug_assertions)]
                 println!("clipboard: files");
-                History::insert(&bytes, ClipboardType::Files, &mut self.conn)?;
+                History::insert_or_update(&bytes, ClipboardType::Files, &mut self.conn)?;
                 self.old_data = bytes;
             }
         }
@@ -115,6 +115,21 @@ impl Clipboard {
             ClipboardWatcherContext::new().map_err(|err| ClipError::Clipboard(err.to_string()))?;
         watcher.add_handler(self);
         Ok(watcher)
+    }
+    pub fn write_to_clipboard(data: HistoryData) -> ClipResult<()> {
+        let ctx = ClipboardContext::new().map_err(|err| ClipError::Clipboard(err.to_string()))?;
+        let data = match data {
+            HistoryData::Text { data, .. } => ctx.set_text(data),
+            HistoryData::Image { data, .. } => {
+                let image = RustImageData::from_bytes(data.as_slice())
+                    .map_err(|err| ClipError::Clipboard(err.to_string()))?;
+                ctx.set_image(image)
+            }
+            HistoryData::Files(items) => ctx.set_files(items),
+            HistoryData::Rtf { data, .. } => ctx.set_rich_text(data),
+            HistoryData::Html { data, .. } => ctx.set_html(data),
+        };
+        data.map_err(|err| ClipError::Clipboard(err.to_string()))
     }
 }
 impl ClipboardHandler for Clipboard {

@@ -1,13 +1,17 @@
+use crate::error::{ClipError, ClipResult};
 use diesel::{
     SqliteConnection,
     connection::SimpleConnection,
     r2d2::{ConnectionManager, Pool},
 };
 
-pub mod model;
+mod model;
 mod schema;
+pub mod service;
+pub use model::ClipboardType;
 
 pub type DbConn = Pool<ConnectionManager<SqliteConnection>>;
+pub use service::{History, HistoryData};
 
 pub fn establish_connection(url: &str) -> ClipResult<DbConn> {
     let not_exists = check_data_file(url)?;
@@ -36,7 +40,3 @@ fn create_tables(conn: &DbConn) -> ClipResult<()> {
         ))
         .map_err(|e| e.into())
 }
-
-pub use model::History;
-
-use crate::error::{ClipError, ClipResult};

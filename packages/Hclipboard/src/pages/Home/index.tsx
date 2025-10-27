@@ -11,8 +11,11 @@ import HistoryItem from './components/HistoryItem';
 import useClipData from './hooks/useClipData';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@hclipboard/components/ui/resizable';
 import { Separator } from '@hclipboard/components/ui/separator';
-import { match } from 'ts-pattern';
+import { match, P } from 'ts-pattern';
 import { copyToClipboard } from '@hclipboard/rpc/query';
+import HistoryDetails from './components/HistoryDetails';
+import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@hclipboard/components/ui/empty';
+import { Copy } from 'lucide-react';
 const appWindow = getCurrentWebviewWindow();
 
 export default function Home() {
@@ -65,9 +68,9 @@ export default function Home() {
         }
       })
       .with('Enter', async () => {
-        const item = data[selectedIndex];
-        // todo
-        // await copyToClipboard(item.data);
+        const item = data.at(selectedIndex);
+        if (!item) return;
+        await copyToClipboard(item.id);
       })
       // oxlint-disable-next-line no-empty-function
       .otherwise(() => {});
@@ -107,7 +110,21 @@ export default function Home() {
           </ul>
         </ResizablePanel>
         <ResizableHandle />
-        <ResizablePanel>2222</ResizablePanel>
+        <ResizablePanel>
+          {match(detail)
+            .with(P.nonNullable, (data) => <HistoryDetails item={data} />)
+            .otherwise(() => (
+              <Empty>
+                <EmptyHeader>
+                  <EmptyMedia variant="icon">
+                    <Copy />
+                  </EmptyMedia>
+                  <EmptyTitle>No data</EmptyTitle>
+                  <EmptyDescription>No data found</EmptyDescription>
+                </EmptyHeader>
+              </Empty>
+            ))}
+        </ResizablePanel>
       </ResizablePanelGroup>
     </div>
   );

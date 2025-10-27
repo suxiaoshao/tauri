@@ -2,7 +2,19 @@ import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import { useCallback, useEffect, useState } from 'react';
 import { query } from '../../../rpc/query';
 import { decode } from 'cbor2';
-import { array, blob, enum_, type InferOutput, integer, number, object, parse, pipe, instance } from 'valibot';
+import {
+  array,
+  type InferOutput,
+  integer,
+  number,
+  object,
+  parse,
+  pipe,
+  instance,
+  union,
+  literal,
+  string,
+} from 'valibot';
 const appWindow = getCurrentWebviewWindow();
 
 export enum ClipType {
@@ -16,8 +28,45 @@ export enum ClipType {
 const ClipHistorySchema = array(
   object({
     id: pipe(number(), integer()),
-    data: instance(Uint8Array),
-    type: enum_(ClipType),
+    data: union([
+      object({
+        tag: literal(ClipType.Text),
+        value: object({
+          data: string(),
+          wordCount: pipe(number(), integer()),
+          charCount: pipe(number(), integer()),
+        }),
+      }),
+      object({
+        tag: literal(ClipType.Image),
+        value: object({
+          data: instance(Uint8Array<ArrayBuffer>),
+          width: pipe(number(), integer()),
+          height: pipe(number(), integer()),
+          size: pipe(number(), integer()),
+        }),
+      }),
+      object({
+        tag: literal(ClipType.Files),
+        value: array(string()),
+      }),
+      object({
+        tag: literal(ClipType.Rtf),
+        value: object({
+          data: string(),
+          wordCount: pipe(number(), integer()),
+          charCount: pipe(number(), integer()),
+        }),
+      }),
+      object({
+        tag: literal(ClipType.Html),
+        value: object({
+          data: string(),
+          wordCount: pipe(number(), integer()),
+          charCount: pipe(number(), integer()),
+        }),
+      }),
+    ]),
     updateTime: number(),
   }),
 );
@@ -30,7 +79,6 @@ export default function useClipData(searchName: string | undefined) {
   // 查询剪切板历史
   const fetchData = useCallback(async () => {
     const newData = await query({ searchName: searchName || null });
-    console.log(newData, decode(new Uint8Array(newData)));
     const data = parse(ClipHistorySchema, decode(new Uint8Array(newData)));
     setDate(data);
   }, [searchName]);

@@ -7,7 +7,7 @@ use crate::{
 };
 use ciborium::into_writer;
 use clipboard_rs::ClipboardWatcher;
-use enigo::{Enigo, Keyboard, Settings};
+use enigo::{Enigo, Key, Keyboard, Settings};
 use serde_json::Value;
 use tauri::{
     AppHandle, Manager, Runtime,
@@ -69,24 +69,39 @@ fn query_history(search_name: Option<String>, state: tauri::State<DbConn>) -> Cl
 }
 
 #[tauri::command]
-fn copy_to_clipboard<R: Runtime>(data: String, app_handle: AppHandle<R>) -> ClipResult<()> {
+fn copy_to_clipboard<R: Runtime>(id: i32, app_handle: AppHandle<R>) -> ClipResult<()> {
+    // window
     if cfg!(target_os = "macos") {
         #[cfg(target_os = "macos")]
         {
             if let Some(prev_app) = app_handle.try_state::<FrontmostApp>() {
-                use clipboard_rs::{Clipboard, ClipboardContext};
                 let prev_app = prev_app.inner().lock().unwrap();
                 restore_frontmost_app(&prev_app);
-                let ctx =
-                    ClipboardContext::new().map_err(|err| ClipError::Clipboard(err.to_string()))?;
-                ctx.set_text(data.clone())
-                    .map_err(|err| ClipError::Clipboard(err.to_string()))?;
             }
         }
     } else if let Some(window) = app_handle.get_webview_window("main") {
         window.hide()?;
     }
+    let mut conn = app_handle.state::<DbConn>().get()?;
+    let history = History::find_by_id(id, &mut conn)?;
+    Clipboard::write_to_clipboard(history.data)?;
     let mut enigo = Enigo::new(&Settings::default())?;
-    enigo.text(&data)?;
+    enigo.key(
+        if cfg!(target_os = "macos") {
+            Key::Meta
+        } else {
+            Key::Control
+        },
+        enigo::Direction::Press,
+    )?;
+    enigo.key(Key::Unicode('v'), enigo::Direction::Click)?;
+    enigo.key(
+        if cfg!(target_os = "macos") {
+            Key::Meta
+        } else {
+            Key::Control
+        },
+        enigo::Direction::Release,
+    )?;
     Ok(())
 }

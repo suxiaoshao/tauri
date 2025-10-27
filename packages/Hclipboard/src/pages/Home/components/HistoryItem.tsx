@@ -2,6 +2,7 @@ import { Text, File, Image, CodeXml, Code } from 'lucide-react';
 import { ClipType, type ClipHistory } from '../hooks/useClipData';
 import { match } from 'ts-pattern';
 import { cn } from '@hclipboard/lib/utils';
+import { Badge } from '@hclipboard/components/ui/badge';
 
 export interface HistoryItemProps {
   item: ClipHistory;
@@ -10,8 +11,8 @@ export interface HistoryItemProps {
   ref?: React.Ref<HTMLLIElement>;
 }
 
-export default function HistoryItem({ item: { data, type }, selected, ref, onPointerMove }: HistoryItemProps) {
-  const decoder = new TextDecoder('utf8');
+export default function HistoryItem({ item: { data }, selected, ref, onPointerMove }: HistoryItemProps) {
+  const spanClass = 'truncate flex-1';
   return (
     <li
       className={cn(
@@ -21,35 +22,38 @@ export default function HistoryItem({ item: { data, type }, selected, ref, onPoi
       ref={ref}
       onPointerMove={onPointerMove}
     >
-      {match(type)
-        .with(ClipType.Text, () => (
+      {match(data)
+        .with({ tag: ClipType.Text }, ({ value: { data } }) => (
           <>
             <Text />
-            <span className="truncate">{decoder.decode(data)}</span>
+            <span className={spanClass}>{data}</span>
           </>
         ))
-        .with(ClipType.Image, () => (
+        .with({ tag: ClipType.Image }, ({ value: { height, width } }) => (
           <>
             <Image />
-            <span></span>
+            <span className={spanClass}>
+              Image ({width}x{height})
+            </span>
           </>
         ))
-        .with(ClipType.Files, () => (
+        .with({ tag: ClipType.Files }, ({ value }) => (
           <>
             <File />
-            <span></span>
+            <span className={spanClass}>{value.map((file) => file.split('/').pop()).join(',')}</span>
+            <Badge>{value.length} Files</Badge>
           </>
         ))
-        .with(ClipType.Rtf, () => (
+        .with({ tag: ClipType.Rtf }, ({ value: { data } }) => (
           <>
             <Code />
-            <span></span>
+            <span className={spanClass}>{data}</span>
           </>
         ))
-        .with(ClipType.Html, () => (
+        .with({ tag: ClipType.Html }, ({ value: { data } }) => (
           <>
             <CodeXml />
-            <span></span>
+            <span className={spanClass}>{data}</span>
           </>
         ))
         .exhaustive()}
