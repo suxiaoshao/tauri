@@ -47,7 +47,7 @@ fn main() -> ClipResult<()> {
                 .build(),
         )
         .plugin(plugin::clipboard::ClipboardPlugin)
-        .plugin(plugin::window::WindowPlugin)
+        .plugin(plugin::window::WindowPlugin::default())
         .plugin(plugin::tracing::TracingPlugin)
         .run(tauri::generate_context!())?;
     Ok(())

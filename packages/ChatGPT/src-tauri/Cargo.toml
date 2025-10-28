@@ -17,6 +17,7 @@ tauri-build = { workspace = true, features = [] }
 tauri = { workspace = true, features = ["macos-private-api", "tray-icon"] }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
+delay = { path = "../../../crates/delay" }
 
 # database
 diesel = { version = "2.3.2", features = [

@@ -44,6 +44,17 @@ export default function Home() {
     if (inputRef) {
       inputRef.focus();
     }
+    const unlisten = appWindow.onFocusChanged((handle) => {
+      if (handle) {
+        inputRef?.focus();
+      }
+    });
+    return () => {
+      (async () => {
+        const f = await unlisten;
+        f();
+      })();
+    };
   }, [inputRef]);
   const detail = data.at(selectedIndex);
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -60,11 +71,13 @@ export default function Home() {
       .with('ArrowUp', () => {
         if (selectedIndex > 0) {
           setSelectedIndex(selectedIndex - 1);
+          e.preventDefault();
         }
       })
       .with('ArrowDown', () => {
         if (selectedIndex < data.length - 1) {
           setSelectedIndex(selectedIndex + 1);
+          e.preventDefault();
         }
       })
       .with('Enter', async () => {

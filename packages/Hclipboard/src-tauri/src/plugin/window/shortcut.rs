@@ -11,7 +11,7 @@ use objc2::rc::Retained;
 use objc2_app_kit::{NSApplicationActivationOptions, NSRunningApplication, NSWorkspace};
 #[cfg(target_os = "macos")]
 use std::sync::{Arc, Mutex};
-use tauri::{AppHandle, Manager, Runtime};
+use tauri::{AppHandle, Manager, Runtime, WebviewWindowBuilder};
 
 use crate::error::ClipResult;
 
@@ -68,6 +68,38 @@ pub fn on_short<R: Runtime>(app: &AppHandle<R>) -> ClipResult<()> {
             window.show()?;
             window.set_focus()?;
         }
+    } else {
+        #[cfg(target_os = "macos")]
+        {
+            let prev_app = record_frontmost_app();
+            match app.try_state::<FrontmostApp>() {
+                Some(old_prev_app) => {
+                    *old_prev_app.lock().unwrap() = prev_app;
+                }
+                None => {
+                    app.manage(Arc::new(Mutex::new(prev_app)));
+                }
+            }
+        }
+        create_main_window(app)?;
     }
+    Ok(())
+}
+
+fn create_main_window<R: Runtime>(app: &AppHandle<R>) -> ClipResult<()> {
+    let window = WebviewWindowBuilder::new(app, "main", Default::default())
+        .title("Hclipboard")
+        .fullscreen(false)
+        .inner_size(800.0, 600.0)
+        .skip_taskbar(true)
+        .transparent(true)
+        .always_on_top(true)
+        .title_bar_style(tauri::TitleBarStyle::Overlay)
+        .hidden_title(true)
+        .build()?;
+
+    window.show()?;
+    window.set_focus()?;
+
     Ok(())
 }

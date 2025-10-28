@@ -5,6 +5,8 @@
  * @LastEditTime: 2024-09-25 02:21:13
  * @FilePath: /tauri/packages/ChatGPT/src-tauri/src/plugins/temporary_conversation/mod.rs
  */
+use super::ChatGPTConfig;
+use crate::errors::ChatGPTResult;
 use history::TemporaryStore;
 #[cfg(target_os = "macos")]
 use objc2::rc::Retained;
@@ -16,10 +18,6 @@ use tauri::{AppHandle, Manager, Runtime, WebviewWindow, WebviewWindowBuilder, Wi
 use tauri_plugin_global_shortcut::{GlobalShortcutExt, Shortcut};
 use tauri_plugin_positioner::{Position, WindowExt};
 
-use crate::errors::ChatGPTResult;
-
-use super::ChatGPTConfig;
-mod delay;
 mod history;
 mod listen;
 
