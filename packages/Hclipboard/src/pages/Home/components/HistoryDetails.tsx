@@ -44,20 +44,20 @@ function Informations({ items }: InformationsProps) {
 }
 
 interface RtfDetailProps {
-  data: string;
+  text: string;
   wordCount: number;
   charCount: number;
   updateTime: number;
 }
 
-function RtfDetail({ data, wordCount, charCount, updateTime }: RtfDetailProps) {
+function RtfDetail({ text, wordCount, charCount, updateTime }: RtfDetailProps) {
   const [renderedData, setRenderedData] = useState<HTMLElement[] | null>(null);
   const promiseFn = useCallback(async () => {
     const encoder = new TextEncoder();
-    const buffer = encoder.encode(data);
+    const buffer = encoder.encode(text);
     const doc = new RTFJS.Document(buffer.buffer, {});
     setRenderedData(await doc.render());
-  }, [data]);
+  }, [text]);
 
   useEffect(() => {
     promiseFn();
@@ -105,13 +105,13 @@ export default function HistoryDetails({ item }: HistoryDetailsProps) {
           { data: { tag: ClipType.Text } },
           ({
             data: {
-              value: { charCount, data, wordCount },
+              value: { charCount, text, wordCount },
             },
             updateTime,
           }) => (
             <>
               <div className="flex-1 overflow-y-auto p-3">
-                <p className="leading-7">{data}</p>
+                <p className="leading-7">{text}</p>
               </div>
               <Separator />
               <Informations
@@ -175,13 +175,13 @@ export default function HistoryDetails({ item }: HistoryDetailsProps) {
           { data: { tag: ClipType.Html } },
           ({
             data: {
-              value: { data, charCount, wordCount },
+              value: { text, charCount, wordCount },
             },
             updateTime,
           }) => (
             <>
               {/* oxlint-disable-next-line no-danger */}
-              <div className="flex-1 overflow-y-auto" dangerouslySetInnerHTML={{ __html: data }} />
+              <div className="flex-1 overflow-y-auto" dangerouslySetInnerHTML={{ __html: text }} />
               <Separator />
               <Informations
                 items={[
@@ -198,10 +198,10 @@ export default function HistoryDetails({ item }: HistoryDetailsProps) {
           { data: { tag: ClipType.Rtf } },
           ({
             data: {
-              value: { data, charCount, wordCount },
+              value: { text, charCount, wordCount },
             },
             updateTime,
-          }) => <RtfDetail data={data} charCount={charCount} wordCount={wordCount} updateTime={updateTime} />,
+          }) => <RtfDetail text={text} charCount={charCount} wordCount={wordCount} updateTime={updateTime} />,
         )
         .exhaustive()}
     </div>

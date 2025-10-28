@@ -94,12 +94,6 @@ pub enum ClipError {
         #[from]
         FromUtf8Error,
     ),
-    #[error("png DecodingError")]
-    PngDecodingError(
-        #[serde(skip_serializing)]
-        #[from]
-        png::DecodingError,
-    ),
 }
 
 impl From<tauri::Error> for ClipError {

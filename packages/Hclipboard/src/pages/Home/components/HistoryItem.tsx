@@ -23,10 +23,10 @@ export default function HistoryItem({ item: { data }, selected, ref, onPointerMo
       onPointerMove={onPointerMove}
     >
       {match(data)
-        .with({ tag: ClipType.Text }, ({ value: { data } }) => (
+        .with({ tag: ClipType.Text }, ({ value: { text } }) => (
           <>
             <Text />
-            <span className={spanClass}>{data}</span>
+            <span className={spanClass}>{text}</span>
           </>
         ))
         .with({ tag: ClipType.Image }, ({ value: { height, width } }) => (
@@ -44,16 +44,16 @@ export default function HistoryItem({ item: { data }, selected, ref, onPointerMo
             <Badge>{value.length} Files</Badge>
           </>
         ))
-        .with({ tag: ClipType.Rtf }, ({ value: { data } }) => (
+        .with({ tag: ClipType.Rtf }, ({ value: { plainText } }) => (
           <>
             <Code />
-            <span className={spanClass}>{data}</span>
+            <span className={spanClass}>{plainText}</span>
           </>
         ))
-        .with({ tag: ClipType.Html }, ({ value: { data } }) => (
+        .with({ tag: ClipType.Html }, ({ value: { plainText } }) => (
           <>
             <CodeXml />
-            <span className={spanClass}>{data}</span>
+            <span className={spanClass}>{plainText}</span>
           </>
         ))
         .exhaustive()}

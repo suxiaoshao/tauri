@@ -62,7 +62,7 @@ fn setup<R: Runtime>(app: &AppHandle<R>) -> ClipResult<()> {
 #[tauri::command]
 fn query_history(search_name: Option<String>, state: tauri::State<DbConn>) -> ClipResult<Response> {
     let mut conn = state.get()?;
-    let data = History::query(search_name.as_ref().map(|data| data.as_bytes()), &mut conn)?;
+    let data = History::query(search_name.as_deref(), &mut conn)?;
     let mut bytes = Vec::new();
     into_writer(&data, &mut bytes)?;
     Ok(Response::new(bytes))

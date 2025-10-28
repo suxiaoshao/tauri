@@ -32,7 +32,7 @@ const ClipHistorySchema = array(
       object({
         tag: literal(ClipType.Text),
         value: object({
-          data: string(),
+          text: string(),
           wordCount: pipe(number(), integer()),
           charCount: pipe(number(), integer()),
         }),
@@ -53,7 +53,8 @@ const ClipHistorySchema = array(
       object({
         tag: literal(ClipType.Rtf),
         value: object({
-          data: string(),
+          text: string(),
+          plainText: string(),
           wordCount: pipe(number(), integer()),
           charCount: pipe(number(), integer()),
         }),
@@ -61,7 +62,8 @@ const ClipHistorySchema = array(
       object({
         tag: literal(ClipType.Html),
         value: object({
-          data: string(),
+          text: string(),
+          plainText: string(),
           wordCount: pipe(number(), integer()),
           charCount: pipe(number(), integer()),
         }),

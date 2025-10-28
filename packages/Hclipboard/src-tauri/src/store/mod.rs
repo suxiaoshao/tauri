@@ -8,7 +8,6 @@ use diesel::{
 mod model;
 mod schema;
 pub mod service;
-pub use model::ClipboardType;
 
 pub type DbConn = Pool<ConnectionManager<SqliteConnection>>;
 pub use service::{History, HistoryData};
