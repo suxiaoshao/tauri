@@ -18,8 +18,8 @@ use crate::error::ClipResult;
 #[cfg(target_os = "macos")]
 fn record_frontmost_app() -> Option<Retained<NSRunningApplication>> {
     // 获取 [NSWorkspace sharedWorkspace].frontmostApplication
-    let workspace = unsafe { NSWorkspace::sharedWorkspace() };
-    unsafe { workspace.frontmostApplication() }
+    let workspace = NSWorkspace::sharedWorkspace();
+    workspace.frontmostApplication()
 }
 
 #[cfg(target_os = "macos")]
@@ -27,11 +27,9 @@ pub fn restore_frontmost_app(prev_app: &Option<Retained<NSRunningApplication>>) 
     // 调用 [prevApp activateWithOptions:NSApplicationActivateIgnoringOtherApps]
     const NSAPPLICATION_ACTIVATE_IGNORING_OTHER_APPS: usize = 1 << 1;
     if let Some(app) = prev_app.as_ref() {
-        unsafe {
-            app.activateWithOptions(NSApplicationActivationOptions(
-                NSAPPLICATION_ACTIVATE_IGNORING_OTHER_APPS,
-            ));
-        }
+        app.activateWithOptions(NSApplicationActivationOptions(
+            NSAPPLICATION_ACTIVATE_IGNORING_OTHER_APPS,
+        ));
     }
 }
 

@@ -7,5 +7,5 @@ edition = "2024"
 crate-type = ["cdylib"]
 
 [dependencies]
-wit-bindgen = "0.46.0"
-visdom = { version = "1.0.3", features = ["full"] }
+wit-bindgen = "0.47.0"
+visdom = { version = "1.0.4", features = ["full"] }

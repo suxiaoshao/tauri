@@ -20,7 +20,7 @@ serde_json = { workspace = true }
 delay = { path = "../../../crates/delay" }
 
 # database
-diesel = { version = "2.3.2", features = [
+diesel = { version = "2.3.3", features = [
     "sqlite",
     "r2d2",
     "numeric",
@@ -35,16 +35,16 @@ pinyin = "0.10.0"
 thiserror = "2.0.17"
 
 # log
-tauri-plugin-log = { version = "2.7.0" }
+tauri-plugin-log = { version = "2.7.1" }
 log = "0.4.28"
 
 # 窗口管理
-tauri-plugin-window-state = { version = "2.4.0" }
+tauri-plugin-window-state = { version = "2.4.1" }
 window-vibrancy = "0.6.0"
 
 # http request
-reqwest = { version = "0.12.23", features = ["json"] }
-tokio = { version = "1.47.1", features = [
+reqwest = { version = "0.12.24", features = ["json"] }
+tokio = { version = "1.48.0", features = [
     "rt",
     "rt-multi-thread",
     "sync",
@@ -58,26 +58,26 @@ async-stream = "0.3.6"
 
 # config
 notify = { version = "8.2.0" }
-toml = "0.9.7"
-csv = "1.3.1"
+toml = "0.9.8"
+csv = "1.4.0"
 
 # plugin
-tauri-plugin-global-shortcut = "2.3.0"
-tauri-plugin-notification = "2.3.1"
-tauri-plugin-os = "2.3.1"
-tauri-plugin-opener = "2.5.0"
-tauri-plugin-dialog = "2.4.0"
-tauri-plugin-positioner = "2.3.0"
+tauri-plugin-global-shortcut = "2.3.1"
+tauri-plugin-notification = "2.3.3"
+tauri-plugin-os = "2.3.2"
+tauri-plugin-opener = "2.5.2"
+tauri-plugin-dialog = "2.4.2"
+tauri-plugin-positioner = "2.3.1"
 
 # extension
-wasmtime = { version = "37.0.1" }
-wasmtime-wasi = "37.0.1"
+wasmtime = { version = "38.0.3" }
+wasmtime-wasi = "38.0.3"
 get-selected-text = "0.1.6"
 
 [target.'cfg(target_os="macos")'.dependencies]
-objc2 = "0.6.2"
-objc2-app-kit = "0.3.1"
-objc2-foundation = "0.3.1"
+objc2 = "0.6.3"
+objc2-app-kit = "0.3.2"
+objc2-foundation = "0.3.2"
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem

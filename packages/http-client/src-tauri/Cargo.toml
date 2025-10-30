@@ -19,10 +19,10 @@ tauri = { workspace = true, features = ["macos-private-api", "tray-icon"] }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
 # 数据库
-diesel = { version = "2.3.2", features = ["sqlite","returning_clauses_for_sqlite_3_35"] }
+diesel = { version = "2.3.3", features = ["sqlite","returning_clauses_for_sqlite_3_35"] }
 
 # http
-reqwest = "0.12.23"
+reqwest = "0.12.24"
 
 # 错误处理
 anyhow = "1.0.100"
@@ -33,16 +33,16 @@ walkdir = "2.5.0"
 pinyin = "0.10.0"
 
 # plugin
-tauri-plugin-notification = "2.3.1"
-tauri-plugin-clipboard-manager = "2.3.0"
-tauri-plugin-shell = "2.3.1"
+tauri-plugin-notification = "2.3.3"
+tauri-plugin-clipboard-manager = "2.3.2"
+tauri-plugin-shell = "2.3.3"
 
 
 [target.'cfg(target_os = "macos")'.dependencies]
 plist = { version = "1.8.0" }
 
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
-tauri-plugin-global-shortcut = "2.3.0"
+tauri-plugin-global-shortcut = "2.3.1"
 
 
 [features]

@@ -18,10 +18,10 @@ tauri = { workspace = true, features = ["macos-private-api"] }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
 delay = { path = "../../../crates/delay" }
-tokio = { version = "1.47.1", default-features = false, features = ["time"] }
+tokio = { version = "1.48.0", default-features = false, features = ["time"] }
 
 # database
-diesel = { version = "2.3.2", features = ["sqlite", "r2d2","returning_clauses_for_sqlite_3_35"] }
+diesel = { version = "2.3.3", features = ["sqlite", "r2d2","returning_clauses_for_sqlite_3_35"] }
 libsqlite3-sys = { version = "0.35.0", features = ["bundled-windows"] }
 time = "0.3.44"
 
@@ -36,13 +36,13 @@ thiserror = "2.0.17"
 window-vibrancy = "0.6.0"
 
 # log
-tauri-plugin-log = { version = "2.7.0" }
+tauri-plugin-log = { version = "2.7.1" }
 log = "0.4.28"
 
 # plugin
-tauri-plugin-global-shortcut = "2.3.0"
-tauri-plugin-notification = "2.3.1"
-tauri-plugin-os = "2.3.1"
+tauri-plugin-global-shortcut = "2.3.1"
+tauri-plugin-notification = "2.3.3"
+tauri-plugin-os = "2.3.2"
 
 # 数据传输
 ciborium = "0.2.2"
@@ -50,9 +50,9 @@ serde_bytes = "0.11.19"
 unicode-segmentation = "1.12.0"
 
 [target.'cfg(target_os="macos")'.dependencies]
-objc2 = "0.6.2"
-objc2-app-kit = { version = "0.3.1", features = ["NSRunningApplication"] }
-objc2-foundation = "0.3.1"
+objc2 = "0.6.3"
+objc2-app-kit = { version = "0.3.2", features = ["NSRunningApplication"] }
+objc2-foundation = "0.3.2"
 
 [dev-dependencies]
 anyhow = "1.0.100"
