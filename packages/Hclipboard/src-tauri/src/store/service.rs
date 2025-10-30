@@ -7,7 +7,7 @@ use diesel::SqliteConnection;
 use time::OffsetDateTime;
 
 #[derive(serde::Serialize, serde::Deserialize, PartialEq, Eq, Debug)]
-#[serde(tag = "tag", content = "value", rename_all = "camelCase")]
+#[serde(tag = "tag", content = "value")]
 pub enum HistoryData {
     Text {
         text: String,
@@ -56,7 +56,7 @@ impl From<&HistoryData> for ClipboardType {
     }
 }
 
-#[derive(serde::Serialize)]
+#[derive(serde::Serialize, Debug)]
 pub struct History {
     id: i32,
     pub(crate) data: HistoryData,
@@ -91,11 +91,18 @@ impl History {
         }
     }
     /// 根据数据获取历史记录
-    pub fn query(search_name: Option<&str>, conn: &mut SqliteConnection) -> ClipResult<Vec<Self>> {
-        let data: Vec<History> = HistoryModel::query_all(conn)?
-            .into_iter()
-            .map(TryFrom::try_from)
-            .collect::<Result<_, _>>()?;
+    pub fn query(
+        search_name: Option<&str>,
+        clipboard_type: Option<ClipboardType>,
+        conn: &mut SqliteConnection,
+    ) -> ClipResult<Vec<Self>> {
+        let data: Vec<History> = match clipboard_type {
+            Some(clipboard_type) => HistoryModel::query_by_type(clipboard_type, conn)?,
+            None => HistoryModel::query_all(conn)?,
+        }
+        .into_iter()
+        .map(TryFrom::try_from)
+        .collect::<Result<_, _>>()?;
         match search_name {
             Some(search_name) => Ok(data
                 .into_iter()

@@ -10,6 +10,7 @@ mod schema;
 pub mod service;
 
 pub type DbConn = Pool<ConnectionManager<SqliteConnection>>;
+pub use model::ClipboardType;
 pub use service::{History, HistoryData};
 
 pub fn establish_connection(url: &str) -> ClipResult<DbConn> {

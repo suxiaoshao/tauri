@@ -1,6 +1,6 @@
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import { useCallback, useEffect, useState } from 'react';
-import { query } from '../../../rpc/query';
+import { ClipboardType, query, type QueryHistoryRequest } from '../../../rpc/query';
 import { decode } from 'cbor2';
 import {
   array,
@@ -17,20 +17,12 @@ import {
 } from 'valibot';
 const appWindow = getCurrentWebviewWindow();
 
-export enum ClipType {
-  Text = 'text',
-  Image = 'image',
-  Html = 'html',
-  Rtf = 'rtf',
-  Files = 'files',
-}
-
 const ClipHistorySchema = array(
   object({
     id: pipe(number(), integer()),
     data: union([
       object({
-        tag: literal(ClipType.Text),
+        tag: literal(ClipboardType.Text),
         value: object({
           text: string(),
           wordCount: pipe(number(), integer()),
@@ -38,7 +30,7 @@ const ClipHistorySchema = array(
         }),
       }),
       object({
-        tag: literal(ClipType.Image),
+        tag: literal(ClipboardType.Image),
         value: object({
           data: instance(Uint8Array<ArrayBuffer>),
           width: pipe(number(), integer()),
@@ -47,11 +39,11 @@ const ClipHistorySchema = array(
         }),
       }),
       object({
-        tag: literal(ClipType.Files),
+        tag: literal(ClipboardType.Files),
         value: array(string()),
       }),
       object({
-        tag: literal(ClipType.Rtf),
+        tag: literal(ClipboardType.Rtf),
         value: object({
           text: string(),
           plainText: string(),
@@ -60,7 +52,7 @@ const ClipHistorySchema = array(
         }),
       }),
       object({
-        tag: literal(ClipType.Html),
+        tag: literal(ClipboardType.Html),
         value: object({
           text: string(),
           plainText: string(),
@@ -75,15 +67,15 @@ const ClipHistorySchema = array(
 
 export type ClipHistory = InferOutput<typeof ClipHistorySchema>[0];
 
-export default function useClipData(searchName: string | undefined) {
+export default function useClipData(state: QueryHistoryRequest) {
   // 剪切板历史
   const [data, setDate] = useState([] as ClipHistory[]);
   // 查询剪切板历史
   const fetchData = useCallback(async () => {
-    const newData = await query({ searchName: searchName || null });
+    const newData = await query(state);
     const data = parse(ClipHistorySchema, decode(new Uint8Array(newData)));
     setDate(data);
-  }, [searchName]);
+  }, [state]);
   useEffect(() => {
     fetchData();
     // 重新获取焦点时刷新数据

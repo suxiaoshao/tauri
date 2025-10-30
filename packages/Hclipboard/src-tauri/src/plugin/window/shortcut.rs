@@ -87,16 +87,21 @@ pub fn on_short<R: Runtime>(app: &AppHandle<R>) -> ClipResult<()> {
 }
 
 fn create_main_window<R: Runtime>(app: &AppHandle<R>) -> ClipResult<()> {
-    let window = WebviewWindowBuilder::new(app, "main", Default::default())
+    let window = WebviewWindowBuilder::new(app, "main", tauri::WebviewUrl::App("/".into()))
         .title("Hclipboard")
         .fullscreen(false)
         .inner_size(800.0, 600.0)
         .skip_taskbar(true)
         .transparent(true)
         .always_on_top(true)
+        .center();
+    #[cfg(target_os = "macos")]
+    let window = window
         .title_bar_style(tauri::TitleBarStyle::Overlay)
-        .hidden_title(true)
-        .build()?;
+        .hidden_title(true);
+    #[cfg(target_os = "windows")]
+    let window = window.decorations(false);
+    let window = window.build()?;
 
     window.show()?;
     window.set_focus()?;

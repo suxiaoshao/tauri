@@ -42,6 +42,7 @@ log = "0.4.28"
 # plugin
 tauri-plugin-global-shortcut = "2.3.0"
 tauri-plugin-notification = "2.3.1"
+tauri-plugin-os = "2.3.1"
 
 # 数据传输
 ciborium = "0.2.2"

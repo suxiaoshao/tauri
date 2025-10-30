@@ -6,46 +6,58 @@
  * @FilePath: /self-tools/Users/sushao/Documents/code/tauri/packages/Hclipboard/src/pages/Home/index.tsx
  */
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useReducer, useState } from 'react';
 import HistoryItem from './components/HistoryItem';
 import useClipData from './hooks/useClipData';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@hclipboard/components/ui/resizable';
 import { Separator } from '@hclipboard/components/ui/separator';
 import { match, P } from 'ts-pattern';
-import { copyToClipboard } from '@hclipboard/rpc/query';
+import { type ClipboardType, copyToClipboard, type QueryHistoryRequest } from '@hclipboard/rpc/query';
 import HistoryDetails from './components/HistoryDetails';
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@hclipboard/components/ui/empty';
 import { Copy } from 'lucide-react';
+import { TypeSelect } from './components/TypeSelect';
+import type { Enum } from 'types';
 const appWindow = getCurrentWebviewWindow();
 
+type Action =
+  | Enum<'setSearchName', string | undefined>
+  | Enum<'setClipboardType', ClipboardType | undefined>
+  | Enum<'reset'>;
+
+function reducer(state: QueryHistoryRequest, action: Action): QueryHistoryRequest {
+  return match(action)
+    .with({ tag: 'setSearchName' }, ({ value }) => ({ ...state, searchName: value }))
+    .with(
+      {
+        tag: 'setClipboardType',
+      },
+      ({ value }) => ({ ...state, clipboardType: value }),
+    )
+    .with(
+      {
+        tag: 'reset',
+      },
+      () => ({ clipboardType: undefined, searchName: undefined }),
+    )
+    .otherwise(() => state);
+}
+
 export default function Home() {
-  // 表单
-  const [searchName, setSearchName] = useState<string>('');
+  const [state, dispatch] = useReducer(reducer, { clipboardType: undefined, searchName: undefined });
   // 历史记录
-  const data = useClipData(searchName);
+  const data = useClipData(state);
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
   useEffect(() => {
     setSelectedIndex(0);
   }, [data]);
-  useEffect(() => {
-    const fn = appWindow.onFocusChanged(() => {
-      setSearchName('');
-    });
-    return () => {
-      (async () => {
-        const f = await fn;
-        f();
-      })();
-    };
-  }, []);
   // focus
   const [inputRef, setInputRef] = useState<HTMLInputElement | null>(null);
   useEffect(() => {
-    if (inputRef) {
-      inputRef.focus();
-    }
+    inputRef?.focus();
     const unlisten = appWindow.onFocusChanged((handle) => {
       if (handle) {
+        dispatch({ tag: 'reset' });
         inputRef?.focus();
       }
     });
@@ -97,14 +109,17 @@ export default function Home() {
 
   return (
     <div className="w-full h-full flex flex-col" onKeyDown={handleKeyDown}>
-      <input
-        className="p-3 pl-4 pr-4 appearance-none border-none focus:outline-none"
-        ref={setInputRef}
-        placeholder="搜索"
-        spellCheck={false}
-        value={searchName}
-        onChange={(e) => setSearchName(e.target.value)}
-      />
+      <div className="p-3 pl-4 pr-4 flex">
+        <input
+          className="appearance-none border-none focus:outline-none flex-1"
+          placeholder="搜索"
+          spellCheck={false}
+          ref={setInputRef}
+          value={state.searchName}
+          onChange={(e) => dispatch({ tag: 'setSearchName', value: e.target.value || undefined })}
+        />
+        <TypeSelect value={state.clipboardType} onChange={(value) => dispatch({ tag: 'setClipboardType', value })} />
+      </div>
       <Separator />
       <ResizablePanelGroup className="flex-1" direction="horizontal">
         <ResizablePanel defaultSize={35}>

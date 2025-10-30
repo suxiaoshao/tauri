@@ -1,8 +1,9 @@
 import { Text, File, Image, CodeXml, Code } from 'lucide-react';
-import { ClipType, type ClipHistory } from '../hooks/useClipData';
+import { type ClipHistory } from '../hooks/useClipData';
 import { match } from 'ts-pattern';
 import { cn } from '@hclipboard/lib/utils';
 import { Badge } from '@hclipboard/components/ui/badge';
+import { ClipboardType } from '@hclipboard/rpc/query';
 
 export interface HistoryItemProps {
   item: ClipHistory;
@@ -23,13 +24,13 @@ export default function HistoryItem({ item: { data }, selected, ref, onPointerMo
       onPointerMove={onPointerMove}
     >
       {match(data)
-        .with({ tag: ClipType.Text }, ({ value: { text } }) => (
+        .with({ tag: ClipboardType.Text }, ({ value: { text } }) => (
           <>
             <Text />
             <span className={spanClass}>{text}</span>
           </>
         ))
-        .with({ tag: ClipType.Image }, ({ value: { height, width } }) => (
+        .with({ tag: ClipboardType.Image }, ({ value: { height, width } }) => (
           <>
             <Image />
             <span className={spanClass}>
@@ -37,20 +38,20 @@ export default function HistoryItem({ item: { data }, selected, ref, onPointerMo
             </span>
           </>
         ))
-        .with({ tag: ClipType.Files }, ({ value }) => (
+        .with({ tag: ClipboardType.Files }, ({ value }) => (
           <>
             <File />
             <span className={spanClass}>{value.map((file) => file.split('/').pop()).join(',')}</span>
             <Badge>{value.length} Files</Badge>
           </>
         ))
-        .with({ tag: ClipType.Rtf }, ({ value: { plainText } }) => (
+        .with({ tag: ClipboardType.Rtf }, ({ value: { plainText } }) => (
           <>
             <Code />
             <span className={spanClass}>{plainText}</span>
           </>
         ))
-        .with({ tag: ClipType.Html }, ({ value: { plainText } }) => (
+        .with({ tag: ClipboardType.Html }, ({ value: { plainText } }) => (
           <>
             <CodeXml />
             <span className={spanClass}>{plainText}</span>

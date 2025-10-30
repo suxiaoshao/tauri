@@ -1,11 +1,13 @@
 import { match } from 'ts-pattern';
-import { ClipType, type ClipHistory } from '../hooks/useClipData';
+import { type ClipHistory } from '../hooks/useClipData';
 import { Separator } from '@hclipboard/components/ui/separator';
 import formatTime from '@hclipboard/utils/formatTime';
 import { Fragment } from 'react/jsx-runtime';
 import prettyBytes from 'pretty-bytes';
 import { RTFJS } from 'rtf.js';
 import { useCallback, useEffect, useState } from 'react';
+import { encodeNonAsciiHTML } from 'entities';
+import { ClipboardType } from '@hclipboard/rpc/query';
 
 RTFJS.loggingEnabled(false);
 
@@ -102,31 +104,37 @@ export default function HistoryDetails({ item }: HistoryDetailsProps) {
     <div className="flex flex-col h-full w-full">
       {match(item)
         .with(
-          { data: { tag: ClipType.Text } },
+          { data: { tag: ClipboardType.Text } },
           ({
             data: {
               value: { charCount, text, wordCount },
             },
             updateTime,
-          }) => (
-            <>
-              <div className="flex-1 overflow-y-auto p-3">
-                <p className="leading-7">{text}</p>
-              </div>
-              <Separator />
-              <Informations
-                items={[
-                  { label: 'Content Type', value: 'Text' },
-                  { label: 'Char Count', value: charCount },
-                  { label: 'Word Count', value: wordCount },
-                  { label: 'Copied', value: formatTime(updateTime) },
-                ]}
-              />
-            </>
-          ),
+          }) => {
+            const dataList = text.split('\n').map((value) => encodeNonAsciiHTML(value).replaceAll(' ', '&nbsp;'));
+            return (
+              <>
+                <div className="flex-1 overflow-y-auto p-3">
+                  {dataList.map((value, index) => (
+                    // oxlint-disable-next-line no-array-index-key no-danger
+                    <p key={index} className="leading-7 break-all" dangerouslySetInnerHTML={{ __html: value }} />
+                  ))}
+                </div>
+                <Separator />
+                <Informations
+                  items={[
+                    { label: 'Content Type', value: 'Text' },
+                    { label: 'Char Count', value: charCount },
+                    { label: 'Word Count', value: wordCount },
+                    { label: 'Copied', value: formatTime(updateTime) },
+                  ]}
+                />
+              </>
+            );
+          },
         )
         .with(
-          { data: { tag: ClipType.Image } },
+          { data: { tag: ClipboardType.Image } },
           ({
             data: {
               value: { data, height, size, width },
@@ -152,7 +160,7 @@ export default function HistoryDetails({ item }: HistoryDetailsProps) {
             );
           },
         )
-        .with({ data: { tag: ClipType.Files } }, ({ data: { value }, updateTime }) => (
+        .with({ data: { tag: ClipboardType.Files } }, ({ data: { value }, updateTime }) => (
           <>
             <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-2">
               {value.map((file) => (
@@ -172,7 +180,7 @@ export default function HistoryDetails({ item }: HistoryDetailsProps) {
           </>
         ))
         .with(
-          { data: { tag: ClipType.Html } },
+          { data: { tag: ClipboardType.Html } },
           ({
             data: {
               value: { text, charCount, wordCount },
@@ -195,7 +203,7 @@ export default function HistoryDetails({ item }: HistoryDetailsProps) {
           ),
         )
         .with(
-          { data: { tag: ClipType.Rtf } },
+          { data: { tag: ClipboardType.Rtf } },
           ({
             data: {
               value: { text, charCount, wordCount },

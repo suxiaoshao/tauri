@@ -2821,6 +2821,7 @@ dependencies = [
  "tauri-plugin-global-shortcut",
  "tauri-plugin-log",
  "tauri-plugin-notification",
+ "tauri-plugin-os",
  "thiserror 2.0.17",
  "time",
  "tokio",

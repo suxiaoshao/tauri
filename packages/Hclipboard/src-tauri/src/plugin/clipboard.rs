@@ -3,7 +3,7 @@ use crate::plugin::window::{FrontmostApp, restore_frontmost_app};
 use crate::{
     clipboard::Clipboard,
     error::{ClipError, ClipResult},
-    store::{self, DbConn, History},
+    store::{self, ClipboardType, DbConn, History},
 };
 use ciborium::into_writer;
 use clipboard_rs::ClipboardWatcher;
@@ -60,9 +60,13 @@ fn setup<R: Runtime>(app: &AppHandle<R>) -> ClipResult<()> {
 }
 
 #[tauri::command]
-fn query_history(search_name: Option<String>, state: tauri::State<DbConn>) -> ClipResult<Response> {
+fn query_history(
+    search_name: Option<String>,
+    clipboard_type: Option<ClipboardType>,
+    state: tauri::State<DbConn>,
+) -> ClipResult<Response> {
     let mut conn = state.get()?;
-    let data = History::query(search_name.as_deref(), &mut conn)?;
+    let data = History::query(search_name.as_deref(), clipboard_type, &mut conn)?;
     let mut bytes = Vec::new();
     into_writer(&data, &mut bytes)?;
     Ok(Response::new(bytes))

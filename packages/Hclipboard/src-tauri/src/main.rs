@@ -20,6 +20,7 @@ fn main() -> ClipResult<()> {
         Ok(())
     });
     app.plugin(tauri_plugin_notification::init())
+        .plugin(tauri_plugin_os::init())
         .plugin(
             tauri_plugin_log::Builder::default()
                 .level(LevelFilter::Info)

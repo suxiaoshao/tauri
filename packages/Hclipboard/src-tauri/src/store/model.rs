@@ -6,7 +6,7 @@ use std::{
     str::FromStr,
 };
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, serde::Serialize, serde::Deserialize, Debug)]
 pub enum ClipboardType {
     Text,
     Image,
@@ -112,8 +112,18 @@ impl HistoryModel {
             .load::<HistoryModel>(conn)?;
         Ok(data)
     }
+    /// 根据 type 获取历史记录
+    pub(super) fn query_by_type(
+        r#type: ClipboardType,
+        conn: &mut SqliteConnection,
+    ) -> ClipResult<Vec<HistoryModel>> {
+        let data = history::table
+            .filter(history::type_.eq(r#type.to_string()))
+            .order(history::update_time.desc())
+            .load::<HistoryModel>(conn)?;
+        Ok(data)
+    }
 }
-
 #[cfg(test)]
 mod tests {
     use diesel::{
