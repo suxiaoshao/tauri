@@ -25,7 +25,7 @@ const getColorScheme = (
   return colorSetting;
 };
 
-export const colorSchemaMatch = window.matchMedia('(prefers-color-scheme: dark)');
+const colorSchemaMatch = window.matchMedia('(prefers-color-scheme: dark)');
 
 function getInitDate(): ThemeSliceType {
   const colorSetting = (window.localStorage.getItem('colorSetting') ?? 'system') as ThemeSliceType['colorSetting'];
@@ -40,7 +40,7 @@ function getInitDate(): ThemeSliceType {
   };
 }
 
-export const useThemeStore = create<
+const useThemeStore = create<
   ThemeSliceType & {
     // eslint-disable-next-line no-unexpected-multiline
     setSystemColorScheme: (scheme: ThemeSliceType['systemColorScheme']) => void;

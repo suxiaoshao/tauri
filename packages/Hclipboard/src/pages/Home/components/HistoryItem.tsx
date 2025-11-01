@@ -17,8 +17,9 @@ export default function HistoryItem({ item: { data }, selected, ref, onPointerMo
   return (
     <li
       className={cn(
-        'flex gap-2 px-2 py-3 text-sm outline-hidden select-none',
-        selected && 'bg-accent text-accent-foreground',
+        'flex gap-2 px-4 py-3 text-sm outline-hidden select-none relative',
+        selected &&
+          'after:bg-input after:left-1.5 after:top-0 after:absolute after:w-[calc(100%-(--spacing(3)))] after:h-full after:rounded-lg after:content-[""] after:-z-10',
       )}
       ref={ref}
       onPointerMove={onPointerMove}

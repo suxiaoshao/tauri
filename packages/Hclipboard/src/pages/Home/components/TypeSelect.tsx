@@ -32,7 +32,7 @@ const clipboardTypes = [
   },
   {
     value: ClipboardType.Files,
-    label: 'File',
+    label: 'Files',
   },
   {
     value: ClipboardType.Rtf,
@@ -83,8 +83,13 @@ export function TypeSelect({ value, onChange }: TypeSelectProps) {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        {/* oxlint-disable-next-line role-has-required-aria-props */}
-        <Button variant="outline" role="combobox" aria-expanded={open} className="w-[200px] justify-between">
+        <Button
+          variant="outline"
+          // oxlint-disable-next-line role-has-required-aria-props
+          role="combobox"
+          aria-expanded={open}
+          className="w-[200px] justify-between items-center"
+        >
           {match(value)
             .with(ClipboardType.Files, () => 'Files')
             .with(ClipboardType.Text, () => 'Text')
@@ -92,7 +97,14 @@ export function TypeSelect({ value, onChange }: TypeSelectProps) {
             .with(ClipboardType.Html, () => 'HTML')
             .with(ClipboardType.Rtf, () => 'RTF')
             .otherwise(() => 'All Types')}
-          <ChevronsUpDown className="opacity-50" />
+          <div className="flex gap-1 items-center">
+            <span className="text-muted-foreground">
+              {match(platform)
+                .with('macos', () => '⌘ P')
+                .otherwise(() => 'Ctrl P')}
+            </span>
+            <ChevronsUpDown className="opacity-50" />
+          </div>
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[200px] p-0">
@@ -119,10 +131,10 @@ export function TypeSelect({ value, onChange }: TypeSelectProps) {
             </CommandGroup>
             <CommandSeparator />
             <CommandGroup>
-              {clipboardTypes.map((framework) => (
+              {clipboardTypes.map((type) => (
                 <CommandItem
-                  key={framework.value}
-                  value={framework.value}
+                  key={type.value}
+                  value={type.value}
                   onSelect={(currentValue: unknown) => {
                     onChange(
                       match(currentValue)
@@ -135,10 +147,10 @@ export function TypeSelect({ value, onChange }: TypeSelectProps) {
                     setOpen(false);
                   }}
                 >
-                  {framework.label}
+                  {type.label}
                   <Check
                     visibility={match(value)
-                      .with(framework.value, () => 'visible')
+                      .with(type.value, () => 'visible')
                       .otherwise(() => 'hidden')}
                     className={cn('ml-auto')}
                   />

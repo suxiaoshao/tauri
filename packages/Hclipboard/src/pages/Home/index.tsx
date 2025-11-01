@@ -81,16 +81,22 @@ export default function Home() {
     }
     match(e.key)
       .with('ArrowUp', () => {
-        if (selectedIndex > 0) {
-          setSelectedIndex(selectedIndex - 1);
+        setSelectedIndex((oldValue) => {
+          if (oldValue > 0) {
+            return oldValue - 1;
+          }
           e.preventDefault();
-        }
+          return oldValue;
+        });
       })
       .with('ArrowDown', () => {
-        if (selectedIndex < data.length - 1) {
-          setSelectedIndex(selectedIndex + 1);
+        setSelectedIndex((oldValue) => {
+          if (oldValue < data.length - 1) {
+            return oldValue + 1;
+          }
           e.preventDefault();
-        }
+          return oldValue;
+        });
       })
       .with('Enter', async () => {
         const item = data.at(selectedIndex);
@@ -109,7 +115,7 @@ export default function Home() {
 
   return (
     <div className="w-full h-full flex flex-col" onKeyDown={handleKeyDown}>
-      <div className="p-3 pl-4 pr-4 flex">
+      <div className="p-3 pl-4 pr-4 flex items-center" data-tauri-drag-region>
         <input
           className="appearance-none border-none focus:outline-none flex-1"
           placeholder="搜索"
@@ -123,7 +129,7 @@ export default function Home() {
       <Separator />
       <ResizablePanelGroup className="flex-1" direction="horizontal">
         <ResizablePanel defaultSize={35}>
-          <ul className="overflow-y-auto h-full">
+          <ul className="overflow-y-auto h-[calc(100%-(--spacing(4)))] mt-2 mb-2">
             {data.map((item, index) => (
               <HistoryItem
                 key={item.id}
