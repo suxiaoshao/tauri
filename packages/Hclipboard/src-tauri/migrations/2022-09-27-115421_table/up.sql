@@ -2,7 +2,8 @@
 create table history
 (
     id          INTEGER primary key autoincrement not null,
-    data        text                              not null,
+    data        blob                              not null,
+    type        text                              not null check ( type in ('text', 'rtf', 'html', 'image', 'files') ),
     update_time NUMERIC                           not null
 );
 

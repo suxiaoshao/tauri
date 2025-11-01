@@ -8,7 +8,7 @@
     "clipboard:default",
     "notification:default",
     "core:window:allow-start-dragging",
-    "clipboard-manager:allow-write-text",
-    "core:window:allow-hide"
+    "core:window:allow-hide",
+    "os:default"
   ]
 }

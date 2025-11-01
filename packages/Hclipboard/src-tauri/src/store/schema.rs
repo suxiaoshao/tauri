@@ -3,7 +3,9 @@
 diesel::table! {
     history (id) {
         id -> Integer,
-        data -> Text,
+        data -> Binary,
+        #[sql_name = "type"]
+        type_ -> Text,
         update_time -> BigInt,
     }
 }

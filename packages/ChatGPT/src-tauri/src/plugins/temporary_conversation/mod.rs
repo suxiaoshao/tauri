@@ -5,6 +5,8 @@
  * @LastEditTime: 2024-09-25 02:21:13
  * @FilePath: /tauri/packages/ChatGPT/src-tauri/src/plugins/temporary_conversation/mod.rs
  */
+use super::ChatGPTConfig;
+use crate::errors::ChatGPTResult;
 use history::TemporaryStore;
 #[cfg(target_os = "macos")]
 use objc2::rc::Retained;
@@ -16,10 +18,6 @@ use tauri::{AppHandle, Manager, Runtime, WebviewWindow, WebviewWindowBuilder, Wi
 use tauri_plugin_global_shortcut::{GlobalShortcutExt, Shortcut};
 use tauri_plugin_positioner::{Position, WindowExt};
 
-use crate::errors::ChatGPTResult;
-
-use super::ChatGPTConfig;
-mod delay;
 mod history;
 mod listen;
 
@@ -146,8 +144,8 @@ pub fn on_shortcut_trigger<R: Runtime>(
 #[cfg(target_os = "macos")]
 fn record_frontmost_app() -> Option<Retained<NSRunningApplication>> {
     // 获取 [NSWorkspace sharedWorkspace].frontmostApplication
-    let workspace = unsafe { NSWorkspace::sharedWorkspace() };
-    unsafe { workspace.frontmostApplication() }
+    let workspace = NSWorkspace::sharedWorkspace();
+    workspace.frontmostApplication()
 }
 
 #[cfg(target_os = "macos")]
@@ -155,11 +153,9 @@ fn restore_frontmost_app(prev_app: &Option<Retained<NSRunningApplication>>) {
     // 调用 [prevApp activateWithOptions:NSApplicationActivateIgnoringOtherApps]
     const NSAPPLICATION_ACTIVATE_IGNORING_OTHER_APPS: usize = 1 << 1;
     if let Some(app) = prev_app.as_ref() {
-        unsafe {
-            app.activateWithOptions(NSApplicationActivationOptions(
-                NSAPPLICATION_ACTIVATE_IGNORING_OTHER_APPS,
-            ));
-        }
+        app.activateWithOptions(NSApplicationActivationOptions(
+            NSAPPLICATION_ACTIVATE_IGNORING_OTHER_APPS,
+        ));
     }
 }
 

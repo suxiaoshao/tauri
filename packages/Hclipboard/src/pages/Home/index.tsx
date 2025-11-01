@@ -5,90 +5,161 @@
  * @LastEditTime: 2024-03-07 00:42:35
  * @FilePath: /self-tools/Users/sushao/Documents/code/tauri/packages/Hclipboard/src/pages/Home/index.tsx
  */
-import { Box, List, TextField } from '@mui/material';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
-import { useCallback, useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { useKey } from 'react-use';
-import { match } from 'ts-pattern';
-import { copyToClipboard } from '../../rpc/query';
+import React, { useEffect, useReducer, useState } from 'react';
 import HistoryItem from './components/HistoryItem';
 import useClipData from './hooks/useClipData';
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@hclipboard/components/ui/resizable';
+import { Separator } from '@hclipboard/components/ui/separator';
+import { match, P } from 'ts-pattern';
+import { type ClipboardType, copyToClipboard, type QueryHistoryRequest } from '@hclipboard/rpc/query';
+import HistoryDetails from './components/HistoryDetails';
+import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@hclipboard/components/ui/empty';
+import { Copy } from 'lucide-react';
+import { TypeSelect } from './components/TypeSelect';
+import type { Enum } from 'types';
 const appWindow = getCurrentWebviewWindow();
 
+type Action =
+  | Enum<'setSearchName', string | undefined>
+  | Enum<'setClipboardType', ClipboardType | undefined>
+  | Enum<'reset'>;
+
+function reducer(state: QueryHistoryRequest, action: Action): QueryHistoryRequest {
+  return match(action)
+    .with({ tag: 'setSearchName' }, ({ value }) => ({ ...state, searchName: value }))
+    .with(
+      {
+        tag: 'setClipboardType',
+      },
+      ({ value }) => ({ ...state, clipboardType: value }),
+    )
+    .with(
+      {
+        tag: 'reset',
+      },
+      () => ({ clipboardType: undefined, searchName: undefined }),
+    )
+    .otherwise(() => state);
+}
+
 export default function Home() {
-  // 表单
-  const { register, watch, setValue } = useForm<{ searchData?: string }>();
-  const searchName = watch('searchData');
+  const [state, dispatch] = useReducer(reducer, { clipboardType: undefined, searchName: undefined });
   // 历史记录
-  const data = useClipData(searchName);
-  // 被选择
-  const [selectIndex, setSelectIndex] = useState<number>(0);
+  const data = useClipData(state);
+  const [selectedIndex, setSelectedIndex] = useState<number>(0);
   useEffect(() => {
-    setSelectIndex(0);
+    setSelectedIndex(0);
   }, [data]);
-  const add = useCallback(() => {
-    if (selectIndex < data.length - 1) {
-      setSelectIndex((value) => value + 1);
-    }
-  }, [data.length, selectIndex]);
-  const sub = useCallback(() => {
-    if (selectIndex >= 1) {
-      setSelectIndex((value) => value - 1);
-    }
-  }, [selectIndex]);
-  useKey('ArrowUp', sub, undefined, [sub]);
-  useKey('ArrowDown', add, undefined, [add]);
-  useKey(
-    'Enter',
-    async () => {
-      const item = data[selectIndex];
-      await copyToClipboard(item.data);
-    },
-    undefined,
-    [data, selectIndex],
-  );
+  // focus
+  const [inputRef, setInputRef] = useState<HTMLInputElement | null>(null);
   useEffect(() => {
-    const fn = appWindow.onFocusChanged(() => {
-      setValue('searchData', '');
+    inputRef?.focus();
+    const unlisten = appWindow.onFocusChanged((handle) => {
+      if (handle) {
+        dispatch({ tag: 'reset' });
+        inputRef?.focus();
+      }
     });
     return () => {
       (async () => {
-        const f = await fn;
+        const f = await unlisten;
         f();
       })();
     };
-  }, [setValue]);
-  const [ref, setRef] = useState<HTMLDivElement | undefined>();
-  useEffect(() => {
-    if (ref) {
-      ref?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }, [inputRef]);
+  const detail = data.at(selectedIndex);
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    // Check if IME composition is finished before triggering key binds
+    // This prevents unwanted triggering while user is still inputting text with IME
+    // e.keyCode === 229 is for the CJK IME with Legacy Browser [https://w3c.github.io/uievents/#determine-keydown-keyup-keyCode]
+    // isComposing is for the CJK IME with Modern Browser [https://developer.mozilla.org/en-US/docs/Web/API/CompositionEvent/isComposing]
+    const isComposing = e.nativeEvent.isComposing;
+
+    if (e.defaultPrevented || isComposing) {
+      return;
     }
-  }, [ref]);
+    match(e.key)
+      .with('ArrowUp', () => {
+        setSelectedIndex((oldValue) => {
+          if (oldValue > 0) {
+            return oldValue - 1;
+          }
+          e.preventDefault();
+          return oldValue;
+        });
+      })
+      .with('ArrowDown', () => {
+        setSelectedIndex((oldValue) => {
+          if (oldValue < data.length - 1) {
+            return oldValue + 1;
+          }
+          e.preventDefault();
+          return oldValue;
+        });
+      })
+      .with('Enter', async () => {
+        const item = data.at(selectedIndex);
+        if (!item) return;
+        await copyToClipboard(item.id);
+      })
+      // oxlint-disable-next-line no-empty-function
+      .otherwise(() => {});
+  };
+  const [selectedRef, setSelectedRef] = useState<HTMLInputElement | null>(null);
+  useEffect(() => {
+    if (selectedRef) {
+      selectedRef?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+  }, [selectedRef]);
+
   return (
-    <Box
-      sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 1 }}
-    >
-      <TextField
-        placeholder="搜索"
-        sx={{ margin: 1 }}
-        {...register('searchData')}
-        slotProps={{ htmlInput: { spellCheck: 'false' } }}
-      />
-      <List sx={{ flex: '1 1 0', overflowY: 'auto', width: '100%' }}>
-        {data.map((item, index) => (
-          <HistoryItem
-            index={index}
-            key={item.id}
-            item={item}
-            selected={selectIndex === index}
-            isLast={index === data.length - 1}
-            {...match(selectIndex)
-              .with(index, () => ({ ref: setRef }))
-              .otherwise(() => ({}))}
-          />
-        ))}
-      </List>
-    </Box>
+    <div className="w-full h-full flex flex-col" onKeyDown={handleKeyDown}>
+      <div className="p-3 pl-4 pr-4 flex items-center" data-tauri-drag-region>
+        <input
+          className="appearance-none border-none focus:outline-none flex-1"
+          placeholder="搜索"
+          spellCheck={false}
+          ref={setInputRef}
+          value={state.searchName}
+          onChange={(e) => dispatch({ tag: 'setSearchName', value: e.target.value || undefined })}
+        />
+        <TypeSelect value={state.clipboardType} onChange={(value) => dispatch({ tag: 'setClipboardType', value })} />
+      </div>
+      <Separator />
+      <ResizablePanelGroup className="flex-1" direction="horizontal">
+        <ResizablePanel defaultSize={35}>
+          <ul className="overflow-y-auto h-[calc(100%-(--spacing(4)))] mt-2 mb-2">
+            {data.map((item, index) => (
+              <HistoryItem
+                key={item.id}
+                item={item}
+                selected={index === selectedIndex}
+                {...match(selectedIndex)
+                  .with(index, () => ({ ref: setSelectedRef }))
+                  .otherwise(() => ({}))}
+                onPointerMove={() => setSelectedIndex(index)}
+              />
+            ))}
+          </ul>
+        </ResizablePanel>
+        <ResizableHandle />
+        <ResizablePanel>
+          {match(detail)
+            .with(P.nonNullable, (data) => <HistoryDetails item={data} />)
+            .otherwise(() => (
+              <Empty>
+                <EmptyHeader>
+                  <EmptyMedia variant="icon">
+                    <Copy />
+                  </EmptyMedia>
+                  <EmptyTitle>No data</EmptyTitle>
+                  <EmptyDescription>No data found</EmptyDescription>
+                </EmptyHeader>
+              </Empty>
+            ))}
+        </ResizablePanel>
+      </ResizablePanelGroup>
+    </div>
   );
 }

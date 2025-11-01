@@ -11,15 +11,15 @@ use objc2::rc::Retained;
 use objc2_app_kit::{NSApplicationActivationOptions, NSRunningApplication, NSWorkspace};
 #[cfg(target_os = "macos")]
 use std::sync::{Arc, Mutex};
-use tauri::{AppHandle, Manager, Runtime};
+use tauri::{AppHandle, Manager, Runtime, WebviewWindowBuilder};
 
 use crate::error::ClipResult;
 
 #[cfg(target_os = "macos")]
 fn record_frontmost_app() -> Option<Retained<NSRunningApplication>> {
     // 获取 [NSWorkspace sharedWorkspace].frontmostApplication
-    let workspace = unsafe { NSWorkspace::sharedWorkspace() };
-    unsafe { workspace.frontmostApplication() }
+    let workspace = NSWorkspace::sharedWorkspace();
+    workspace.frontmostApplication()
 }
 
 #[cfg(target_os = "macos")]
@@ -27,11 +27,9 @@ pub fn restore_frontmost_app(prev_app: &Option<Retained<NSRunningApplication>>) 
     // 调用 [prevApp activateWithOptions:NSApplicationActivateIgnoringOtherApps]
     const NSAPPLICATION_ACTIVATE_IGNORING_OTHER_APPS: usize = 1 << 1;
     if let Some(app) = prev_app.as_ref() {
-        unsafe {
-            app.activateWithOptions(NSApplicationActivationOptions(
-                NSAPPLICATION_ACTIVATE_IGNORING_OTHER_APPS,
-            ));
-        }
+        app.activateWithOptions(NSApplicationActivationOptions(
+            NSAPPLICATION_ACTIVATE_IGNORING_OTHER_APPS,
+        ));
     }
 }
 
@@ -68,6 +66,43 @@ pub fn on_short<R: Runtime>(app: &AppHandle<R>) -> ClipResult<()> {
             window.show()?;
             window.set_focus()?;
         }
+    } else {
+        #[cfg(target_os = "macos")]
+        {
+            let prev_app = record_frontmost_app();
+            match app.try_state::<FrontmostApp>() {
+                Some(old_prev_app) => {
+                    *old_prev_app.lock().unwrap() = prev_app;
+                }
+                None => {
+                    app.manage(Arc::new(Mutex::new(prev_app)));
+                }
+            }
+        }
+        create_main_window(app)?;
     }
+    Ok(())
+}
+
+fn create_main_window<R: Runtime>(app: &AppHandle<R>) -> ClipResult<()> {
+    let window = WebviewWindowBuilder::new(app, "main", tauri::WebviewUrl::App("/".into()))
+        .title("Hclipboard")
+        .fullscreen(false)
+        .inner_size(800.0, 600.0)
+        .skip_taskbar(true)
+        .transparent(true)
+        .always_on_top(true)
+        .center();
+    #[cfg(target_os = "macos")]
+    let window = window
+        .title_bar_style(tauri::TitleBarStyle::Overlay)
+        .hidden_title(true);
+    #[cfg(target_os = "windows")]
+    let window = window.decorations(false);
+    let window = window.build()?;
+
+    window.show()?;
+    window.set_focus()?;
+
     Ok(())
 }
