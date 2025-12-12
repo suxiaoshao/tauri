@@ -77,5 +77,22 @@
   "conversation_template_deleted": "会话模板已删除",
   "an_unknown_error_occurred": "发生了未知错误",
   "message_id_is_empty": "消息 ID 为空",
-  "plugin_name": "插件:{{name}}"
+  "plugin_name": "插件:{{name}}",
+  "plugin_no_found": "未找到插件",
+  "conversation_tree": "会话树",
+  "actions": "操作",
+  "folder_empty_title": "文件夹为空",
+  "folder_empty_description": "您还没有创建任何文件夹和对话。开始创建您的第一个文件夹吧。",
+  "create_folder": "创建文件夹",
+  "create_conversation": "创建会话",
+  "move_folder": "移动文件夹",
+  "parent_folder": "父文件夹",
+  "modify_folder": "修改文件夹",
+  "source": "原始内容",
+  "send_content": "发送内容",
+  "conversation_not_found": "会话未找到",
+  "add": "添加 {{name}}",
+  "open": "打开 {{name}}",
+  "category": "分类",
+  "template_not_found": "模板未找到"
 }

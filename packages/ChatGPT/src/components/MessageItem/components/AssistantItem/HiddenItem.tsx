@@ -1,11 +1,12 @@
 import assistant from '@chatgpt/assets/assistant.jpg';
-import { Avatar, Box, Divider } from '@mui/material';
-import { AvatarSx, MessageSelectedSx, MessageSx } from '../../const';
+import { avatarClassName, messageClassName, messageSelectedClassName } from '../../const';
 import { type BaseMessage } from '../../types';
 import ToolBar from '../ToolBar';
 import DeleteMessageIcon from '../ToolBar/DeleteMessageIcon';
 import { useState, useEffect } from 'react';
-import { match } from 'ts-pattern';
+import { cn } from '@chatgpt/lib/utils';
+import { Separator } from '@chatgpt/components/ui/separator';
+import { Avatar, AvatarImage } from '@chatgpt/components/ui/avatar';
 
 export interface HiddenItemProps {
   message: BaseMessage;
@@ -19,18 +20,17 @@ export default function HiddenItem({ message, selected }: HiddenItemProps) {
       ref?.scrollIntoView({ block: 'start', behavior: 'smooth' });
     }
   }, [ref, selected]);
-  const sx = match(selected)
-    .with(true, () => ({ ...MessageSx, ...MessageSelectedSx }))
-    .otherwise(() => MessageSx);
   return (
     <>
-      <Box sx={sx} ref={setRef}>
-        <Avatar sx={AvatarSx} src={assistant} />
+      <div className={cn(selected && messageSelectedClassName, messageClassName)} ref={setRef}>
+        <Avatar className={avatarClassName}>
+          <AvatarImage src={assistant} />
+        </Avatar>
         <ToolBar>
           <DeleteMessageIcon id={message.id} />
         </ToolBar>
-      </Box>
-      <Divider />
+      </div>
+      <Separator />
     </>
   );
 }

@@ -1,28 +1,29 @@
 import FolderSelect from '@chatgpt/components/FolderSelect';
+import { Button } from '@chatgpt/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@chatgpt/components/ui/dialog';
+import { FieldError, FieldGroup, FieldLabel, Field } from '@chatgpt/components/ui/field';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@chatgpt/components/ui/tooltip';
+import { useBoolean } from '@chatgpt/hooks/use-boolean';
 import { type MoveFolderParams, moveFolder } from '@chatgpt/service/chat/mutation';
 import { type Folder } from '@chatgpt/types/folder';
-import DriveFileMoveIcon from '@mui/icons-material/DriveFileMove';
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  FormLabel,
-  IconButton,
-  Tooltip,
-} from '@mui/material';
-import { useCallback, useState } from 'react';
+import { FolderInput } from 'lucide-react';
+import { useCallback } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 export interface MoveFolderProps {
   folder: Folder;
 }
 
 export default function MoveFolder({ folder }: MoveFolderProps) {
-  const [open, setOpen] = useState(false);
-  const handleOpen = useCallback(() => setOpen(true), []);
-  const handleClose = useCallback(() => setOpen(false), []);
+  const [open, { set, setFalse }] = useBoolean(false);
   const { control, handleSubmit } = useForm<Pick<MoveFolderParams, 'parentId'>>({
     defaultValues: {
       parentId: folder.parentId,
@@ -31,46 +32,46 @@ export default function MoveFolder({ folder }: MoveFolderProps) {
   const onSubmit = useCallback(
     async ({ parentId }: Pick<MoveFolderParams, 'parentId'>) => {
       await moveFolder({ parentId, id: folder.id });
-      handleClose();
+      setFalse();
     },
-    [folder.id, handleClose],
+    [folder.id, setFalse],
   );
+  const { t } = useTranslation();
   return (
-    <>
-      <Tooltip title="Move">
-        <IconButton onClick={handleOpen}>
-          <DriveFileMoveIcon />
-        </IconButton>
+    <Dialog open={open} onOpenChange={set}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <DialogTrigger asChild>
+            <Button variant="ghost" size="icon">
+              <FolderInput />
+            </Button>
+          </DialogTrigger>
+        </TooltipTrigger>
+        <TooltipContent>{t('move')}</TooltipContent>
       </Tooltip>
-      <Dialog
-        component="form"
-        onSubmit={handleSubmit(onSubmit)}
-        open={open}
-        onClose={handleClose}
-        fullWidth
-        sx={{
-          height: '500px',
-          '& .MuiDialog-paper': {
-            backgroundColor: (theme) => theme.palette.background.paper + 'a0',
-            backdropFilter: 'blur(20px)',
-          },
-        }}
-      >
-        <DialogTitle>Move Folder</DialogTitle>
-        <DialogContent>
-          <FormLabel sx={{ display: 'block' }}>Parent Folder :</FormLabel>
-          <Controller
-            control={control}
-            name="parentId"
-            render={({ field }) => <FolderSelect {...field} disabledFolderIds={[folder.id]} />}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button variant="text" type="submit">
-            Move
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{t('move_folder')}</DialogTitle>
+        </DialogHeader>
+        <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
+          <FieldGroup>
+            <Controller
+              control={control}
+              name="parentId"
+              render={({ field, fieldState }) => (
+                <Field>
+                  <FieldLabel>{t('parent_folder')}</FieldLabel>
+                  <FolderSelect {...field} disabledFolderIds={[folder.id]} />
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                </Field>
+              )}
+            />
+          </FieldGroup>
+          <DialogFooter>
+            <Button type="submit">{t('move')}</Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }

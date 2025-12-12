@@ -1,10 +1,11 @@
-import { Close } from '@mui/icons-material';
-import { IconButton, InputAdornment, TextField, type TextFieldProps } from '@mui/material';
-import { useCallback, useEffect, useState } from 'react';
+import { type ComponentProps, useCallback, useEffect, useState } from 'react';
 import { useRecordHotkeys } from 'react-hotkeys-hook';
 import { match } from 'ts-pattern';
+import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '../ui/input-group';
+import { XIcon } from 'lucide-react';
 
-export interface HotkeyInputProps extends Omit<TextFieldProps, 'value' | 'onChange' | 'onBlur' | 'onFucos'> {
+export interface HotkeyInputProps
+  extends Omit<ComponentProps<typeof InputGroupInput>, 'value' | 'onChange' | 'onBlur' | 'onFocus'> {
   value?: string | null;
   onChange: (event: { target: { value: string | null } }) => void;
   onBlur?: (event: { target: { value: string | null } }) => void;
@@ -47,27 +48,23 @@ function HotkeyInput({ value, onChange, onBlur, ...props }: HotkeyInputProps) {
   }, [onChange]);
 
   return (
-    <TextField
-      {...props}
-      value={innerValue ?? ''}
-      onFocus={() => {
-        match(isRecording)
-          .with(true, () => stop())
-          .otherwise(() => start());
-      }}
-      onBlur={handleBlur}
-      slotProps={{
-        input: {
-          endAdornment: (
-            <InputAdornment position="end">
-              <IconButton onClick={handleClear} edge="end">
-                <Close />
-              </IconButton>
-            </InputAdornment>
-          ),
-        },
-      }}
-    />
+    <InputGroup>
+      <InputGroupInput
+        {...props}
+        value={innerValue ?? ''}
+        onFocus={() => {
+          match(isRecording)
+            .with(true, () => stop())
+            .otherwise(() => start());
+        }}
+        onBlur={handleBlur}
+      />
+      <InputGroupAddon align="inline-end">
+        <InputGroupButton type="button" variant="ghost" size="icon-xs" onClick={handleClear}>
+          <XIcon />
+        </InputGroupButton>
+      </InputGroupAddon>
+    </InputGroup>
   );
 }
 

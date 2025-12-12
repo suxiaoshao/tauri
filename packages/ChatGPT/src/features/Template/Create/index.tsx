@@ -7,7 +7,6 @@
  */
 import { addConversationTemplate } from '@chatgpt/service/chat/mutation';
 import { type NewConversationTemplate } from '@chatgpt/types/conversationTemplate';
-import { Box } from '@mui/material';
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TemplateEdit, { type TemplateForm } from '../components/TemplateEdit';
@@ -30,17 +29,9 @@ export default function ConversationTemplateCreate() {
     [navigate],
   );
   return (
-    <Box
-      sx={{
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        backgroundColor: 'transparent',
-      }}
-    >
+    <div className="size-full flex flex-col">
       <TemplateCreateHeader formId={formId} />
       <TemplateEdit id={formId} onSubmit={handleSubmit} />
-    </Box>
+    </div>
   );
 }

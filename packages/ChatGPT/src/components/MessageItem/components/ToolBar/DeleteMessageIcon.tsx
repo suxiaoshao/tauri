@@ -1,9 +1,10 @@
 import { MessageActionContext } from '@chatgpt/components/MessageHistory/MessageActionContext';
-import { Delete } from '@mui/icons-material';
-import { IconButton, Tooltip } from '@mui/material';
+import { Trash } from 'lucide-react';
 import { useCallback, useContext } from 'react';
-import { ToolSx } from '../../const';
+import { toolClassName } from '../../const';
 import { useTranslation } from 'react-i18next';
+import { Button } from '@chatgpt/components/ui/button';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@chatgpt/components/ui/tooltip';
 
 export interface DeleteMessageIconProps {
   id: number;
@@ -18,10 +19,13 @@ export default function DeleteMessageIcon({ id }: DeleteMessageIconProps) {
     return null;
   }
   return (
-    <Tooltip title={t('delete_message')}>
-      <IconButton size="small" onClick={handleClick}>
-        <Delete fontSize="small" sx={ToolSx} />
-      </IconButton>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button size="icon-sm" variant="ghost" onClick={handleClick}>
+          <Trash className={toolClassName} />
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent>{t('delete_message')}</TooltipContent>
     </Tooltip>
   );
 }

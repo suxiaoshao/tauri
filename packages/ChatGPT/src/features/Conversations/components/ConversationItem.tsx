@@ -5,37 +5,55 @@
  * @LastEditTime: 2024-04-19 04:07:38
  * @FilePath: /tauri/packages/ChatGPT/src/features/Conversations/components/ConversationItem.tsx
  */
+import {
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
+} from '@chatgpt/components/ui/sidebar';
 import { type Conversation } from '@chatgpt/types/conversation';
-import { getNodeIdByConversation } from '@chatgpt/utils/chatData';
-import { Avatar, Box, Typography } from '@mui/material';
-import { TreeItem } from '@mui/x-tree-view';
+import { useSelected } from '../useSelected';
+import { match, P } from 'ts-pattern';
+import { SelectedType } from '../types';
+import { Link, useMatch } from 'react-router-dom';
 
 export interface ConversationItemProps {
   conversation: Conversation;
+  subItem: boolean;
 }
 
-export default function ConversationItem({ conversation }: ConversationItemProps) {
+export default function ConversationItem({ conversation, subItem }: ConversationItemProps) {
+  const matchHome = useMatch('/');
+  const [selected] = useSelected();
+  const isActive = match([selected, matchHome] as const)
+    .with([{ tag: SelectedType.Conversation, value: conversation.id }, P.nonNullable], () => true)
+    .otherwise(() => false);
+  const searchParams = new URLSearchParams({
+    selectedType: SelectedType.Conversation,
+    selectedId: conversation.id.toString(),
+  }).toString();
+  if (subItem) {
+    return (
+      <SidebarMenuSubItem>
+        <SidebarMenuSubButton asChild isActive={isActive}>
+          <Link replace={matchHome !== null} to={{ pathname: '/', search: searchParams }}>
+            {conversation.icon}
+            <span>{conversation.title}</span>
+            <span>{conversation.info}</span>
+          </Link>
+        </SidebarMenuSubButton>
+      </SidebarMenuSubItem>
+    );
+  }
   return (
-    <TreeItem
-      itemId={getNodeIdByConversation(conversation)}
-      label={
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            p: 0.5,
-            pr: 0,
-          }}
-        >
-          <Avatar sx={{ backgroundColor: 'transparent', width: 24, height: 24, mr: 1 }}>{conversation.icon}</Avatar>
-          <Typography variant="body2" sx={{ fontWeight: 'inherit', flexGrow: 1 }}>
-            {conversation.title}
-          </Typography>
-          <Typography variant="caption" color="inherit">
-            {conversation.info}
-          </Typography>
-        </Box>
-      }
-    />
+    <SidebarMenuItem>
+      <SidebarMenuButton asChild isActive={isActive}>
+        <Link replace={matchHome !== null} to={{ pathname: '/', search: searchParams }}>
+          {conversation.icon}
+          <span>{conversation.title}</span>
+          <span>{conversation.info}</span>
+        </Link>
+      </SidebarMenuButton>
+    </SidebarMenuItem>
   );
 }

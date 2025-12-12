@@ -7,11 +7,14 @@
  */
 import { type NewFolder } from '@chatgpt/types/folder';
 import { valibotResolver } from '@hookform/resolvers/valibot';
-import { Box, FormLabel, TextField, type BoxProps } from '@mui/material';
 import { Controller, useForm, type Resolver } from 'react-hook-form';
 import { integer, nullish, number, object, pipe, string, type InferInput } from 'valibot';
 import FolderSelect from '../FolderSelect';
 import { useTranslation } from 'react-i18next';
+import { cn } from '@chatgpt/lib/utils';
+import type { ComponentProps } from 'react';
+import { FieldError, FieldGroup, FieldLabel, Field } from '../ui/field';
+import { Input } from '../ui/input';
 
 const folderSchema = object({ name: string(), parentId: nullish(pipe(number(), integer())) });
 
@@ -19,12 +22,12 @@ export type FolderForm = InferInput<typeof folderSchema>;
 
 const DefaultValues: Partial<NewFolder> = {};
 
-export interface FolderEditProps extends Omit<BoxProps<'form'>, 'component' | 'id' | 'onSubmit'> {
+export interface FolderEditProps extends Omit<ComponentProps<'form'>, 'component' | 'id' | 'onSubmit'> {
   initialValues?: NewFolder;
   id: string;
   onSubmit: (newFolder: FolderForm) => Promise<void>;
 }
-export default function FolderEdit({ initialValues, id, sx, onSubmit: submit, ...props }: FolderEditProps) {
+export default function FolderEdit({ initialValues, id, className, onSubmit: submit, ...props }: FolderEditProps) {
   const {
     register,
     handleSubmit,
@@ -37,31 +40,30 @@ export default function FolderEdit({ initialValues, id, sx, onSubmit: submit, ..
   const onSubmit = handleSubmit(submit);
   const { t } = useTranslation();
   return (
-    <Box
+    <form
+      className={cn('grow flex flex-col relative overflow-y-auto', className)}
       {...props}
-      sx={{
-        flex: '1 1 0',
-        display: 'flex',
-        flexDirection: 'column',
-        position: 'relative',
-        overflowY: 'auto',
-        p: 2,
-        ...sx,
-      }}
-      component="form"
       id={id}
       onSubmit={onSubmit}
     >
-      <TextField
-        error={!!errors.name?.message}
-        helperText={errors.name?.message}
-        {...register('name', { required: true })}
-        required
-        label={t('title')}
-        fullWidth
-      />
-      <FormLabel sx={{ mt: 2 }}>{t('folder')}</FormLabel>
-      <Controller control={control} name="parentId" render={({ field }) => <FolderSelect {...field} />} />
-    </Box>
+      <FieldGroup>
+        <Field>
+          <FieldLabel>{t('title')}</FieldLabel>
+          <Input {...register('name', { required: true })} />
+          {errors.name && <FieldError errors={[errors.name]} />}
+        </Field>
+        <Controller
+          control={control}
+          name="parentId"
+          render={({ field, fieldState }) => (
+            <Field>
+              <FieldLabel>{t('folder')}</FieldLabel>
+              <FolderSelect {...field} />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+      </FieldGroup>
+    </form>
   );
 }

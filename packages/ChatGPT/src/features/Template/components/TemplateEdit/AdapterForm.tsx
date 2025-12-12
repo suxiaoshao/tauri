@@ -3,11 +3,13 @@ import Loading from '@chatgpt/components/Loading';
 import { InputItemForm } from '@chatgpt/features/Setting/Adapter';
 import usePromise, { PromiseStatus } from '@chatgpt/hooks/usePromise';
 import { getAllAdapterTemplateInputs } from '@chatgpt/service/adapter';
-import { Box, Divider, MenuItem, TextField } from '@mui/material';
 import { Controller, useFormContext, useWatch } from 'react-hook-form';
 import { match } from 'ts-pattern';
 import type { TemplateForm } from '.';
 import { useTranslation } from 'react-i18next';
+import { Fragment } from 'react/jsx-runtime';
+import { Field, FieldError, FieldLabel, FieldSeparator } from '@chatgpt/components/ui/field';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@chatgpt/components/ui/select';
 
 export default function AdapterForm() {
   const { control } = useFormContext<TemplateForm>();
@@ -19,30 +21,31 @@ export default function AdapterForm() {
   const { t } = useTranslation();
 
   const content = match(data)
-    .with({ tag: PromiseStatus.loading }, () => <Loading sx={{ width: '100%', height: '100%' }} />)
+    .with({ tag: PromiseStatus.loading }, () => <Loading className="size-full" />)
     .with({ tag: PromiseStatus.error }, ({ value }) => <ErrorInfo error={value} refetch={fn} />)
     .with({ tag: PromiseStatus.data }, ({ value }) => (
-      <Box sx={{ gap: 2, display: 'flex', flexDirection: 'column' }}>
+      <Fragment>
         <Controller
           control={control}
           name="adapter"
           rules={{ required: true }}
-          render={({ field, fieldState }) => (
-            <TextField
-              error={!!fieldState?.error?.message}
-              helperText={fieldState?.error?.message}
-              select
-              label={t('adapter')}
-              required
-              fullWidth
-              {...field}
-            >
-              {value.map(({ name }) => (
-                <MenuItem key={name} value={name}>
-                  {name}
-                </MenuItem>
-              ))}
-            </TextField>
+          render={({ field: { onChange, ...field }, fieldState }) => (
+            <Field>
+              <FieldLabel>{t('adapter')}</FieldLabel>
+              <Select onValueChange={onChange} {...field}>
+                <SelectTrigger>
+                  <SelectValue placeholder={t('adapter')} />
+                </SelectTrigger>
+                <SelectContent>
+                  {value.map(({ name }) => (
+                    <SelectItem key={name} value={name}>
+                      {name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
           )}
         />
         {value
@@ -50,9 +53,9 @@ export default function AdapterForm() {
           ?.inputs.map((input) => (
             <InputItemForm key={input.id} inputItem={input} prefixName="template" />
           ))}
-        <Divider />
-      </Box>
+        <FieldSeparator />
+      </Fragment>
     ))
-    .otherwise(() => <Loading sx={{ width: '100%', height: '100%' }} />);
+    .otherwise(() => <Loading className="size-full" />);
   return content;
 }

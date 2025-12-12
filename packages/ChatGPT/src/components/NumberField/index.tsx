@@ -5,11 +5,11 @@
  * @LastEditTime: 2024-04-19 11:57:40
  * @FilePath: /self-tools/Users/sushao/Documents/code/tauri/packages/ChatGPT/src/components/NumberField/index.tsx
  */
-import { TextField, type TextFieldProps } from '@mui/material';
-import React, { useImperativeHandle } from 'react';
+import React, { type ComponentProps, useImperativeHandle } from 'react';
 import { match, P } from 'ts-pattern';
+import { Input } from '../ui/input';
 
-export interface NumberFieldProps extends Omit<TextFieldProps, 'type' | 'onChange'> {
+export interface NumberFieldProps extends Omit<ComponentProps<'input'>, 'type' | 'onChange'> {
   onChange?: (value: { target: { value: number } }) => void;
   ref: React.Ref<HTMLInputElement | null>;
 }
@@ -105,7 +105,7 @@ function NumberField({ onChange, ref, ...props }: NumberFieldProps) {
   useImperativeHandle<HTMLInputElement | null, HTMLInputElement | null>(ref, () => {
     return proxy(sourceRef);
   }, [sourceRef]);
-  return <TextField type="number" onChange={handleChange} {...props} inputRef={setSourceRef} />;
+  return <Input type="number" onChange={handleChange} {...props} ref={setSourceRef} />;
 }
 
 export default NumberField;

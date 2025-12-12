@@ -1,31 +1,28 @@
-import { Search as SearchIcon } from '@mui/icons-material';
-import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { useCallback, useState } from 'react';
+import { Search as SearchIcon } from 'lucide-react';
 import useSearchKey from './useSearchKey';
 import SearchDialog from './components/SearchDialog';
 import { useTranslation } from 'react-i18next';
+import { SidebarMenuButton, SidebarMenuItem } from '@chatgpt/components/ui/sidebar';
+import { useBoolean } from '@chatgpt/hooks/use-boolean';
 
 export default function Search() {
   // dialog
-  const [open, setOpen] = useState(false);
-  const handleSearch = useCallback(() => setOpen((value) => !value), []);
-  const handleOpen = useCallback(() => setOpen(true), []);
-  const handleClose = () => setOpen(false);
+  const [open, { set, setTrue, toggle }] = useBoolean(false);
 
   // hotkeys
-  useSearchKey(handleSearch);
+  useSearchKey(toggle);
 
   const { t } = useTranslation();
 
   return (
     <>
-      <ListItemButton onClick={handleOpen}>
-        <ListItemIcon>
+      <SidebarMenuItem>
+        <SidebarMenuButton onClick={setTrue}>
           <SearchIcon />
-        </ListItemIcon>
-        <ListItemText primary={t('search_conversation')} />
-      </ListItemButton>
-      <SearchDialog open={open} onClose={handleClose} />
+          <span>{t('search_conversation')}</span>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+      <SearchDialog open={open} onOpenChange={set} />
     </>
   );
 }

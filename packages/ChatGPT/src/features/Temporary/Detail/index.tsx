@@ -6,7 +6,6 @@ import usePlatform from '@chatgpt/hooks/usePlatform';
 import { PromiseStatus } from '@chatgpt/hooks/usePromise';
 import usePromiseFn from '@chatgpt/hooks/usePromiseFn';
 import { type TemporaryMessageEvent } from '@chatgpt/types/temporaryConversation';
-import { Box } from '@mui/material';
 import { getCurrentWebviewWindow, WebviewWindow } from '@tauri-apps/api/webviewWindow';
 import { useCallback, useEffect } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
@@ -115,32 +114,20 @@ export default function TemporaryDetail() {
     .with({ tag: PromiseStatus.data }, ({ value }) => (
       <>
         <TemporaryHeader persistentId={persistentId} template={value.template} />
-        <Box sx={{ flex: '1 1 0', overflowY: 'auto' }}>
+        <div className="flex-[1_1_0] overflow-y-auto">
           <MessageHistory
             onMessageViewed={handleMessageView}
             onMessageDeleted={handleDeteteMessage}
             messages={value.messages}
           />
-        </Box>
+        </div>
         <ChatForm status={status} onSendMessage={onSendContent} />
       </>
     ))
-    .with({ tag: PromiseStatus.loading }, () => <Loading sx={{ width: '100%', flex: '1 1 0' }} />)
+    .with({ tag: PromiseStatus.loading }, () => <Loading className="w-full flex-[1_1_0]" />)
     .with({ tag: PromiseStatus.error }, ({ value }) => (
       <ErrorInfo error={value} refetch={() => fetchData(persistentId)} />
     ))
     .otherwise(() => null);
-  return (
-    <Box
-      sx={{
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        backgroundColor: 'transparent',
-      }}
-    >
-      {content}
-    </Box>
-  );
+  return <div className="size-full flex flex-col">{content}</div>;
 }

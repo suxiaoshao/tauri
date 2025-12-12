@@ -7,12 +7,14 @@
  */
 import assistant from '@chatgpt/assets/assistant.jpg';
 import CustomMarkdown from '@chatgpt/components/Markdown';
-import { Avatar, Box, CircularProgress, Divider } from '@mui/material';
-import { AvatarSx, MarkdownSx, MessageSelectedSx, MessageSx } from '../../const';
+import { avatarClassName, markdownClassName, messageClassName, messageSelectedClassName } from '../../const';
 import { type BaseMessage } from '../../types';
 import { useState, useEffect } from 'react';
-import { match } from 'ts-pattern';
 import { getSourceContent } from '@chatgpt/utils/content';
+import { cn } from '@chatgpt/lib/utils';
+import { Avatar, AvatarImage } from '@chatgpt/components/ui/avatar';
+import { Spinner } from '@chatgpt/components/ui/spinner';
+import { Separator } from '@chatgpt/components/ui/separator';
 
 export interface LoadingItemProps {
   message: BaseMessage;
@@ -26,17 +28,16 @@ export default function LoadingItem({ message, selected }: LoadingItemProps) {
       ref?.scrollIntoView({ block: 'start', behavior: 'smooth' });
     }
   }, [ref, selected]);
-  const sx = match(selected)
-    .with(true, () => ({ ...MessageSx, ...MessageSelectedSx }))
-    .otherwise(() => MessageSx);
   return (
     <>
-      <Box sx={sx} ref={setRef}>
-        <Avatar sx={AvatarSx} src={assistant} />
-        <CustomMarkdown sx={MarkdownSx} value={getSourceContent(message.content)} />
-        <CircularProgress size={20} sx={{ mr: 2, mt: 3 }} color="inherit" />
-      </Box>
-      <Divider />
+      <div className={cn(selected && messageSelectedClassName, messageClassName)} ref={setRef}>
+        <Avatar className={avatarClassName}>
+          <AvatarImage src={assistant} />
+        </Avatar>
+        <CustomMarkdown className={markdownClassName} value={getSourceContent(message.content)} />
+        <Spinner className="size-40 mr-4 mt-4" />
+      </div>
+      <Separator />
     </>
   );
 }

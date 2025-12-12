@@ -5,41 +5,46 @@ import { type InputItem } from '@chatgpt/types/adapter';
 import { match } from 'ts-pattern';
 import Loading from '@chatgpt/components/Loading';
 import ErrorInfo from '@chatgpt/components/ErrorInfo';
-import {
-  Box,
-  Checkbox,
-  Divider,
-  FormControlLabel,
-  FormLabel,
-  IconButton,
-  InputAdornment,
-  MenuItem,
-  TextField,
-  Typography,
-} from '@mui/material';
-import { Add, Delete } from '@mui/icons-material';
 import NumberField from '@chatgpt/components/NumberField';
 import { useState } from 'react';
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  FieldLegend,
+  FieldSeparator,
+  FieldSet,
+} from '@chatgpt/components/ui/field';
+import { Input } from '@chatgpt/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@chatgpt/components/ui/select';
+import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '@chatgpt/components/ui/input-group';
+import { XIcon } from 'lucide-react';
+import { Button } from '@chatgpt/components/ui/button';
+import { useTranslation } from 'react-i18next';
+import { Checkbox } from '@chatgpt/components/ui/checkbox';
 
 export default function AdapterSettings() {
   const [data, fn] = usePromise(getAllAdapterSettingInputs);
   const content = match(data)
-    .with({ tag: PromiseStatus.loading }, () => <Loading sx={{ width: '100%', height: '100%' }} />)
+    .with({ tag: PromiseStatus.loading }, () => <Loading className="size-full" />)
     .with({ tag: PromiseStatus.error }, ({ value }) => <ErrorInfo error={value} refetch={fn} />)
     .with({ tag: PromiseStatus.data }, ({ value }) => (
-      <Box sx={{ flex: '1 1 auto', overflowY: 'auto', p: 1, px: 2, gap: 1, display: 'flex', flexDirection: 'column' }}>
-        {value.map(({ inputs, name }) => (
-          <Box key={name} sx={{ gap: 2, display: 'flex', flexDirection: 'column' }}>
-            <Typography variant="h6">{name}</Typography>
-            {inputs.map((input) => (
-              <InputItemForm key={input.id} inputItem={input} prefixName={`adapterSettings.${name}`} />
-            ))}
-            <Divider />
-          </Box>
+      <FieldGroup className="p-3 flex-[1_1_auto] overflow-y-auto">
+        {value.map(({ inputs, name }, index) => (
+          <FieldSet key={name}>
+            <FieldLegend>{name}</FieldLegend>
+            <FieldGroup>
+              {inputs.map((input) => (
+                <InputItemForm key={input.id} inputItem={input} prefixName={`adapterSettings.${name}`} />
+              ))}
+            </FieldGroup>
+            {index !== value.length - 1 && <FieldSeparator />}
+          </FieldSet>
         ))}
-      </Box>
+      </FieldGroup>
     ))
-    .otherwise(() => <Loading sx={{ width: '100%', height: '100%' }} />);
+    .otherwise(() => <Loading className="size-full" />);
   return content;
 }
 
@@ -55,43 +60,39 @@ export function InputItemForm({
   const { register, control, setValue } = useFormContext();
   const formPath = `${prefixName}.${inputItem.id}`;
   const [openMaxTokens, setOpenMaxTokens] = useState(false);
+  const { t } = useTranslation();
   return match(inputItem.inputType)
     .with({ tag: 'text' }, () => (
-      <TextField fullWidth required={required} label={inputItem.name} {...register(formPath)} />
+      <Field>
+        <FieldLabel>{inputItem.name}</FieldLabel>
+        <Input required={required} {...register(formPath, { required })} />
+      </Field>
     ))
     .with({ tag: 'integer' }, ({ value }) => (
-      <NumberField
-        fullWidth
-        required={required}
-        label={inputItem.name}
-        slotProps={{
-          htmlInput: {
-            step: value.step,
-            max: value.max,
-            min: value.min,
-            defaultValue: value.default,
-          },
-        }}
-        defaultValue={value.default}
-        {...register(formPath, { valueAsNumber: true })}
-      />
+      <Field>
+        <FieldLabel>{inputItem.name}</FieldLabel>
+        <NumberField
+          required={required}
+          step={value.step}
+          max={value.max}
+          min={value.min}
+          defaultValue={value.default}
+          {...register(formPath, { valueAsNumber: true })}
+        />
+      </Field>
     ))
     .with({ tag: 'float' }, ({ value }) => (
-      <NumberField
-        fullWidth
-        required={required}
-        label={inputItem.name}
-        slotProps={{
-          htmlInput: {
-            step: value.step,
-            max: value.max,
-            min: value.min,
-            defaultValue: value.default,
-          },
-        }}
-        defaultValue={value.default}
-        {...register(formPath, { valueAsNumber: true })}
-      />
+      <Field>
+        <FieldLabel>{inputItem.name}</FieldLabel>
+        <NumberField
+          required={required}
+          step={value.step}
+          max={value.max}
+          min={value.min}
+          defaultValue={value.default}
+          {...register(formPath, { valueAsNumber: true })}
+        />
+      </Field>
     ))
     .with({ tag: 'select' }, (value) => (
       <Controller
@@ -99,14 +100,23 @@ export function InputItemForm({
         name={formPath}
         rules={{ required: required }}
         defaultValue={value.value.at(0)}
-        render={({ field }) => (
-          <TextField select label={inputItem.name} required={required} fullWidth {...field}>
-            {value.value.map((item) => (
-              <MenuItem key={item} value={item}>
-                {item}
-              </MenuItem>
-            ))}
-          </TextField>
+        render={({ field: { onChange, ...field }, fieldState }) => (
+          <Field>
+            <FieldLabel>{inputItem.name}</FieldLabel>
+            <Select required={required} onValueChange={onChange} {...field}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {value.value.map((item) => (
+                  <SelectItem key={item} value={item}>
+                    {item}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+          </Field>
         )}
       />
     ))
@@ -114,20 +124,24 @@ export function InputItemForm({
       return (
         // todo optional
         <>
-          <FormControlLabel
-            control={
+          <Field>
+            <div className="flex items-center gap-3">
               <Checkbox
+                id={`${prefixName}-${inputItem.id}`}
                 checked={openMaxTokens}
-                onChange={(_, check) => {
-                  setOpenMaxTokens(check);
-                  if (!check) {
+                onCheckedChange={(check) => {
+                  const checked = match(check)
+                    .with(true, () => true)
+                    .otherwise(() => false);
+                  setOpenMaxTokens(checked);
+                  if (!checked) {
                     setValue(formPath, null);
                   }
                 }}
               />
-            }
-            label={`Open ${inputItem.name}`}
-          />
+              <FieldLabel htmlFor={`${prefixName}-${inputItem.id}`}>{t('open', { name: inputItem.name })}</FieldLabel>
+            </div>
+          </Field>
           {openMaxTokens && (
             <InputItemForm inputItem={{ ...inputItem, inputType: value }} prefixName={prefixName} required={false} />
           )}
@@ -152,38 +166,35 @@ function ArrayField({
     control,
     name: `${prefixName}.${id}`,
   });
+  const { t } = useTranslation();
   return (
-    <>
-      <FormLabel>{name}</FormLabel>
-      {fields.map((field, index) =>
-        match(inputItem.inputType)
-          .with({ tag: 'text' }, () => (
-            <TextField
-              key={field.id}
-              required
-              label={inputItem.name}
-              fullWidth
-              {...register(`${prefixName}.${id}.${index}`)}
-              slotProps={{
-                input: {
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton onClick={() => remove(index)}>
-                        <Delete />
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                },
-              }}
-            />
-          ))
-          .otherwise(() => null),
-      )}
-      <Box>
-        <IconButton onClick={() => append('')}>
-          <Add />
-        </IconButton>
-      </Box>
-    </>
+    <Field>
+      <FieldLabel>{name}</FieldLabel>
+      <FieldGroup className="gap-4">
+        {fields.map((field, index) =>
+          match(inputItem.inputType)
+            .with({ tag: 'text' }, () => (
+              <InputGroup key={field.id}>
+                <InputGroupInput required {...register(`${prefixName}.${id}.${index}`)} />
+                <InputGroupAddon align="inline-end">
+                  <InputGroupButton
+                    type="button"
+                    variant="ghost"
+                    size="icon-xs"
+                    onClick={() => remove(index)}
+                    aria-label={`Remove email ${index + 1}`}
+                  >
+                    <XIcon />
+                  </InputGroupButton>
+                </InputGroupAddon>
+              </InputGroup>
+            ))
+            .otherwise(() => null),
+        )}
+        <Button type="button" variant="outline" size="sm" onClick={() => append({ address: '' })}>
+          {t('add', { name: name })}
+        </Button>
+      </FieldGroup>
+    </Field>
   );
 }

@@ -7,14 +7,15 @@
  */
 import assistant from '@chatgpt/assets/assistant.jpg';
 import CustomMarkdown from '@chatgpt/components/Markdown';
-import { Avatar, Box, Divider } from '@mui/material';
-import { AvatarSx, MarkdownSx, MessageSelectedSx, MessageSx } from '../../const';
+import { avatarClassName, markdownClassName, messageClassName, messageSelectedClassName } from '../../const';
 import { type BaseMessage } from '../../types';
 import ToolBar from '../ToolBar';
 import DeleteMessageIcon from '../ToolBar/DeleteMessageIcon';
 import { useState, useEffect } from 'react';
-import { match } from 'ts-pattern';
 import { getSourceContent } from '@chatgpt/utils/content';
+import { Separator } from '@chatgpt/components/ui/separator';
+import { cn } from '@chatgpt/lib/utils';
+import { Avatar, AvatarImage } from '@chatgpt/components/ui/avatar';
 
 export interface ErrorItemProps {
   message: BaseMessage;
@@ -28,26 +29,25 @@ export default function ErrorItem({ message, selected }: ErrorItemProps) {
       ref?.scrollIntoView({ block: 'start', behavior: 'smooth' });
     }
   }, [ref, selected]);
-  const sx = match(selected)
-    .with(true, () => ({ ...MessageSx, ...MessageSelectedSx }))
-    .otherwise(() => MessageSx);
   return (
     <>
-      <Box
-        sx={{
-          ...sx,
-          borderLeft: (theme) => `${theme.spacing(1)} solid ${theme.palette.error.light}`,
-          backgroundColor: (theme) => `${theme.palette.error.main}10`,
-        }}
+      <div
+        className={cn(
+          'border-l-2 border-solid border-destructive bg-destructive',
+          selected && messageSelectedClassName,
+          messageClassName,
+        )}
         ref={setRef}
       >
-        <Avatar sx={AvatarSx} src={assistant} />
-        <CustomMarkdown sx={MarkdownSx} value={getSourceContent(message.content)} />
+        <Avatar className={avatarClassName}>
+          <AvatarImage src={assistant} />
+        </Avatar>
+        <CustomMarkdown className={markdownClassName} value={getSourceContent(message.content)} />
         <ToolBar>
           <DeleteMessageIcon id={message.id} />
         </ToolBar>
-      </Box>
-      <Divider />
+      </div>
+      <Separator />
     </>
   );
 }

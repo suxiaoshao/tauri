@@ -1,7 +1,5 @@
 import { clearConversation, deleteConversation } from '@chatgpt/service/chat/mutation';
 import { type Conversation } from '@chatgpt/types/conversation';
-import { CleaningServices, CopyAll, Delete } from '@mui/icons-material';
-import { Avatar, Box, IconButton, Tooltip, Typography } from '@mui/material';
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ExportConversation from './ExportConversation';
@@ -11,6 +9,10 @@ import { useHotkeys } from 'react-hotkeys-hook';
 import usePlatform from '@chatgpt/hooks/usePlatform';
 import { match } from 'ts-pattern';
 import { useTranslation } from 'react-i18next';
+import { Avatar, AvatarFallback } from '@chatgpt/components/ui/avatar';
+import { Button } from '@chatgpt/components/ui/button';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@chatgpt/components/ui/tooltip';
+import { BrushCleaning, Copy, Trash } from 'lucide-react';
 export interface ConversationHeaderProps {
   conversation: Conversation;
 }
@@ -44,45 +46,45 @@ export default function ConversationHeader({ conversation }: ConversationHeaderP
   const { t } = useTranslation();
 
   return (
-    <Box
-      data-tauri-drag-region
-      sx={{
-        width: '100%',
-        display: 'flex',
-        p: 1,
-        justifyContent: 'center',
-        boxShadow: (theme) => theme.shadows[3].split(',0px')[0],
-      }}
-    >
-      <Avatar data-tauri-drag-region sx={{ backgroundColor: 'transparent' }}>
-        {conversation.icon}
+    <div className="w-full flex p-2 justify-center items-center shadow" data-tauri-drag-region>
+      <Avatar data-tauri-drag-region>
+        <AvatarFallback className="bg-transparent">{conversation.icon}</AvatarFallback>
       </Avatar>
-      <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', ml: 1 }} data-tauri-drag-region>
-        <Typography data-tauri-drag-region variant="h6" component="span">
+      <div className="grow flex items-center gap-2 ml-2" data-tauri-drag-region>
+        <span className="text-xl" data-tauri-drag-region>
           {conversation.title}
-        </Typography>
-        <Typography sx={{ ml: 1 }} data-tauri-drag-region variant="body2" color="inherit" component="span">
+        </span>
+        <span className="text-sm text-accent-foreground" data-tauri-drag-region>
           {conversation.info}
-        </Typography>
-      </Box>
+        </span>
+      </div>
       <UpdateConversation conversation={conversation} />
-      <Tooltip title={t('delete')}>
-        <IconButton onClick={handleDelete}>
-          <Delete />
-        </IconButton>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button variant="ghost" size="icon" onClick={handleDelete}>
+            <Trash />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>{t('delete')}</TooltipContent>
       </Tooltip>
-      <Tooltip title={t('copy_to_new_conversation')}>
-        <IconButton onClick={handleCopy}>
-          <CopyAll />
-        </IconButton>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button variant="ghost" size="icon" onClick={handleCopy}>
+            <Copy />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>{t('copy_to_new_conversation')}</TooltipContent>
       </Tooltip>
       <MoveConversation conversation={conversation} />
-      <Tooltip title={t('clear_messages')}>
-        <IconButton onClick={handleClear}>
-          <CleaningServices />
-        </IconButton>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button variant="ghost" size="icon" onClick={handleClear}>
+            <BrushCleaning />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>{t('clear_messages')}</TooltipContent>
       </Tooltip>
       <ExportConversation conversation={conversation} />
-    </Box>
+    </div>
   );
 }

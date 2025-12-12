@@ -1,13 +1,15 @@
 import usePlatform from '@chatgpt/hooks/usePlatform';
 import { clearTemporaryConversation } from '@chatgpt/service/temporaryConversation/mutation';
 import { type ConversationTemplate } from '@chatgpt/types/conversationTemplate';
-import { CleaningServices } from '@mui/icons-material';
-import { Avatar, Box, IconButton, Tooltip, Typography } from '@mui/material';
+import { BrushCleaning } from 'lucide-react';
 import { useCallback } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { match } from 'ts-pattern';
 import SaveConversation from './SaveConversation';
 import { useTranslation } from 'react-i18next';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@chatgpt/components/ui/tooltip';
+import { Button } from '@chatgpt/components/ui/button';
+import { Avatar, AvatarFallback } from '@chatgpt/components/ui/avatar';
 
 export interface TemporaryHeaderProps {
   template: ConversationTemplate;
@@ -35,33 +37,27 @@ export default function TemporaryHeader({ template, persistentId }: TemporaryHea
   );
   const { t } = useTranslation();
   return (
-    <Box
-      data-tauri-drag-region
-      sx={{
-        width: '100%',
-        display: 'flex',
-        p: 1,
-        justifyContent: 'center',
-        boxShadow: (theme) => theme.shadows[3].split(',0px')[0],
-      }}
-    >
-      <Avatar data-tauri-drag-region sx={{ backgroundColor: 'transparent' }}>
-        {template.icon}
+    <div className="w-full flex p-2 justify-center shadow items-center" data-tauri-drag-region>
+      <Avatar data-tauri-drag-region>
+        <AvatarFallback className="bg-transparent">{template.icon}</AvatarFallback>
       </Avatar>
-      <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', ml: 1 }} data-tauri-drag-region>
-        <Typography data-tauri-drag-region variant="h6" component="span">
+      <div className="grow flex items-center ml-1 gap-2" data-tauri-drag-region>
+        <span className="text-xl leading-snug font-medium" data-tauri-drag-region>
           {template.name}
-        </Typography>
-        <Typography sx={{ ml: 1 }} data-tauri-drag-region variant="body2" color="inherit" component="span">
+        </span>
+        <span className="text-sm text-accent-foreground" data-tauri-drag-region>
           {template.description}
-        </Typography>
-      </Box>
-      <Tooltip title={t('clear_messages')}>
-        <IconButton onClick={handleClear}>
-          <CleaningServices />
-        </IconButton>
+        </span>
+      </div>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button variant="ghost" size="icon" onClick={handleClear}>
+            <BrushCleaning />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>{t('clear_messages')}</TooltipContent>
       </Tooltip>
       <SaveConversation persistentId={persistentId} />
-    </Box>
+    </div>
   );
 }

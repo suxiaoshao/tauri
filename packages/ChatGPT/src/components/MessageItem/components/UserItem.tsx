@@ -7,8 +7,7 @@
  */
 import user from '@chatgpt/assets/user.jpg';
 import CustomMarkdown from '@chatgpt/components/Markdown';
-import { Avatar, Box, Chip, Divider } from '@mui/material';
-import { AvatarSx, MarkdownSx, MessageSelectedSx, MessageSx } from '../const';
+import { avatarClassName, markdownClassName, messageClassName, messageSelectedClassName } from '../const';
 import { type BaseMessage } from '../types';
 import ToolBar from './ToolBar';
 import CopyIcon from './ToolBar/CopyIcon';
@@ -18,6 +17,10 @@ import { useEffect, useState } from 'react';
 import { match } from 'ts-pattern';
 import { getSourceContent } from '@chatgpt/utils/content';
 import { useTranslation } from 'react-i18next';
+import { cn } from '@chatgpt/lib/utils';
+import { Avatar, AvatarImage } from '@chatgpt/components/ui/avatar';
+import { Separator } from '@chatgpt/components/ui/separator';
+import { Badge } from '@chatgpt/components/ui/badge';
 
 export interface UserItemProps {
   message: BaseMessage;
@@ -31,17 +34,18 @@ export default function UserItem({ message, selected }: UserItemProps) {
       ref?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     }
   }, [ref, selected]);
-  const sx = match(selected)
-    .with(true, () => ({ ...MessageSx, ...MessageSelectedSx }))
-    .otherwise(() => MessageSx);
   const { t } = useTranslation();
   return (
     <>
-      <Box sx={sx} ref={setRef}>
-        <Avatar sx={AvatarSx} src={user} />
+      <div className={cn(selected && messageSelectedClassName, messageClassName)} ref={setRef}>
+        <Avatar className={avatarClassName}>
+          <AvatarImage src={user} />
+        </Avatar>
         {match(message.content)
-          .with({ tag: 'text' }, ({ value }) => <CustomMarkdown sx={MarkdownSx} value={value} />)
-          .with({ tag: 'extension' }, ({ value: { source } }) => <CustomMarkdown sx={MarkdownSx} value={source} />)
+          .with({ tag: 'text' }, ({ value }) => <CustomMarkdown className={markdownClassName} value={value} />)
+          .with({ tag: 'extension' }, ({ value: { source } }) => (
+            <CustomMarkdown className={markdownClassName} value={source} />
+          ))
           .exhaustive()}
 
         <ToolBar>
@@ -50,12 +54,12 @@ export default function UserItem({ message, selected }: UserItemProps) {
           <CopyIcon content={getSourceContent(message.content)} />
           {match(message.content)
             .with({ tag: 'extension' }, ({ value: { extensionName } }) => (
-              <Chip label={t('plugin_name', { name: extensionName })} size="small" />
+              <Badge variant="outline">{t('plugin_name', { name: extensionName })}</Badge>
             ))
             .otherwise(() => null)}
         </ToolBar>
-      </Box>
-      <Divider />
+      </div>
+      <Separator />
     </>
   );
 }

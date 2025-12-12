@@ -5,78 +5,70 @@
  * @LastEditTime: 2024-05-01 03:19:24
  * @FilePath: /tauri/packages/ChatGPT/src/features/Template/List/index.tsx
  */
-import { Apps } from '@mui/icons-material';
-import { Avatar, Box, List, ListItemAvatar, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { useCallback, useMemo } from 'react';
-import { useLocation, useMatch, useNavigate } from 'react-router-dom';
+import { useMemo } from 'react';
+import { Link, useLocation, useMatch } from 'react-router-dom';
 import { useShallow } from 'zustand/react/shallow';
 import TemplateInfo from '../components/TemplateInfo';
 import { selectTemplates, useTemplateStore } from '../templateSlice';
 import TemplateListHeader from './components/Header';
 import { useTranslation } from 'react-i18next';
+import { SidebarMenuButton, SidebarMenuItem } from '@chatgpt/components/ui/sidebar';
+import { match, P } from 'ts-pattern';
+import { LayoutTemplate } from 'lucide-react';
+import { Item, ItemContent, ItemGroup, ItemMedia, ItemTitle } from '@chatgpt/components/ui/item';
+import { Avatar, AvatarFallback } from '@chatgpt/components/ui/avatar';
 
 function ConversationTemplateList() {
   const templates = useTemplateStore(useShallow(selectTemplates));
-  const navigate = useNavigate();
-  const handleClick = useCallback(
-    (templateId: number) => {
-      navigate(`/template/${templateId}`);
-    },
-    [navigate],
-  );
   const content = useMemo(
     () => (
-      <List sx={{ flex: '1 1 0', overflowY: 'auto' }}>
+      <ItemGroup className="flex-[1_1_o] overflow-y-auto">
         {templates.map(({ id, icon, description, mode, name }) => (
-          <ListItemButton key={id} onClick={() => handleClick(id)}>
-            <ListItemAvatar>
-              <Avatar sx={{ bgcolor: 'transparent' }}>{icon}</Avatar>
-            </ListItemAvatar>
-            <ListItemText primary={name} secondary={<TemplateInfo description={description} mode={mode} />} />
-          </ListItemButton>
+          <Item key={id} asChild>
+            <Link to={`/template/${id}`}>
+              <ItemMedia>
+                <Avatar>
+                  <AvatarFallback className="bg-transparent">{icon}</AvatarFallback>
+                </Avatar>
+              </ItemMedia>
+              <ItemContent>
+                <ItemTitle>
+                  {name} <TemplateInfo description={description} mode={mode} />
+                </ItemTitle>
+              </ItemContent>
+            </Link>
+          </Item>
         ))}
-      </List>
+      </ItemGroup>
     ),
-    [templates, handleClick],
+    [templates],
   );
   return (
-    <Box
-      sx={{
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        backgroundColor: 'transparent',
-      }}
-    >
+    <div className="size-full flex flex-col">
       <TemplateListHeader />
       {content}
-    </Box>
+    </div>
   );
 }
 
 function TemplateItem() {
-  const navigate = useNavigate();
   const pathname = useLocation().pathname;
   const matchAdd = useMatch('/template');
-  const match = useMemo(() => pathname.startsWith('/template'), [pathname]);
+  const isMatch = useMemo(() => pathname.startsWith('/template'), [pathname]);
   const { t } = useTranslation();
   return (
-    <ListItemButton
-      onClick={() => {
-        if (matchAdd) {
-          navigate('/');
-        } else {
-          navigate('/template');
-        }
-      }}
-      selected={match}
-    >
-      <ListItemIcon>
-        <Apps />
-      </ListItemIcon>
-      <ListItemText primary={t('template')} />
-    </ListItemButton>
+    <SidebarMenuItem>
+      <SidebarMenuButton asChild isActive={isMatch}>
+        <Link
+          to={match(matchAdd)
+            .with(P.nonNullable, () => '/')
+            .otherwise(() => '/template')}
+        >
+          <LayoutTemplate />
+          <span>{t('template')}</span>
+        </Link>
+      </SidebarMenuButton>
+    </SidebarMenuItem>
   );
 }
 
