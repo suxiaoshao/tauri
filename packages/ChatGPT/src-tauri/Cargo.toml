@@ -20,7 +20,7 @@ serde_json = { workspace = true }
 delay = { path = "../../../crates/delay" }
 
 # database
-diesel = { version = "2.3.3", features = [
+diesel = { version = "2.3.4", features = [
     "sqlite",
     "r2d2",
     "numeric",
@@ -36,14 +36,14 @@ thiserror = "2.0.17"
 
 # log
 tauri-plugin-log = { version = "2.7.1" }
-log = "0.4.28"
+log = "0.4.29"
 
 # 窗口管理
 tauri-plugin-window-state = { version = "2.4.1" }
-window-vibrancy = "0.6.0"
+window-vibrancy = "0.7.1"
 
 # http request
-reqwest = { version = "0.12.24", features = ["json"] }
+reqwest = { version = "0.12.25", features = ["json"] }
 tokio = { version = "1.48.0", features = [
     "rt",
     "rt-multi-thread",
@@ -70,8 +70,8 @@ tauri-plugin-dialog = "2.4.2"
 tauri-plugin-positioner = "2.3.1"
 
 # extension
-wasmtime = { version = "38.0.3" }
-wasmtime-wasi = "38.0.3"
+wasmtime = { version = "39.0.1" }
+wasmtime-wasi = "39.0.1"
 get-selected-text = "0.1.6"
 
 [target.'cfg(target_os="macos")'.dependencies]

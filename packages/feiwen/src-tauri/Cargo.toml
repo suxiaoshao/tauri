@@ -20,25 +20,25 @@ serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
 # log
 tauri-plugin-log = { version = "2.7.1" }
-log = "0.4.28"
+log = "0.4.29"
 
 # database
-diesel = { version = "2.3.3", features = ["sqlite", "r2d2", "returning_clauses_for_sqlite_3_35"] }
+diesel = { version = "2.3.4", features = ["sqlite", "r2d2", "returning_clauses_for_sqlite_3_35"] }
 libsqlite3-sys = { version = "0.35.0", features = ["bundled"] }
 time = { version = "0.3.44", features = ["serde"] }
 
 # http
-reqwest = "0.12.24"
+reqwest = "0.12.25"
 
 # html
-scraper = "0.24.0"
+scraper = "0.25.0"
 nom = "8.0.0"
 futures = "0.3.31"
 thiserror = "2.0.17"
 
 # 窗口管理
 tauri-plugin-window-state = { version = "2.4.1" }
-window-vibrancy = "0.6.0"
+window-vibrancy = "0.7.1"
 url = "2.5.7"
 
 # plugin

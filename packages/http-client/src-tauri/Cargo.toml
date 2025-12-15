@@ -22,21 +22,21 @@ delay = { path = "../../../crates/delay" }
 tokio = { version = "1.48.0", default-features = false, features = ["time"] }
 
 # 数据库
-diesel = { version = "2.3.3", features = ["sqlite","returning_clauses_for_sqlite_3_35"] }
+diesel = { version = "2.3.4", features = ["sqlite","returning_clauses_for_sqlite_3_35"] }
 
 # http
-reqwest = "0.12.24"
+reqwest = "0.12.25"
 
 # 错误处理
 anyhow = "1.0.100"
 thiserror = "2.0.17"
 
 # 窗口管理
-window-vibrancy = "0.6.0"
+window-vibrancy = "0.7.1"
 
 # log
 tauri-plugin-log = { version = "2.7.1" }
-log = "0.4.28"
+log = "0.4.29"
 
 # 搜索应用
 lnk = "0.6.3"
