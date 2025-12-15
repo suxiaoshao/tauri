@@ -5,17 +5,40 @@
  * @LastEditTime: 2024-09-23 03:07:13
  * @FilePath: /tauri/packages/ChatGPT/src/features/Home/FolderDetail/components/ContentEmpty.tsx
  */
-import AddConversation from '@chatgpt/features/Adds/AddConversation';
-import AddFolder from '@chatgpt/features/Adds/AddFolder';
-import { List } from '@mui/material';
+import { Button } from '@chatgpt/components/ui/button';
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from '@chatgpt/components/ui/empty';
+import { FolderCode } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 
 export default function ContentEmpty() {
+  const { t } = useTranslation();
   return (
-    <List>
-      {/* eslint-disable-next-line label-has-associated-control */}
-      <AddConversation.Item />
-      {/* eslint-disable-next-line label-has-associated-control */}
-      <AddFolder.Item />
-    </List>
+    <Empty className="size-full">
+      <EmptyHeader>
+        <EmptyMedia variant="icon">
+          <FolderCode />
+        </EmptyMedia>
+        <EmptyTitle>{t('folder_empty_title')}</EmptyTitle>
+        <EmptyDescription>{t('folder_empty_description')}</EmptyDescription>
+      </EmptyHeader>
+      <EmptyContent>
+        <div className="flex gap-2">
+          <Button asChild>
+            <Link to="/add/folder">{t('create_folder')}</Link>
+          </Button>
+          <Button asChild>
+            <Link to="/add/conversation">{t('create_conversation')}</Link>
+          </Button>
+        </div>
+      </EmptyContent>
+    </Empty>
   );
 }

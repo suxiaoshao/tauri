@@ -6,16 +6,15 @@
  * @FilePath: /tauri/packages/ChatGPT/src/features/Theme/themeSlice.ts
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
-import { argbFromHex, themeFromSourceColor, youThemeToMuiTheme } from 'theme';
 import { match } from 'ts-pattern';
 import { create } from 'zustand';
-import { type Config, Theme } from '../Setting/types';
+import { Theme } from '../Setting/types';
 
 export interface ThemeSliceType {
   systemColorScheme: Theme.Dark | Theme.Light;
 }
 
-const getColorScheme = (colorSetting: Theme, systemColorScheme: ThemeSliceType['systemColorScheme']) => {
+export const getColorScheme = (colorSetting: Theme, systemColorScheme: ThemeSliceType['systemColorScheme']) => {
   if (colorSetting === Theme.System) {
     return systemColorScheme;
   }
@@ -41,17 +40,3 @@ export const useThemeStore = create<
   ...getInitDate(),
   setSystemColorScheme: (scheme) => set({ systemColorScheme: scheme }),
 }));
-
-export const selectActiveYouTheme = (
-  theme: Config['theme'],
-  systemColorScheme: ThemeSliceType['systemColorScheme'],
-) => {
-  const colorScheme = getColorScheme(theme.theme, systemColorScheme);
-  return themeFromSourceColor(argbFromHex(theme.color)).schemes[colorScheme];
-};
-
-export const selectMuiTheme = (theme: Config['theme'], systemColorScheme: ThemeSliceType['systemColorScheme']) => {
-  const colorScheme = getColorScheme(theme.theme, systemColorScheme);
-  const youTheme = selectActiveYouTheme(theme, systemColorScheme);
-  return youThemeToMuiTheme(youTheme, colorScheme);
-};

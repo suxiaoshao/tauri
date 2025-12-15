@@ -7,14 +7,13 @@
  */
 import { addConversation } from '@chatgpt/service/chat/mutation';
 import { type NewConversation } from '@chatgpt/types/conversation';
-import { Add } from '@mui/icons-material';
-import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
-import PublishIcon from '@mui/icons-material/Publish';
-import { Box, IconButton, ListItemButton, ListItemIcon, ListItemText, Toolbar, Typography } from '@mui/material';
+import { ArrowLeft, Plus, Upload } from 'lucide-react';
 import { useCallback } from 'react';
-import { useLocation, useMatch, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useMatch, useNavigate } from 'react-router-dom';
 import ConversationEdit, { type ConversationForm } from '../../components/ConversationEdit';
 import { useTranslation } from 'react-i18next';
+import { SidebarMenuButton, SidebarMenuItem } from '@chatgpt/components/ui/sidebar';
+import { Button } from '@chatgpt/components/ui/button';
 
 function AddConversation() {
   const navigate = useNavigate();
@@ -33,58 +32,36 @@ function AddConversation() {
   const { state } = useLocation();
   const { t } = useTranslation();
   return (
-    <Box
-      sx={{
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        overflowY: 'auto',
-        backgroundColor: 'transparent',
-      }}
-    >
-      <Box
-        data-tauri-drag-region
-        sx={{ backgroundColor: 'transparent', boxShadow: (theme) => theme.shadows[3].split(',0px')[0] }}
-      >
-        <Toolbar data-tauri-drag-region variant="dense" sx={{ pl: '0!important' }}>
-          <IconButton onClick={() => navigate(-1)}>
-            <KeyboardArrowLeftIcon />
-          </IconButton>
-          <Typography data-tauri-drag-region variant="h6" sx={{ ml: 1 }}>
-            {t('add_conversation')}
-          </Typography>
-          <Box sx={{ flexGrow: 1 }} />
-          <IconButton form="conversation-form" type="submit">
-            <PublishIcon />
-          </IconButton>
-        </Toolbar>
-      </Box>
-      <ConversationEdit initialValues={state} id="conversation-form" onSubmit={handleSubmit} />
-    </Box>
+    <div className="size-full flex flex-col overflow-y-auto">
+      <div className="shadow flex items-center gap-2 h-14" data-tauri-drag-region>
+        <Button size="icon" variant="ghost" onClick={() => navigate(-1)}>
+          <ArrowLeft />
+        </Button>
+        <span data-tauri-drag-region className="text-xl leading-snug font-medium">
+          {t('add_conversation')}
+        </span>
+        <div className="grow" />
+        <Button size="icon" variant="ghost" form="conversation-form" type="submit">
+          <Upload />
+        </Button>
+      </div>
+      <ConversationEdit className="p-4" initialValues={state} id="conversation-form" onSubmit={handleSubmit} />
+    </div>
   );
 }
 
 function AddConversationItem() {
-  const navigate = useNavigate();
   const matchAdd = useMatch('/add/conversation');
   const { t } = useTranslation();
   return (
-    <ListItemButton
-      onClick={() => {
-        if (matchAdd) {
-          navigate('/');
-        } else {
-          navigate('/add/conversation');
-        }
-      }}
-      selected={matchAdd !== null}
-    >
-      <ListItemIcon>
-        <Add />
-      </ListItemIcon>
-      <ListItemText primary={t('add_conversation')} />
-    </ListItemButton>
+    <SidebarMenuItem>
+      <SidebarMenuButton asChild isActive={matchAdd !== null}>
+        <Link to="/add/conversation">
+          <Plus />
+          <span>{t('add_conversation')}</span>
+        </Link>
+      </SidebarMenuButton>
+    </SidebarMenuItem>
   );
 }
 

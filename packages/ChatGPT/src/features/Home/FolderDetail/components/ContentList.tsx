@@ -5,13 +5,21 @@
  * @LastEditTime: 2024-04-29 02:46:17
  * @FilePath: /tauri/packages/ChatGPT/src/features/Home/FolderDetail/components/ContentList.tsx
  */
+import { Avatar, AvatarFallback } from '@chatgpt/components/ui/avatar';
+import {
+  Item,
+  ItemContent,
+  ItemDescription,
+  ItemGroup,
+  ItemMedia,
+  ItemSeparator,
+  ItemTitle,
+} from '@chatgpt/components/ui/item';
 import { SelectedType } from '@chatgpt/features/Conversations/types';
-import { useSelected } from '@chatgpt/features/Conversations/useSelected';
 import { type Conversation } from '@chatgpt/types/conversation';
 import { type Folder } from '@chatgpt/types/folder';
-import FolderIcon from '@mui/icons-material/Folder';
-import { Avatar, Divider, List, ListItemAvatar, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { useCallback } from 'react';
+import { Folder as FolderIcon } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export interface ContentListProps {
   folders: Folder[];
@@ -19,38 +27,57 @@ export interface ContentListProps {
 }
 
 export default function ContentList({ folders, conversations }: ContentListProps) {
-  const setSelected = useSelected()[1];
-  const handleFolderClick = useCallback(
-    (folderId: number) => {
-      setSelected({ tag: SelectedType.Folder, value: folderId });
-    },
-    [setSelected],
-  );
-  const handleConversationClick = useCallback(
-    (conversationId: number) => {
-      setSelected({ tag: SelectedType.Conversation, value: conversationId });
-    },
-    [setSelected],
-  );
   return (
-    <List>
+    <ItemGroup>
       {folders.map((folder) => (
-        <ListItemButton key={folder.id} onClick={() => handleFolderClick(folder.id)}>
-          <ListItemIcon>
-            <FolderIcon color="info" />
-          </ListItemIcon>
-          <ListItemText primary={folder.name} secondary={folder.path} />
-        </ListItemButton>
+        <Item key={folder.id} asChild>
+          <Link
+            replace
+            to={{
+              search: new URLSearchParams({
+                selectedType: SelectedType.Folder,
+                selectedId: folder.id.toString(),
+              }).toString(),
+            }}
+          >
+            <ItemMedia>
+              <Avatar>
+                <AvatarFallback className="bg-transparent">
+                  <FolderIcon />
+                </AvatarFallback>
+              </Avatar>
+            </ItemMedia>
+            <ItemContent className="gap-1">
+              <ItemTitle>{folder.name}</ItemTitle>
+              <ItemDescription>{folder.path}</ItemDescription>
+            </ItemContent>
+          </Link>
+        </Item>
       ))}
-      {conversations.length + folders.length > 0 && <Divider />}
+      {conversations.length > 0 && folders.length > 0 && <ItemSeparator />}
       {conversations.map((conversation) => (
-        <ListItemButton key={conversation.id} onClick={() => handleConversationClick(conversation.id)}>
-          <ListItemAvatar>
-            <Avatar sx={{ bgcolor: 'transparent' }}>{conversation.icon}</Avatar>
-          </ListItemAvatar>
-          <ListItemText primary={conversation.title} secondary={conversation.info} />
-        </ListItemButton>
+        <Item asChild key={conversation.id}>
+          <Link
+            replace
+            to={{
+              search: new URLSearchParams({
+                selectedType: SelectedType.Conversation,
+                selectedId: conversation.id.toString(),
+              }).toString(),
+            }}
+          >
+            <ItemMedia>
+              <Avatar>
+                <AvatarFallback className="bg-transparent">{conversation.icon}</AvatarFallback>
+              </Avatar>
+            </ItemMedia>
+            <ItemContent className="gap-1">
+              <ItemTitle>{conversation.title}</ItemTitle>
+              {conversation.info && <ItemDescription>{conversation.info}</ItemDescription>}
+            </ItemContent>
+          </Link>
+        </Item>
       ))}
-    </List>
+    </ItemGroup>
   );
 }

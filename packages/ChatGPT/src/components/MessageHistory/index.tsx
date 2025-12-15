@@ -1,4 +1,3 @@
-import { Box } from '@mui/material';
 import { useMemo, useState } from 'react';
 import MessageItem from '../MessageItem';
 import { type BaseMessage } from '../MessageItem/types';
@@ -78,11 +77,11 @@ export default function MessageHistory({ messages, onMessageDeleted, onMessageVi
   );
   return (
     <MessageActionContext.Provider value={contextValue}>
-      <Box sx={{ mb: 4, width: '100%' }}>
+      <div className="mb-8 w-full">
         {messages.map((message, index) => (
           <MessageItem selected={selectedIndex === index} message={message} key={message.id} />
         ))}
-      </Box>
+      </div>
     </MessageActionContext.Provider>
   );
 }

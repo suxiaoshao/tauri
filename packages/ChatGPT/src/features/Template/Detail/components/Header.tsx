@@ -5,24 +5,28 @@
  * @LastEditTime: 2024-05-01 03:14:09
  * @FilePath: /tauri/packages/ChatGPT/src/features/Template/Detail/components/header.tsx
  */
+import { Avatar, AvatarFallback } from '@chatgpt/components/ui/avatar';
+import { Button } from '@chatgpt/components/ui/button';
+import { Skeleton } from '@chatgpt/components/ui/skeleton';
+import { ToggleGroup, ToggleGroupItem } from '@chatgpt/components/ui/toggle-group';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@chatgpt/components/ui/tooltip';
 import { Alignment } from '@chatgpt/features/MessagePreview/Success';
 import { type PromiseData, PromiseStatus } from '@chatgpt/hooks/usePromise';
 import { deleteConversationTemplate } from '@chatgpt/service/chat/mutation';
 import { type ConversationTemplate } from '@chatgpt/types/conversationTemplate';
-import { Delete, Edit, Preview, Refresh, Save } from '@mui/icons-material';
-import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
-import { Avatar, Box, IconButton, Skeleton, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from '@mui/material';
+import { ArrowLeft, Eye, Edit, RefreshCcw, Save, Trash } from 'lucide-react';
 import { enqueueSnackbar } from 'notify';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import { match } from 'ts-pattern';
 
 export interface TemplateDetailHeaderProps {
   refresh: () => void;
   data: PromiseData<ConversationTemplate>;
   alignment: Alignment;
-  handleAlignment: (event: React.MouseEvent<HTMLElement>, newAlignment: string | null) => void;
+  handleAlignment: (newAlignment: string | null) => void;
   formId: string;
 }
 
@@ -39,32 +43,32 @@ export default function TemplateDetailHeader({
     return match(data)
       .with({ tag: PromiseStatus.loading }, () => (
         <>
-          <Skeleton variant="circular" width={40} height={40} />
-          <Skeleton variant="text" sx={{ fontSize: '1rem' }} />
+          <Skeleton className="rounded-full size-10" />
+          <Skeleton className="h-4 w-[250px]" />
         </>
       ))
       .with({ tag: PromiseStatus.error }, () => (
-        <Typography data-tauri-drag-region variant="h6" component="span">
+        <span className="text-xl leading-snug font-medium" data-tauri-drag-region>
           {t('conversation_templates')}
-        </Typography>
+        </span>
       ))
       .with({ tag: PromiseStatus.data }, ({ value }) => (
         <>
-          <Typography data-tauri-drag-region variant="h6" component="span">
+          <span className="text-xl leading-snug font-medium" data-tauri-drag-region>
             {value.name}
-          </Typography>
-          <Avatar data-tauri-drag-region sx={{ backgroundColor: 'transparent' }}>
-            {value.icon}
+          </span>
+          <Avatar data-tauri-drag-region>
+            <AvatarFallback className="bg-transparent">{value.icon}</AvatarFallback>
           </Avatar>
-          <Typography sx={{ ml: 1 }} data-tauri-drag-region variant="body2" color="inherit" component="span">
+          <span className="text-sm text-accent-foreground" data-tauri-drag-region>
             {value.description}
-          </Typography>
+          </span>
         </>
       ))
       .otherwise(() => (
-        <Typography data-tauri-drag-region variant="h6" component="span">
+        <span className="text-xl leading-snug font-medium" data-tauri-drag-region>
           {t('conversation_templates')}
-        </Typography>
+        </span>
       ));
   }, [data, t]);
   const deleteButton = useMemo(() => {
@@ -73,13 +77,17 @@ export default function TemplateDetailHeader({
         const handleDelete = async () => {
           await deleteConversationTemplate({ id: value.id });
           navigate('/template');
-          enqueueSnackbar(t('conversation_template_deleted'), { variant: 'success' });
+          toast.success(t('conversation_template_deleted'));
+          enqueueSnackbar(t('conversation_template_deleted'));
         };
         return (
-          <Tooltip title={t('delete')}>
-            <IconButton onClick={handleDelete}>
-              <Delete />
-            </IconButton>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" onClick={handleDelete}>
+                <Trash />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>{t('delete')}</TooltipContent>
           </Tooltip>
         );
       })
@@ -90,10 +98,13 @@ export default function TemplateDetailHeader({
       .with({ tag: PromiseStatus.data }, () => {
         return match(alignment)
           .with(Alignment.edit, () => (
-            <Tooltip title={t('save')}>
-              <IconButton type="submit" form={formId}>
-                <Save />
-              </IconButton>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" type="submit" form={formId}>
+                  <Save />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>{t('save')}</TooltipContent>
             </Tooltip>
           ))
           .otherwise(() => null);
@@ -101,39 +112,28 @@ export default function TemplateDetailHeader({
       .otherwise(() => null);
   }, [data, formId, alignment, t]);
   return (
-    <Box
-      data-tauri-drag-region
-      sx={{
-        width: '100%',
-        display: 'flex',
-        p: 1,
-        justifyContent: 'center',
-        boxShadow: (theme) => theme.shadows[3].split(',0px')[0],
-        alignItems: 'center',
-        gap: 1,
-      }}
-    >
-      <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center' }} data-tauri-drag-region>
-        <IconButton sx={{ mr: 1 }} onClick={() => navigate(-1)}>
-          <KeyboardArrowLeftIcon />
-        </IconButton>
+    <div className="w-full flex p-2 justify-center shadow items-center gap-2" data-tauri-drag-region>
+      <div className="grow flex items-center gap-2" data-tauri-drag-region>
+        <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
+          <ArrowLeft />
+        </Button>
         {content}
-      </Box>
-      <ToggleButtonGroup value={alignment} exclusive onChange={handleAlignment}>
-        <ToggleButton value={Alignment.preview}>
-          <Preview />
-        </ToggleButton>
-        <ToggleButton value={Alignment.edit}>
+      </div>
+      <ToggleGroup variant="outline" type="single" value={alignment} onValueChange={handleAlignment}>
+        <ToggleGroupItem value={Alignment.preview}>
+          <Eye />
+        </ToggleGroupItem>
+        <ToggleGroupItem value={Alignment.edit}>
           <Edit />
-        </ToggleButton>
-      </ToggleButtonGroup>
-      <Box>
-        <IconButton disabled={data.tag === 'loading'} onClick={refresh}>
-          <Refresh />
-        </IconButton>
+        </ToggleGroupItem>
+      </ToggleGroup>
+      <div>
+        <Button variant="ghost" size="icon" disabled={data.tag === 'loading'} onClick={refresh}>
+          <RefreshCcw />
+        </Button>
         {deleteButton}
         {submitButton}
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
 }

@@ -50,7 +50,7 @@ const patternType = P.union(
 
 interface TypeSelectProps {
   value: ClipboardType | undefined;
-  onChange: (value: ClipboardType | undefined) => void;
+  onChange: (value?: ClipboardType | undefined) => void;
 }
 
 export function TypeSelect({ value, onChange }: TypeSelectProps) {
@@ -115,8 +115,7 @@ export function TypeSelect({ value, onChange }: TypeSelectProps) {
             <CommandGroup>
               <CommandItem
                 onSelect={() => {
-                  // oxlint-disable-next-line  no-useless-undefined
-                  onChange(undefined);
+                  onChange();
                   setOpen(false);
                 }}
               >

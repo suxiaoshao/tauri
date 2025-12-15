@@ -1,9 +1,10 @@
 import { MessageActionContext } from '@chatgpt/components/MessageHistory/MessageActionContext';
-import { Preview } from '@mui/icons-material';
-import { IconButton, Tooltip } from '@mui/material';
+import { Eye } from 'lucide-react';
 import { useCallback, useContext } from 'react';
-import { ToolSx } from '../../const';
+import { toolClassName } from '../../const';
 import { useTranslation } from 'react-i18next';
+import { Button } from '@chatgpt/components/ui/button';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@chatgpt/components/ui/tooltip';
 
 export interface ViewIconProp {
   id: number;
@@ -19,10 +20,13 @@ export default function ViewIcon({ id }: ViewIconProp) {
     return null;
   }
   return (
-    <Tooltip title={t('view_message')}>
-      <IconButton size="small" onClick={handleClick}>
-        <Preview fontSize="small" sx={ToolSx} />
-      </IconButton>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button variant="ghost" size="icon-sm" onClick={handleClick}>
+          <Eye fontSize="small" className={toolClassName} />
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent>{t('view_message')}</TooltipContent>
     </Tooltip>
   );
 }

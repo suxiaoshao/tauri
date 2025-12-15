@@ -8,17 +8,24 @@
  */
 import assistant from '@chatgpt/assets/assistant.jpg';
 import CustomMarkdown from '@chatgpt/components/Markdown';
-import { CheckCircleOutlineOutlined } from '@mui/icons-material';
-import { Avatar, Box, Divider } from '@mui/material';
-import { AvatarSx, MarkdownSx, MessageSelectedSx, MessageSx, ToolSx } from '../../const';
+import {
+  avatarClassName,
+  markdownClassName,
+  messageClassName,
+  messageSelectedClassName,
+  toolClassName,
+} from '../../const';
 import { type BaseMessage } from '../../types';
 import ToolBar from '../ToolBar';
 import CopyIcon from '../ToolBar/CopyIcon';
 import DeleteMessageIcon from '../ToolBar/DeleteMessageIcon';
 import ViewIcon from '../ToolBar/ViewIcon';
 import { useState, useEffect } from 'react';
-import { match } from 'ts-pattern';
 import { getSourceContent } from '@chatgpt/utils/content';
+import { cn } from '@chatgpt/lib/utils';
+import { Separator } from '@chatgpt/components/ui/separator';
+import { Avatar, AvatarImage } from '@chatgpt/components/ui/avatar';
+import { CircleCheck } from 'lucide-react';
 
 export interface NormalItemProps {
   message: BaseMessage;
@@ -32,22 +39,21 @@ export default function NormalItem({ message, selected }: NormalItemProps) {
       ref?.scrollIntoView({ block: 'start', behavior: 'smooth' });
     }
   }, [ref, selected]);
-  const sx = match(selected)
-    .with(true, () => ({ ...MessageSx, ...MessageSelectedSx }))
-    .otherwise(() => MessageSx);
   return (
     <>
-      <Box sx={sx} ref={setRef}>
-        <Avatar sx={AvatarSx} src={assistant} />
-        <CustomMarkdown sx={{ ...MarkdownSx }} value={getSourceContent(message.content)} />
+      <div className={cn(selected && messageSelectedClassName, messageClassName)} ref={setRef}>
+        <Avatar className={avatarClassName}>
+          <AvatarImage src={assistant} />
+        </Avatar>
+        <CustomMarkdown className={markdownClassName} value={getSourceContent(message.content)} />
         <ToolBar>
-          <CheckCircleOutlineOutlined fontSize="small" sx={ToolSx} />
+          <CircleCheck className={cn('size-4 mr-2', toolClassName)} />
           <DeleteMessageIcon id={message.id} />
           <ViewIcon id={message.id} />
           <CopyIcon content={getSourceContent(message.content)} />
         </ToolBar>
-      </Box>
-      <Divider />
+      </div>
+      <Separator />
     </>
   );
 }

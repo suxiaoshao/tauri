@@ -6,14 +6,19 @@
  * @FilePath: /tauri/packages/ChatGPT/src/features/MessagePreview/Success.tsx
  */
 import CustomEdit from '@chatgpt/components/CustomEdit';
+import { Button } from '@chatgpt/components/ui/button';
+import { ToggleGroup, ToggleGroupItem } from '@chatgpt/components/ui/toggle-group';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@chatgpt/components/ui/tooltip';
 import type { Content, Message } from '@chatgpt/types/message';
 import { getSendContent, getSourceContent } from '@chatgpt/utils/content';
-import { Edit, Preview, Upload } from '@mui/icons-material';
-import { Box, FormLabel, IconButton, ToggleButton, ToggleButtonGroup, Tooltip } from '@mui/material';
+import { Edit, Eye, Upload } from 'lucide-react';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import { useCallback, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { match } from 'ts-pattern';
+import { FieldLabel, Field } from '@chatgpt/components/ui/field';
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@chatgpt/components/ui/resizable';
 const appWindow = getCurrentWebviewWindow();
 
 export interface SuccessProps {
@@ -28,7 +33,7 @@ export enum Alignment {
 export default function Success({ message, updateMessageContent }: SuccessProps) {
   const [searchParams, setSearchParams] = useSearchParams();
   const handleAlignment = useCallback(
-    (event: React.MouseEvent<HTMLElement>, newAlignment: string | null) => {
+    (newAlignment: string | null) => {
       if (newAlignment !== null) {
         setSearchParams((prev) => {
           prev.set('action', newAlignment);
@@ -55,30 +60,33 @@ export default function Success({ message, updateMessageContent }: SuccessProps)
       setSubmitLoading(false);
     }
   }, [code, updateMessageContent]);
-
+  const { t } = useTranslation();
   return (
-    <Box sx={{ width: '100%', height: '100%', p: 2, display: 'flex', flexDirection: 'column' }}>
-      <Box sx={{ display: 'flex', mb: 2, justifyContent: 'space-between', alignItems: 'center' }}>
-        <ToggleButtonGroup value={toggleValue} exclusive onChange={handleAlignment}>
-          <ToggleButton value={Alignment.preview}>
-            <Preview />
-          </ToggleButton>
-          <ToggleButton value={Alignment.edit}>
+    <div className="size-full p-4 flex flex-col">
+      <div className="flex mb-4 justify-between items-center">
+        <ToggleGroup variant="outline" type="single" value={toggleValue} onValueChange={handleAlignment}>
+          <ToggleGroupItem value={Alignment.preview}>
+            <Eye />
+          </ToggleGroupItem>
+          <ToggleGroupItem value={Alignment.edit}>
             <Edit />
-          </ToggleButton>
-        </ToggleButtonGroup>
+          </ToggleGroupItem>
+        </ToggleGroup>
         {toggleValue === Alignment.edit && (
-          <Tooltip title="Submit">
-            <IconButton disabled={submitLoading} onClick={handleSubmit} color="primary">
-              <Upload />
-            </IconButton>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" disabled={submitLoading} onClick={handleSubmit}>
+                <Upload />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>{t('submit')}</TooltipContent>
           </Tooltip>
         )}
-      </Box>
+      </div>
       {match(code)
         .with({ tag: 'text' }, ({ value }) => (
           <CustomEdit
-            sx={{ width: '100%', height: '100%', borderRadius: (theme) => theme.spacing(1), overflow: 'hidden' }}
+            className="size-full rounded-xl overflow-hidden"
             value={match(toggleValue)
               .with(Alignment.preview, () => getSourceContent(message.content))
               .with(Alignment.edit, () => value)
@@ -94,71 +102,76 @@ export default function Success({ message, updateMessageContent }: SuccessProps)
           />
         ))
         .with({ tag: 'extension' }, ({ value: { content, source } }) => (
-          <Box sx={{ width: '100%', height: '100%', display: 'flex', gap: 1 }}>
-            <Box sx={{ flex: '1 1 0', display: 'flex', flexDirection: 'column' }}>
-              <FormLabel>Source</FormLabel>
-              <CustomEdit
-                sx={{ flex: '1 1 0', borderRadius: (theme) => theme.spacing(1), overflow: 'hidden' }}
-                value={match(toggleValue)
-                  .with(Alignment.preview, () => getSourceContent(message.content))
-                  .with(Alignment.edit, () => source)
-                  .exhaustive()}
-                readonly={toggleValue === Alignment.preview}
-                language="markdown"
-                onChange={(newValue) => {
-                  setCode((oldValue) => {
-                    return match(oldValue)
-                      .with(
-                        { tag: 'extension' },
-                        ({ value: { content, extensionName } }) =>
-                          ({
-                            tag: 'extension',
-                            value: {
-                              content,
-                              extensionName,
-                              source: newValue,
-                            },
-                          }) satisfies Content,
-                      )
-                      .with({ tag: 'text' }, () => oldValue)
-                      .exhaustive();
-                  });
-                }}
-              />
-            </Box>
-            <Box sx={{ flex: '1 1 0', display: 'flex', flexDirection: 'column' }}>
-              <FormLabel>Send Content</FormLabel>
-              <CustomEdit
-                sx={{ flex: '1 1 0', borderRadius: (theme) => theme.spacing(1), overflow: 'hidden' }}
-                value={match(toggleValue)
-                  .with(Alignment.preview, () => getSendContent(message.content))
-                  .with(Alignment.edit, () => content)
-                  .exhaustive()}
-                readonly={toggleValue === Alignment.preview}
-                language="markdown"
-                onChange={(newValue) => {
-                  setCode((oldValue) => {
-                    return match(oldValue)
-                      .with(
-                        { tag: 'extension' },
-                        ({ value: { source, extensionName } }) =>
-                          ({
-                            tag: 'extension',
-                            value: {
-                              source,
-                              extensionName,
-                              content: newValue,
-                            },
-                          }) satisfies Content,
-                      )
-                      .otherwise(() => oldValue);
-                  });
-                }}
-              />
-            </Box>
-          </Box>
+          <ResizablePanelGroup direction="horizontal" className="size-full">
+            <ResizablePanel className="size-full" defaultSize={50}>
+              <Field className="size-full">
+                <FieldLabel>{t('source')}</FieldLabel>
+                <CustomEdit
+                  className="h-full rounded-l-xl overflow-hidden"
+                  value={match(toggleValue)
+                    .with(Alignment.preview, () => getSourceContent(message.content))
+                    .with(Alignment.edit, () => source)
+                    .exhaustive()}
+                  readonly={toggleValue === Alignment.preview}
+                  language="markdown"
+                  onChange={(newValue) => {
+                    setCode((oldValue) => {
+                      return match(oldValue)
+                        .with(
+                          { tag: 'extension' },
+                          ({ value: { content, extensionName } }) =>
+                            ({
+                              tag: 'extension',
+                              value: {
+                                content,
+                                extensionName,
+                                source: newValue,
+                              },
+                            }) satisfies Content,
+                        )
+                        .with({ tag: 'text' }, () => oldValue)
+                        .exhaustive();
+                    });
+                  }}
+                />
+              </Field>
+            </ResizablePanel>
+            <ResizableHandle />
+            <ResizablePanel className="size-full">
+              <Field className="size-full">
+                <FieldLabel>{t('send_content')}</FieldLabel>
+                <CustomEdit
+                  className="h-full rounded-r-xl overflow-hidden"
+                  value={match(toggleValue)
+                    .with(Alignment.preview, () => getSendContent(message.content))
+                    .with(Alignment.edit, () => content)
+                    .exhaustive()}
+                  readonly={toggleValue === Alignment.preview}
+                  language="markdown"
+                  onChange={(newValue) => {
+                    setCode((oldValue) => {
+                      return match(oldValue)
+                        .with(
+                          { tag: 'extension' },
+                          ({ value: { source, extensionName } }) =>
+                            ({
+                              tag: 'extension',
+                              value: {
+                                source,
+                                extensionName,
+                                content: newValue,
+                              },
+                            }) satisfies Content,
+                        )
+                        .otherwise(() => oldValue);
+                    });
+                  }}
+                />
+              </Field>
+            </ResizablePanel>
+          </ResizablePanelGroup>
         ))
         .exhaustive()}
-    </Box>
+    </div>
   );
 }

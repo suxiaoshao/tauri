@@ -1,212 +1,109 @@
-import {
-  Box,
-  type BoxProps,
-  Divider,
-  Link,
-  Paper,
-  type SxProps,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  type Theme,
-  Typography,
-  type TypographyProps,
-} from '@mui/material';
+import React, { type ComponentProps, type JSX, startTransition, useEffect } from 'react';
 import MarkdownSource, { type MarkdownToJSX } from 'markdown-to-jsx';
 import Prism from 'prismjs';
-import React, { type JSX, startTransition, useEffect } from 'react';
-import { match, P } from 'ts-pattern';
 import './init';
+import { match, P } from 'ts-pattern';
+import { Separator } from '../ui/separator';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 
-export interface MarkdownProps extends BoxProps {
+export interface MarkdownProps extends ComponentProps<'div'> {
   value: string;
 }
 
 function CustomImage(props: React.ImgHTMLAttributes<HTMLImageElement>) {
-  return <Box component="img" {...props} />;
+  // oxlint-disable-next-line alt-text no-img-element
+  return <img {...props} />;
 }
 
 function CustomLink(props: { title: string; href: string; children: string }) {
   return (
-    <Link title={props.title} href={props.href} target="_blank" sx={{ display: 'inline-block', ml: 0.5, mr: 0.5 }}>
+    // oxlint-disable-next-line no-html-link-for-pages
+    <a
+      title={props.title}
+      href={props.href}
+      target="_blank"
+      className="inline-block ml-1 mr-1 underline text-blue-700 dark:text-blue-300"
+    >
       {props.children}
-    </Link>
+    </a>
   );
 }
 
-function CustomHead(props: TypographyProps) {
-  return (
-    <>
-      <Typography
-        sx={{
-          margin: match(props.variant)
-            .with('h2', () => '10px 0 0 10px')
-            .otherwise(() => '30px 0 0 10px'),
-        }}
-        id={String(props.children)}
-        variant={props.variant}
-      >
-        {props.children}
-      </Typography>
-      <Divider
-        sx={{
-          margin: '15px 0 15px 0',
-        }}
-      />
-    </>
-  );
-}
-
-function MyCode(props: { children: string; className?: string }) {
+function CustomCode(props: { children: string; className?: string }) {
   if (props.className) {
     return <code className={props.className}>{props.children}</code>;
   }
   return (
-    <Box
-      component="span"
-      sx={({
-        palette: {
-          secondary: { main, contrastText },
-        },
-      }) => ({
-        borderRadius: 2,
-        p: 0.3,
-        pl: 0.5,
-        pr: 0.5,
-        m: 0.3,
-        mr: 0.5,
-        ml: 0.5,
-        minWidth: 20,
-        fontSize: 17,
-        background: main,
-        color: contrastText,
-        display: 'inline-flex',
-        justifyContent: 'center',
-      })}
-      className="code-inline"
-    >
+    <code className="bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">
       {props.children}
-    </Box>
+    </code>
   );
 }
 
 function CustomPre(props: { children: string }) {
   return (
-    <Box sx={{ width: '100%' }}>
-      <Box component="pre" className="line-numbers" sx={{ width: '100%' }}>
-        {props.children}
-      </Box>
-    </Box>
+    <div>
+      <pre className="line-numbers">{props.children}</pre>
+    </div>
   );
 }
 
-function MyListItem(props: { children: JSX.Element[] }) {
+function CustomListItem(props: { children: JSX.Element[] }) {
   return (
-    <li>
-      {props.children.map((value) => {
-        return match(value)
-          .with(P.string, (str) => (
-            <Typography
-              variant="body1"
-              component="span"
-              sx={{
-                margin: '6px 0 6px 0',
-                display: 'inline-block',
-              }}
-              key={str.toString()}
-            >
-              {str}
-            </Typography>
-          ))
-          .otherwise(() => value);
-      })}
-    </li>
+    <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
+      {props.children.map((value) =>
+        match(value)
+          .with(P.string, (value) => <li key={JSON.stringify(value)}>{value}</li>)
+          .otherwise((value) => value),
+      )}
+    </ul>
   );
 }
 
-function MyTable(props: { children: JSX.Element }) {
-  return (
-    <TableContainer
-      component={Paper}
-      sx={{
-        margin: '10px 5px 10px 5px',
-        width: 'auto',
-      }}
-    >
-      <Table>{props.children}</Table>
-    </TableContainer>
-  );
+function TypographyH1({ children }: { children: JSX.Element }) {
+  return <h1 className="scroll-m-20 text-center text-4xl font-extrabold tracking-tight text-balance">{children}</h1>;
 }
 
-function MyBlockquote(props: { children: JSX.Element }) {
-  return (
-    <Box
-      sx={{
-        mt: 2,
-        mb: 2,
-        p: 1,
-        borderRadius: 2,
-        background: 'var(--you-on-tertiary)',
-        color: 'var(--you-tertiary)',
-      }}
-    >
-      {props.children}
-    </Box>
-  );
+function TypographyH2({ children }: { children: JSX.Element }) {
+  return <h2 className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0">{children}</h2>;
+}
+
+function TypographyH3({ children }: { children: JSX.Element }) {
+  return <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">{children}</h3>;
+}
+
+function TypographyH4({ children }: { children: JSX.Element }) {
+  return <h4 className="scroll-m-20 text-xl font-semibold tracking-tight">{children}</h4>;
+}
+
+function TypographyP({ children }: { children: JSX.Element }) {
+  return <p className="leading-7 not-first:mt-6">{children}</p>;
+}
+
+function TypographyBlockquote({ children }: { children: JSX.Element }) {
+  return <blockquote className="mt-6 border-l-2 pl-6 italic">{children}</blockquote>;
 }
 
 const option: MarkdownToJSX.Options = {
   overrides: {
-    h1: {
-      component: CustomHead,
-      props: {
-        variant: 'h4',
-      },
-    },
-    h2: {
-      component: CustomHead,
-      props: {
-        variant: 'h5',
-      },
-    },
-    h3: {
-      component: CustomHead,
-      props: {
-        variant: 'h6',
-      },
-    },
-    h4: {
-      component: CustomHead,
-      props: {
-        variant: 'h7',
-      },
-    },
-    p: {
-      component: Typography,
-      props: {
-        variant: 'body1',
-        sx: {
-          fontSize: 16,
-          lineHeight: '1.5em',
-        } as SxProps<Theme>,
-      },
-    },
+    h1: TypographyH1,
+    h2: TypographyH2,
+    h3: TypographyH3,
+    h4: TypographyH4,
+    p: TypographyP,
     img: CustomImage,
     a: CustomLink,
-    code: MyCode,
+    code: CustomCode,
     pre: CustomPre,
-    li: MyListItem,
-    table: MyTable,
-    thead: TableHead,
+    ul: CustomListItem,
+    table: Table,
+    thead: TableHeader,
     tr: TableRow,
     tbody: TableBody,
     td: TableCell,
-    th: TableCell,
-    hr: Divider,
-    blockquote: MyBlockquote,
+    th: TableHead,
+    hr: Separator,
+    blockquote: TypographyBlockquote,
   },
 };
 export default function CustomMarkdown({ value, ...props }: MarkdownProps) {
@@ -218,8 +115,8 @@ export default function CustomMarkdown({ value, ...props }: MarkdownProps) {
     });
   }, [value, ref]);
   return (
-    <Box {...props} ref={setRef}>
+    <div {...props} ref={setRef}>
       <MarkdownSource options={option}>{value}</MarkdownSource>
-    </Box>
+    </div>
   );
 }

@@ -5,29 +5,17 @@
  * @LastEditTime: 2024-05-01 03:49:36
  * @FilePath: /tauri/packages/ChatGPT/src/features/Template/components/TemplateInfo.tsx
  */
-import { Mode } from '@chatgpt/types/common';
+import { Badge } from '@chatgpt/components/ui/badge';
 import { type ConversationTemplate } from '@chatgpt/types/conversationTemplate';
 import { getModeKey } from '@chatgpt/utils/getModeKey';
-import { Chip, type ChipProps, Typography } from '@mui/material';
-import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { match } from 'ts-pattern';
 
 export default function TemplateInfo({ description, mode }: Pick<ConversationTemplate, 'description' | 'mode'>) {
   const { t } = useTranslation();
-  const color = useMemo<ChipProps['color']>(
-    () =>
-      match(mode)
-        .with(Mode.AssistantOnly, () => 'primary' as const)
-        .with(Mode.Contextual, () => 'secondary' as const)
-        .with(Mode.Single, () => 'tertiary' as const)
-        .otherwise(() => 'default' as const),
-    [mode],
-  );
   return (
-    <Typography variant="body2">
-      <Chip color={color} label={t(getModeKey(mode))} size="small" variant="outlined" />
+    <span className="leading-7">
+      <Badge variant="outline">{t(getModeKey(mode))}</Badge>
       {description && ` ${description}`}
-    </Typography>
+    </span>
   );
 }

@@ -1,10 +1,12 @@
 import { deleteFolder } from '@chatgpt/service/chat/mutation';
 import { type Folder } from '@chatgpt/types/folder';
-import { Delete } from '@mui/icons-material';
-import { Box, IconButton, Typography } from '@mui/material';
 import { useCallback } from 'react';
 import MoveFolder from './MoveFolder';
 import UpdateFolder from './UpdateFolder';
+import { Button } from '@chatgpt/components/ui/button';
+import { Trash } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@chatgpt/components/ui/tooltip';
+import { useTranslation } from 'react-i18next';
 export interface FolderHeaderProps {
   folder: Folder;
 }
@@ -13,31 +15,28 @@ export default function FolderHeader({ folder }: FolderHeaderProps) {
   const handleDelete = useCallback(async () => {
     await deleteFolder({ id: folder.id });
   }, [folder.id]);
+  const { t } = useTranslation();
 
   return (
-    <Box
-      data-tauri-drag-region
-      sx={{
-        width: '100%',
-        display: 'flex',
-        p: 1,
-        justifyContent: 'center',
-        boxShadow: (theme) => theme.shadows[3].split(',0px')[0],
-      }}
-    >
-      <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', ml: 1 }} data-tauri-drag-region>
-        <Typography data-tauri-drag-region variant="h6" component="span">
+    <div className="w-full flex p-2 justify-center shadow" data-tauri-drag-region>
+      <div className="grow flex items-center ml-2 gap-2" data-tauri-drag-region>
+        <span className="text-xl" data-tauri-drag-region>
           {folder.name}
-        </Typography>
-        <Typography sx={{ ml: 1 }} data-tauri-drag-region variant="body2" color="inherit" component="span">
+        </span>
+        <span className="text-sm text-accent-foreground" data-tauri-drag-region>
           {folder.path}
-        </Typography>
-      </Box>
+        </span>
+      </div>
       <UpdateFolder folder={folder} />
-      <IconButton onClick={handleDelete}>
-        <Delete />
-      </IconButton>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button variant="ghost" size="icon" onClick={handleDelete}>
+            <Trash />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>{t('delete')}</TooltipContent>
+      </Tooltip>
       <MoveFolder folder={folder} />
-    </Box>
+    </div>
   );
 }

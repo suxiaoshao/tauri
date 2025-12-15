@@ -21,23 +21,23 @@ delay = { path = "../../../crates/delay" }
 tokio = { version = "1.48.0", default-features = false, features = ["time"] }
 
 # database
-diesel = { version = "2.3.3", features = ["sqlite", "r2d2","returning_clauses_for_sqlite_3_35"] }
+diesel = { version = "2.3.4", features = ["sqlite", "r2d2","returning_clauses_for_sqlite_3_35"] }
 libsqlite3-sys = { version = "0.35.0", features = ["bundled-windows"] }
 time = "0.3.44"
 
 # 剪切板监听
 enigo = "0.6.1"
-clipboard-rs = "0.3.0"
+clipboard-rs = "0.3.1"
 
 # 错误处理
 thiserror = "2.0.17"
 
 # 窗口管理
-window-vibrancy = "0.6.0"
+window-vibrancy = "0.7.1"
 
 # log
 tauri-plugin-log = { version = "2.7.1" }
-log = "0.4.28"
+log = "0.4.29"
 
 # plugin
 tauri-plugin-global-shortcut = "2.3.1"

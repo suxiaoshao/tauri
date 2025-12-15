@@ -1,9 +1,11 @@
 import HotkeyInput from '@chatgpt/components/HotkeyInput';
-import { Box, TextField, MenuItem, InputLabel } from '@mui/material';
 import { Controller, useFormContext } from 'react-hook-form';
 import { match } from 'ts-pattern';
 import { type Config, Language, Theme } from '../types';
 import { useTranslation } from 'react-i18next';
+import { Field, FieldError, FieldGroup, FieldLabel, FieldSet } from '@chatgpt/components/ui/field';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@chatgpt/components/ui/select';
+import { Input } from '@chatgpt/components/ui/input';
 
 export default function GeneralSettings() {
   const {
@@ -13,94 +15,84 @@ export default function GeneralSettings() {
   } = useFormContext<Config>();
   const { t } = useTranslation();
   return (
-    <Box
-      sx={{
-        p: 2,
-        pt: 3,
-        flex: '1 1 0',
-        overflowY: 'auto',
-        height: '100%',
-      }}
-    >
-      <Controller
-        control={control}
-        name="theme.theme"
-        rules={{ required: true }}
-        render={({ field, fieldState }) => (
-          <TextField
-            required
-            {...field}
-            label={t('theme')}
-            select
-            fullWidth
-            sx={{ mt: 2 }}
-            error={!!fieldState.error?.message}
-            helperText={fieldState.error?.message}
-          >
-            <MenuItem value={Theme.Dark}>{t(Theme.Dark)}</MenuItem>
-            <MenuItem value={Theme.Light}>{t(Theme.Light)}</MenuItem>
-            <MenuItem value={Theme.System}>{t(Theme.System)}</MenuItem>
-          </TextField>
-        )}
-      />
-
-      <InputLabel htmlFor="color-input" sx={{ mt: 2 }} required error={!!errors.theme?.color?.message}>
-        {t('color')}
-      </InputLabel>
-      <Box component="input" id="color-input" type="color" {...register('theme.color', { required: true })} />
-      <Box sx={{ color: 'error.main' }}>{errors.theme?.color?.message}</Box>
-      <Controller
-        control={control}
-        name="language"
-        rules={{ required: true }}
-        render={({ field, fieldState }) => (
-          <TextField
-            required
-            {...field}
-            label={t('language')}
-            select
-            fullWidth
-            sx={{ mt: 2 }}
-            error={!!fieldState.error?.message}
-            helperText={fieldState.error?.message}
-          >
-            <MenuItem value={Language.System}>{t(Language.System)}</MenuItem>
-            <MenuItem value={Language.Chinese}>{t(Language.Chinese)}</MenuItem>
-            <MenuItem value={Language.English}>{t(Language.English)}</MenuItem>
-          </TextField>
-        )}
-      />
-      <TextField
-        {...register('httpProxy', {
-          setValueAs: (value) => {
-            return (
-              match(value?.trim())
-                // eslint-disable-next-line no-useless-undefined
-                .with('', () => undefined)
-                .otherwise(() => value)
-            );
-          },
-        })}
-        label={t('http_proxy')}
-        fullWidth
-        sx={{ mt: 2 }}
-        error={!!errors.httpProxy?.message}
-        helperText={errors.httpProxy?.message}
-      />
-      <Controller
-        control={control}
-        name="temporaryHotkey"
-        render={({ field, fieldState }) => (
-          <HotkeyInput
-            {...field}
-            label={t('temporary_conversation_hotkey')}
-            fullWidth
-            sx={{ mt: 2 }}
-            error={!!fieldState.error?.message}
-            helperText={fieldState.error?.message}
+    <FieldSet className="h-full p-3 flex-[1_1_auto] overflow-y-auto">
+      <FieldGroup>
+        <Controller
+          control={control}
+          name="theme.theme"
+          rules={{ required: true }}
+          render={({ field: { onChange, ...field }, fieldState }) => (
+            <Field>
+              <FieldLabel>{t('theme')}</FieldLabel>
+              <Select required onValueChange={onChange} {...field}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={Theme.Dark}>{t(Theme.Dark)}</SelectItem>
+                  <SelectItem value={Theme.Light}>{t(Theme.Light)}</SelectItem>
+                  <SelectItem value={Theme.System}>{t(Theme.System)}</SelectItem>
+                </SelectContent>
+              </Select>
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+        <Field>
+          <FieldLabel>{t('color')}</FieldLabel>
+          <Input type="color" {...register('theme.color', { required: true })} />
+          <FieldError errors={[errors.theme?.color]} />
+        </Field>
+        <Controller
+          control={control}
+          name="language"
+          rules={{ required: true }}
+          render={({ field: { onChange, ...field }, fieldState }) => (
+            <Field>
+              <FieldLabel>{t('language')}</FieldLabel>
+              <Select required onValueChange={onChange} {...field}>
+                <SelectTrigger>
+                  <SelectValue placeholder={t('language')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={Language.System}>{t(Language.System)}</SelectItem>
+                  <SelectItem value={Language.Chinese}>{t(Language.Chinese)}</SelectItem>
+                  <SelectItem value={Language.English}>{t(Language.English)}</SelectItem>
+                </SelectContent>
+              </Select>
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+        <Field>
+          <FieldLabel>{t('http_proxy')}</FieldLabel>
+          <Input
+            placeholder={t('http_proxy')}
+            {...register('httpProxy', {
+              setValueAs: (value) => {
+                return (
+                  match(value?.trim())
+                    // eslint-disable-next-line no-useless-undefined
+                    .with('', () => undefined)
+                    .otherwise(() => value)
+                );
+              },
+            })}
           />
-        )}
-      />
-    </Box>
+          <FieldError errors={[errors.httpProxy]} />
+        </Field>
+        <Controller
+          control={control}
+          name="temporaryHotkey"
+          render={({ field, fieldState }) => (
+            <Field>
+              <FieldLabel>{t('temporary_conversation_hotkey')}</FieldLabel>
+              <HotkeyInput {...field} />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+      </FieldGroup>
+    </FieldSet>
   );
 }

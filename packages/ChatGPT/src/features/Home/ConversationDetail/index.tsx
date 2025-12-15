@@ -4,7 +4,6 @@ import usePromiseFn from '@chatgpt/hooks/usePromiseFn';
 import { deleteMessage } from '@chatgpt/service/chat/mutation';
 import { fetchMessage } from '@chatgpt/service/chat/query';
 import { type Conversation } from '@chatgpt/types/conversation';
-import { Box } from '@mui/material';
 import { WebviewWindow } from '@tauri-apps/api/webviewWindow';
 import { useCallback } from 'react';
 import Header from './components/ConversationHeader';
@@ -41,24 +40,16 @@ export default function ConversationDetail({ conversation }: ConversationDetailP
   );
   const [status, onSendMessage] = usePromiseFn(fetchFn);
   return (
-    <Box
-      sx={{
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        backgroundColor: 'transparent',
-      }}
-    >
+    <div className=" size-full flex flex-col">
       <Header conversation={conversation} />
-      <Box sx={{ flex: '1 1 0', overflowY: 'auto' }}>
+      <div className="flex-[1_1_0] overflow-y-auto">
         <MessageHistory
           onMessageViewed={handleMessageView}
           onMessageDeleted={handleMessageDelete}
           messages={conversation.messages}
         />
-      </Box>
+      </div>
       <ChatForm status={status} onSendMessage={onSendMessage} />
-    </Box>
+    </div>
   );
 }

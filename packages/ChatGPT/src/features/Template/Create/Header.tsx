@@ -5,9 +5,8 @@
  * @LastEditTime: 2024-05-01 02:18:50
  * @FilePath: /tauri/packages/ChatGPT/src/features/Template/List/header.tsx
  */
-import { Publish } from '@mui/icons-material';
-import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
-import { Box, IconButton, Typography } from '@mui/material';
+import { Button } from '@chatgpt/components/ui/button';
+import { ArrowLeft, Upload } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
@@ -19,27 +18,18 @@ export default function TemplateCreateHeader({ formId }: TemplateCreateHeaderPro
   const navigate = useNavigate();
   const { t } = useTranslation();
   return (
-    <Box
-      data-tauri-drag-region
-      sx={{
-        width: '100%',
-        display: 'flex',
-        p: 1,
-        justifyContent: 'center',
-        boxShadow: (theme) => theme.shadows[3].split(',0px')[0],
-      }}
-    >
-      <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', ml: 1 }} data-tauri-drag-region>
-        <IconButton sx={{ mr: 1 }} onClick={() => navigate(-1)}>
-          <KeyboardArrowLeftIcon />
-        </IconButton>
-        <Typography data-tauri-drag-region variant="h6" component="span">
+    <div className="w-full flex p-2 justify-center shadow" data-tauri-drag-region>
+      <div className="grow flex items-center gap-2" data-tauri-drag-region>
+        <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
+          <ArrowLeft />
+        </Button>
+        <span className="text-xl leading-snug font-medium" data-tauri-drag-region>
           {t('create_template')}
-        </Typography>
-      </Box>
-      <IconButton type="submit" form={formId}>
-        <Publish />
-      </IconButton>
-    </Box>
+        </span>
+      </div>
+      <Button variant="ghost" size="icon" type="submit" form={formId}>
+        <Upload />
+      </Button>
+    </div>
   );
 }

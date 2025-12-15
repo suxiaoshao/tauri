@@ -1,16 +1,26 @@
 import useSettingKey from '@chatgpt/hooks/useSettingKey';
 import { createSettingWindow, openSettingFile, setConfigService } from '@chatgpt/service/config';
 import { valibotResolver } from '@hookform/resolvers/valibot';
-import { FileOpen, Power, Save, Settings } from '@mui/icons-material';
-import { Box, Divider, List, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { FilePen, Plug, Save, Settings } from 'lucide-react';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import { useCallback } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useShallow } from 'zustand/react/shallow';
 import { selectConfig, useConfigStore } from './configSlice';
 import { ChatGPTConfigSchema, type Config } from './types';
-import { Outlet, useMatch, useNavigate } from 'react-router-dom';
+import { Link, Outlet, useMatch } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+} from '@chatgpt/components/ui/sidebar';
 const appWindow = getCurrentWebviewWindow();
 
 function Setting() {
@@ -20,7 +30,6 @@ function Setting() {
     resolver: valibotResolver(ChatGPTConfigSchema),
   });
   const { handleSubmit } = methods;
-  const navigate = useNavigate();
   const matchGeneral = useMatch('/setting/general');
   const matchAdapter = useMatch('/setting/adapter');
 
@@ -31,72 +40,57 @@ function Setting() {
   const { t } = useTranslation();
   return (
     <FormProvider {...methods}>
-      <Box
-        sx={{
-          width: '100%',
-          height: '100%',
-          backgroundColor: 'transparent',
-          display: 'flex',
-          flexDirection: 'row',
-        }}
-        component="form"
-        onSubmit={onSubmit}
-      >
-        <Box
-          sx={{
-            width: 220,
-            flexShrink: 0,
-            '& .MuiToolbar-root': {
-              backgroundColor: 'transparent',
-            },
-            backgroundColor: 'transparent',
-          }}
-          className="box"
-          data-tauri-drag-region
-        >
-          <List>
-            <ListItemButton
-              onClick={() => {
-                navigate('/setting/general');
-              }}
-              selected={matchGeneral !== null}
-            >
-              <ListItemIcon>
-                <Settings />
-              </ListItemIcon>
-              <ListItemText primary={t('general')} />
-            </ListItemButton>
-            <ListItemButton
-              onClick={() => {
-                navigate('/setting/adapter');
-              }}
-              selected={matchAdapter !== null}
-            >
-              <ListItemIcon>
-                <Power />
-              </ListItemIcon>
-              <ListItemText primary={t('adapter')} />
-            </ListItemButton>
-          </List>
-          <Divider />
-          <List>
-            <ListItemButton onClick={onSubmit}>
-              <ListItemIcon>
-                <Save />
-              </ListItemIcon>
-              <ListItemText primary={t('submit')} />
-            </ListItemButton>
-            <ListItemButton onClick={openSettingFile}>
-              <ListItemIcon>
-                <FileOpen />
-              </ListItemIcon>
-              <ListItemText primary={t('open_setting_file')} />
-            </ListItemButton>
-          </List>
-        </Box>
-        <Divider orientation="vertical" />
-        <Outlet />
-      </Box>
+      <SidebarProvider defaultOpen>
+        <Sidebar>
+          <SidebarContent>
+            <SidebarGroup>
+              <SidebarGroupLabel>{t('category')}</SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton isActive={matchGeneral !== null} asChild>
+                      <Link to="/setting/general">
+                        <Settings />
+                        {t('general')}
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton isActive={matchAdapter !== null} asChild>
+                      <Link to="/setting/adapter">
+                        <Plug />
+                        {t('adapter')}
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+            <SidebarGroup>
+              <SidebarGroupLabel>{t('actions')}</SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton onClick={onSubmit}>
+                      <Save />
+                      {t('submit')}
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton onClick={openSettingFile}>
+                      <FilePen />
+                      {t('open_setting_file')}
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          </SidebarContent>
+        </Sidebar>
+        <main className="flex-1">
+          <Outlet />
+        </main>
+      </SidebarProvider>
     </FormProvider>
   );
 }
@@ -108,12 +102,12 @@ function SettingItem() {
   }, []);
   const { t } = useTranslation();
   return (
-    <ListItemButton onClick={handleSetting}>
-      <ListItemIcon>
+    <SidebarMenuItem>
+      <SidebarMenuButton onClick={handleSetting}>
         <Settings />
-      </ListItemIcon>
-      <ListItemText primary={t('settings')} />
-    </ListItemButton>
+        <span>{t('settings')}</span>
+      </SidebarMenuButton>
+    </SidebarMenuItem>
   );
 }
 

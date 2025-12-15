@@ -7,6 +7,7 @@
  */
 import { type InvokeArgs, invoke } from '@tauri-apps/api/core';
 import { enqueueSnackbar } from 'notify';
+import { toast } from 'sonner';
 
 export async function appInvoke<P, R>(cmd: string, params: P): Promise<R> {
   try {
@@ -14,11 +15,14 @@ export async function appInvoke<P, R>(cmd: string, params: P): Promise<R> {
     return response;
   } catch (error) {
     if (error instanceof Error) {
-      await enqueueSnackbar(error.message, { variant: 'error' });
+      toast.error(error.message);
+      await enqueueSnackbar(error.message);
     } else if (typeof error === 'string') {
-      await enqueueSnackbar(error, { variant: 'error' });
+      toast.error(error);
+      await enqueueSnackbar(error);
     } else {
-      await enqueueSnackbar('unknown error', { variant: 'error' });
+      toast.error('unknown error');
+      await enqueueSnackbar('unknown error');
     }
     // eslint-disable-next-line no-console
     console.error(error);

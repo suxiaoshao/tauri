@@ -11,7 +11,6 @@ import { Alignment } from '@chatgpt/features/MessagePreview/Success';
 import usePromise, { type PromiseData, PromiseStatus } from '@chatgpt/hooks/usePromise';
 import { updateConversationTemplate } from '@chatgpt/service/chat/mutation';
 import { findConversationTemplate } from '@chatgpt/service/chat/query';
-import { Box } from '@mui/material';
 import { enqueueSnackbar } from 'notify';
 import { useCallback, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
@@ -22,11 +21,12 @@ import TemplateDetailView from './components/View';
 import { getAdapterTemplateInputs } from '@chatgpt/service/adapter';
 import type { ConversationTemplate } from '@chatgpt/types/conversationTemplate';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 
 export default function ConversationTemplateDetail() {
   const { t } = useTranslation();
   const [alignment, setAlignment] = useState(Alignment.preview);
-  const handleAlignment = useCallback((event: React.MouseEvent<HTMLElement>, newAlignment: string | null) => {
+  const handleAlignment = useCallback((newAlignment: string | null) => {
     match(newAlignment)
       .with(Alignment.preview, () => setAlignment(Alignment.preview))
       .with(Alignment.edit, () => setAlignment(Alignment.edit))
@@ -58,9 +58,9 @@ export default function ConversationTemplateDetail() {
   // render content
   const content = useMemo(() => {
     return match(data)
-      .with({ tag: PromiseStatus.loading }, () => <Loading sx={{ width: '100%', height: '100%' }} />)
+      .with({ tag: PromiseStatus.loading }, () => <Loading className="size-full" />)
       .with({ tag: PromiseStatus.error }, ({ value }) => (
-        <ErrorInfo sx={{ flex: '1 1 0' }} error={value} refetch={refresh} />
+        <ErrorInfo className="flex-[1_1_0]" error={value} refetch={refresh} />
       ))
       .with({ tag: PromiseStatus.data }, ({ value }) =>
         match(alignment)
@@ -68,26 +68,19 @@ export default function ConversationTemplateDetail() {
           .with(Alignment.edit, () => {
             const onSubmit = async (formData: TemplateForm) => {
               await updateConversationTemplate({ data: formData, id: value.template.id });
-              enqueueSnackbar(t('template_updated_successfully'), { variant: 'success' });
+              toast.success(t('template_updated_successfully'));
+              enqueueSnackbar(t('template_updated_successfully'));
               refresh();
               setAlignment(Alignment.preview);
             };
             return <TemplateEdit onSubmit={onSubmit} id={formId} initialValues={value.template} />;
           })
-          .otherwise(() => <Loading sx={{ width: '100%', height: '100%' }} />),
+          .otherwise(() => <Loading className="size-full" />),
       )
-      .otherwise(() => <Loading sx={{ width: '100%', height: '100%' }} />);
+      .otherwise(() => <Loading className="size-full" />);
   }, [data, refresh, alignment, formId, t]);
   return (
-    <Box
-      sx={{
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        backgroundColor: 'transparent',
-      }}
-    >
+    <div className="size-full flex flex-col">
       <TemplateDetailHeader
         formId={formId}
         alignment={alignment}
@@ -114,6 +107,6 @@ export default function ConversationTemplateDetail() {
         refresh={refresh}
       />
       {content}
-    </Box>
+    </div>
   );
 }

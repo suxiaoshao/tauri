@@ -6,15 +6,14 @@
  * @FilePath: /tauri/packages/ChatGPT/src/features/Adds/AddFolder.tsx
  */
 import FolderEdit, { type FolderForm } from '@chatgpt/components/FolderEdit';
+import { Button } from '@chatgpt/components/ui/button';
+import { SidebarMenuButton, SidebarMenuItem } from '@chatgpt/components/ui/sidebar';
 import { addFolder } from '@chatgpt/service/chat/mutation';
 import { type NewFolder } from '@chatgpt/types/folder';
-import { Add } from '@mui/icons-material';
-import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
-import PublishIcon from '@mui/icons-material/Publish';
-import { Box, IconButton, ListItemButton, ListItemIcon, ListItemText, Toolbar, Typography } from '@mui/material';
+import { ArrowLeft, Plus, Upload } from 'lucide-react';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useMatch, useNavigate } from 'react-router-dom';
+import { Link, useMatch, useNavigate } from 'react-router-dom';
 
 function AddFolder() {
   const navigate = useNavigate();
@@ -32,58 +31,37 @@ function AddFolder() {
   );
   const { t } = useTranslation();
   return (
-    <Box
-      sx={{
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        overflowY: 'auto',
-        backgroundColor: 'transparent',
-      }}
-    >
-      <Box
-        data-tauri-drag-region
-        sx={{ backgroundColor: 'transparent', boxShadow: (theme) => theme.shadows[3].split(',0px')[0] }}
-      >
-        <Toolbar data-tauri-drag-region variant="dense">
-          <IconButton onClick={() => navigate(-1)}>
-            <KeyboardArrowLeftIcon />
-          </IconButton>
-          <Typography data-tauri-drag-region variant="h6">
-            {t('add_folder')}
-          </Typography>
-          <Box sx={{ flexGrow: 1 }} />
-          <IconButton form="folder-form" type="submit">
-            <PublishIcon />
-          </IconButton>
-        </Toolbar>
-      </Box>
-      <FolderEdit id="folder-form" onSubmit={handleSubmit} />
-    </Box>
+    <div className="size-full flex flex-col overflow-y-auto">
+      <div className="shadow flex items-center gap-2 h-14" data-tauri-drag-region>
+        <Button size="icon" variant="ghost" onClick={() => navigate(-1)}>
+          <ArrowLeft />
+        </Button>
+        <span data-tauri-drag-region className="text-xl leading-snug font-medium">
+          {t('add_folder')}
+        </span>
+        <div className="grow" />
+        <Button size="icon" variant="ghost" form="folder-form" type="submit">
+          <Upload />
+        </Button>
+      </div>
+
+      <FolderEdit className="p-4" id="folder-form" onSubmit={handleSubmit} />
+    </div>
   );
 }
 
 function AddFolderItem() {
-  const navigate = useNavigate();
   const matchAdd = useMatch('/add/folder');
   const { t } = useTranslation();
   return (
-    <ListItemButton
-      onClick={() => {
-        if (matchAdd) {
-          navigate('/');
-        } else {
-          navigate('/add/folder');
-        }
-      }}
-      selected={matchAdd !== null}
-    >
-      <ListItemIcon>
-        <Add />
-      </ListItemIcon>
-      <ListItemText primary={t('add_folder')} />
-    </ListItemButton>
+    <SidebarMenuItem>
+      <SidebarMenuButton asChild isActive={matchAdd !== null}>
+        <Link to="/add/folder">
+          <Plus />
+          <span>{t('add_folder')}</span>
+        </Link>
+      </SidebarMenuButton>
+    </SidebarMenuItem>
   );
 }
 

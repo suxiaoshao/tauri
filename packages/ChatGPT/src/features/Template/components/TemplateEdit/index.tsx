@@ -8,14 +8,18 @@
 import { Mode, Role } from '@chatgpt/types/common';
 import { type ConversationTemplate } from '@chatgpt/types/conversationTemplate';
 import { valibotResolver } from '@hookform/resolvers/valibot';
-import { Box, FormLabel, IconButton, MenuItem, TextField } from '@mui/material';
 import { Controller, FormProvider, useFieldArray, useForm } from 'react-hook-form';
 import { type InferInput, any, array, emoji, enum_, nullish, object, pipe, string } from 'valibot';
 import AdapterForm from './AdapterForm';
-import { Add, Delete } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { getModeKey } from '@chatgpt/utils/getModeKey';
 import { getRoleKey } from '@chatgpt/utils/getRoleKey';
+import { Field, FieldError, FieldGroup, FieldLabel } from '@chatgpt/components/ui/field';
+import { Input } from '@chatgpt/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@chatgpt/components/ui/select';
+import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupTextarea } from '@chatgpt/components/ui/input-group';
+import { XIcon } from 'lucide-react';
+import { Button } from '@chatgpt/components/ui/button';
 
 const templateSchema = object({
   name: string(),
@@ -66,111 +70,91 @@ export default function TemplateEdit({ initialValues, id, onSubmit }: TemplateEd
 
   return (
     <FormProvider {...methods}>
-      <Box
-        sx={{
-          flex: '1 1 0',
-          display: 'flex',
-          flexDirection: 'column',
-          position: 'relative',
-          overflowY: 'auto',
-          p: 2,
-          gap: 2,
-        }}
-        component="form"
-        id={id}
-        onSubmit={handleSubmit(onSubmit)}
-      >
-        <TextField
-          error={!!errors.name?.message}
-          helperText={errors.name?.message}
-          {...register('name', { required: true })}
-          required
-          label={t('name')}
-          fullWidth
-        />
-        <TextField
-          error={!!errors.icon?.message}
-          helperText={errors.icon?.message}
-          label={t('icon')}
-          required
-          {...register('icon', { required: true })}
-          fullWidth
-        />
-        <TextField
-          error={!!errors.description?.message}
-          helperText={errors.description?.message}
-          {...register('description')}
-          label={t('description')}
-          fullWidth
-        />
-        <Controller
-          control={control}
-          name="mode"
-          rules={{ required: true }}
-          render={({ field, fieldState }) => (
-            <TextField
-              error={!!fieldState?.error?.message}
-              helperText={fieldState?.error?.message}
-              select
-              label={t('mode')}
-              required
-              fullWidth
-              {...field}
-            >
-              <MenuItem value={Mode.Contextual}>{t(getModeKey(Mode.Contextual))}</MenuItem>
-              <MenuItem value={Mode.Single}>{t(getModeKey(Mode.Single))}</MenuItem>
-              <MenuItem value={Mode.AssistantOnly}>{t(getModeKey(Mode.AssistantOnly))}</MenuItem>
-            </TextField>
-          )}
-        />
-        <AdapterForm />
-        <Box sx={{ gap: 2, display: 'flex', alignItems: 'center' }}>
-          <FormLabel required>{t('prompts')}</FormLabel>
-          <IconButton onClick={() => append({ role: Role.assistant, prompt: '' })}>
-            <Add />
-          </IconButton>
-        </Box>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          {fields.map((field, index) => (
-            <Box sx={{ display: 'flex', gap: 1, alignItems: 'start' }} key={field.id}>
-              <Controller
-                control={control}
-                name={`prompts.${index}.role`}
-                rules={{ required: true }}
-                render={({ field, fieldState }) => (
-                  <TextField
-                    error={!!fieldState?.error?.message}
-                    helperText={fieldState?.error?.message}
-                    select
-                    label={t('role')}
-                    required
-                    fullWidth
-                    sx={{ flex: '1 1 0' }}
-                    {...field}
-                  >
-                    <MenuItem value={Role.assistant}>{t(getRoleKey(Role.assistant))}</MenuItem>
-                    <MenuItem value={Role.user}>{t(getRoleKey(Role.user))}</MenuItem>
-                    <MenuItem value={Role.developer}>{t(getRoleKey(Role.developer))}</MenuItem>
-                  </TextField>
-                )}
-              />
-              <TextField
-                error={!!errors?.prompts?.[index]?.prompt?.message}
-                helperText={errors?.prompts?.[index]?.prompt?.message}
-                {...register(`prompts.${index}.prompt`, { required: true })}
-                label={t('prompt')}
-                fullWidth
-                sx={{ flex: '1 1 0' }}
-                multiline
-                maxRows={4}
-              />
-              <IconButton sx={{ mt: 1 }} onClick={() => remove(index)}>
-                <Delete />
-              </IconButton>
-            </Box>
-          ))}
-        </Box>
-      </Box>
+      <form className="flex-[1_1_0] overflow-y-auto relative p-4" id={id} onSubmit={handleSubmit(onSubmit)}>
+        <FieldGroup>
+          <Field>
+            <FieldLabel>{t('name')}</FieldLabel>
+            <Input required placeholder={t('name')} {...register('name', { required: true })} />
+            <FieldError errors={[errors.name]} />
+          </Field>
+          <Field>
+            <FieldLabel>{t('icon')}</FieldLabel>
+            <Input required placeholder={t('icon')} {...register('icon', { required: true })} />
+            <FieldError errors={[errors.icon]} />
+          </Field>
+          <Field>
+            <FieldLabel>{t('description')}</FieldLabel>
+            <Input placeholder={t('description')} {...register('description')} />
+            <FieldError errors={[errors.description]} />
+          </Field>
+          <Controller
+            control={control}
+            name="mode"
+            rules={{ required: true }}
+            render={({ field: { onChange, ...field }, fieldState }) => (
+              <Field>
+                <FieldLabel>{t('mode')}</FieldLabel>
+                <Select onValueChange={onChange} {...field}>
+                  <SelectTrigger>
+                    <SelectValue placeholder={t('mode')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={Mode.Contextual}>{t(getModeKey(Mode.Contextual))}</SelectItem>
+                    <SelectItem value={Mode.Single}>{t(getModeKey(Mode.Single))}</SelectItem>
+                    <SelectItem value={Mode.AssistantOnly}>{t(getModeKey(Mode.AssistantOnly))}</SelectItem>
+                  </SelectContent>
+                </Select>
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              </Field>
+            )}
+          />
+          <AdapterForm />
+          <Field>
+            <FieldLabel>{t('prompts')}</FieldLabel>
+            <FieldGroup className="gap-4">
+              {fields.map((field, index) => (
+                <InputGroup key={field.id}>
+                  <InputGroupTextarea
+                    {...register(`prompts.${index}.prompt`, { required: true })}
+                    placeholder={t('prompt')}
+                    rows={4}
+                  />
+                  <InputGroupAddon align="block-start">
+                    <Controller
+                      control={control}
+                      name={`prompts.${index}.role`}
+                      rules={{ required: true }}
+                      render={({ field: { onChange, ...field } }) => (
+                        <Select onValueChange={onChange} {...field}>
+                          <SelectTrigger>
+                            <SelectValue placeholder={t('role')} />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value={Role.assistant}>{t(getRoleKey(Role.assistant))}</SelectItem>
+                            <SelectItem value={Role.user}>{t(getRoleKey(Role.user))}</SelectItem>
+                            <SelectItem value={Role.developer}>{t(getRoleKey(Role.developer))}</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
+                    <InputGroupButton className="ml-auto" variant="ghost" size="icon-sm" onClick={() => remove(index)}>
+                      <XIcon />
+                    </InputGroupButton>
+                  </InputGroupAddon>
+                </InputGroup>
+              ))}
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => append({ role: Role.assistant, prompt: '' })}
+              >
+                {t('add', { name: t('prompt') })}
+              </Button>
+            </FieldGroup>
+          </Field>
+        </FieldGroup>
+      </form>
     </FormProvider>
   );
 }

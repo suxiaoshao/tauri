@@ -44,12 +44,12 @@ export default function MessagePreview() {
   const [data, func] = usePromise(fn);
   const content = useMemo(() => {
     return match(data)
-      .with({ tag: PromiseStatus.loading }, () => <Loading sx={{ width: '100%', height: '100%' }} />)
+      .with({ tag: PromiseStatus.loading }, () => <Loading className="size-full" />)
       .with({ tag: PromiseStatus.error }, ({ value }) => <ErrorInfo error={value} refetch={func} />)
       .with({ tag: PromiseStatus.data }, ({ value }) => (
         <Success updateMessageContent={(content) => updateMessageContent({ id: value.id, content })} message={value} />
       ))
-      .otherwise(() => <Loading sx={{ width: '100%', height: '100%' }} />);
+      .otherwise(() => <Loading className="size-full" />);
   }, [data, func]);
   return content;
 }

@@ -8,6 +8,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "dayjs": "^1.11.18"
+    "dayjs": "^1.11.19"
   }
 }

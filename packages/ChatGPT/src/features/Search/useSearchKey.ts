@@ -1,16 +1,19 @@
 import usePlatform from '@chatgpt/hooks/usePlatform';
-import { useEffect } from 'react';
+import { useEffect, useEffectEvent } from 'react';
 
-export default function useSearchKey(setOpen: () => void) {
+export default function useSearchKey(toggle: () => void) {
   const platform = usePlatform();
+  const handleShortcut = useEffectEvent((event: KeyboardEvent) => {
+    const isMacos = platform === 'macos';
+    if (((event.metaKey && isMacos) || (event.ctrlKey && !isMacos)) && event.key === 'f') {
+      toggle();
+    }
+  });
   useEffect(() => {
-    const handleShortcut = (event: KeyboardEvent) => {
-      const isMacos = platform === 'macos';
-      if (((event.metaKey && isMacos) || (event.ctrlKey && !isMacos)) && event.key === 'f') {
-        setOpen();
-      }
+    const abortController = new AbortController();
+    document.addEventListener('keydown', handleShortcut, { signal: abortController.signal });
+    return () => {
+      abortController.abort();
     };
-    document.addEventListener('keydown', handleShortcut);
-    return () => document.removeEventListener('keydown', handleShortcut);
-  }, [setOpen, platform]);
+  }, []);
 }

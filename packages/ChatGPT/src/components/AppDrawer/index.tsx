@@ -12,87 +12,62 @@ import Search from '@chatgpt/features/Search';
 import Setting from '@chatgpt/features/Setting';
 import ConversationTemplateList from '@chatgpt/features/Template/List';
 import usePlatform from '@chatgpt/hooks/usePlatform';
-import { Box, Divider, List, Toolbar } from '@mui/material';
-import { useMemo, useState } from 'react';
-import { Resizable } from 'react-resizable';
-import 'react-resizable/css/styles.css';
+import { useMemo } from 'react';
 import { Outlet } from 'react-router-dom';
 import { match } from 'ts-pattern';
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '../ui/resizable';
+import {
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarProvider,
+} from '../ui/sidebar';
+import { useTranslation } from 'react-i18next';
 
 export default function AppDrawer() {
-  const [drawerWidth, setDrawerWidth] = useState(250);
   const platform = usePlatform();
   const headersHeight = useMemo(() => {
     return match(platform)
-      .with('macos', () => 28)
-      .otherwise(() => 0);
+      .with('macos', () => '28px')
+      .otherwise(() => '0px');
   }, [platform]);
+  const { t } = useTranslation();
   return (
-    <Box sx={{ width: '100%', height: '100%', backgroundColor: 'transparent', display: 'flex', flexDirection: 'row' }}>
-      <Resizable
-        width={drawerWidth}
-        onResize={(_, { size }) => {
-          setDrawerWidth(size.width);
-        }}
-        height={window.innerHeight}
-        axis="x"
-        handle={(_, ref) => (
-          <Box
-            ref={ref}
-            sx={{
-              width: 10,
-              height: '100%',
-              backgroundColor: 'transparent',
-              cursor: 'ew-resize',
-              position: 'absolute',
-              right: -5,
-              top: 0,
-            }}
-          />
-        )}
-      >
-        <Box
-          sx={{
-            width: drawerWidth,
-            flexShrink: 0,
-            '& .MuiToolbar-root': {
-              height: `${headersHeight}px`,
-              minHeight: `${headersHeight}px`,
-              backgroundColor: 'transparent',
-            },
-            backgroundColor: 'transparent',
-            height: '100%',
-          }}
-          className="box"
-          data-tauri-drag-region
-        >
-          <Toolbar data-tauri-drag-region />
-          <Box sx={{ height: 'calc(100% - 28px)', display: 'flex', flexDirection: 'column' }}>
-            <ConversationTree />
-            <Divider />
-            <List>
-              {/* eslint-disable-next-line label-has-associated-control */}
-              <AddConversation.Item />
-              {/* eslint-disable-next-line label-has-associated-control */}
-              <AddFolder.Item />
-              {/* eslint-disable-next-line label-has-associated-control */}
-              <ConversationTemplateList.Item />
-              {/* eslint-disable-next-line label-has-associated-control */}
-              <Setting.Item />
-              <Search />
-            </List>
-          </Box>
-        </Box>
-      </Resizable>
-      <Divider orientation="vertical" />
-      <Box
-        sx={{
-          width: `calc(100% - ${drawerWidth}px)`,
-          height: `100%`,
-        }}
-      >
-        <Outlet />
-      </Box>
-    </Box>
+    <SidebarProvider className="size-full" defaultOpen={false}>
+      <ResizablePanelGroup direction="horizontal" className="size-full bg-transparent flex-1">
+        <ResizablePanel defaultSize={33}>
+          <SidebarContent className="size-full bg-transparent overflow-y-hidden flex flex-col" data-tauri-drag-region>
+            {/* @ts-expect-error css variables */}
+            <div className="h-(--headersHeight)" style={{ '--headersHeight': headersHeight }} data-tauri-drag-region />
+            <SidebarGroup className="flex-[1_auto_o] w-full overflow-hidden">
+              <SidebarGroupLabel>{t('conversation_tree')}</SidebarGroupLabel>
+              <ConversationTree />
+            </SidebarGroup>
+            <SidebarGroup>
+              <SidebarGroupLabel>{t('actions')}</SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  {/* eslint-disable-next-line label-has-associated-control */}
+                  <AddConversation.Item />
+                  {/* eslint-disable-next-line label-has-associated-control */}
+                  <AddFolder.Item />
+                  {/* eslint-disable-next-line label-has-associated-control */}
+                  <ConversationTemplateList.Item />
+                  {/* eslint-disable-next-line label-has-associated-control */}
+                  <Setting.Item />
+                  <Search />
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          </SidebarContent>
+        </ResizablePanel>
+        <ResizableHandle />
+        <ResizablePanel>
+          <Outlet />
+        </ResizablePanel>
+      </ResizablePanelGroup>
+    </SidebarProvider>
   );
 }

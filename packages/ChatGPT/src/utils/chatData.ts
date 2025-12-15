@@ -1,8 +1,6 @@
-import { type Selected, SelectedType } from '@chatgpt/features/Conversations/types';
 import { type ChatData } from '@chatgpt/types/chatData';
 import { type Conversation } from '@chatgpt/types/conversation';
 import { type Folder } from '@chatgpt/types/folder';
-import { match } from 'ts-pattern';
 
 export function findConversation(chatData: ChatData, conversationId: number | null): Conversation | null {
   const conversation = _findConversation(chatData.conversations, conversationId);
@@ -52,30 +50,4 @@ export function getFirstConversation(chatData: ChatData): Conversation | null {
 
 function _findConversation(conversations: Conversation[], conversationId: number | null): Conversation | null {
   return conversations.find((c) => c.id === conversationId) ?? null;
-}
-
-export function getNodeId(node: Selected): string {
-  return `${node.tag}-${node.value}`;
-}
-
-export function getNodeIdByConversation(conversation: Conversation): string {
-  return getNodeId({ tag: SelectedType.Conversation, value: conversation.id });
-}
-
-export function getNodeIdByFolder(folder: Folder): string {
-  return getNodeId({ tag: SelectedType.Folder, value: folder.id });
-}
-
-export function getSelectedFromNodeId(nodeId: string): Selected {
-  const [tag, value] = nodeId.split('-');
-  return match(tag)
-    .with(
-      SelectedType.Conversation,
-      () => ({ tag: SelectedType.Conversation, value: Number.parseInt(value, 10) }) satisfies Selected,
-    )
-    .with(
-      SelectedType.Folder,
-      () => ({ tag: SelectedType.Folder, value: Number.parseInt(value, 10) }) satisfies Selected,
-    )
-    .otherwise(() => ({ tag: SelectedType.None }) satisfies Selected);
 }

@@ -9,11 +9,13 @@ import assistant from '@chatgpt/assets/assistant.jpg';
 import system from '@chatgpt/assets/system.png';
 import user from '@chatgpt/assets/user.jpg';
 import CustomMarkdown from '@chatgpt/components/Markdown';
+import { Avatar, AvatarImage } from '@chatgpt/components/ui/avatar';
+import { Item, ItemContent, ItemGroup, ItemMedia, ItemSeparator, ItemTitle } from '@chatgpt/components/ui/item';
+import { Separator } from '@chatgpt/components/ui/separator';
 import type { AdapterInputs } from '@chatgpt/types/adapter';
 import { Role } from '@chatgpt/types/common';
 import { type ConversationTemplate } from '@chatgpt/types/conversationTemplate';
 import { getRoleKey } from '@chatgpt/utils/getRoleKey';
-import { Avatar, Box, Divider, List, ListItem, ListItemAvatar, ListItemText, Typography } from '@mui/material';
 import { Details, type DetailsItem } from 'details';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -45,17 +47,13 @@ export default function TemplateDetailView({ data, inputs }: TemplateDetailViewP
     [data, inputs, t],
   );
   return (
-    <Box sx={{ flex: '1 1 0', overflowY: 'auto' }}>
-      <Typography sx={{ ml: 2, mt: 2 }} variant="h6">
-        {t('base_information')}
-      </Typography>
-      <Details sx={{ p: 2 }} items={items} />
-      <Divider variant="middle" sx={{ mt: 1, mb: 1 }} />
-      <Typography sx={{ ml: 2 }} variant="h6">
-        {t('prompts')}
-      </Typography>
-      <List>
-        {data.prompts.map((prompt) => {
+    <div className="flex-[1_1_0] overflow-y-auto">
+      <h6 className="ml-4 mt-4 text-xl leading-snug font-medium">{t('base_information')}</h6>
+      <Details className="p-4" items={items} />
+      <Separator className="my-4" />
+      <h6 className="ml-4 mt-4 text-xl leading-snug font-medium">{t('prompts')}</h6>
+      <ItemGroup>
+        {data.prompts.map((prompt, index) => {
           const avatar = match(prompt.role)
             .with(Role.user, () => user)
             .with(Role.assistant, () => assistant)
@@ -64,20 +62,22 @@ export default function TemplateDetailView({ data, inputs }: TemplateDetailViewP
           return (
             // eslint-disable-next-line label-has-associated-control
             <React.Fragment key={prompt.prompt}>
-              <ListItem alignItems="flex-start">
-                <ListItemAvatar>
-                  <Avatar src={avatar} />
-                </ListItemAvatar>
-                <ListItemText
-                  primary={t(getRoleKey(prompt.role))}
-                  secondary={<CustomMarkdown value={prompt.prompt} />}
-                />
-              </ListItem>
-              <Divider sx={{ mr: 2 }} variant="inset" component="li" />
+              <Item className="items-start">
+                <ItemMedia>
+                  <Avatar>
+                    <AvatarImage src={avatar} />
+                  </Avatar>
+                </ItemMedia>
+                <ItemContent className="gap-1">
+                  <ItemTitle>{t(getRoleKey(prompt.role))}</ItemTitle>
+                  <CustomMarkdown value={prompt.prompt} />
+                </ItemContent>
+              </Item>
+              {index !== data.prompts.length - 1 && <ItemSeparator />}
             </React.Fragment>
           );
         })}
-      </List>
-    </Box>
+      </ItemGroup>
+    </div>
   );
 }

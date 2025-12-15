@@ -1,17 +1,10 @@
-import { Box } from '@mui/material';
-
 export interface ToolBarProps {
   children: React.ReactNode;
 }
 export default function ToolBar({ children }: ToolBarProps) {
   return (
-    <Box
-      data-toolbar
-      sx={{
-        display: 'none',
-      }}
-    >
+    <div className="hidden group-hover:flex group-hover:absolute right-2 top-0 items-center" data-toolbar>
       {children}
-    </Box>
+    </div>
   );
 }

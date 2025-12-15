@@ -6,53 +6,32 @@
  * @FilePath: /tauri/packages/ChatGPT/src/features/Conversations/index.tsx
  */
 import { selectChatData, useConversationStore } from '@chatgpt/features/Conversations/conversationSlice';
-import { getNodeId, getSelectedFromNodeId } from '@chatgpt/utils/chatData';
-import { ChevronRight, ExpandMore } from '@mui/icons-material';
-import { SimpleTreeView } from '@mui/x-tree-view';
-import { useCallback, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import ConversationItem from './components/ConversationItem';
 import FolderItem from './components/FolderItem';
-import { useSelected } from './useSelected';
+import { SidebarGroupContent, SidebarMenu } from '@chatgpt/components/ui/sidebar';
 
 export default function ConversationTree() {
-  const navigate = useNavigate();
   const { conversations, folders, fetchConversations } = useConversationStore(
     useShallow((state) => ({
       ...selectChatData(state),
       fetchConversations: state.fetchConversations,
     })),
   );
-  const [selected, setSelected] = useSelected();
-  const handleSelect = useCallback(
-    (_event: React.SyntheticEvent | null, nodeIds: string | null) => {
-      if (!nodeIds) {
-        return;
-      }
-      navigate('/');
-      setSelected(getSelectedFromNodeId(nodeIds));
-    },
-    [setSelected, navigate],
-  );
   useEffect(() => {
     fetchConversations();
   }, [fetchConversations]);
   return (
-    <SimpleTreeView
-      aria-label="file system navigator"
-      sx={{ flex: '1 auto 0', width: '100%', overflowY: 'auto' }}
-      selectedItems={getNodeId(selected)}
-      onSelectedItemsChange={handleSelect}
-      multiSelect={false}
-      slots={{ collapseIcon: ExpandMore, expandIcon: ChevronRight }}
-    >
-      {folders.map((f) => (
-        <FolderItem key={f.id} folder={f} />
-      ))}
-      {conversations.map((c) => (
-        <ConversationItem key={c.id} conversation={c} />
-      ))}
-    </SimpleTreeView>
+    <SidebarGroupContent className="overflow-y-auto" aria-label="file system navigator">
+      <SidebarMenu>
+        {folders.map((f) => (
+          <FolderItem subItem={false} key={f.id} folder={f} />
+        ))}
+        {conversations.map((c) => (
+          <ConversationItem subItem={false} key={c.id} conversation={c} />
+        ))}
+      </SidebarMenu>
+    </SidebarGroupContent>
   );
 }

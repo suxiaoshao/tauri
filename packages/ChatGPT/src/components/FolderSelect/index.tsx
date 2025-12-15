@@ -1,16 +1,16 @@
 import { SELECT_FOLDERS, useConversationStore } from '@chatgpt/features/Conversations/conversationSlice';
-import { ListItemText, MenuItem, MenuList } from '@mui/material';
 import { type ForwardedRef, useMemo } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { type FolderSelectContextType, FolderSelectContext } from './FolderSelectContext';
 import FolderSelectItem from './FolderSelectItem';
 import { useTranslation } from 'react-i18next';
+import { SidebarContent, SidebarGroup, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '../ui/sidebar';
 
 export interface FolderSelectProps {
   value?: number | null;
   onChange: (id: number | null) => void;
   disabledFolderIds?: number[];
-  ref: ForwardedRef<HTMLUListElement>;
+  ref: ForwardedRef<HTMLDivElement>;
 }
 
 function FolderSelect({ value, onChange, disabledFolderIds = [], ref }: FolderSelectProps) {
@@ -25,15 +25,21 @@ function FolderSelect({ value, onChange, disabledFolderIds = [], ref }: FolderSe
   const { t } = useTranslation();
   return (
     <FolderSelectContext.Provider value={contextValue}>
-      <MenuList ref={ref}>
-        <MenuItem selected={value === null} onClick={() => onChange(null)}>
-          <ListItemText primary={t('root')} secondary="/" />
-        </MenuItem>
-
-        {folders.map((folder) => (
-          <FolderSelectItem key={folder.id} folder={folder} />
-        ))}
-      </MenuList>
+      <SidebarContent ref={ref}>
+        <SidebarGroup>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton type="button" onClick={() => onChange(null)} isActive={value === null}>
+                {t('root')}
+                <span className="text-accent-foreground">/</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            {folders.map((folder) => (
+              <FolderSelectItem subItem={false} key={folder.id} folder={folder} />
+            ))}
+          </SidebarMenu>
+        </SidebarGroup>
+      </SidebarContent>
     </FolderSelectContext.Provider>
   );
 }

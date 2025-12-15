@@ -8,25 +8,35 @@
 import { useConversationStore } from '@chatgpt/features/Conversations/conversationSlice';
 import { type ExportConversationParams, ExportType, exportConversation } from '@chatgpt/service/chat/mutation';
 import { type Conversation } from '@chatgpt/types/conversation';
-import IosShareIcon from '@mui/icons-material/IosShare';
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  IconButton,
-  MenuItem,
-  TextField,
-  Tooltip,
-} from '@mui/material';
 import {} from '@tauri-apps/api';
 import { enqueueSnackbar } from 'notify';
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useShallow } from 'zustand/react/shallow';
 import * as dialog from '@tauri-apps/plugin-dialog';
 import { useTranslation } from 'react-i18next';
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@chatgpt/components/ui/dialog';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@chatgpt/components/ui/tooltip';
+import { Button } from '@chatgpt/components/ui/button';
+import { useBoolean } from '@chatgpt/hooks/use-boolean';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@chatgpt/components/ui/select';
+import { FieldError, FieldGroup, FieldLabel, Field } from '@chatgpt/components/ui/field';
+import { Share } from 'lucide-react';
+import { toast } from 'sonner';
 
 export interface ExportConversationProps {
   conversation: Conversation;
@@ -42,62 +52,66 @@ async function selectFolder() {
 export default function ExportConversation({ conversation }: ExportConversationProps) {
   const { t } = useTranslation();
   const fetchConversations = useConversationStore(useShallow(({ fetchConversations }) => fetchConversations));
-  const [open, setOpen] = useState(false);
-  const handleOpen = useCallback(() => setOpen(true), []);
-  const handleClose = useCallback(() => setOpen(false), []);
+  const [open, { set, setFalse }] = useBoolean();
   const { control, handleSubmit } = useForm<Pick<ExportConversationParams, 'exportType'>>({});
   const onSubmit = useCallback(
     async ({ exportType }: Pick<ExportConversationParams, 'exportType'>) => {
       const path = await selectFolder();
       await exportConversation({ path, exportType, id: conversation.id });
       fetchConversations();
-      handleClose();
-      await enqueueSnackbar(t('exported_successfully'), { variant: 'success' });
+      setFalse();
+      toast.success(t('exported_successfully'));
+      await enqueueSnackbar(t('exported_successfully'));
     },
-    [conversation.id, fetchConversations, handleClose, t],
+    [conversation.id, fetchConversations, setFalse, t],
   );
   return (
-    <>
-      <Tooltip title={t('export')}>
-        <IconButton onClick={handleOpen}>
-          <IosShareIcon />
-        </IconButton>
+    <Dialog open={open} onOpenChange={set}>
+      <Tooltip>
+        <DialogTrigger asChild>
+          <TooltipTrigger asChild>
+            <Button variant="ghost" size="icon">
+              <Share />
+            </Button>
+          </TooltipTrigger>
+        </DialogTrigger>
+        <TooltipContent>{t('export')}</TooltipContent>
       </Tooltip>
-      <Dialog
-        component="form"
-        onSubmit={handleSubmit(onSubmit)}
-        open={open}
-        onClose={handleClose}
-        fullWidth
-        sx={{
-          height: '500px',
-          '& .MuiDialog-paper': {
-            backgroundColor: (theme) => theme.palette.background.paper + 'a0',
-            backdropFilter: 'blur(20px)',
-          },
-        }}
-      >
-        <DialogTitle>{t('export_messages')}</DialogTitle>
-        <DialogContent>
-          <Controller
-            control={control}
-            name="exportType"
-            rules={{ required: true }}
-            render={({ field }) => (
-              <TextField sx={{ mt: 2 }} label={t('export_type')} fullWidth select {...field} required>
-                <MenuItem value={ExportType.JSON}>{ExportType.JSON}</MenuItem>
-                <MenuItem value={ExportType.CSV}>{ExportType.CSV}</MenuItem>
-                <MenuItem value={ExportType.TXT}>{ExportType.TXT}</MenuItem>
-              </TextField>
-            )}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button variant="text" type="submit">
-            {t('export')}
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{t('export_messages')}</DialogTitle>
+        </DialogHeader>
+        <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
+          <FieldGroup>
+            <Controller
+              control={control}
+              name="exportType"
+              rules={{ required: true }}
+              render={({ field: { onChange, ...field }, fieldState }) => (
+                <Field>
+                  <FieldLabel>{t('export_type')}</FieldLabel>
+                  <Select onValueChange={onChange} {...field}>
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectItem value={ExportType.JSON}>{ExportType.JSON}</SelectItem>
+                        <SelectItem value={ExportType.CSV}>{ExportType.CSV}</SelectItem>
+                        <SelectItem value={ExportType.TXT}>{ExportType.TXT}</SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                </Field>
+              )}
+            />
+          </FieldGroup>
+          <DialogFooter>
+            <Button type="submit">{t('export')}</Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }

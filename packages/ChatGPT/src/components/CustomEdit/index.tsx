@@ -1,6 +1,5 @@
-import { Box, type BoxProps } from '@mui/material';
 import * as monaco from 'monaco-editor';
-import { startTransition, useCallback, useEffect, useImperativeHandle, useState } from 'react';
+import { type ComponentProps, startTransition, useCallback, useEffect, useImperativeHandle, useState } from 'react';
 import './init';
 
 /**
@@ -9,7 +8,7 @@ import './init';
  * @since 0.2.2
  * @description 可写情况下的 editProp
  * */
-export interface NotReadOnlyEditProp extends Omit<BoxProps, 'onChange'> {
+export interface NotReadOnlyEditProp extends Omit<ComponentProps<'div'>, 'onChange' | 'ref'> {
   /**
    * 要显示的代码字符串
    * */
@@ -27,7 +26,7 @@ export interface NotReadOnlyEditProp extends Omit<BoxProps, 'onChange'> {
    * 当编辑器代码改变时触发的方法
    * */
   onChange?(newCode: string): void;
-  ref?: React.Ref<HTMLDivElement | undefined>;
+  ref?: React.Ref<HTMLDivElement | null>;
 }
 
 /**
@@ -47,7 +46,7 @@ function CustomEdit({
   /**
    * 编辑器绑定的 dom 的引用
    * */
-  const [editRef, setEditRef] = useState<HTMLDivElement | undefined>();
+  const [editRef, setEditRef] = useState<HTMLDivElement | null>(null);
   /**
    * 编辑器实体
    * */
@@ -57,7 +56,7 @@ function CustomEdit({
    * */
   useEffect(() => {
     if (
-      editRef !== undefined &&
+      editRef !== null &&
       ((edit === undefined && editRef.firstChild === null) ||
         (edit !== undefined && edit?.getModel()?.getLanguageId() && edit?.getModel()?.getLanguageId() !== language))
     ) {
@@ -125,9 +124,9 @@ function CustomEdit({
       format();
     });
   }, [format]);
-  useImperativeHandle(ref, () => editRef, [editRef]);
+  useImperativeHandle<HTMLDivElement | null, HTMLDivElement | null>(ref, () => editRef, [editRef]);
 
-  return <Box {...props} ref={setEditRef} />;
+  return <div {...props} ref={setEditRef} />;
 }
 
 export default CustomEdit;

@@ -1,1 +1,6 @@
 .prettierrc.js
+
+**/components/ui/*
+packages/ChatGPT/src/hooks/use-toggle.ts
+packages/ChatGPT/src/hooks/use-mobile.ts
+packages/ChatGPT/src/hooks/use-boolean.ts

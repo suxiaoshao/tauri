@@ -5,10 +5,8 @@
  * @LastEditTime: 2024-05-01 03:30:54
  * @FilePath: /tauri/common/theme/src/themeSlice.ts
  */
-import { argbFromHex, themeFromSourceColor } from '@material/material-color-utilities';
 import { match } from 'ts-pattern';
 import { create } from 'zustand';
-import { youThemeToMuiTheme } from './utils/youTheme';
 
 export interface ThemeSliceType {
   color: string;
@@ -16,7 +14,7 @@ export interface ThemeSliceType {
   systemColorScheme: 'light' | 'dark';
 }
 
-const getColorScheme = (
+export const getColorScheme = (
   colorSetting: ThemeSliceType['colorSetting'],
   systemColorScheme: ThemeSliceType['systemColorScheme'],
 ) => {
@@ -66,16 +64,3 @@ export const useThemeStore = create<
       };
     }),
 }));
-
-const selectColorMode = (state: ThemeSliceType) => getColorScheme(state.colorSetting, state.systemColorScheme);
-
-export const selectActiveYouTheme = (state: ThemeSliceType) => {
-  const colorScheme = selectColorMode(state);
-  return themeFromSourceColor(argbFromHex(state.color)).schemes[colorScheme];
-};
-
-export const selectMuiTheme = (state: ThemeSliceType) => {
-  const colorScheme = selectColorMode(state);
-  const youTheme = selectActiveYouTheme(state);
-  return youThemeToMuiTheme(youTheme, colorScheme);
-};

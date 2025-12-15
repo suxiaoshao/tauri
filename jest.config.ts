@@ -23,6 +23,9 @@ const config: Config = {
   setupFilesAfterEnv: ['./config/test/testSetup.ts'],
   moduleDirectories: ['node_modules', '<rootDir>'],
   testEnvironment: 'jsdom',
+  moduleNameMapper: {
+    '@chatgpt/(.*)': '<rootDir>/packages/chatgpt/src/$1',
+  },
 };
 
 export default config;
