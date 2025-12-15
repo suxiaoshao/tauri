@@ -8,6 +8,7 @@
 import { type InvokeArgs, invoke } from '@tauri-apps/api/core';
 import { t } from 'i18next';
 import { enqueueSnackbar } from 'notify';
+import { toast } from 'sonner';
 import { enum_, nullish, object, parseAsync, string } from 'valibot';
 
 export interface ChatGPTError {
@@ -76,17 +77,21 @@ export async function appInvoke<P, R>(cmd: string, params: P): Promise<R> {
     return response;
   } catch (error) {
     if (error instanceof Error) {
-      await enqueueSnackbar(error.message, { variant: 'error' });
+      toast.error(error.message);
+      await enqueueSnackbar(error.message);
     } else if (typeof error === 'string') {
-      await enqueueSnackbar(error, { variant: 'error' });
+      toast.error(error);
+      await enqueueSnackbar(error);
     } else {
       try {
         const err = await parseAsync(ChatGPTErrorSchema, error);
-        await enqueueSnackbar(err.message, { variant: 'error' });
+        toast.error(err.message);
+        await enqueueSnackbar(err.message);
       } catch (error) {
         // eslint-disable-next-line no-console
         console.error('Validation failed:', error);
-        await enqueueSnackbar(t('an_unknown_error_occurred'), { variant: 'error' });
+        toast.error(t('an_unknown_error_occurred'));
+        await enqueueSnackbar(t('an_unknown_error_occurred'));
       }
     }
     // eslint-disable-next-line no-console

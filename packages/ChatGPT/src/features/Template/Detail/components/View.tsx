@@ -49,7 +49,7 @@ export default function TemplateDetailView({ data, inputs }: TemplateDetailViewP
   return (
     <div className="flex-[1_1_0] overflow-y-auto">
       <h6 className="ml-4 mt-4 text-xl leading-snug font-medium">{t('base_information')}</h6>
-      <Details sx={{ p: 2 }} items={items} />
+      <Details className="p-4" items={items} />
       <Separator className="my-4" />
       <h6 className="ml-4 mt-4 text-xl leading-snug font-medium">{t('prompts')}</h6>
       <ItemGroup>

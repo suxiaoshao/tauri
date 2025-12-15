@@ -21,6 +21,7 @@ import TemplateDetailView from './components/View';
 import { getAdapterTemplateInputs } from '@chatgpt/service/adapter';
 import type { ConversationTemplate } from '@chatgpt/types/conversationTemplate';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 
 export default function ConversationTemplateDetail() {
   const { t } = useTranslation();
@@ -67,7 +68,8 @@ export default function ConversationTemplateDetail() {
           .with(Alignment.edit, () => {
             const onSubmit = async (formData: TemplateForm) => {
               await updateConversationTemplate({ data: formData, id: value.template.id });
-              enqueueSnackbar(t('template_updated_successfully'), { variant: 'success' });
+              toast.success(t('template_updated_successfully'));
+              enqueueSnackbar(t('template_updated_successfully'));
               refresh();
               setAlignment(Alignment.preview);
             };

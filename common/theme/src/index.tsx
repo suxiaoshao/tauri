@@ -5,35 +5,30 @@
  * @LastEditTime: 2024-01-29 20:58:40
  * @FilePath: /tauri/common/theme/src/index.tsx
  */
-import '@fontsource/roboto/300.css';
-import '@fontsource/roboto/400.css';
-import '@fontsource/roboto/500.css';
-import '@fontsource/roboto/700.css';
-import { createTheme, CssBaseline, ThemeProvider } from '@mui/material';
 import { useEffect } from 'react';
 import { match } from 'ts-pattern';
 import { useShallow } from 'zustand/react/shallow';
 import './index.css';
-import { colorSchemaMatch, selectActiveYouTheme, selectMuiTheme, useThemeStore } from './themeSlice';
-import setYouThemeToCssVars from './utils/cssVar';
+import { colorSchemaMatch, getColorScheme, useThemeStore } from './themeSlice';
 
 export interface CustomThemeProps {
   children?: React.ReactNode;
 }
 
 export function CustomTheme({ children }: CustomThemeProps) {
-  const { setSystemColorScheme, ...state } = useThemeStore(
-    useShallow(({ color, colorSetting, setSystemColorScheme, systemColorScheme }) => ({
-      color,
-      colorSetting,
-      systemColorScheme,
+  const { setSystemColorScheme, colorScheme } = useThemeStore(
+    useShallow(({ colorSetting, setSystemColorScheme, systemColorScheme }) => ({
       setSystemColorScheme,
+      colorScheme: getColorScheme(colorSetting, systemColorScheme),
     })),
   );
 
   useEffect(() => {
-    setYouThemeToCssVars(selectActiveYouTheme(state));
-  }, [state]);
+    const root = window.document.documentElement;
+    root.classList.remove('light', 'dark');
+    root.classList.add(colorScheme);
+  }, [colorScheme]);
+
   useEffect(() => {
     const sign = new AbortController();
     colorSchemaMatch.addEventListener(
@@ -50,16 +45,5 @@ export function CustomTheme({ children }: CustomThemeProps) {
       sign.abort();
     };
   }, [setSystemColorScheme]);
-  return (
-    <ThemeProvider theme={createTheme(selectMuiTheme(state))}>
-      <CssBaseline />
-      {children}
-    </ThemeProvider>
-  );
+  return children;
 }
-
-export { argbFromHex, hexFromArgb, themeFromSourceColor } from '@material/material-color-utilities';
-
-export { youThemeToMuiTheme } from './utils/youTheme';
-
-export { default as setYouThemeToCssVars } from './utils/cssVar';

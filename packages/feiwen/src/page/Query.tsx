@@ -1,12 +1,14 @@
+import { Button } from '@feiwen/components/ui/button';
 import { getTags } from '@feiwen/service/store';
-import { Box, Button } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 export default function Query() {
-  const navigate = useNavigate();
   return (
-    <Box sx={{ width: '100%', height: '100%' }}>
-      Home<Button onClick={() => navigate('/fetch')}>获取数据</Button>
+    <div className="size-full">
+      Home
+      <Button asChild>
+        <Link to="/fetch">获取数据</Link>
+      </Button>
       <Button
         onClick={async () => {
           const data = await getTags();
@@ -15,6 +17,6 @@ export default function Query() {
       >
         test
       </Button>
-    </Box>
+    </div>
   );
 }

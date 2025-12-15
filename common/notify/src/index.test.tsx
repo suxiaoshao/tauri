@@ -6,8 +6,7 @@
  * @FilePath: /tauri/common/notify/src/index.test.tsx
  */
 import { cleanup, render, screen, waitFor } from '@testing-library/react';
-import { useSnackbar } from 'notistack';
-import { afterEach, describe, expect, it } from '@jest/globals';
+import { afterEach, describe, expect, it, jest } from '@jest/globals';
 import { enqueueSnackbar, SnackbarProvider } from '.';
 import { mockIPC } from '@tauri-apps/api/mocks';
 
@@ -22,6 +21,20 @@ describe('notify', () => {
         return true;
       }
     });
+    // mock 实现
+    const mockMQL = {
+      matches: true,
+      media: '(max-width: 600px)',
+      onchange: null,
+      addListener: jest.fn(),
+      removeListener: jest.fn(),
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+      dispatchEvent: jest.fn(),
+    };
+    // @ts-expect-error mock
+    // oxlint-disable-next-line prefer-spy-on
+    window.matchMedia = jest.fn().mockReturnValue(mockMQL);
     class Notification {
       static permission = 'default';
       //oxlint-disable-next-line no-useless-constructor no-empty-function
@@ -33,26 +46,5 @@ describe('notify', () => {
     expect(screen.getByText('111')).toBeTruthy();
     await waitFor(async () => await enqueueSnackbar('test'));
     expect(screen.getByText('test')).toBeTruthy();
-  });
-  it('use hooks', async () => {
-    function Test() {
-      const snackbar = useSnackbar();
-      return (
-        <div>
-          <button type="button" onClick={() => snackbar.enqueueSnackbar('test click')}>
-            test
-          </button>
-        </div>
-      );
-    }
-    render(
-      <SnackbarProvider>
-        <Test />
-      </SnackbarProvider>,
-    );
-    expect(screen.getByText('test')).toBeTruthy();
-    await waitFor(() => screen.getByText('test').click());
-    expect(screen.getByText('test click')).toBeTruthy();
-    expect(screen.getByText('test click')).toBeTruthy();
   });
 });

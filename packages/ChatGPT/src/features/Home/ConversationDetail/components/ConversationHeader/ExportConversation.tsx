@@ -36,6 +36,7 @@ import {
 } from '@chatgpt/components/ui/select';
 import { FieldError, FieldGroup, FieldLabel, Field } from '@chatgpt/components/ui/field';
 import { Share } from 'lucide-react';
+import { toast } from 'sonner';
 
 export interface ExportConversationProps {
   conversation: Conversation;
@@ -59,7 +60,8 @@ export default function ExportConversation({ conversation }: ExportConversationP
       await exportConversation({ path, exportType, id: conversation.id });
       fetchConversations();
       setFalse();
-      await enqueueSnackbar(t('exported_successfully'), { variant: 'success' });
+      toast.success(t('exported_successfully'));
+      await enqueueSnackbar(t('exported_successfully'));
     },
     [conversation.id, fetchConversations, setFalse, t],
   );

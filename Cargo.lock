@@ -2978,8 +2978,13 @@ name = "http-client"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "delay",
  "diesel",
  "lnk",
+ "log",
+ "objc2 0.6.3",
+ "objc2-app-kit",
+ "objc2-foundation 0.3.2",
  "pinyin",
  "plist",
  "reqwest",
@@ -2989,9 +2994,13 @@ dependencies = [
  "tauri-build",
  "tauri-plugin-clipboard-manager",
  "tauri-plugin-global-shortcut",
+ "tauri-plugin-log",
  "tauri-plugin-notification",
  "tauri-plugin-shell",
+ "thiserror 2.0.17",
+ "tokio",
  "walkdir",
+ "window-vibrancy",
 ]
 
 [[package]]

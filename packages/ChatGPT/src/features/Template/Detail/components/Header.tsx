@@ -19,6 +19,7 @@ import { enqueueSnackbar } from 'notify';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import { match } from 'ts-pattern';
 
 export interface TemplateDetailHeaderProps {
@@ -76,7 +77,8 @@ export default function TemplateDetailHeader({
         const handleDelete = async () => {
           await deleteConversationTemplate({ id: value.id });
           navigate('/template');
-          enqueueSnackbar(t('conversation_template_deleted'), { variant: 'success' });
+          toast.success(t('conversation_template_deleted'));
+          enqueueSnackbar(t('conversation_template_deleted'));
         };
         return (
           <Tooltip>

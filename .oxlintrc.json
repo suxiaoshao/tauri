@@ -213,7 +213,7 @@
     "max-expects": "warn",
     "max-nested-describe": "warn",
     "no-alias-methods": "warn",
-    "no-confusing-set-timeout": "warn",
+    "no-confusing-set-timeout": "allow",
     "no-deprecated-functions": "warn",
     "no-done-callback": "warn",
     "no-duplicate-hooks": "warn",

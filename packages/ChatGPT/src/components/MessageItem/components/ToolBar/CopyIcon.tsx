@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@chatgpt/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@chatgpt/components/ui/tooltip';
 import { Copy } from 'lucide-react';
+import { toast } from 'sonner';
 
 export interface CopyIconProps {
   content: string;
@@ -14,7 +15,8 @@ export default function CopyIcon({ content }: CopyIconProps) {
   const { t } = useTranslation();
   const handleCopy = useCallback(async () => {
     await navigator.clipboard.writeText(content);
-    enqueueSnackbar(t('copied_to_clipboard'), { variant: 'success' });
+    toast.success(t('copied_to_clipboard'));
+    enqueueSnackbar(t('copied_to_clipboard'));
   }, [content, t]);
   return (
     <Tooltip>
