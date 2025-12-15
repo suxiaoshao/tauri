@@ -5,7 +5,7 @@
  * @LastEditTime: 2024-05-01 05:08:53
  */
 import { editor } from 'monaco-editor';
-import monankai from 'monaco-themes/themes/Dracula.json';
+import monankai from '../../../node_modules/monaco-themes/themes/Dracula.json';
 editor.defineTheme('dracula', monankai as editor.IStandaloneThemeData);
 
 self.MonacoEnvironment = {
