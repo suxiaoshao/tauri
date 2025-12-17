@@ -7,6 +7,9 @@ mod app_search;
 mod errors;
 mod plugin;
 
+#[cfg(target_os = "macos")]
+use std::default;
+
 use app_search::AppPath;
 use log::LevelFilter;
 use tauri_plugin_global_shortcut::ShortcutState;
@@ -14,8 +17,13 @@ use tauri_plugin_log::{Target, TargetKind};
 
 fn main() -> anyhow::Result<()> {
     let context = tauri::generate_context!();
-    tauri::Builder::default()
-        .plugin(tauri_plugin_shell::init())
+    let app = tauri::Builder::default();
+    #[cfg(target_os = "macos")]
+    let app = app.setup(|app| {
+        app.set_activation_policy(tauri::ActivationPolicy::Accessory);
+        Ok(())
+    });
+    app.plugin(tauri_plugin_shell::init())
         .plugin(
             tauri_plugin_log::Builder::default()
                 .level(LevelFilter::Info)
@@ -42,13 +50,7 @@ fn main() -> anyhow::Result<()> {
         .plugin(plugin::window::WindowPlugin::default())
         .plugin(plugin::tray::TrayPlugin)
         .invoke_handler(tauri::generate_handler![app_search])
-        .setup(setup)
         .run(context)?;
-    Ok(())
-}
-
-fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
-    app.set_activation_policy(tauri::ActivationPolicy::Accessory);
     Ok(())
 }
 

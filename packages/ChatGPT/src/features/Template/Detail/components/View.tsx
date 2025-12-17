@@ -8,6 +8,7 @@
 import assistant from '@chatgpt/assets/assistant.jpg';
 import system from '@chatgpt/assets/system.png';
 import user from '@chatgpt/assets/user.jpg';
+import { Details, type DetailsItem } from '@chatgpt/components/Details';
 import CustomMarkdown from '@chatgpt/components/Markdown';
 import { Avatar, AvatarImage } from '@chatgpt/components/ui/avatar';
 import { Item, ItemContent, ItemGroup, ItemMedia, ItemSeparator, ItemTitle } from '@chatgpt/components/ui/item';
@@ -16,7 +17,6 @@ import type { AdapterInputs } from '@chatgpt/types/adapter';
 import { Role } from '@chatgpt/types/common';
 import { type ConversationTemplate } from '@chatgpt/types/conversationTemplate';
 import { getRoleKey } from '@chatgpt/utils/getRoleKey';
-import { Details, type DetailsItem } from 'details';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { format } from 'time';
