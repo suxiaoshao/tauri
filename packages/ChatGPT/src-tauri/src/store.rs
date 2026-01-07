@@ -33,8 +33,7 @@ use self::model::{SqlConversationTemplate, SqlNewConversation, SqlNewConversatio
 const DB_FILE: &str = "history.sqlite3";
 const DB_FILE_V2: &str = "history_v2.sqlite3";
 const DB_FILE_V3: &str = "history_v3.sqlite3";
-const CREATE_TABLE_SQL: &str =
-    include_str!("../../migrations/2023-07-25-025504_create_table/up.sql");
+const CREATE_TABLE_SQL: &str = include_str!("../migrations/2023-07-25-025504_create_table/up.sql");
 
 pub enum StoreVersion {
     None(DbConn),

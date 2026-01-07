@@ -18,10 +18,10 @@ tauri = { workspace = true, features = ["macos-private-api"] }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
 delay = { path = "../../../crates/delay" }
-tokio = { version = "1.48.0", default-features = false, features = ["time"] }
+tokio = { version = "1.49.0", default-features = false, features = ["time"] }
 
 # database
-diesel = { version = "2.3.4", features = ["sqlite", "r2d2","returning_clauses_for_sqlite_3_35"] }
+diesel = { version = "2.3.5", features = ["sqlite", "r2d2","returning_clauses_for_sqlite_3_35"] }
 libsqlite3-sys = { version = "0.35.0", features = ["bundled-windows"] }
 time = "0.3.44"
 

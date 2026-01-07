@@ -4,5 +4,5 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-tokio = { version = "1.48.0", default-features = false, features = ["macros","time"] }
+tokio = { version = "1.49.0", default-features = false, features = ["macros","time"] }
 tauri = { workspace = true, features = [] }
