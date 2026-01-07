@@ -19,13 +19,13 @@ tauri = { workspace = true, features = ["macos-private-api", "tray-icon"] }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
 delay = { path = "../../../crates/delay" }
-tokio = { version = "1.48.0", default-features = false, features = ["time"] }
+tokio = { version = "1.49.0", default-features = false, features = ["time"] }
 
 # 数据库
-diesel = { version = "2.3.4", features = ["sqlite","returning_clauses_for_sqlite_3_35"] }
+diesel = { version = "2.3.5", features = ["sqlite","returning_clauses_for_sqlite_3_35"] }
 
 # http
-reqwest = "0.12.25"
+reqwest = "0.13.1"
 
 # 错误处理
 anyhow = "1.0.100"
@@ -41,7 +41,7 @@ log = "0.4.29"
 # 搜索应用
 lnk = "0.6.3"
 walkdir = "2.5.0"
-pinyin = "0.10.0"
+pinyin = "0.11.0"
 
 # plugin
 tauri-plugin-notification = "2.3.3"

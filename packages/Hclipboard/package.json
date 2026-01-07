@@ -20,7 +20,7 @@
     "cmdk": "^1.1.1",
     "dayjs": "^1.11.19",
     "entities": "^7.0.0",
-    "lucide-react": "^0.561.0",
+    "lucide-react": "^0.562.0",
     "notify": "workspace:^",
     "pretty-bytes": "^7.1.0",
     "react-resizable-panels": "^3.0.6",

@@ -7,9 +7,6 @@ mod app_search;
 mod errors;
 mod plugin;
 
-#[cfg(target_os = "macos")]
-use std::default;
-
 use app_search::AppPath;
 use log::LevelFilter;
 use tauri_plugin_global_shortcut::ShortcutState;
