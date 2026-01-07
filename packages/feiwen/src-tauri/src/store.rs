@@ -33,14 +33,10 @@ fn check_data_file(url: &str) -> FeiwenResult<bool> {
 }
 fn create_tables(conn: &DbConn) -> FeiwenResult<()> {
     let conn = &mut conn.get()?;
+    conn.batch_execute(include_str!("../migrations/2022-05-15-162950_novel/up.sql"))?;
+    conn.batch_execute(include_str!("../migrations/2022-05-15-163112_tag/up.sql"))?;
     conn.batch_execute(include_str!(
-        "../../migrations/2022-05-15-162950_novel/up.sql"
-    ))?;
-    conn.batch_execute(include_str!(
-        "../../migrations/2022-05-15-163112_tag/up.sql"
-    ))?;
-    conn.batch_execute(include_str!(
-        "../../migrations/2022-05-16-064913_novel_tag/up.sql"
+        "../migrations/2022-05-16-064913_novel_tag/up.sql"
     ))?;
     Ok(())
 }

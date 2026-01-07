@@ -35,8 +35,6 @@ fn check_data_file(url: &str) -> ClipResult<bool> {
 }
 fn create_tables(conn: &DbConn) -> ClipResult<()> {
     conn.get()?
-        .batch_execute(include_str!(
-            "../../migrations/2022-09-27-115421_table/up.sql"
-        ))
+        .batch_execute(include_str!("../migrations/2022-09-27-115421_table/up.sql"))
         .map_err(|e| e.into())
 }
