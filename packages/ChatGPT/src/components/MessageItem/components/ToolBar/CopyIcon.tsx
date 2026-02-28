@@ -20,10 +20,8 @@ export default function CopyIcon({ content }: CopyIconProps) {
   }, [content, t]);
   return (
     <Tooltip>
-      <TooltipTrigger asChild>
-        <Button variant="ghost" size="icon-sm" onClick={handleCopy}>
-          <Copy fontSize="small" className={toolClassName} />
-        </Button>
+      <TooltipTrigger render={<Button variant="ghost" size="icon-sm" onClick={handleCopy} />}>
+        <Copy fontSize="small" className={toolClassName} />
       </TooltipTrigger>
       <TooltipContent>{t('copy')}</TooltipContent>
     </Tooltip>

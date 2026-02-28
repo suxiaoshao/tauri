@@ -47,12 +47,8 @@ export default function UpdateConversation({ conversation }: UpdateConversationP
   return (
     <Dialog open={open} onOpenChange={set}>
       <Tooltip>
-        <TooltipTrigger asChild>
-          <DialogTrigger asChild>
-            <Button variant="ghost" size="icon">
-              <EditIcon />
-            </Button>
-          </DialogTrigger>
+        <TooltipTrigger render={<DialogTrigger render={<Button variant="ghost" size="icon" />} />}>
+          <EditIcon />
         </TooltipTrigger>
         <TooltipContent>{t('modify')}</TooltipContent>
       </Tooltip>

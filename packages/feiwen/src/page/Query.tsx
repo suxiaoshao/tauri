@@ -6,13 +6,10 @@ export default function Query() {
   return (
     <div className="size-full">
       Home
-      <Button asChild>
-        <Link to="/fetch">获取数据</Link>
-      </Button>
+      <Button render={<Link to="/fetch" />}>获取数据</Button>
       <Button
         onClick={async () => {
-          const data = await getTags();
-          console.log(data);
+          await getTags();
         }}
       >
         test

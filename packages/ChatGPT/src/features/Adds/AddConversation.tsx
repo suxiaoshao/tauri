@@ -55,11 +55,9 @@ function AddConversationItem() {
   const { t } = useTranslation();
   return (
     <SidebarMenuItem>
-      <SidebarMenuButton asChild isActive={matchAdd !== null}>
-        <Link to="/add/conversation">
-          <Plus />
-          <span>{t('add_conversation')}</span>
-        </Link>
+      <SidebarMenuButton isActive={matchAdd !== null} render={<Link to="/add/conversation" />}>
+        <Plus />
+        <span>{t('add_conversation')}</span>
       </SidebarMenuButton>
     </SidebarMenuItem>
   );

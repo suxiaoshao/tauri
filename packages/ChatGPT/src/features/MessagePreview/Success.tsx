@@ -64,7 +64,11 @@ export default function Success({ message, updateMessageContent }: SuccessProps)
   return (
     <div className="size-full p-4 flex flex-col">
       <div className="flex mb-4 justify-between items-center">
-        <ToggleGroup variant="outline" type="single" value={toggleValue} onValueChange={handleAlignment}>
+        <ToggleGroup
+          variant="outline"
+          value={[toggleValue]}
+          onValueChange={(groupValue) => handleAlignment(groupValue[0] ?? null)}
+        >
           <ToggleGroupItem value={Alignment.preview}>
             <Eye />
           </ToggleGroupItem>
@@ -74,10 +78,8 @@ export default function Success({ message, updateMessageContent }: SuccessProps)
         </ToggleGroup>
         {toggleValue === Alignment.edit && (
           <Tooltip>
-            <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" disabled={submitLoading} onClick={handleSubmit}>
-                <Upload />
-              </Button>
+            <TooltipTrigger render={<Button variant="ghost" size="icon" disabled={submitLoading} onClick={handleSubmit} />}>
+              <Upload />
             </TooltipTrigger>
             <TooltipContent>{t('submit')}</TooltipContent>
           </Tooltip>

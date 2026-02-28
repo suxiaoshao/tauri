@@ -86,11 +86,9 @@ export default function ChatForm({ status, onSendMessage }: ChatFormProps) {
           control={control}
           render={({ field }) => (
             <Popover open={open} onOpenChange={set}>
-              <PopoverTrigger asChild>
-                <Button variant="ghost" className="group">
+              <PopoverTrigger render={<Button variant="ghost" className="group" />}>
                   {t('plugin_name', { name: field.value ?? t('none') })}
                   <ChevronDown className="transition-transform ml-auto group-data-[state=open]:rotate-180" />
-                </Button>
               </PopoverTrigger>
               <PopoverContent className="p-0">
                 <Command>

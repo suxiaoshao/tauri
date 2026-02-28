@@ -89,11 +89,18 @@ export default function ConversationEdit({
               <FieldLabel>{t('template')}</FieldLabel>
               <Select
                 required
-                onValueChange={(newValue) => onChange(Number.parseInt(newValue, 10))}
+                onValueChange={(newValue) => {
+                  if (newValue === null) {
+                    onChange(null);
+                    return;
+                  }
+
+                  onChange(Number.parseInt(newValue, 10));
+                }}
                 value={String(value)}
                 {...field}
               >
-                <SelectTrigger className="w-[180px]">
+                <SelectTrigger className="w-45">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>

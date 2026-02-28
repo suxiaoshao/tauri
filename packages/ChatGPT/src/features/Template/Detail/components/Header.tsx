@@ -44,7 +44,7 @@ export default function TemplateDetailHeader({
       .with({ tag: PromiseStatus.loading }, () => (
         <>
           <Skeleton className="rounded-full size-10" />
-          <Skeleton className="h-4 w-[250px]" />
+          <Skeleton className="h-4 w-62.5" />
         </>
       ))
       .with({ tag: PromiseStatus.error }, () => (
@@ -82,10 +82,8 @@ export default function TemplateDetailHeader({
         };
         return (
           <Tooltip>
-            <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" onClick={handleDelete}>
-                <Trash />
-              </Button>
+            <TooltipTrigger render={<Button variant="ghost" size="icon" onClick={handleDelete} />}>
+              <Trash />
             </TooltipTrigger>
             <TooltipContent>{t('delete')}</TooltipContent>
           </Tooltip>
@@ -99,10 +97,8 @@ export default function TemplateDetailHeader({
         return match(alignment)
           .with(Alignment.edit, () => (
             <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" type="submit" form={formId}>
-                  <Save />
-                </Button>
+              <TooltipTrigger render={<Button variant="ghost" size="icon" type="submit" form={formId} />}>
+                <Save />
               </TooltipTrigger>
               <TooltipContent>{t('save')}</TooltipContent>
             </Tooltip>
@@ -119,7 +115,11 @@ export default function TemplateDetailHeader({
         </Button>
         {content}
       </div>
-      <ToggleGroup variant="outline" type="single" value={alignment} onValueChange={handleAlignment}>
+      <ToggleGroup
+        variant="outline"
+        value={[alignment]}
+        onValueChange={(groupValue) => handleAlignment(groupValue[0] ?? null)}
+      >
         <ToggleGroupItem value={Alignment.preview}>
           <Eye />
         </ToggleGroupItem>

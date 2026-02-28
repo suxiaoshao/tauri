@@ -21,10 +21,8 @@ export default function ViewIcon({ id }: ViewIconProp) {
   }
   return (
     <Tooltip>
-      <TooltipTrigger asChild>
-        <Button variant="ghost" size="icon-sm" onClick={handleClick}>
-          <Eye fontSize="small" className={toolClassName} />
-        </Button>
+      <TooltipTrigger render={<Button variant="ghost" size="icon-sm" onClick={handleClick} />}>
+        <Eye fontSize="small" className={toolClassName} />
       </TooltipTrigger>
       <TooltipContent>{t('view_message')}</TooltipContent>
     </Tooltip>

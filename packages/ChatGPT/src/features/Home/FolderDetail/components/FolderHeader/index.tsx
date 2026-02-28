@@ -29,10 +29,8 @@ export default function FolderHeader({ folder }: FolderHeaderProps) {
       </div>
       <UpdateFolder folder={folder} />
       <Tooltip>
-        <TooltipTrigger asChild>
-          <Button variant="ghost" size="icon" onClick={handleDelete}>
-            <Trash />
-          </Button>
+        <TooltipTrigger render={<Button variant="ghost" size="icon" onClick={handleDelete} />}>
+          <Trash />
         </TooltipTrigger>
         <TooltipContent>{t('delete')}</TooltipContent>
       </Tooltip>

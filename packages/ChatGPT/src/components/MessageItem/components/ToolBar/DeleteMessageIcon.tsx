@@ -20,10 +20,8 @@ export default function DeleteMessageIcon({ id }: DeleteMessageIconProps) {
   }
   return (
     <Tooltip>
-      <TooltipTrigger asChild>
-        <Button size="icon-sm" variant="ghost" onClick={handleClick}>
-          <Trash className={toolClassName} />
-        </Button>
+      <TooltipTrigger render={<Button size="icon-sm" variant="ghost" onClick={handleClick} />}>
+        <Trash className={toolClassName} />
       </TooltipTrigger>
       <TooltipContent>{t('delete_message')}</TooltipContent>
     </Tooltip>

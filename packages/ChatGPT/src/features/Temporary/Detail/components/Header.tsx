@@ -50,10 +50,8 @@ export default function TemporaryHeader({ template, persistentId }: TemporaryHea
         </span>
       </div>
       <Tooltip>
-        <TooltipTrigger asChild>
-          <Button variant="ghost" size="icon" onClick={handleClear}>
-            <BrushCleaning />
-          </Button>
+        <TooltipTrigger render={<Button variant="ghost" size="icon" onClick={handleClear} />}>
+          <BrushCleaning />
         </TooltipTrigger>
         <TooltipContent>{t('clear_messages')}</TooltipContent>
       </Tooltip>

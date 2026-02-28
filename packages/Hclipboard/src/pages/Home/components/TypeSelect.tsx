@@ -82,14 +82,18 @@ export function TypeSelect({ value, onChange }: TypeSelectProps) {
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          // oxlint-disable-next-line role-has-required-aria-props
-          role="combobox"
-          aria-expanded={open}
-          className="w-[200px] justify-between items-center"
-        >
+      <PopoverTrigger
+        render={
+          <Button
+            variant="outline"
+            // oxlint-disable-next-line role-has-required-aria-props
+            role="combobox"
+            aria-expanded={open}
+            className="w-[200px] justify-between items-center"
+          />
+        }
+      >
+        
           {match(value)
             .with(ClipboardType.Files, () => 'Files')
             .with(ClipboardType.Text, () => 'Text')
@@ -105,7 +109,6 @@ export function TypeSelect({ value, onChange }: TypeSelectProps) {
             </span>
             <ChevronsUpDown className="opacity-50" />
           </div>
-        </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[200px] p-0">
         <Command>

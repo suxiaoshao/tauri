@@ -30,52 +30,58 @@ export default function ContentList({ folders, conversations }: ContentListProps
   return (
     <ItemGroup>
       {folders.map((folder) => (
-        <Item key={folder.id} asChild>
-          <Link
-            replace
-            to={{
-              search: new URLSearchParams({
-                selectedType: SelectedType.Folder,
-                selectedId: folder.id.toString(),
-              }).toString(),
-            }}
-          >
-            <ItemMedia>
-              <Avatar>
-                <AvatarFallback className="bg-transparent">
-                  <FolderIcon />
-                </AvatarFallback>
-              </Avatar>
-            </ItemMedia>
-            <ItemContent className="gap-1">
-              <ItemTitle>{folder.name}</ItemTitle>
-              <ItemDescription>{folder.path}</ItemDescription>
-            </ItemContent>
-          </Link>
+        <Item
+          key={folder.id}
+          render={
+            <Link
+              replace
+              to={{
+                search: new URLSearchParams({
+                  selectedType: SelectedType.Folder,
+                  selectedId: folder.id.toString(),
+                }).toString(),
+              }}
+            />
+          }
+        >
+          <ItemMedia>
+            <Avatar>
+              <AvatarFallback className="bg-transparent">
+                <FolderIcon />
+              </AvatarFallback>
+            </Avatar>
+          </ItemMedia>
+          <ItemContent className="gap-1">
+            <ItemTitle>{folder.name}</ItemTitle>
+            <ItemDescription>{folder.path}</ItemDescription>
+          </ItemContent>
         </Item>
       ))}
       {conversations.length > 0 && folders.length > 0 && <ItemSeparator />}
       {conversations.map((conversation) => (
-        <Item asChild key={conversation.id}>
-          <Link
-            replace
-            to={{
-              search: new URLSearchParams({
-                selectedType: SelectedType.Conversation,
-                selectedId: conversation.id.toString(),
-              }).toString(),
-            }}
-          >
-            <ItemMedia>
-              <Avatar>
-                <AvatarFallback className="bg-transparent">{conversation.icon}</AvatarFallback>
-              </Avatar>
-            </ItemMedia>
-            <ItemContent className="gap-1">
-              <ItemTitle>{conversation.title}</ItemTitle>
-              {conversation.info && <ItemDescription>{conversation.info}</ItemDescription>}
-            </ItemContent>
-          </Link>
+        <Item
+          key={conversation.id}
+          render={
+            <Link
+              replace
+              to={{
+                search: new URLSearchParams({
+                  selectedType: SelectedType.Conversation,
+                  selectedId: conversation.id.toString(),
+                }).toString(),
+              }}
+            />
+          }
+        >
+          <ItemMedia>
+            <Avatar>
+              <AvatarFallback className="bg-transparent">{conversation.icon}</AvatarFallback>
+            </Avatar>
+          </ItemMedia>
+          <ItemContent className="gap-1">
+            <ItemTitle>{conversation.title}</ItemTitle>
+            {conversation.info && <ItemDescription>{conversation.info}</ItemDescription>}
+          </ItemContent>
         </Item>
       ))}
     </ItemGroup>

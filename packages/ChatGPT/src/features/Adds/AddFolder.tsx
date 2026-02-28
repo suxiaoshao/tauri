@@ -55,11 +55,9 @@ function AddFolderItem() {
   const { t } = useTranslation();
   return (
     <SidebarMenuItem>
-      <SidebarMenuButton asChild isActive={matchAdd !== null}>
-        <Link to="/add/folder">
-          <Plus />
-          <span>{t('add_folder')}</span>
-        </Link>
+      <SidebarMenuButton isActive={matchAdd !== null} render={<Link to="/add/folder" />}>
+        <Plus />
+        <span>{t('add_folder')}</span>
       </SidebarMenuButton>
     </SidebarMenuItem>
   );

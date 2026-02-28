@@ -40,12 +40,8 @@ export default function MoveConversation({ conversation }: MoveConversationProps
   return (
     <Dialog open={open} onOpenChange={set}>
       <Tooltip>
-        <DialogTrigger asChild>
-          <TooltipTrigger asChild>
-            <Button variant="ghost" size="icon">
-              <FolderInput />
-            </Button>
-          </TooltipTrigger>
+        <DialogTrigger render={<TooltipTrigger render={<Button variant="ghost" size="icon" />} />}>
+          <FolderInput />
         </DialogTrigger>
         <TooltipContent>{t('move')}</TooltipContent>
       </Tooltip>

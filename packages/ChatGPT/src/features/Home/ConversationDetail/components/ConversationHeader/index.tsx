@@ -60,27 +60,21 @@ export default function ConversationHeader({ conversation }: ConversationHeaderP
       </div>
       <UpdateConversation conversation={conversation} />
       <Tooltip>
-        <TooltipTrigger asChild>
-          <Button variant="ghost" size="icon" onClick={handleDelete}>
-            <Trash />
-          </Button>
+        <TooltipTrigger render={<Button variant="ghost" size="icon" onClick={handleDelete} />}>
+          <Trash />
         </TooltipTrigger>
         <TooltipContent>{t('delete')}</TooltipContent>
       </Tooltip>
       <Tooltip>
-        <TooltipTrigger asChild>
-          <Button variant="ghost" size="icon" onClick={handleCopy}>
-            <Copy />
-          </Button>
+        <TooltipTrigger render={<Button variant="ghost" size="icon" onClick={handleCopy} />}>
+          <Copy />
         </TooltipTrigger>
         <TooltipContent>{t('copy_to_new_conversation')}</TooltipContent>
       </Tooltip>
       <MoveConversation conversation={conversation} />
       <Tooltip>
-        <TooltipTrigger asChild>
-          <Button variant="ghost" size="icon" onClick={handleClear}>
-            <BrushCleaning />
-          </Button>
+        <TooltipTrigger render={<Button variant="ghost" size="icon" onClick={handleClear} />}>
+          <BrushCleaning />
         </TooltipTrigger>
         <TooltipContent>{t('clear_messages')}</TooltipContent>
       </Tooltip>
