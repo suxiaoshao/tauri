@@ -20,7 +20,7 @@ serde_json = { workspace = true }
 delay = { path = "../../../crates/delay" }
 
 # database
-diesel = { version = "2.3.5", features = [
+diesel = { version = "2.3.6", features = [
     "sqlite",
     "r2d2",
     "numeric",
@@ -28,14 +28,14 @@ diesel = { version = "2.3.5", features = [
     "returning_clauses_for_sqlite_3_35"
 ] }
 libsqlite3-sys = { version = "0.35.0", features = ["bundled-windows"] }
-time = { version = "0.3.44", features = ["serde"] }
+time = { version = "0.3.47", features = ["serde"] }
 pinyin = "0.11.0"
 
 # 错误处理
-thiserror = "2.0.17"
+thiserror = "2.0.18"
 
 # log
-tauri-plugin-log = { version = "2.7.1" }
+tauri-plugin-log = { version = "2.8.0" }
 log = "0.4.29"
 
 # 窗口管理
@@ -43,7 +43,7 @@ tauri-plugin-window-state = { version = "2.4.1" }
 window-vibrancy = "0.7.1"
 
 # http request
-reqwest = { version = "0.12.15", features = ["json"] }
+reqwest = { version = "0.12.28", features = ["json"] }
 tokio = { version = "1.49.0", features = [
     "rt",
     "rt-multi-thread",
@@ -53,29 +53,29 @@ tokio = { version = "1.49.0", features = [
     "macros",
 ] }
 reqwest-eventsource = "0.6.0"
-futures = "0.3.31"
+futures = "0.3.32"
 async-stream = "0.3.6"
 
 # config
 notify = { version = "8.2.0" }
-toml = "0.9.10"
+toml = "1.0.3"
 csv = "1.4.0"
 
 # plugin
 tauri-plugin-global-shortcut = "2.3.1"
 tauri-plugin-notification = "2.3.3"
 tauri-plugin-os = "2.3.2"
-tauri-plugin-opener = "2.5.2"
-tauri-plugin-dialog = "2.4.2"
+tauri-plugin-opener = "2.5.3"
+tauri-plugin-dialog = "2.6.0"
 tauri-plugin-positioner = "2.3.1"
 
 # extension
-wasmtime = { version = "40.0.0" }
-wasmtime-wasi = "40.0.0"
+wasmtime = { version = "42.0.1" }
+wasmtime-wasi = "42.0.1"
 get-selected-text = "0.1.6"
 
 [target.'cfg(target_os="macos")'.dependencies]
-objc2 = "0.6.3"
+objc2 = "0.6.4"
 objc2-app-kit = "0.3.2"
 objc2-foundation = "0.3.2"
 
@@ -86,4 +86,4 @@ custom-protocol = ["tauri/custom-protocol"]
 
 [dev-dependencies]
 dotenv = "0.15.0"
-anyhow = "1.0.100"
+anyhow = "1.0.102"
