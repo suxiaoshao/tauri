@@ -1,0 +1,7 @@
+{
+  "ignoreFiles": ["changelog.config.js", "packages/*/postcss.config.ts"],
+  "ignoreDependencies": ["@tailwindcss/postcss", "babel-plugin-react-compiler", "jsdom", "ts-node"],
+  "ignoreIssues": {
+    "packages/*/src/components/ui/**": ["exports", "types"]
+  }
+}

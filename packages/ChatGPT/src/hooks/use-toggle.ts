@@ -1,6 +1,6 @@
 import { useMemo, useReducer } from 'react';
 
-export interface Actions<T> {
+interface Actions<T> {
   setLeft: () => void;
   setRight: () => void;
   set: (value: T) => void;

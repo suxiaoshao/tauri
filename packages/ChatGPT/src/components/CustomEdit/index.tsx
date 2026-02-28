@@ -8,7 +8,7 @@ import './init';
  * @since 0.2.2
  * @description 可写情况下的 editProp
  * */
-export interface NotReadOnlyEditProp extends Omit<ComponentProps<'div'>, 'onChange' | 'ref'> {
+interface NotReadOnlyEditProp extends Omit<ComponentProps<'div'>, 'onChange' | 'ref'> {
   /**
    * 要显示的代码字符串
    * */

@@ -4,9 +4,9 @@ import { match } from 'ts-pattern';
 import { type PromiseData, PromiseStatus } from '@chatgpt/hooks/usePromise';
 import { getTemporaryConversation } from '@chatgpt/service/temporaryConversation/query';
 
-export type TemporaryConversationState = PromiseData<TemporaryConversation>;
+type TemporaryConversationState = PromiseData<TemporaryConversation>;
 
-export interface TemporaryConversationStore {
+interface TemporaryConversationStore {
   state: TemporaryConversationState;
   updateMessage: (message: TemporaryMessageEvent) => void;
   fetchData: (persistentId: number | null) => Promise<void>;

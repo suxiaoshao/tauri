@@ -29,9 +29,9 @@ const saveConversationSchema = object({
   folderId: nullable(pipe(number(), integer())),
 });
 
-export type SaveConversationForm = InferInput<typeof saveConversationSchema>;
+type SaveConversationForm = InferInput<typeof saveConversationSchema>;
 
-export interface SaveConversationProps {
+interface SaveConversationProps {
   persistentId: number | null;
 }
 

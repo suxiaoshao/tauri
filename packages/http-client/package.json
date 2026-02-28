@@ -17,8 +17,7 @@
     "lucide-react": "^0.562.0",
     "notify": "workspace:^",
     "tailwind-merge": "^3.4.0",
-    "theme": "workspace:^",
-    "types": "workspace:^"
+    "theme": "workspace:^"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.18",

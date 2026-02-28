@@ -19,7 +19,7 @@ import { cn } from '@chatgpt/lib/utils';
 import { Separator } from '@chatgpt/components/ui/separator';
 import { Avatar, AvatarFallback } from '@chatgpt/components/ui/avatar';
 
-export interface SystemItemProps {
+interface SystemItemProps {
   message: BaseMessage;
   selected: boolean;
 }

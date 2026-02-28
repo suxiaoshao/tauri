@@ -7,7 +7,7 @@ import HiddenItem from './HiddenItem';
 import LoadingItem from './LoadingItem';
 import NormalItem from './NormalItem';
 
-export interface AssistantItemProps {
+interface AssistantItemProps {
   message: BaseMessage;
   selected: boolean;
 }

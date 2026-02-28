@@ -4,7 +4,7 @@ import { type BaseMessage } from '../MessageItem/types';
 import { MessageActionContext } from './MessageActionContext';
 import { useHotkeys } from 'react-hotkeys-hook';
 
-export interface MessageHistoryProps {
+interface MessageHistoryProps {
   messages: BaseMessage[];
   onMessageViewed?: (id: number) => void;
   onMessageDeleted?: (id: number) => Promise<void>;

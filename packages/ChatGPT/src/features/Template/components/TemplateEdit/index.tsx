@@ -42,7 +42,7 @@ const getDefaultValues = (): Partial<TemplateForm> => ({
   mode: Mode.Contextual,
 });
 
-export interface TemplateEditProps {
+interface TemplateEditProps {
   initialValues?: ConversationTemplate;
   id: string;
   onSubmit: (newTemplate: TemplateForm) => Promise<void>;

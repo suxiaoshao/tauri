@@ -1,82 +1,95 @@
 # AGENTS.md
 
-## 项目概览
+## 仓库概览
 
-这是一个 `pnpm workspace + Cargo workspace` 组成的多包仓库，核心是多个基于 `Tauri 2 + React 19 + TypeScript + Rsbuild` 的桌面应用，以及少量独立 Rust 工具包。
+这是一个 `pnpm workspace + Cargo workspace` 多包仓库，核心是多个基于 `Tauri 2 + React 19 + TypeScript + Rsbuild` 的桌面应用，以及少量独立 Rust 包。
 
-- 前端包位于 `packages/*`
-- 共享前端代码位于 `common/*`
-- Rust 共享 crate 位于 `crates/*`
-- Tauri 后端代码通常位于各应用的 `packages/<app>/src-tauri`
+- 前端应用：`packages/*`
+- 前端共享：`common/*`
+- Rust 共享 crate：`crates/*`
+- Tauri 后端通常位于 `packages/<app>/src-tauri`
 
-## 目录职责
+主要应用：
 
-### 应用包
+- `packages/ChatGPT`
+- `packages/Hclipboard`
+- `packages/http-client`
+- `packages/feiwen`
+- `packages/movie`
+- `packages/remove`
 
-- `packages/ChatGPT`: 功能最完整的聊天应用，前端在 `src`，Tauri/Rust 后端在 `src-tauri`
-- `packages/Hclipboard`: 剪贴板历史相关应用，包含前端和 `src-tauri` 数据存储/插件逻辑
-- `packages/http-client`: HTTP 请求客户端，前端在 `src`，Tauri 插件和窗口逻辑在 `src-tauri`
-- `packages/feiwen`: 小说抓取/整理相关应用，抓取与存储逻辑在 `src-tauri`
-- `packages/movie`: 独立 Rust 包
-- `packages/remove`: 独立 Rust 包
+共享包：
 
-### 共享包
+- `common/theme`
+- `common/notify`
+- `common/time`
+- `common/types`
+- `crates/delay`
 
-- `common/theme`: 主题相关共享代码
-- `common/notify`: 通知相关共享代码
-- `common/time`: 时间格式化等工具
-- `common/types`: 共享类型
-- `crates/delay`: Rust 共享 crate
+## 先记住的事实
 
-## 技术栈与约定
+- 这是多应用仓库，不存在单一前端入口。开始修改前先确认目标应用。
+- 根 `tsconfig.json` 开启 `strict`，不要引入宽松类型写法。
+- 路径别名：
+  - `@chatgpt/* -> packages/ChatGPT/src/*`
+  - `@feiwen/* -> packages/feiwen/src/*`
+  - `@hclipboard/* -> packages/Hclipboard/src/*`
+  - `@http-client/* -> packages/http-client/src/*`
+- 共享前端能力优先复用 `common/*`，但只有至少两个包真实需要时才抽象。
+- 不要无关重构，不要批量改 import、命名、目录结构或全仓格式化。
 
-- 包管理器：`pnpm`
-- 前端构建：`rsbuild`
-- 前端框架：`React 19`
-- TypeScript：根 `tsconfig.json` 开启 `strict`
-- Rust 工作区：根 `Cargo.toml`
-- Tauri 版本：2.x
-- UI 组件大量使用 `Radix UI`、`class-variance-authority`、`tailwind-merge`
-- 前端包普遍启用了 `babel-plugin-react-compiler`
+## UI 约定
 
-## Tauri 文档入口
+- 各应用使用 `shadcn/ui` 体系，并带有自己的 `components.json`。
+- `src/components/ui/*` 是目标应用自己的 shadcn 组件目录，通常由 shadcn 安装/生成，并基于 `Base UI`、`class-variance-authority`、`tailwind-merge` 演进。
+- 不要把 `components/ui/*` 当成通用第三方源码目录整体替换，也不要按 `Radix UI` 项目去理解或迁移。
+- 涉及 `shadcn/ui` 时，先检查目标应用的 `components.json`，不要凭印象修改 `aliases`、`tailwind.css`、`baseColor`、`registries`。
+- 新增或迁移 shadcn 组件时，保持在目标应用自己的 `src/components/ui` 下，不要跨应用混用。
+- 若问题涉及 shadcn API、CLI、registry 或迁移规则，先查 `https://ui.shadcn.com/llms.txt`。
 
-- 插件总览：`https://tauri.app/plugin/`
-- 配置参考：`https://tauri.app/reference/config/`
-- JavaScript API：`https://tauri.app/reference/javascript/api/`
-- Rust API：`https://docs.rs/tauri/2.10.2/tauri/`
-- 其他官方文档入口：`https://tauri.app/start/`
+## 前端修改规则
 
-## 关键事实（写代码前先记住）
+- 先进入目标应用上下文，再修改 `components`、`features`、`service`、`hooks` 等现有目录。
+- 保持现有技术选型，不要无故引入新的状态管理、样式方案、请求库或表单库。
+- 仓库启用了 React Compiler，不要默认到处添加 `useMemo`/`useCallback`。
+- 样式优先沿用当前应用的 CSS Variables、Tailwind 原子类和现有工具函数。
+- 不要修改不相关应用的 `components.json`、`rsbuild.config.ts`、`tauri.conf.json`。
 
-- 这是多应用仓库，不存在单一前端入口；开发时先确认目标应用，再进入对应 `packages/<app>` 上下文。
-- `packages/ChatGPT`、`packages/feiwen`、`packages/Hclipboard`、`packages/http-client` 都包含 `components.json`，并接入了 `shadcn/ui` 风格组件体系。
-- 各应用普遍采用 `new-york` 风格、`lucide` 图标、CSS Variables 方案，Tailwind 样式入口通常是 `src/index.css`。
-- CI 位于 `.github/workflows/ci.yaml`，当前会执行 `pnpm lint`、`pnpm test`、`pnpm run build:web`、`cargo clippy --all`、`cargo test --all`。
-- GitHub issue 模板已存在，位于 `.github/ISSUE_TEMPLATE/`，包含 `bug_report.yml`、`feature_request.yml`、`tech_request.yml`。
+## Tauri / Rust 规则
 
-## shadcn/ui 规则
+- 修改前先确认后端是否位于 `packages/<app>/src-tauri`。
+- 数据存储、插件、窗口、托盘、快捷键等逻辑通常在 `plugin.rs`、`plugins/*`、`store/*`、`window/*`。
+- 影响 capability、插件权限、窗口行为时，要连同 `tauri.conf.json`、`capabilities/*.json` 一起检查。
+- 涉及 schema、migration、store service 时，必须同步检查 `migrations/`、`schema.rs`、`model.rs`、`service.rs`。
+- 可复用的 Rust 逻辑优先考虑放到 `crates/*`。
+- 不确定 Tauri API 或配置时，优先查官方文档：
+  - `https://tauri.app/plugin/`
+  - `https://tauri.app/reference/config/`
+  - `https://tauri.app/reference/javascript/api/`
+  - `https://docs.rs/tauri/2.10.2/tauri/`
 
-- 遇到 `shadcn/ui` 相关问题时，优先检查目标应用的 `components.json`，不要凭印象修改组件别名、样式入口或 registry。
-- 新增或迁移 `shadcn/ui` 组件时，保持在目标应用自己的 `src/components/ui` 下，不要跨应用混用组件目录。
-- 需要复用组件时，优先复用现有 `src/components/ui/*` 实现；只有在多个应用都明确需要同一抽象时，才考虑提炼到共享层。
-- 不要随意改动 `components.json` 中的 `aliases`、`tailwind.css`、`baseColor`、`registries`，除非任务明确要求。
-- 若任务涉及 `shadcn/ui` 组件 API、CLI、registry 或迁移规则，先查 `https://ui.shadcn.com/llms.txt`，再按文档处理。
+## 提权与命令规则
+
+- 任何需要联网、安装依赖、修改 lockfile、运行 `pnpm install`、`pnpm add`、`pnpm dlx`、`cargo install`、`gh` 写操作或其他超出沙盒权限的命令，必须先向用户申请权限。
+- 不要通过读取缓存、手动拼接临时目录、直接调用已缓存二进制或其他绕过方式替代正式提权。
+- 若命令因权限、网络或沙盒限制失败，应直接按实际命令重新申请权限，不要换成规避限制的替代方案。
+- 删除文件、覆盖生成产物或改写锁文件前，也要先明确说明并申请权限。
 
 ## 常用命令
 
-在仓库根目录执行：
+根目录：
 
-- 安装依赖：`pnpm install`
-- 格式化：`pnpm run format`
-- 全量检查：`pnpm run lint`
-- 单独运行 oxlint：`pnpm run oxlint`
-- TypeScript 构建检查：`pnpm run tslint`
-- 测试：`pnpm run test`
-- 构建所有前端：`pnpm run build:web`
-- 构建所有 Tauri 应用：`pnpm run build:tauri`
+- `pnpm install`
+- `pnpm run format`
+- `pnpm run oxlint`
+- `pnpm run knip`
+- `pnpm run tslint`
+- `pnpm run lint`
+- `pnpm run test`
+- `pnpm run build:web`
+- `pnpm run build:tauri`
 
-运行单个应用时，优先使用过滤命令：
+单应用：
 
 - `pnpm --filter ChatGPT dev`
 - `pnpm --filter ChatGPT build`
@@ -85,123 +98,34 @@
 - `pnpm --filter http-client tauri dev`
 - `pnpm --filter feiwen tauri dev`
 
-如果要运行 Rust 包：
+Rust：
 
 - `cargo check -p delay`
 - `cargo check -p movie`
 - `cargo check -p remove`
 
-## 路径与导入
+## 验证要求
 
-根 `tsconfig.json` 中已定义路径别名：
+- 任何代码修改后，都必须执行与改动直接相关的验证命令。
+- 修改前端代码：至少运行 `pnpm run oxlint` 和 `pnpm run tslint`。
+- 修改 `knip.json`、依赖声明、导出声明或清理未使用代码：补充执行 `pnpm run knip`。
+- 修改前端测试、测试配置或影响测试行为的实现：补充执行 `pnpm run test`。
+- 修改共享前端包 `common/*`：默认执行 `pnpm run lint`，必要时补 `pnpm run test`。
+- 修改 Rust 代码：至少执行相关包的 `cargo check -p <pkg>`。
+- 修改 Rust 测试、migration、store、插件或其他运行时关键逻辑：优先执行 `cargo test -p <pkg>`；影响面不清晰时执行 `cargo test --all`。
+- 若改动可能影响 CI，按 CI 对齐执行：`pnpm lint`、`pnpm test`、`pnpm run build:web`、`cargo clippy --all`、`cargo test --all`。
+- 汇报时要写明实际执行过的验证命令；如果没执行，必须说明原因。
 
-- `@chatgpt/* -> packages/ChatGPT/src/*`
-- `@feiwen/* -> packages/feiwen/src/*`
-- `@hclipboard/* -> packages/Hclipboard/src/*`
-- `@http-client/* -> packages/http-client/src/*`
+## GitHub 规则
 
-共享包通常通过 workspace 包名直接引用：
+- GitHub 相关操作优先使用 `gh`，不要手写推测性结果。
+- 若 `gh` 需要登录、权限或沙盒放行，直接申请权限，不要绕过认证流程。
+- 编写 issue、PR、release note、评论前，先检查 `.github` 下现有模板和工作流。
+- issue 内容优先参考 `.github/ISSUE_TEMPLATE/bug_report.yml`、`feature_request.yml`、`tech_request.yml`。
+- issue 应尽量带上明确产品名：`feiwen`、`Hclipboard`、`http-client`、`movie`、`remove`、`ChatGPT`、`common` 或 `all`。
 
-- `theme`
-- `notify`
-- `time`
-- `types`
+## 其他
 
-修改前端代码时，优先复用 `common/*` 中已有能力，不要在各应用内重复实现主题、通知、时间和基础类型。
-
-## 工作方式建议
-
-### 修改前端时
-
-- 先确认目标应用位于哪个 `packages/<app>/src`
-- 优先沿用现有组件目录结构，例如 `components`、`features`、`service`、`hooks`
-- 保持已有技术选型，不要无故切换到新状态管理或新 UI 库
-- 本仓库已启用 React Compiler，不要默认到处添加 `useMemo`/`useCallback`
-- 共享逻辑优先抽到 `common/*`，但只在至少两个包真正需要时再抽
-- 涉及 `shadcn/ui` 组件时，优先在目标应用现有 `components/ui` 体系内补齐，不要另起一套封装
-- 修改样式时，优先使用当前应用的 CSS Variables、Tailwind 原子类和现有 `utils` 辅助函数
-
-### 修改 Tauri/Rust 时
-
-- 先确认目标应用的后端是否在 `packages/<app>/src-tauri`
-- 数据存储、插件、窗口、托盘、快捷键等逻辑通常分布在 `plugin.rs`、`plugins/*`、`store/*`、`window/*`
-- 跨应用可复用的 Rust 逻辑优先考虑放到 `crates/*`
-- 改动 schema、migration、store service 时，必须同时检查调用链和数据兼容性
-- 涉及 Tauri capability、插件权限、窗口行为时，连同 `tauri.conf.json`、`capabilities/*.json` 一起检查
-- 遇到 Tauri API、配置、插件用法不确定时，优先查上面的官方文档入口，不要凭旧版本记忆修改
-
-### 修改测试时
-
-- Jest 配置在根目录 `jest.config.ts`
-- 测试环境为 `jsdom`
-- 测试初始化位于 `config/test/testSetup.ts`
-- 现有测试较少，新增行为改动时优先补最接近变更点的测试
-
-## 提交前最低检查
-
-如果只改了前端 TypeScript/React：
-
-- `pnpm run oxlint`
-- `pnpm run tslint`
-
-如果改了共享包或影响范围不明确：
-
-- `pnpm run lint`
-- `pnpm run test`
-
-如果改了 Rust/Tauri：
-
-- 对应包执行 `cargo clippy`
-- 如涉及前后端联动，再执行对应应用的 `pnpm --filter <pkg> tauri dev` 或至少 `pnpm --filter <pkg> build`
-
-## 完成后验证（必须执行）
-
-- 完成任何代码修改后，必须运行与改动直接相关的验证命令，不能只修改不验证。
-- 修改了前端代码：至少运行 `pnpm run oxlint` 和 `pnpm run tslint`。
-- 修改了前端测试、测试配置或会影响测试行为的实现：还必须运行 `pnpm run test`。
-- 修改了共享前端包 `common/*`：默认执行 `pnpm run lint`，必要时补 `pnpm run test`。
-- 修改了 Rust 代码：至少运行相关包的 `cargo check -p <pkg>`。
-- 修改了 Rust 测试、migration、store、插件或影响运行时行为的 Rust 实现：优先运行 `cargo test -p <pkg>`；影响面不清晰时运行 `cargo test --all`。
-- 若改动可能影响 CI 结果，按 CI 对齐执行：`pnpm lint`、`pnpm test`、`pnpm run build:web`、`cargo clippy --all`、`cargo test --all`。
-- 汇报结果时应注明实际执行过的验证命令；如果没执行，必须说明原因。
-
-## 本仓库内的实现偏好
-
-- 优先做小范围、定点修改，不要无关重构
-- 不要随意改动所有包共用的构建配置，除非任务明确要求
-- 不要新增与现有模式重复的基础设施
-- 新增文件时遵循现有命名风格和目录层级
-- 保持 ASCII 为默认字符集，除非目标文件已经明确使用非 ASCII 内容
-- 涉及 Windows 行为、快捷键、托盘、剪贴板、文件系统能力时，优先查看对应 `src-tauri` 实现后再改
-
-## 修改约束
-
-- 修改或新增代码文件时，统一使用 `UTF-8` 编码。
-- 修改或新增代码文件时，统一使用 `LF` 换行符。
-- 不要凭空新增仓库里不存在的构建体系、脚手架或脚本约定。
-- 不要把同一功能同时改成“前端一套、Tauri 一套”的重复实现；优先延续现有分层边界。
-- 不要在无明确需求时批量调整 import 顺序、文件命名、目录结构或格式化整个仓库。
-- 不要修改不相关应用的 `components.json`、`rsbuild.config.ts`、`tauri.conf.json`。
-- 涉及数据库 schema / migration 时，必须同步检查对应 `migrations/`、`schema.rs`、`model.rs`、`service.rs`。
-- 共享逻辑只有在多个包真实复用时再抽象；不要为了“看起来更通用”提前抽层。
-- 未经要求不要引入新的状态管理、样式方案、请求库或表单库。
-
-## 文档与交付要求
-
-- 文档和说明优先写可直接执行的命令，而不是泛泛描述。
-- 结果说明应优先包含：改动范围、关键行为变化、验证命令。
-- 若某命令依赖外部条件，例如系统 GUI、Tauri 运行环境、平台能力或网络权限，必须明确标注。
-
-## GitHub 协作规则
-
-- 当用户要求执行 GitHub 相关操作时，优先使用 `gh` 命令行，而不是手写推测性结果。
-- 若 `gh` 遇到未登录、权限不足或沙盒限制，直接申请相应权限，不要绕过认证流程。
-- 当用户要求编写 issue、PR 描述、release note 或评论内容时，先查看 `.github` 下的现有模板和工作流，再按仓库惯例组织内容。
-- 编写 issue 内容时，优先参考 `.github/ISSUE_TEMPLATE/bug_report.yml`、`.github/ISSUE_TEMPLATE/feature_request.yml`、`.github/ISSUE_TEMPLATE/tech_request.yml`。
-- 这套 issue 模板包含 `product` 和 `component` 维度；写 issue 时应尽量带上具体产品名，例如 `feiwen`、`Hclipboard`、`http-client`、`movie`、`remove`、`ChatGPT`、`common` 或 `all`。
-
-## 额外说明
-
-- 多个应用使用相同的 `rsbuild.config.ts` 模式，但开发端口不完全一致，启动前先检查目标包配置
-- 根目录存在 `node_modules` 与 `target`，搜索时应避免把它们当作业务代码
-- PowerShell 环境可能输出与 `fnm` 相关的 profile 噪声，这不是项目代码问题
+- 修改或新增代码文件时，统一使用 `UTF-8` 编码和 `LF` 换行符。
+- 搜索代码时避开根目录 `node_modules` 与 `target`。
+- PowerShell 里若出现 `fnm` profile 噪声，可忽略，不是项目代码问题。

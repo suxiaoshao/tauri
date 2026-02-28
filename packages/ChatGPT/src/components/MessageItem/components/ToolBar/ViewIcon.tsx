@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@chatgpt/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@chatgpt/components/ui/tooltip';
 
-export interface ViewIconProp {
+interface ViewIconProp {
   id: number;
 }
 

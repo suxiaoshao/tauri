@@ -12,7 +12,7 @@ import { useConfigStore } from '../Setting/configSlice';
 import { Theme } from '../Setting/types';
 import { colorSchemaMatch, getColorScheme, useThemeStore } from './themeSlice';
 
-export interface CustomThemeProps {
+interface CustomThemeProps {
   children?: React.ReactNode;
 }
 

@@ -1,12 +1,12 @@
 import { type TemporaryMessage, type TemporaryConversation } from '@chatgpt/types/temporaryConversation';
 import { appInvoke } from '../base';
 
-export interface FindTemporaryMessageParams {
+interface FindTemporaryMessageParams {
   persistentId: number | null;
   messageId: number;
 }
 
-export interface GetTemporaryConversationsParams {
+interface GetTemporaryConversationsParams {
   persistentId: number | null;
 }
 

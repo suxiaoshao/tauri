@@ -4,7 +4,7 @@ import ContentEmpty from './components/ContentEmpty';
 import ContentList from './components/ContentList';
 import FolderHeader from './components/FolderHeader';
 
-export interface FolderDetailProps {
+interface FolderDetailProps {
   folder: Folder;
 }
 

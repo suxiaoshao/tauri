@@ -10,7 +10,7 @@ import { match } from 'ts-pattern';
 import { create } from 'zustand';
 import { Theme } from '../Setting/types';
 
-export interface ThemeSliceType {
+interface ThemeSliceType {
   systemColorScheme: Theme.Dark | Theme.Light;
 }
 

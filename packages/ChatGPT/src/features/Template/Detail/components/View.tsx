@@ -22,7 +22,7 @@ import { useTranslation } from 'react-i18next';
 import { format } from 'time';
 import { match } from 'ts-pattern';
 
-export interface TemplateDetailViewProps {
+interface TemplateDetailViewProps {
   data: ConversationTemplate;
   inputs: AdapterInputs;
 }

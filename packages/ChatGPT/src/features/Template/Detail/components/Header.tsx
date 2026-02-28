@@ -22,7 +22,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { match } from 'ts-pattern';
 
-export interface TemplateDetailHeaderProps {
+interface TemplateDetailHeaderProps {
   refresh: () => void;
   data: PromiseData<ConversationTemplate>;
   alignment: Alignment;

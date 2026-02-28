@@ -21,7 +21,7 @@ import { FieldLabel, Field } from '@chatgpt/components/ui/field';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@chatgpt/components/ui/resizable';
 const appWindow = getCurrentWebviewWindow();
 
-export interface SuccessProps {
+interface SuccessProps {
   message: Pick<Message, 'content'>;
   updateMessageContent: (content: Content) => Promise<void>;
 }

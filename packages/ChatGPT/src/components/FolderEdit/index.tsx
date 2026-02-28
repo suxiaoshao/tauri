@@ -22,7 +22,7 @@ export type FolderForm = InferInput<typeof folderSchema>;
 
 const DefaultValues: Partial<NewFolder> = {};
 
-export interface FolderEditProps extends Omit<ComponentProps<'form'>, 'component' | 'id' | 'onSubmit'> {
+interface FolderEditProps extends Omit<ComponentProps<'form'>, 'component' | 'id' | 'onSubmit'> {
   initialValues?: NewFolder;
   id: string;
   onSubmit: (newFolder: FolderForm) => Promise<void>;

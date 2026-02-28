@@ -5,7 +5,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../ui/colla
 import { SidebarMenuButton, SidebarMenuItem, SidebarMenuSub } from '../ui/sidebar';
 import { FolderClosed, FolderOpen } from 'lucide-react';
 
-export interface FolderSelectItemProps {
+interface FolderSelectItemProps {
   folder: Folder;
   disabled?: boolean;
   subItem: boolean;

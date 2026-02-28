@@ -1,11 +1,11 @@
 import { create } from 'zustand';
 import { Language } from '../Setting/types';
 
-export interface I18nType {
+interface I18nType {
   language: string;
 }
 
-export interface I18nAction {
+interface I18nAction {
   setSystemLanguage: (language: string) => void;
 }
 

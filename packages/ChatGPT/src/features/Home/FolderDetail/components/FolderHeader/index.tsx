@@ -7,7 +7,7 @@ import { Button } from '@chatgpt/components/ui/button';
 import { Trash } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@chatgpt/components/ui/tooltip';
 import { useTranslation } from 'react-i18next';
-export interface FolderHeaderProps {
+interface FolderHeaderProps {
   folder: Folder;
 }
 

@@ -4,7 +4,7 @@ import { match } from 'ts-pattern';
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '../ui/input-group';
 import { XIcon } from 'lucide-react';
 
-export interface HotkeyInputProps extends Omit<
+interface HotkeyInputProps extends Omit<
   ComponentProps<typeof InputGroupInput>,
   'value' | 'onChange' | 'onBlur' | 'onFocus'
 > {

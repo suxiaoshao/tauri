@@ -6,7 +6,7 @@ import FolderSelectItem from './FolderSelectItem';
 import { useTranslation } from 'react-i18next';
 import { SidebarContent, SidebarGroup, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '../ui/sidebar';
 
-export interface FolderSelectProps {
+interface FolderSelectProps {
   value?: number | null;
   onChange: (id: number | null) => void;
   disabledFolderIds?: number[];

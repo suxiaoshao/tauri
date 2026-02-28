@@ -9,7 +9,7 @@ export async function getAllAdapterTemplateInputs(): Promise<[AdapterInputs]> {
   return await appInvoke<unknown, [AdapterInputs]>('plugin:adapter|get_all_adapter_template_inputs', {});
 }
 
-export interface GetAdapterTemplateInputsParams {
+interface GetAdapterTemplateInputsParams {
   adapterName: string;
 }
 

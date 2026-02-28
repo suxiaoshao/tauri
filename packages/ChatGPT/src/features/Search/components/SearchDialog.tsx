@@ -16,7 +16,7 @@ import { pinyin } from 'pinyin-pro';
 import { useMatch, useNavigate } from 'react-router-dom';
 import { SelectedType } from '@chatgpt/features/Conversations/types';
 
-export interface SearchDialogProps {
+interface SearchDialogProps {
   open: boolean;
   onOpenChange: (b: boolean) => void;
 }
@@ -29,7 +29,7 @@ const initialState: SearchData = {
   conversationList: [],
 };
 
-export type SearchAction = Enum<'setConversationList', Conversation[]>;
+type SearchAction = Enum<'setConversationList', Conversation[]>;
 function reducer(state: SearchData, action: SearchAction): SearchData {
   return match(action)
     .with({ tag: 'setConversationList' }, (action) => {

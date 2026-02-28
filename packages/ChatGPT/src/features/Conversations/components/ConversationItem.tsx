@@ -17,7 +17,7 @@ import { match, P } from 'ts-pattern';
 import { SelectedType } from '../types';
 import { Link, useMatch } from 'react-router-dom';
 
-export interface ConversationItemProps {
+interface ConversationItemProps {
   conversation: Conversation;
   subItem: boolean;
 }

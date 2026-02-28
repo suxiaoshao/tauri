@@ -10,7 +10,7 @@ import { match } from 'ts-pattern';
 import { create } from 'zustand';
 import { useShallow } from 'zustand/react/shallow';
 
-export interface ThemeSliceType {
+interface ThemeSliceType {
   colorSetting: 'dark' | 'light' | 'system';
   systemColorScheme: 'light' | 'dark';
 }

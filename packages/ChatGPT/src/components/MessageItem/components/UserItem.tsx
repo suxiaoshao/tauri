@@ -22,7 +22,7 @@ import { Avatar, AvatarImage } from '@chatgpt/components/ui/avatar';
 import { Separator } from '@chatgpt/components/ui/separator';
 import { Badge } from '@chatgpt/components/ui/badge';
 
-export interface UserItemProps {
+interface UserItemProps {
   message: BaseMessage;
   selected: boolean;
 }

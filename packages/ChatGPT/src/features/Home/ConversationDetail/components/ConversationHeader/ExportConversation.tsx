@@ -38,7 +38,7 @@ import { FieldError, FieldGroup, FieldLabel, Field } from '@chatgpt/components/u
 import { Share } from 'lucide-react';
 import { toast } from 'sonner';
 
-export interface ExportConversationProps {
+interface ExportConversationProps {
   conversation: Conversation;
 }
 async function selectFolder() {

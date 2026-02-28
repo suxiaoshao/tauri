@@ -21,7 +21,7 @@ import { type Folder } from '@chatgpt/types/folder';
 import { Folder as FolderIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-export interface ContentListProps {
+interface ContentListProps {
   folders: Folder[];
   conversations: Conversation[];
 }

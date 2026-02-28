@@ -7,7 +7,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@chatgpt/components/ui/
 import { Copy } from 'lucide-react';
 import { toast } from 'sonner';
 
-export interface CopyIconProps {
+interface CopyIconProps {
   content: string;
 }
 

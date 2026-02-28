@@ -1,3 +1,4 @@
+/* oxlint-disable jest/require-hook */
 import { match } from 'ts-pattern';
 import { type ClipHistory } from '../hooks/useClipData';
 import { Separator } from '@hclipboard/components/ui/separator';

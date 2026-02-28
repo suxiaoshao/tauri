@@ -20,7 +20,7 @@ const sendMessageSchema = object({
 
 type SendMessageInput = InferInput<typeof sendMessageSchema>;
 
-export interface ChatFormProps {
+interface ChatFormProps {
   status: PromiseData<void>;
   onSendMessage: (content: string, extensionName: string | null) => Promise<void>;
 }

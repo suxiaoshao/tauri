@@ -5,7 +5,7 @@ export async function getConfig() {
   return await appInvoke<unknown, Config>('plugin:config|get_config', null);
 }
 
-export interface SetConfigParams {
+interface SetConfigParams {
   data: Config;
 }
 

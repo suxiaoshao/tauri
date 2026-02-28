@@ -10,7 +10,7 @@ import { ArrowLeft, Upload } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
-export interface TemplateCreateHeaderProps {
+interface TemplateCreateHeaderProps {
   formId: string;
 }
 

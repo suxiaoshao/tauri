@@ -11,7 +11,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@chatgpt/components/ui/
 import { Button } from '@chatgpt/components/ui/button';
 import { Avatar, AvatarFallback } from '@chatgpt/components/ui/avatar';
 
-export interface TemporaryHeaderProps {
+interface TemporaryHeaderProps {
   template: ConversationTemplate;
   persistentId: number | null;
 }

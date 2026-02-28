@@ -1,3 +1,4 @@
+/* oxlint-disable jest/require-hook */
 import i18n, { changeLanguage, type Resource } from 'i18next';
 import { useEffect, useMemo } from 'react';
 import { initReactI18next } from 'react-i18next';
@@ -25,7 +26,7 @@ i18n.use(initReactI18next).init<typeof resources>({
   },
 });
 
-export interface I18nextProps {
+interface I18nextProps {
   children: React.ReactNode;
 }
 

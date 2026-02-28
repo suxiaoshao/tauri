@@ -13,7 +13,7 @@ import { Avatar, AvatarFallback } from '@chatgpt/components/ui/avatar';
 import { Button } from '@chatgpt/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@chatgpt/components/ui/tooltip';
 import { BrushCleaning, Copy, Trash } from 'lucide-react';
-export interface ConversationHeaderProps {
+interface ConversationHeaderProps {
   conversation: Conversation;
 }
 
