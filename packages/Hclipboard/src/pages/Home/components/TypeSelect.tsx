@@ -93,22 +93,21 @@ export function TypeSelect({ value, onChange }: TypeSelectProps) {
           />
         }
       >
-        
-          {match(value)
-            .with(ClipboardType.Files, () => 'Files')
-            .with(ClipboardType.Text, () => 'Text')
-            .with(ClipboardType.Image, () => 'Image')
-            .with(ClipboardType.Html, () => 'HTML')
-            .with(ClipboardType.Rtf, () => 'RTF')
-            .otherwise(() => 'All Types')}
-          <div className="flex gap-1 items-center">
-            <span className="text-muted-foreground">
-              {match(platform)
-                .with('macos', () => '⌘ P')
-                .otherwise(() => 'Ctrl P')}
-            </span>
-            <ChevronsUpDown className="opacity-50" />
-          </div>
+        {match(value)
+          .with(ClipboardType.Files, () => 'Files')
+          .with(ClipboardType.Text, () => 'Text')
+          .with(ClipboardType.Image, () => 'Image')
+          .with(ClipboardType.Html, () => 'HTML')
+          .with(ClipboardType.Rtf, () => 'RTF')
+          .otherwise(() => 'All Types')}
+        <div className="flex gap-1 items-center">
+          <span className="text-muted-foreground">
+            {match(platform)
+              .with('macos', () => '⌘ P')
+              .otherwise(() => 'Ctrl P')}
+          </span>
+          <ChevronsUpDown className="opacity-50" />
+        </div>
       </PopoverTrigger>
       <PopoverContent className="w-[200px] p-0">
         <Command>

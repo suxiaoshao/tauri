@@ -78,7 +78,9 @@ export default function Success({ message, updateMessageContent }: SuccessProps)
         </ToggleGroup>
         {toggleValue === Alignment.edit && (
           <Tooltip>
-            <TooltipTrigger render={<Button variant="ghost" size="icon" disabled={submitLoading} onClick={handleSubmit} />}>
+            <TooltipTrigger
+              render={<Button variant="ghost" size="icon" disabled={submitLoading} onClick={handleSubmit} />}
+            >
               <Upload />
             </TooltipTrigger>
             <TooltipContent>{t('submit')}</TooltipContent>
