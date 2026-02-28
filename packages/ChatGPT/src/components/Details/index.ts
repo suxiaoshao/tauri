@@ -6,7 +6,4 @@
  * @FilePath: /tauri/common/details/src/index.ts
  */
 export { default as Details } from './Details';
-
-export { type DetailsProps } from './Details';
-
 export { type DetailsItem } from './types';

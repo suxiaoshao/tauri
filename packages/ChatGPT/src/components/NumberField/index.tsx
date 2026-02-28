@@ -9,7 +9,7 @@ import React, { type ComponentProps, useImperativeHandle } from 'react';
 import { match, P } from 'ts-pattern';
 import { Input } from '../ui/input';
 
-export interface NumberFieldProps extends Omit<ComponentProps<'input'>, 'type' | 'onChange'> {
+interface NumberFieldProps extends Omit<ComponentProps<'input'>, 'type' | 'onChange'> {
   onChange?: (value: { target: { value: number } }) => void;
   ref: React.Ref<HTMLInputElement | null>;
 }

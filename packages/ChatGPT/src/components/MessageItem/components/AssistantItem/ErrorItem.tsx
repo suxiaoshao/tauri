@@ -17,7 +17,7 @@ import { Separator } from '@chatgpt/components/ui/separator';
 import { cn } from '@chatgpt/lib/utils';
 import { Avatar, AvatarImage } from '@chatgpt/components/ui/avatar';
 
-export interface ErrorItemProps {
+interface ErrorItemProps {
   message: BaseMessage;
   selected: boolean;
 }

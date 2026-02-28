@@ -16,7 +16,7 @@ import { Edit as EditIcon } from 'lucide-react';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
-export interface FolderHeaderProps {
+interface FolderHeaderProps {
   folder: Folder;
 }
 
@@ -36,12 +36,8 @@ export default function UpdateFolder({ folder }: FolderHeaderProps) {
   return (
     <Dialog open={open} onOpenChange={set}>
       <Tooltip>
-        <TooltipTrigger asChild>
-          <DialogTrigger asChild>
-            <Button variant="ghost" size="icon">
-              <EditIcon />
-            </Button>
-          </DialogTrigger>
+        <TooltipTrigger render={<DialogTrigger render={<Button variant="ghost" size="icon" />} />}>
+          <EditIcon />
         </TooltipTrigger>
         <TooltipContent>{t('modify')}</TooltipContent>
       </Tooltip>

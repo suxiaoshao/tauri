@@ -48,19 +48,15 @@ function Setting() {
               <SidebarGroupContent>
                 <SidebarMenu>
                   <SidebarMenuItem>
-                    <SidebarMenuButton isActive={matchGeneral !== null} asChild>
-                      <Link to="/setting/general">
-                        <Settings />
-                        {t('general')}
-                      </Link>
+                    <SidebarMenuButton isActive={matchGeneral !== null} render={<Link to="/setting/general" />}>
+                      <Settings />
+                      {t('general')}
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                   <SidebarMenuItem>
-                    <SidebarMenuButton isActive={matchAdapter !== null} asChild>
-                      <Link to="/setting/adapter">
-                        <Plug />
-                        {t('adapter')}
-                      </Link>
+                    <SidebarMenuButton isActive={matchAdapter !== null} render={<Link to="/setting/adapter" />}>
+                      <Plug />
+                      {t('adapter')}
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 </SidebarMenu>

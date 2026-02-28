@@ -7,7 +7,7 @@ export interface AppPath {
   name: string;
 }
 
-export interface QueryAppsRequest {
+interface QueryAppsRequest {
   path: string;
 }
 

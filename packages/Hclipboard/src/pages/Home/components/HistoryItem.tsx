@@ -5,7 +5,7 @@ import { cn } from '@hclipboard/lib/utils';
 import { Badge } from '@hclipboard/components/ui/badge';
 import { ClipboardType } from '@hclipboard/rpc/query';
 
-export interface HistoryItemProps {
+interface HistoryItemProps {
   item: ClipHistory;
   selected: boolean;
   onPointerMove?: () => void;

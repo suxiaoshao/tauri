@@ -24,19 +24,17 @@ function ConversationTemplateList() {
     () => (
       <ItemGroup className="flex-[1_1_o] overflow-y-auto">
         {templates.map(({ id, icon, description, mode, name }) => (
-          <Item key={id} asChild>
-            <Link to={`/template/${id}`}>
-              <ItemMedia>
-                <Avatar>
-                  <AvatarFallback className="bg-transparent">{icon}</AvatarFallback>
-                </Avatar>
-              </ItemMedia>
-              <ItemContent>
-                <ItemTitle>
-                  {name} <TemplateInfo description={description} mode={mode} />
-                </ItemTitle>
-              </ItemContent>
-            </Link>
+          <Item key={id} render={<Link to={`/template/${id}`} />}>
+            <ItemMedia>
+              <Avatar>
+                <AvatarFallback className="bg-transparent">{icon}</AvatarFallback>
+              </Avatar>
+            </ItemMedia>
+            <ItemContent>
+              <ItemTitle>
+                {name} <TemplateInfo description={description} mode={mode} />
+              </ItemTitle>
+            </ItemContent>
           </Item>
         ))}
       </ItemGroup>
@@ -58,15 +56,18 @@ function TemplateItem() {
   const { t } = useTranslation();
   return (
     <SidebarMenuItem>
-      <SidebarMenuButton asChild isActive={isMatch}>
-        <Link
-          to={match(matchAdd)
-            .with(P.nonNullable, () => '/')
-            .otherwise(() => '/template')}
-        >
-          <LayoutTemplate />
-          <span>{t('template')}</span>
-        </Link>
+      <SidebarMenuButton
+        isActive={isMatch}
+        render={
+          <Link
+            to={match(matchAdd)
+              .with(P.nonNullable, () => '/')
+              .otherwise(() => '/template')}
+          />
+        }
+      >
+        <LayoutTemplate />
+        <span>{t('template')}</span>
       </SidebarMenuButton>
     </SidebarMenuItem>
   );

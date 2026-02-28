@@ -8,7 +8,7 @@ import { cn } from '@chatgpt/lib/utils';
 import { Separator } from '@chatgpt/components/ui/separator';
 import { Avatar, AvatarImage } from '@chatgpt/components/ui/avatar';
 
-export interface HiddenItemProps {
+interface HiddenItemProps {
   message: BaseMessage;
   selected: boolean;
 }

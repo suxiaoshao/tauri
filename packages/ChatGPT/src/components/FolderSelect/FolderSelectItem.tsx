@@ -5,7 +5,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../ui/colla
 import { SidebarMenuButton, SidebarMenuItem, SidebarMenuSub } from '../ui/sidebar';
 import { FolderClosed, FolderOpen } from 'lucide-react';
 
-export interface FolderSelectItemProps {
+interface FolderSelectItemProps {
   folder: Folder;
   disabled?: boolean;
   subItem: boolean;
@@ -34,13 +34,13 @@ export default function FolderSelectItem({ folder, disabled: parentDisabled, sub
     return (
       <Collapsible defaultOpen={false} className="group">
         <SidebarMenuItem>
-          <CollapsibleTrigger asChild>
-            <SidebarMenuButton disabled={disabled} isActive={isActive} onClick={handleClick}>
-              <FolderClosed className="[button[data-state=open]>_&]:hidden" />
-              <FolderOpen className="[button[data-state=closed]>_&]:hidden" />
-              <span>{folder.name}</span>
-              <span className="text-accent-foreground">{folder.path}</span>
-            </SidebarMenuButton>
+          <CollapsibleTrigger
+            render={<SidebarMenuButton disabled={disabled} isActive={isActive} onClick={handleClick} />}
+          >
+            <FolderClosed className="[button[data-state=open]>_&]:hidden" />
+            <FolderOpen className="[button[data-state=closed]>_&]:hidden" />
+            <span>{folder.name}</span>
+            <span className="text-accent-foreground">{folder.path}</span>
           </CollapsibleTrigger>
         </SidebarMenuItem>
         {content}
@@ -50,13 +50,13 @@ export default function FolderSelectItem({ folder, disabled: parentDisabled, sub
   return (
     <Collapsible defaultOpen={false} className="group/collapsible">
       <SidebarMenuItem>
-        <CollapsibleTrigger asChild>
-          <SidebarMenuButton disabled={disabled} isActive={isActive} onClick={handleClick}>
-            <FolderClosed className="group-data-[state=open]/collapsible:hidden" />
-            <FolderOpen className="group-data-[state=closed]/collapsible:hidden" />
-            <span>{folder.name}</span>
-            <span className="text-accent-foreground">{folder.path}</span>
-          </SidebarMenuButton>
+        <CollapsibleTrigger
+          render={<SidebarMenuButton disabled={disabled} isActive={isActive} onClick={handleClick} />}
+        >
+          <FolderClosed className="group-data-[state=open]/collapsible:hidden" />
+          <FolderOpen className="group-data-[state=closed]/collapsible:hidden" />
+          <span>{folder.name}</span>
+          <span className="text-accent-foreground">{folder.path}</span>
         </CollapsibleTrigger>
       </SidebarMenuItem>
       {content}

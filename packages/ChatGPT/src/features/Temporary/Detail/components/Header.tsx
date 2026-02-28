@@ -11,7 +11,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@chatgpt/components/ui/
 import { Button } from '@chatgpt/components/ui/button';
 import { Avatar, AvatarFallback } from '@chatgpt/components/ui/avatar';
 
-export interface TemporaryHeaderProps {
+interface TemporaryHeaderProps {
   template: ConversationTemplate;
   persistentId: number | null;
 }
@@ -50,10 +50,8 @@ export default function TemporaryHeader({ template, persistentId }: TemporaryHea
         </span>
       </div>
       <Tooltip>
-        <TooltipTrigger asChild>
-          <Button variant="ghost" size="icon" onClick={handleClear}>
-            <BrushCleaning />
-          </Button>
+        <TooltipTrigger render={<Button variant="ghost" size="icon" onClick={handleClear} />}>
+          <BrushCleaning />
         </TooltipTrigger>
         <TooltipContent>{t('clear_messages')}</TooltipContent>
       </Tooltip>

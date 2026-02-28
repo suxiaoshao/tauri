@@ -17,7 +17,7 @@ import { match, P } from 'ts-pattern';
 import { SelectedType } from '../types';
 import { Link, useMatch } from 'react-router-dom';
 
-export interface ConversationItemProps {
+interface ConversationItemProps {
   conversation: Conversation;
   subItem: boolean;
 }
@@ -35,24 +35,26 @@ export default function ConversationItem({ conversation, subItem }: Conversation
   if (subItem) {
     return (
       <SidebarMenuSubItem>
-        <SidebarMenuSubButton asChild isActive={isActive}>
-          <Link replace={matchHome !== null} to={{ pathname: '/', search: searchParams }}>
-            {conversation.icon}
-            <span>{conversation.title}</span>
-            <span>{conversation.info}</span>
-          </Link>
+        <SidebarMenuSubButton
+          isActive={isActive}
+          render={<Link replace={matchHome !== null} to={{ pathname: '/', search: searchParams }} />}
+        >
+          {conversation.icon}
+          <span>{conversation.title}</span>
+          <span>{conversation.info}</span>
         </SidebarMenuSubButton>
       </SidebarMenuSubItem>
     );
   }
   return (
     <SidebarMenuItem>
-      <SidebarMenuButton asChild isActive={isActive}>
-        <Link replace={matchHome !== null} to={{ pathname: '/', search: searchParams }}>
-          {conversation.icon}
-          <span>{conversation.title}</span>
-          <span>{conversation.info}</span>
-        </Link>
+      <SidebarMenuButton
+        isActive={isActive}
+        render={<Link replace={matchHome !== null} to={{ pathname: '/', search: searchParams }} />}
+      >
+        {conversation.icon}
+        <span>{conversation.title}</span>
+        <span>{conversation.info}</span>
       </SidebarMenuButton>
     </SidebarMenuItem>
   );

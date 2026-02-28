@@ -22,20 +22,20 @@ delay = { path = "../../../crates/delay" }
 tokio = { version = "1.49.0", default-features = false, features = ["time"] }
 
 # 数据库
-diesel = { version = "2.3.5", features = ["sqlite","returning_clauses_for_sqlite_3_35"] }
+diesel = { version = "2.3.6", features = ["sqlite","returning_clauses_for_sqlite_3_35"] }
 
 # http
-reqwest = "0.13.1"
+reqwest = "0.13.2"
 
 # 错误处理
-anyhow = "1.0.100"
-thiserror = "2.0.17"
+anyhow = "1.0.102"
+thiserror = "2.0.18"
 
 # 窗口管理
 window-vibrancy = "0.7.1"
 
 # log
-tauri-plugin-log = { version = "2.7.1" }
+tauri-plugin-log = { version = "2.8.0" }
 log = "0.4.29"
 
 # 搜索应用
@@ -46,12 +46,12 @@ pinyin = "0.11.0"
 # plugin
 tauri-plugin-notification = "2.3.3"
 tauri-plugin-clipboard-manager = "2.3.2"
-tauri-plugin-shell = "2.3.3"
+tauri-plugin-shell = "2.3.5"
 
 
 [target.'cfg(target_os = "macos")'.dependencies]
 plist = { version = "1.8.0" }
-objc2 = "0.6.3"
+objc2 = "0.6.4"
 objc2-app-kit = { version = "0.3.2", features = ["NSRunningApplication"] }
 objc2-foundation = "0.3.2"
 

@@ -16,7 +16,7 @@ import { Avatar, AvatarImage } from '@chatgpt/components/ui/avatar';
 import { Spinner } from '@chatgpt/components/ui/spinner';
 import { Separator } from '@chatgpt/components/ui/separator';
 
-export interface LoadingItemProps {
+interface LoadingItemProps {
   message: BaseMessage;
   selected: boolean;
 }

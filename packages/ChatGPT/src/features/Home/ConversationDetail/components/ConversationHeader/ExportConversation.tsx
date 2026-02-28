@@ -38,7 +38,7 @@ import { FieldError, FieldGroup, FieldLabel, Field } from '@chatgpt/components/u
 import { Share } from 'lucide-react';
 import { toast } from 'sonner';
 
-export interface ExportConversationProps {
+interface ExportConversationProps {
   conversation: Conversation;
 }
 async function selectFolder() {
@@ -68,12 +68,8 @@ export default function ExportConversation({ conversation }: ExportConversationP
   return (
     <Dialog open={open} onOpenChange={set}>
       <Tooltip>
-        <DialogTrigger asChild>
-          <TooltipTrigger asChild>
-            <Button variant="ghost" size="icon">
-              <Share />
-            </Button>
-          </TooltipTrigger>
+        <DialogTrigger render={<TooltipTrigger render={<Button variant="ghost" size="icon" />} />}>
+          <Share />
         </DialogTrigger>
         <TooltipContent>{t('export')}</TooltipContent>
       </Tooltip>

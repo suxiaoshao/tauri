@@ -6,7 +6,7 @@ import { type NewFolder } from '@chatgpt/types/folder';
 import { appInvoke } from '../base';
 import type { Content } from '@chatgpt/types/message';
 
-export interface AddConversationParams {
+interface AddConversationParams {
   data: NewConversation;
 }
 
@@ -15,7 +15,7 @@ export async function addConversation(params: AddConversationParams) {
   await useConversationStore.getState().fetchConversations();
 }
 
-export interface AddFolderParams {
+interface AddFolderParams {
   folder: NewFolder;
 }
 
@@ -24,7 +24,7 @@ export async function addFolder(params: AddFolderParams) {
   await useConversationStore.getState().fetchConversations();
 }
 
-export interface UpdateConversationParams {
+interface UpdateConversationParams {
   data: NewConversation;
   id: number;
 }
@@ -34,7 +34,7 @@ export async function updateConversation(params: UpdateConversationParams) {
   await useConversationStore.getState().fetchConversations();
 }
 
-export interface DeleteConversationParams {
+interface DeleteConversationParams {
   id: number;
 }
 
@@ -43,7 +43,7 @@ export async function deleteConversation(params: DeleteConversationParams) {
   await useConversationStore.getState().fetchConversations();
 }
 
-export interface DeleteFolderParams {
+interface DeleteFolderParams {
   id: number;
 }
 
@@ -52,7 +52,7 @@ export async function deleteFolder(params: DeleteFolderParams) {
   await useConversationStore.getState().fetchConversations();
 }
 
-export interface UpdateFolderParams {
+interface UpdateFolderParams {
   folder: NewFolder;
   id: number;
 }
@@ -82,7 +82,7 @@ export async function moveFolder(params: MoveFolderParams) {
   await useConversationStore.getState().fetchConversations();
 }
 
-export interface DeleteMessageParams {
+interface DeleteMessageParams {
   id: number;
 }
 
@@ -91,7 +91,7 @@ export async function deleteMessage(params: DeleteMessageParams) {
   await useConversationStore.getState().fetchConversations();
 }
 
-export interface UpdateMessageContentParams {
+interface UpdateMessageContentParams {
   id: number;
   content: Content;
 }
@@ -100,7 +100,7 @@ export async function updateMessageContent(params: UpdateMessageContentParams) {
   await appInvoke<UpdateMessageContentParams, unknown>('plugin:chat|update_message_content', params);
 }
 
-export interface ClearConversationParams {
+interface ClearConversationParams {
   id: number;
 }
 
@@ -125,7 +125,7 @@ export async function exportConversation(params: ExportConversationParams) {
   await appInvoke<ExportConversationParams, unknown>('plugin:chat|export', params);
 }
 
-export interface DeleteConversationTemplateParams {
+interface DeleteConversationTemplateParams {
   id: number;
 }
 
@@ -134,7 +134,7 @@ export async function deleteConversationTemplate(params: DeleteConversationTempl
   await useTemplateStore.getState().fetchTemplates();
 }
 
-export interface AddConversationTemplateParams {
+interface AddConversationTemplateParams {
   data: NewConversationTemplate;
 }
 
@@ -144,7 +144,7 @@ export async function addConversationTemplate(params: AddConversationTemplatePar
   return id;
 }
 
-export interface UpdateConversationTemplateParams {
+interface UpdateConversationTemplateParams {
   data: NewConversationTemplate;
   id: number;
 }

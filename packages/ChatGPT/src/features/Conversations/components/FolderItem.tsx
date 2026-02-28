@@ -21,7 +21,7 @@ import { match, P } from 'ts-pattern';
 import { SelectedType } from '../types';
 import { Link, useMatch } from 'react-router-dom';
 
-export interface FolderItemProps {
+interface FolderItemProps {
   folder: Folder;
   subItem: boolean;
 }
@@ -52,14 +52,17 @@ export default function FolderItem({ folder, subItem }: FolderItemProps) {
     return (
       <Collapsible defaultOpen={false} className="group">
         <SidebarMenuSubItem>
-          <CollapsibleTrigger asChild>
-            <SidebarMenuSubButton isActive={isActive} asChild>
-              <Link replace={matchHome !== null} to={{ pathname: '/', search: searchParams }}>
-                <FolderClosed className="[a[data-state=open]>_&]:hidden" />
-                <FolderOpen className="[a[data-state=closed]>_&]:hidden" />
-                <span>{folder.name}</span>
-              </Link>
-            </SidebarMenuSubButton>
+          <CollapsibleTrigger
+            render={
+              <SidebarMenuSubButton
+                isActive={isActive}
+                render={<Link replace={matchHome !== null} to={{ pathname: '/', search: searchParams }} />}
+              />
+            }
+          >
+            <FolderClosed className="[a[data-state=open]>_&]:hidden" />
+            <FolderOpen className="[a[data-state=closed]>_&]:hidden" />
+            <span>{folder.name}</span>
           </CollapsibleTrigger>
         </SidebarMenuSubItem>
         {content}
@@ -69,14 +72,17 @@ export default function FolderItem({ folder, subItem }: FolderItemProps) {
   return (
     <Collapsible defaultOpen={false} className="group/collapsible">
       <SidebarMenuItem>
-        <CollapsibleTrigger asChild>
-          <SidebarMenuButton isActive={isActive} asChild>
-            <Link replace={matchHome !== null} to={{ pathname: '/', search: searchParams }}>
-              <FolderClosed className="group-data-[state=open]/collapsible:hidden" />
-              <FolderOpen className="group-data-[state=closed]/collapsible:hidden" />
-              <span>{folder.name}</span>
-            </Link>
-          </SidebarMenuButton>
+        <CollapsibleTrigger
+          render={
+            <SidebarMenuButton
+              isActive={isActive}
+              render={<Link replace={matchHome !== null} to={{ pathname: '/', search: searchParams }} />}
+            />
+          }
+        >
+          <FolderClosed className="group-data-[state=open]/collapsible:hidden" />
+          <FolderOpen className="group-data-[state=closed]/collapsible:hidden" />
+          <span>{folder.name}</span>
         </CollapsibleTrigger>
       </SidebarMenuItem>
       {content}

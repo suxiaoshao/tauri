@@ -6,7 +6,7 @@ import SystemItem from './components/SystemItem';
 import UserItem from './components/UserItem';
 import { type BaseMessage } from './types';
 
-export interface MessageItemProps {
+interface MessageItemProps {
   message: BaseMessage;
   selected: boolean;
 }

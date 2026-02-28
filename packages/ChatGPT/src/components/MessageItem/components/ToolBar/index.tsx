@@ -1,4 +1,4 @@
-export interface ToolBarProps {
+interface ToolBarProps {
   children: React.ReactNode;
 }
 export default function ToolBar({ children }: ToolBarProps) {

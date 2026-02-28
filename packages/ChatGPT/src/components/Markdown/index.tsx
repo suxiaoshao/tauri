@@ -6,7 +6,7 @@ import { match, P } from 'ts-pattern';
 import { Separator } from '../ui/separator';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 
-export interface MarkdownProps extends ComponentProps<'div'> {
+interface MarkdownProps extends ComponentProps<'div'> {
   value: string;
 }
 

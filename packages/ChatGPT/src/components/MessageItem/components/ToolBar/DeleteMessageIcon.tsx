@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@chatgpt/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@chatgpt/components/ui/tooltip';
 
-export interface DeleteMessageIconProps {
+interface DeleteMessageIconProps {
   id: number;
 }
 export default function DeleteMessageIcon({ id }: DeleteMessageIconProps) {
@@ -20,10 +20,8 @@ export default function DeleteMessageIcon({ id }: DeleteMessageIconProps) {
   }
   return (
     <Tooltip>
-      <TooltipTrigger asChild>
-        <Button size="icon-sm" variant="ghost" onClick={handleClick}>
-          <Trash className={toolClassName} />
-        </Button>
+      <TooltipTrigger render={<Button size="icon-sm" variant="ghost" onClick={handleClick} />}>
+        <Trash className={toolClassName} />
       </TooltipTrigger>
       <TooltipContent>{t('delete_message')}</TooltipContent>
     </Tooltip>

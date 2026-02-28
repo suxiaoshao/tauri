@@ -13,7 +13,7 @@ import { Avatar, AvatarFallback } from '@chatgpt/components/ui/avatar';
 import { Button } from '@chatgpt/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@chatgpt/components/ui/tooltip';
 import { BrushCleaning, Copy, Trash } from 'lucide-react';
-export interface ConversationHeaderProps {
+interface ConversationHeaderProps {
   conversation: Conversation;
 }
 
@@ -60,27 +60,21 @@ export default function ConversationHeader({ conversation }: ConversationHeaderP
       </div>
       <UpdateConversation conversation={conversation} />
       <Tooltip>
-        <TooltipTrigger asChild>
-          <Button variant="ghost" size="icon" onClick={handleDelete}>
-            <Trash />
-          </Button>
+        <TooltipTrigger render={<Button variant="ghost" size="icon" onClick={handleDelete} />}>
+          <Trash />
         </TooltipTrigger>
         <TooltipContent>{t('delete')}</TooltipContent>
       </Tooltip>
       <Tooltip>
-        <TooltipTrigger asChild>
-          <Button variant="ghost" size="icon" onClick={handleCopy}>
-            <Copy />
-          </Button>
+        <TooltipTrigger render={<Button variant="ghost" size="icon" onClick={handleCopy} />}>
+          <Copy />
         </TooltipTrigger>
         <TooltipContent>{t('copy_to_new_conversation')}</TooltipContent>
       </Tooltip>
       <MoveConversation conversation={conversation} />
       <Tooltip>
-        <TooltipTrigger asChild>
-          <Button variant="ghost" size="icon" onClick={handleClear}>
-            <BrushCleaning />
-          </Button>
+        <TooltipTrigger render={<Button variant="ghost" size="icon" onClick={handleClear} />}>
+          <BrushCleaning />
         </TooltipTrigger>
         <TooltipContent>{t('clear_messages')}</TooltipContent>
       </Tooltip>

@@ -8,7 +8,7 @@
 import { match } from 'ts-pattern';
 import { create } from 'zustand';
 
-export interface ThemeSliceType {
+interface ThemeSliceType {
   color: string;
   colorSetting: 'dark' | 'light' | 'system';
   systemColorScheme: 'light' | 'dark';

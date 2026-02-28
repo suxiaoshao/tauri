@@ -11,13 +11,7 @@ import { enqueueSnackbar } from 'notify';
 import { toast } from 'sonner';
 import { enum_, nullish, object, parseAsync, string } from 'valibot';
 
-export interface ChatGPTError {
-  code: ChatGPTErrorCodes;
-  message: string;
-  data?: string; // Optional, only used for some error types
-}
-
-export enum ChatGPTErrorCodes {
+enum ChatGPTErrorCodes {
   ConfigPath = 'ConfigPath',
   Setup = 'Setup',
   Tauri = 'Tauri',

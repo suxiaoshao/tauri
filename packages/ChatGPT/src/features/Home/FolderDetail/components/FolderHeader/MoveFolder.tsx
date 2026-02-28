@@ -18,7 +18,7 @@ import { useCallback } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-export interface MoveFolderProps {
+interface MoveFolderProps {
   folder: Folder;
 }
 
@@ -40,12 +40,8 @@ export default function MoveFolder({ folder }: MoveFolderProps) {
   return (
     <Dialog open={open} onOpenChange={set}>
       <Tooltip>
-        <TooltipTrigger asChild>
-          <DialogTrigger asChild>
-            <Button variant="ghost" size="icon">
-              <FolderInput />
-            </Button>
-          </DialogTrigger>
+        <TooltipTrigger render={<DialogTrigger render={<Button variant="ghost" size="icon" />} />}>
+          <FolderInput />
         </TooltipTrigger>
         <TooltipContent>{t('move')}</TooltipContent>
       </Tooltip>

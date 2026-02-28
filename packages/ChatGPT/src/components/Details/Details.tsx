@@ -10,7 +10,7 @@ import { type DetailsItem } from './types';
 import type { ComponentProps } from 'react';
 import { cn } from '@chatgpt/lib/utils';
 
-export interface DetailsProps extends ComponentProps<'div'> {
+interface DetailsProps extends ComponentProps<'div'> {
   items: DetailsItem[];
   fullSpan?: number;
 }

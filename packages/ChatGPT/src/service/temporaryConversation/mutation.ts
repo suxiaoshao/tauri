@@ -3,7 +3,7 @@ import type { Content } from '@chatgpt/types/message';
 import { type SaveTemporaryConversation } from '@chatgpt/types/temporaryConversation';
 import { appInvoke } from '@feiwen/service/base';
 
-export interface InitTemporaryConversationParams {
+interface InitTemporaryConversationParams {
   templateId: number;
 }
 
@@ -14,7 +14,7 @@ export async function initTemporaryConversation(params: InitTemporaryConversatio
   );
 }
 
-export interface TemporaryFetchParams {
+interface TemporaryFetchParams {
   content: string;
   persistentId: number | null;
   extensionName: string | null;
@@ -24,7 +24,7 @@ export async function temporaryFetch(params: TemporaryFetchParams) {
   return await appInvoke<TemporaryFetchParams, unknown>('plugin:temporary-conversation|temporary_fetch', params);
 }
 
-export interface DeleteTemporaryMessageParams {
+interface DeleteTemporaryMessageParams {
   messageId: number;
   persistentId: number | null;
 }
@@ -41,7 +41,7 @@ export async function separateWindow() {
   return await appInvoke<null, unknown>('plugin:temporary-conversation|separate_window', null);
 }
 
-export interface DeleteTemporaryConversationParams {
+interface DeleteTemporaryConversationParams {
   persistentId: number | null;
 }
 
@@ -52,7 +52,7 @@ export async function deleteTemporaryConversation(params: DeleteTemporaryConvers
   );
 }
 
-export interface ClearTemporaryConversationParams {
+interface ClearTemporaryConversationParams {
   persistentId: number | null;
 }
 
@@ -64,7 +64,7 @@ export async function clearTemporaryConversation(params: ClearTemporaryConversat
   useTemporaryConversationStore.getState().fetchData(params.persistentId);
 }
 
-export interface SaveTemporaryConversationParams {
+interface SaveTemporaryConversationParams {
   data: SaveTemporaryConversation;
 }
 
@@ -75,7 +75,7 @@ export async function saveTemporaryConversation(params: SaveTemporaryConversatio
   );
 }
 
-export interface UpdateTemporaryMessageParams {
+interface UpdateTemporaryMessageParams {
   persistentId: number | null;
   messageId: number;
   content: Content;

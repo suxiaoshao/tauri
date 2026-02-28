@@ -114,7 +114,8 @@ export default function Home() {
   }, [selectedRef]);
 
   return (
-    <div className="w-full h-full flex flex-col" onKeyDown={handleKeyDown}>
+    // oxlint-disable-next-line jsx-a11y/no-static-element-interactions
+    <main className="w-full h-full flex flex-col" onKeyDown={handleKeyDown}>
       <div className="p-3 pl-4 pr-4 flex items-center" data-tauri-drag-region>
         <input
           className="appearance-none border-none focus:outline-none flex-1"
@@ -160,6 +161,6 @@ export default function Home() {
             ))}
         </ResizablePanel>
       </ResizablePanelGroup>
-    </div>
+    </main>
   );
 }

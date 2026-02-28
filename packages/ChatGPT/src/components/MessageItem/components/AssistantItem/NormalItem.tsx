@@ -27,7 +27,7 @@ import { Separator } from '@chatgpt/components/ui/separator';
 import { Avatar, AvatarImage } from '@chatgpt/components/ui/avatar';
 import { CircleCheck } from 'lucide-react';
 
-export interface NormalItemProps {
+interface NormalItemProps {
   message: BaseMessage;
   selected: boolean;
 }

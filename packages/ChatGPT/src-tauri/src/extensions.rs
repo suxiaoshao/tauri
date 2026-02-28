@@ -4,7 +4,7 @@ use crate::{
 };
 use std::{collections::HashMap, path::PathBuf};
 use tauri::{AppHandle, Manager, Runtime};
-use wasmtime::{Config, Engine, Store, component::*};
+use wasmtime::{Engine, Store, component::*};
 mod component;
 
 pub(crate) use component::{ChatRequest, Extension, ExtensionState};
@@ -28,9 +28,7 @@ impl ExtensionConfig {
 }
 
 fn initialize_wasmtime_engine() -> ChatGPTResult<Engine> {
-    let mut config = Config::new();
-    config.async_support(true);
-    let engine = Engine::new(&config).map_err(|_err| ChatGPTError::WasmtimeEngineCreationFailed)?;
+    let engine = Engine::default();
     Ok(engine)
 }
 

@@ -29,9 +29,9 @@ const saveConversationSchema = object({
   folderId: nullable(pipe(number(), integer())),
 });
 
-export type SaveConversationForm = InferInput<typeof saveConversationSchema>;
+type SaveConversationForm = InferInput<typeof saveConversationSchema>;
 
-export interface SaveConversationProps {
+interface SaveConversationProps {
   persistentId: number | null;
 }
 
@@ -67,12 +67,8 @@ export default function SaveConversation({ persistentId }: SaveConversationProps
   return (
     <Dialog open={open} onOpenChange={set}>
       <Tooltip>
-        <TooltipTrigger asChild>
-          <DialogTrigger asChild>
-            <Button variant="ghost" size="icon">
-              <Save />
-            </Button>
-          </DialogTrigger>
+        <TooltipTrigger render={<DialogTrigger render={<Button variant="ghost" size="icon" />} />}>
+          <Save />
         </TooltipTrigger>
         <TooltipContent>{t('save_conversation')}</TooltipContent>
       </Tooltip>

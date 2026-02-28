@@ -31,12 +31,8 @@ export default function ContentEmpty() {
       </EmptyHeader>
       <EmptyContent>
         <div className="flex gap-2">
-          <Button asChild>
-            <Link to="/add/folder">{t('create_folder')}</Link>
-          </Button>
-          <Button asChild>
-            <Link to="/add/conversation">{t('create_conversation')}</Link>
-          </Button>
+          <Button render={<Link to="/add/folder" />}>{t('create_folder')}</Button>
+          <Button render={<Link to="/add/conversation" />}>{t('create_conversation')}</Button>
         </div>
       </EmptyContent>
     </Empty>

@@ -1,3 +1,4 @@
+/* oxlint-disable jest/require-hook */
 /*
  * @Author: suxiaoshao suxiaoshao@gmail.com
  * @Date: 2023-10-13 12:58:34

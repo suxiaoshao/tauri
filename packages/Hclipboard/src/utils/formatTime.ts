@@ -1,3 +1,4 @@
+/* oxlint-disable jest/require-hook */
 import dayjs from 'dayjs';
 import 'dayjs/locale/af';
 import 'dayjs/locale/am';

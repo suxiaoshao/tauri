@@ -11,7 +11,7 @@ import { Button } from '../ui/button';
 import { Bug } from 'lucide-react';
 import type { ComponentProps } from 'react';
 
-export interface ErrorInfoProps extends ComponentProps<'div'> {
+interface ErrorInfoProps extends ComponentProps<'div'> {
   error: Error;
   refetch?: () => void;
 }

@@ -9,7 +9,7 @@ import { useCallback } from 'react';
 import Header from './components/ConversationHeader';
 import { useTranslation } from 'react-i18next';
 
-export interface ConversationDetailProps {
+interface ConversationDetailProps {
   conversation: Conversation;
 }
 
